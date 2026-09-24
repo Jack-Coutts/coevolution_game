@@ -8,8 +8,6 @@ export const STABLE_PRESET: LeverValues = {
   ...defaultLevers(),
   'prey.initial': 100,
   'pred.initial': 9,
-  'prey.cap': 190,
-  'pred.cap': 12,
   'prey.adultAge': 60,
   'prey.birthGap': 130,
   'prey.litter': 1,

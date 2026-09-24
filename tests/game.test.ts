@@ -86,6 +86,16 @@ describe('simulation', () => {
     expect(s.counters.preyStarved).toBe(1)
   })
 
+  it('limits births with a performance ceiling, not a population lever', () => {
+    expect(LEVERS.some((d) => d.id.endsWith('.cap'))).toBe(false)
+    const s = new Sim(p, 4)
+    expect(s.cap('prey')).toBeGreaterThan(400)
+    expect(s.cap('pred')).toBeGreaterThan(200)
+    for (let i = 0; i < 200; i++) s.step()
+    expect(s.prey.length).toBeLessThan(s.cap('prey'))
+    expect(s.preds.length).toBeLessThan(s.cap('pred'))
+  })
+
   it('lets a fed adult breed, paying the child energy into the newborn', () => {
     const s = new Sim(p, 2)
     const parent = s.prey[0]

@@ -47,11 +47,11 @@ export const SCENARIOS: Scenario[] = [
     name: 'Fox invasion',
     tagline: 'A pack of 14 moves in on 1 November.',
     description:
-      'On 1 November, 14 well-fed foxes arrive from the edge of the meadow, and room for 14 more foxes opens up. Can the rabbits absorb the pressure without being eaten out?',
+      'On 1 November, 14 well-fed foxes arrive from the edge of the meadow. Can the rabbits absorb the pressure without being eaten out?',
     disturbance: {
       regrow: [],
       metabolism: [],
-      arrivals: [{ tick: NOV_1, species: 'pred', count: 14, capBoost: 14 }],
+      arrivals: [{ tick: NOV_1, species: 'pred', count: 14 }],
     },
     spans: [],
     markers: [{ tick: NOV_1, label: 'Foxes arrive' }],

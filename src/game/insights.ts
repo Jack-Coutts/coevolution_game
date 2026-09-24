@@ -51,7 +51,7 @@ export function forecast(h: RunHistory, tick: number): Forecast | null {
   return { prey: project('prey'), pred: project('pred'), ahead }
 }
 
-export function hints(h: RunHistory, tick: number, cap: { prey: number; pred: number }): Hint[] {
+export function hints(h: RunHistory, tick: number): Hint[] {
   const out: Hint[] = []
   if (tick < 24) return out
   const prey = h.stat(tick, 'prey')
@@ -106,15 +106,16 @@ export function hints(h: RunHistory, tick: number, cap: { prey: number; pred: nu
       text: `Bushes are nearly bare (${Math.round(stock * 100)}%). Rabbits eat every berry as it regrows, so food caps the warren.`,
     })
   }
-  if (prey >= cap.prey - 1) {
-    out.push({ id: 'preycap', tone: 'info', text: 'The warren is at its cap, so no rabbits can be born until some die.' })
-  }
-  if (pred >= cap.pred) {
-    const kits = h.stat(tick, 'predBorn') - h.stat(past, 'predBorn')
+  const kits = h.stat(tick, 'predBorn') - h.stat(past, 'predBorn')
+  const foxOld = h.stat(tick, 'predOld') - h.stat(past, 'predOld')
+  if (foxOld >= 1) {
     out.push({
-      id: 'predcap',
-      tone: 'info',
-      text: `Foxes are at their cap of ${cap.pred}, so a kit is born only when an old fox dies (${kits} kit${kits === 1 ? '' : 's'} in the last 10 days).`,
+      id: 'replace',
+      tone: kits >= foxOld ? 'info' : 'warn',
+      text:
+        kits >= foxOld
+          ? `Kits are replacing the foxes that die of old age (${kits} in the last 10 days).`
+          : `Old foxes are dying faster than kits replace them (${kits} kits and ${Math.round(foxOld)} deaths of old age in 10 days).`,
     })
   }
   if (predGrowth > 0.5 && pred >= 6) {
@@ -223,7 +224,7 @@ export function explain(h: RunHistory, end: EndInfo, scenario: Scenario): Explan
       detail: `${starved} foxes starved and ${old} died of old age in their last 12 days.${ctx}`,
       suggestions:
         preyAvg < 25
-          ? ['Give rabbits more food (bushes, regrowth)', 'Lower the fox cap so rabbits can rebuild', 'Start with more rabbits']
+          ? ['Give rabbits more food (bushes, regrowth, sprout rate)', 'Start with fewer foxes', 'Start with more rabbits']
           : [
               'Raise the energy per rabbit, or lower fox metabolism',
               'Widen the fox sense range',
@@ -239,7 +240,7 @@ export function explain(h: RunHistory, end: EndInfo, scenario: Scenario): Explan
     return {
       headline: `Rabbits were eaten out on ${when}.`,
       detail: `${eaten} of the last ${eaten + starved + old} rabbit deaths were to foxes, with about 1 fox for every ${(1 / Math.max(ratio, 1e-6)).toFixed(1)} rabbits.${ctx}`,
-      suggestions: ['Lower the fox cap', 'Raise the rabbit cap, or speed up rabbit breeding', 'Give rabbits more speed or sense range'],
+      suggestions: ['Start with fewer foxes', 'Speed up rabbit breeding', 'Give rabbits more speed or sense range'],
     }
   }
   if (starved >= old) {
@@ -249,7 +250,7 @@ export function explain(h: RunHistory, end: EndInfo, scenario: Scenario): Explan
       detail: `${starved} rabbits starved in their last 12 days, with bushes averaging ${Math.round(stock * 100)}% full.${ctx}`,
       suggestions:
         stock < 0.3
-          ? ['Add bushes or speed up regrowth', 'Lower the rabbit cap so they do not overgraze', 'Raise the energy per berry']
+          ? ['Add bushes or speed up regrowth', 'Start with fewer rabbits so they do not overgraze', 'Raise the energy per berry']
           : ['Lower rabbit metabolism or speed cost', 'Raise rabbit max energy'],
     }
   }

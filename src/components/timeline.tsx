@@ -49,13 +49,18 @@ export function Timeline() {
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0)
       ctx.clearRect(0, 0, W, H)
       const h = game.history
-      const p = game.params
       const horizon = h.horizon
       const iw = W - PAD_L - PAD_R
       const ih = H - PAD_T - PAD_B
       const xOf = (t: number) => PAD_L + (t / horizon) * iw
-      const preyMax = Math.max(10, p?.prey.cap ?? 150)
-      const predMax = Math.max(4, (p?.pred.cap ?? 40) + (game.scenario.disturbance.arrivals.reduce((s, a) => s + (a.species === 'pred' ? a.capBoost : 0), 0)))
+      let preyMax = 10
+      let predMax = 4
+      for (let t = 0; t <= h.head; t += 12) {
+        preyMax = Math.max(preyMax, h.stat(t, 'prey'))
+        predMax = Math.max(predMax, h.stat(t, 'pred'))
+      }
+      preyMax *= 1.15
+      predMax *= 1.15
       const yPrey = (v: number) => PAD_T + ih - (v / preyMax) * ih
       const yPred = (v: number) => PAD_T + ih - (v / predMax) * ih
 

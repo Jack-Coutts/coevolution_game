@@ -29,7 +29,6 @@ export interface Arrival {
   tick: number
   species: Species
   count: number
-  capBoost: number
 }
 
 /** Scenario disturbances. They use their own RNG so the animals' random stream is untouched. */
@@ -121,8 +120,8 @@ export interface SpeciesDef {
 
 export function speciesDefs(p: SimParams): Record<Species, SpeciesDef> {
   return {
-    prey: { key: 'prey', eatsPlants: true, eats: [], body: p.prey, ceiling: Math.min(p.prey.cap, p.eco.ceilingPrey) },
-    pred: { key: 'pred', eatsPlants: false, eats: ['prey'], body: p.pred, ceiling: Math.min(p.pred.cap, p.eco.ceilingPred) },
+    prey: { key: 'prey', eatsPlants: true, eats: [], body: p.prey, ceiling: p.eco.ceilingPrey },
+    pred: { key: 'pred', eatsPlants: false, eats: ['prey'], body: p.pred, ceiling: p.eco.ceilingPred },
   }
 }
 
@@ -259,7 +258,6 @@ export class Sim {
   private sproutAcc = 0
   private nextBush = 0
   private foodRng: Rng
-  private capBoost = { prey: 0, pred: 0 }
   private pending: Intervention[] = []
   private grids: Record<Species, Grid> = { prey: new Grid(), pred: new Grid() }
   private opts: EcoOptions
@@ -310,8 +308,9 @@ export class Sim {
     this.pending.push(action)
   }
 
+  /** Performance ceiling. Ecology, not this number, is what limits a normal meadow. */
   cap(s: Species): number {
-    return this.defs[s].ceiling + this.capBoost[s]
+    return this.defs[s].ceiling
   }
 
   regrowFactor(tick: number): number {
@@ -787,7 +786,6 @@ export class Sim {
   }
 
   private arrive(arr: Arrival): void {
-    this.capBoost[arr.species] += arr.capBoost
     const [ex, ey] = this.edgePoint()
     for (let i = 0; i < arr.count; i++) {
       const x = Math.min(1, Math.max(0, ex + this.evRng.uniform(-0.05, 0.05)))

@@ -147,7 +147,7 @@ export class GameController {
     if (p && this.hintCache.tick !== t) {
       this.hintCache = {
         tick: t,
-        hints: hints(h, t, { prey: p.prey.cap, pred: p.pred.cap }),
+        hints: hints(h, t),
       }
     }
     return {

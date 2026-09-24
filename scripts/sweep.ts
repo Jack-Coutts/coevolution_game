@@ -17,8 +17,6 @@ import { NO_DISTURBANCE, runHeadless, type Disturbance } from '../src/sim/sim'
 const RANGES: Record<string, [number, number]> = {
   'prey.initial': [30, 100],
   'pred.initial': [4, 16],
-  'prey.cap': [100, 250],
-  'pred.cap': [8, 40],
   'food.patches': [8, 20],
   'food.stock': [20, 50],
   'food.regrow': [4, 15],

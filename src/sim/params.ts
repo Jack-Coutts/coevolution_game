@@ -1,6 +1,5 @@
 export interface SpeciesParams {
   initial: number
-  cap: number
   adultAge: number
   birthGap: number
   litter: number
@@ -46,7 +45,7 @@ export interface EcoParams {
   coverSlow: number
   /** Energy per hour per hidden neuron. */
   brainUpkeep: number
-  /** Technical population ceilings (performance only). */
+  /** Births stop here so a runaway population cannot freeze the tab. Normal play stays far below. */
   ceilingPrey: number
   ceilingPred: number
 }
@@ -94,8 +93,8 @@ export function defaultEco(): EcoParams {
     coverSight: 0.04,
     coverSlow: 0.75,
     brainUpkeep: 0.01,
-    ceilingPrey: 600,
-    ceilingPred: 200,
+    ceilingPrey: 800,
+    ceilingPred: 400,
   }
 }
 
@@ -122,7 +121,6 @@ export function defaultParams(): SimParams {
     founderEnergy: 0.75,
     prey: {
       initial: 30,
-      cap: 150,
       adultAge: 80,
       birthGap: 150,
       litter: 1,
@@ -141,7 +139,6 @@ export function defaultParams(): SimParams {
     },
     pred: {
       initial: 6,
-      cap: 40,
       adultAge: 100,
       birthGap: 200,
       litter: 1,

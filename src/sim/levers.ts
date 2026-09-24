@@ -232,32 +232,6 @@ export const LEVERS: LeverDef[] = [
     boost: 1,
     cost: 1,
   },
-  {
-    id: 'prey.cap',
-    group: 'populations',
-    species: 'prey',
-    label: 'Rabbit cap',
-    hint: 'No rabbit is born while the warren is this full.',
-    min: 40,
-    max: 300,
-    step: 10,
-    unit: 'count',
-    boost: 1,
-    cost: 1,
-  },
-  {
-    id: 'pred.cap',
-    group: 'populations',
-    species: 'pred',
-    label: 'Fox cap',
-    hint: 'No fox is born while there are this many foxes.',
-    min: 4,
-    max: 80,
-    step: 2,
-    unit: 'count',
-    boost: 1,
-    cost: 1,
-  },
   ...species('prey', 'rabbit'),
   ...species('pred', 'fox'),
   {
@@ -343,7 +317,7 @@ export const LEVERS: LeverDef[] = [
 export const LEVER_BY_ID: Record<string, LeverDef> = Object.fromEntries(LEVERS.map((l) => [l.id, l]))
 
 export const GROUPS: { id: LeverGroup; label: string; blurb: string }[] = [
-  { id: 'populations', label: 'Populations', blurb: 'Who starts in the meadow, and how crowded it may get.' },
+  { id: 'populations', label: 'Populations', blurb: 'How many animals start in the meadow.' },
   { id: 'lifecycle', label: 'Life cycle', blurb: 'When animals breed, how often, and how long they live.' },
   { id: 'energy', label: 'Energy', blurb: 'The fuel tank: what living, moving and eating are worth.' },
   { id: 'movement', label: 'Senses & movement', blurb: 'How fast they run, how far they see, how sharply they turn.' },
@@ -355,7 +329,6 @@ export const GROUPS: { id: LeverGroup; label: string; blurb: string }[] = [
 function speciesValues(prefix: string, sp: SpeciesParams): LeverValues {
   return {
     [`${prefix}.initial`]: sp.initial,
-    [`${prefix}.cap`]: sp.cap,
     [`${prefix}.adultAge`]: sp.adultAge,
     [`${prefix}.birthGap`]: sp.birthGap,
     [`${prefix}.litter`]: sp.litter,
@@ -394,7 +367,6 @@ function applySpecies(sp: SpeciesParams, v: LeverValues, prefix: string): void {
   const turn = g('turn')
   const litter = g('litter')
   sp.initial = g('initial')
-  sp.cap = g('cap')
   sp.adultAge = g('adultAge')
   sp.litter = litter
   sp.birthGap = litterGap(g('birthGap'), litter)
