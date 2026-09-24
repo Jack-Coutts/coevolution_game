@@ -1,0 +1,3333 @@
+{
+  "variant": "linear",
+  "startSeed": 6000,
+  "nSeeds": 20,
+  "parameters": {
+    "horizon": 8760,
+    "patches": 19,
+    "patchStock": 30,
+    "regrowEvery": 9,
+    "sproutPerDay": 2,
+    "seedSpread": 0.5,
+    "witherHours": 240,
+    "maxBushes": 48,
+    "patchSpacing": 0.15,
+    "eatR": 0.008,
+    "feedR": 0.02,
+    "birthR": 0.02,
+    "foodScent": 0.3,
+    "wallView": 0.1,
+    "geneInit": 1,
+    "mutationRate": 0.03,
+    "mutationSigma": 0.1,
+    "founderEnergy": 0.75,
+    "prey": {
+      "initial": 160,
+      "adultAge": 50,
+      "birthGap": 135,
+      "litter": 2,
+      "lifespan": 840,
+      "maxEnergy": 180,
+      "metabolism": 0.35,
+      "speedCost": 0.5,
+      "mealEnergy": 55,
+      "breedEnergy": 0.65,
+      "childEnergy": 0.45,
+      "visionUpkeep": 0.2,
+      "step": 0.0125,
+      "baseStep": 0.01,
+      "view": [
+        0.2,
+        0.2
+      ],
+      "turn": [
+        1,
+        1
+      ]
+    },
+    "pred": {
+      "initial": 6,
+      "adultAge": 130,
+      "birthGap": 350,
+      "litter": 1,
+      "lifespan": 1000,
+      "maxEnergy": 240,
+      "metabolism": 0.15,
+      "speedCost": 0.9,
+      "mealEnergy": 90,
+      "breedEnergy": 0.95,
+      "childEnergy": 0.6,
+      "visionUpkeep": 0.05,
+      "step": 0.014,
+      "baseStep": 0.014,
+      "view": [
+        0.13,
+        1.3
+      ],
+      "turn": [
+        0.2,
+        0.8
+      ]
+    },
+    "eco": {
+      "hidden": 0,
+      "maxHidden": 12,
+      "growRate": 0,
+      "memory": false,
+      "sexual": false,
+      "heredity": true,
+      "mateR": 0.1,
+      "kinR": 0.12,
+      "cover": 8,
+      "coverR": 0.07,
+      "coverSight": 0.04,
+      "coverSlow": 0.75,
+      "brainUpkeep": 0.01,
+      "ceilingPrey": 800,
+      "ceilingPred": 400
+    }
+  },
+  "note": "Behavioural assays condition on surviving populations; missing snapshots are reported, not treated as zero. Survival outcomes include every seed. Founder-pool is a no-inherited-selection control, not mutation-off.",
+  "outcomes": [
+    {
+      "seed": 6000,
+      "condition": "evolving",
+      "ticks": 1780,
+      "safetyLimitHits": 0,
+      "survived": false
+    },
+    {
+      "seed": 6000,
+      "condition": "founder-pool",
+      "ticks": 1874,
+      "safetyLimitHits": 0,
+      "survived": false
+    },
+    {
+      "seed": 6000,
+      "condition": "selection-only",
+      "ticks": 4708,
+      "safetyLimitHits": 0,
+      "survived": false
+    },
+    {
+      "seed": 6001,
+      "condition": "evolving",
+      "ticks": 8760,
+      "safetyLimitHits": 0,
+      "survived": true
+    },
+    {
+      "seed": 6001,
+      "condition": "founder-pool",
+      "ticks": 8760,
+      "safetyLimitHits": 0,
+      "survived": true
+    },
+    {
+      "seed": 6001,
+      "condition": "selection-only",
+      "ticks": 8760,
+      "safetyLimitHits": 0,
+      "survived": true
+    },
+    {
+      "seed": 6002,
+      "condition": "evolving",
+      "ticks": 3983,
+      "safetyLimitHits": 0,
+      "survived": false
+    },
+    {
+      "seed": 6002,
+      "condition": "founder-pool",
+      "ticks": 8760,
+      "safetyLimitHits": 0,
+      "survived": true
+    },
+    {
+      "seed": 6002,
+      "condition": "selection-only",
+      "ticks": 5922,
+      "safetyLimitHits": 0,
+      "survived": false
+    },
+    {
+      "seed": 6003,
+      "condition": "evolving",
+      "ticks": 3392,
+      "safetyLimitHits": 0,
+      "survived": false
+    },
+    {
+      "seed": 6003,
+      "condition": "founder-pool",
+      "ticks": 2367,
+      "safetyLimitHits": 0,
+      "survived": false
+    },
+    {
+      "seed": 6003,
+      "condition": "selection-only",
+      "ticks": 7534,
+      "safetyLimitHits": 0,
+      "survived": false
+    },
+    {
+      "seed": 6004,
+      "condition": "evolving",
+      "ticks": 8760,
+      "safetyLimitHits": 0,
+      "survived": true
+    },
+    {
+      "seed": 6004,
+      "condition": "founder-pool",
+      "ticks": 8760,
+      "safetyLimitHits": 0,
+      "survived": true
+    },
+    {
+      "seed": 6004,
+      "condition": "selection-only",
+      "ticks": 5680,
+      "safetyLimitHits": 0,
+      "survived": false
+    },
+    {
+      "seed": 6005,
+      "condition": "evolving",
+      "ticks": 8760,
+      "safetyLimitHits": 0,
+      "survived": true
+    },
+    {
+      "seed": 6005,
+      "condition": "founder-pool",
+      "ticks": 5365,
+      "safetyLimitHits": 0,
+      "survived": false
+    },
+    {
+      "seed": 6005,
+      "condition": "selection-only",
+      "ticks": 8760,
+      "safetyLimitHits": 0,
+      "survived": true
+    },
+    {
+      "seed": 6006,
+      "condition": "evolving",
+      "ticks": 4338,
+      "safetyLimitHits": 0,
+      "survived": false
+    },
+    {
+      "seed": 6006,
+      "condition": "founder-pool",
+      "ticks": 8760,
+      "safetyLimitHits": 0,
+      "survived": true
+    },
+    {
+      "seed": 6006,
+      "condition": "selection-only",
+      "ticks": 8760,
+      "safetyLimitHits": 0,
+      "survived": true
+    },
+    {
+      "seed": 6007,
+      "condition": "evolving",
+      "ticks": 7792,
+      "safetyLimitHits": 0,
+      "survived": false
+    },
+    {
+      "seed": 6007,
+      "condition": "founder-pool",
+      "ticks": 8760,
+      "safetyLimitHits": 0,
+      "survived": true
+    },
+    {
+      "seed": 6007,
+      "condition": "selection-only",
+      "ticks": 8760,
+      "safetyLimitHits": 0,
+      "survived": true
+    },
+    {
+      "seed": 6008,
+      "condition": "evolving",
+      "ticks": 8760,
+      "safetyLimitHits": 0,
+      "survived": true
+    },
+    {
+      "seed": 6008,
+      "condition": "founder-pool",
+      "ticks": 8760,
+      "safetyLimitHits": 0,
+      "survived": true
+    },
+    {
+      "seed": 6008,
+      "condition": "selection-only",
+      "ticks": 8760,
+      "safetyLimitHits": 0,
+      "survived": true
+    },
+    {
+      "seed": 6009,
+      "condition": "evolving",
+      "ticks": 3362,
+      "safetyLimitHits": 0,
+      "survived": false
+    },
+    {
+      "seed": 6009,
+      "condition": "founder-pool",
+      "ticks": 8760,
+      "safetyLimitHits": 0,
+      "survived": true
+    },
+    {
+      "seed": 6009,
+      "condition": "selection-only",
+      "ticks": 8760,
+      "safetyLimitHits": 0,
+      "survived": true
+    },
+    {
+      "seed": 6010,
+      "condition": "evolving",
+      "ticks": 6673,
+      "safetyLimitHits": 0,
+      "survived": false
+    },
+    {
+      "seed": 6010,
+      "condition": "founder-pool",
+      "ticks": 3561,
+      "safetyLimitHits": 0,
+      "survived": false
+    },
+    {
+      "seed": 6010,
+      "condition": "selection-only",
+      "ticks": 8760,
+      "safetyLimitHits": 0,
+      "survived": true
+    },
+    {
+      "seed": 6011,
+      "condition": "evolving",
+      "ticks": 2766,
+      "safetyLimitHits": 0,
+      "survived": false
+    },
+    {
+      "seed": 6011,
+      "condition": "founder-pool",
+      "ticks": 8760,
+      "safetyLimitHits": 0,
+      "survived": true
+    },
+    {
+      "seed": 6011,
+      "condition": "selection-only",
+      "ticks": 8760,
+      "safetyLimitHits": 0,
+      "survived": true
+    },
+    {
+      "seed": 6012,
+      "condition": "evolving",
+      "ticks": 2670,
+      "safetyLimitHits": 0,
+      "survived": false
+    },
+    {
+      "seed": 6012,
+      "condition": "founder-pool",
+      "ticks": 8760,
+      "safetyLimitHits": 0,
+      "survived": true
+    },
+    {
+      "seed": 6012,
+      "condition": "selection-only",
+      "ticks": 2496,
+      "safetyLimitHits": 0,
+      "survived": false
+    },
+    {
+      "seed": 6013,
+      "condition": "evolving",
+      "ticks": 2375,
+      "safetyLimitHits": 0,
+      "survived": false
+    },
+    {
+      "seed": 6013,
+      "condition": "founder-pool",
+      "ticks": 2723,
+      "safetyLimitHits": 0,
+      "survived": false
+    },
+    {
+      "seed": 6013,
+      "condition": "selection-only",
+      "ticks": 1833,
+      "safetyLimitHits": 0,
+      "survived": false
+    },
+    {
+      "seed": 6014,
+      "condition": "evolving",
+      "ticks": 1982,
+      "safetyLimitHits": 0,
+      "survived": false
+    },
+    {
+      "seed": 6014,
+      "condition": "founder-pool",
+      "ticks": 8760,
+      "safetyLimitHits": 0,
+      "survived": true
+    },
+    {
+      "seed": 6014,
+      "condition": "selection-only",
+      "ticks": 8760,
+      "safetyLimitHits": 0,
+      "survived": true
+    },
+    {
+      "seed": 6015,
+      "condition": "evolving",
+      "ticks": 1702,
+      "safetyLimitHits": 0,
+      "survived": false
+    },
+    {
+      "seed": 6015,
+      "condition": "founder-pool",
+      "ticks": 2597,
+      "safetyLimitHits": 0,
+      "survived": false
+    },
+    {
+      "seed": 6015,
+      "condition": "selection-only",
+      "ticks": 4124,
+      "safetyLimitHits": 0,
+      "survived": false
+    },
+    {
+      "seed": 6016,
+      "condition": "evolving",
+      "ticks": 8760,
+      "safetyLimitHits": 0,
+      "survived": true
+    },
+    {
+      "seed": 6016,
+      "condition": "founder-pool",
+      "ticks": 3911,
+      "safetyLimitHits": 0,
+      "survived": false
+    },
+    {
+      "seed": 6016,
+      "condition": "selection-only",
+      "ticks": 8760,
+      "safetyLimitHits": 0,
+      "survived": true
+    },
+    {
+      "seed": 6017,
+      "condition": "evolving",
+      "ticks": 7140,
+      "safetyLimitHits": 0,
+      "survived": false
+    },
+    {
+      "seed": 6017,
+      "condition": "founder-pool",
+      "ticks": 8760,
+      "safetyLimitHits": 0,
+      "survived": true
+    },
+    {
+      "seed": 6017,
+      "condition": "selection-only",
+      "ticks": 5038,
+      "safetyLimitHits": 0,
+      "survived": false
+    },
+    {
+      "seed": 6018,
+      "condition": "evolving",
+      "ticks": 8760,
+      "safetyLimitHits": 0,
+      "survived": true
+    },
+    {
+      "seed": 6018,
+      "condition": "founder-pool",
+      "ticks": 8760,
+      "safetyLimitHits": 0,
+      "survived": true
+    },
+    {
+      "seed": 6018,
+      "condition": "selection-only",
+      "ticks": 8760,
+      "safetyLimitHits": 0,
+      "survived": true
+    },
+    {
+      "seed": 6019,
+      "condition": "evolving",
+      "ticks": 2587,
+      "safetyLimitHits": 0,
+      "survived": false
+    },
+    {
+      "seed": 6019,
+      "condition": "founder-pool",
+      "ticks": 8760,
+      "safetyLimitHits": 0,
+      "survived": true
+    },
+    {
+      "seed": 6019,
+      "condition": "selection-only",
+      "ticks": 6360,
+      "safetyLimitHits": 0,
+      "survived": false
+    }
+  ],
+  "table": [
+    {
+      "condition": "evolving",
+      "month": 0,
+      "available": 20,
+      "total": 20,
+      "escape": 0.8856169010125926,
+      "forage": 0.21300381087851744,
+      "preySurvival": 0.5680555555555555,
+      "catchPerFoxDay": 0.08693115307753359
+    },
+    {
+      "condition": "evolving",
+      "month": 1,
+      "available": 20,
+      "total": 20,
+      "escape": 0.8928443614118929,
+      "forage": 0.4593443237202453,
+      "preySurvival": 0.737222222222222,
+      "catchPerFoxDay": 0.09865445335909492
+    },
+    {
+      "condition": "evolving",
+      "month": 4,
+      "available": 13,
+      "total": 20,
+      "escape": 0.9068055893127955,
+      "forage": 0.5916199668361087,
+      "preySurvival": 0.8034188034188035,
+      "catchPerFoxDay": 0.107438569489424
+    },
+    {
+      "condition": "evolving",
+      "month": 8,
+      "available": 9,
+      "total": 20,
+      "escape": 0.9123206981989003,
+      "forage": 0.701617962052697,
+      "preySurvival": 0.8185185185185184,
+      "catchPerFoxDay": 0.11370370370370371
+    },
+    {
+      "condition": "founder-pool",
+      "month": 0,
+      "available": 20,
+      "total": 20,
+      "escape": 0.8856169010125926,
+      "forage": 0.21300381087851744,
+      "preySurvival": 0.5680555555555555,
+      "catchPerFoxDay": 0.08693115307753359
+    },
+    {
+      "condition": "founder-pool",
+      "month": 1,
+      "available": 20,
+      "total": 20,
+      "escape": 0.8927363509378805,
+      "forage": 0.31801219456302166,
+      "preySurvival": 0.7055555555555555,
+      "catchPerFoxDay": 0.08932472207233415
+    },
+    {
+      "condition": "founder-pool",
+      "month": 4,
+      "available": 16,
+      "total": 20,
+      "escape": 0.8895004436369124,
+      "forage": 0.2760439535349128,
+      "preySurvival": 0.6781249999999999,
+      "catchPerFoxDay": 0.08805651087225466
+    },
+    {
+      "condition": "founder-pool",
+      "month": 8,
+      "available": 13,
+      "total": 20,
+      "escape": 0.8932268958255061,
+      "forage": 0.2867459665634339,
+      "preySurvival": 0.7068376068376069,
+      "catchPerFoxDay": 0.07208955201028422
+    },
+    {
+      "condition": "selection-only",
+      "month": 0,
+      "available": 20,
+      "total": 20,
+      "escape": 0.8856169010125926,
+      "forage": 0.21300381087851744,
+      "preySurvival": 0.5680555555555555,
+      "catchPerFoxDay": 0.08693115307753359
+    },
+    {
+      "condition": "selection-only",
+      "month": 1,
+      "available": 20,
+      "total": 20,
+      "escape": 0.8972977550427919,
+      "forage": 0.4680181961097215,
+      "preySurvival": 0.7397222222222222,
+      "catchPerFoxDay": 0.0941710731777
+    },
+    {
+      "condition": "selection-only",
+      "month": 4,
+      "available": 18,
+      "total": 20,
+      "escape": 0.9063829022480492,
+      "forage": 0.5654520315068304,
+      "preySurvival": 0.7574074074074075,
+      "catchPerFoxDay": 0.11638218509504267
+    },
+    {
+      "condition": "selection-only",
+      "month": 8,
+      "available": 14,
+      "total": 20,
+      "escape": 0.9114719406019626,
+      "forage": 0.5752573754040425,
+      "preySurvival": 0.7555555555555555,
+      "catchPerFoxDay": 0.10502529429088846
+    }
+  ],
+  "rows": [
+    {
+      "seed": 6000,
+      "condition": "evolving",
+      "month": 0,
+      "ticks": 1780,
+      "assay": {
+        "escape": 0.8973509933774835,
+        "forage": 0.23447814228545558,
+        "preySurvival": 0.6444444444444445,
+        "catchRate": 0.11
+      }
+    },
+    {
+      "seed": 6000,
+      "condition": "evolving",
+      "month": 1,
+      "ticks": 1780,
+      "assay": {
+        "escape": 0.8823529411764706,
+        "forage": 0.45218115374506335,
+        "preySurvival": 0.7555555555555555,
+        "catchRate": 0.13333333333333333
+      }
+    },
+    {
+      "seed": 6000,
+      "condition": "evolving",
+      "month": 4,
+      "ticks": 1780,
+      "assay": null
+    },
+    {
+      "seed": 6000,
+      "condition": "evolving",
+      "month": 8,
+      "ticks": 1780,
+      "assay": null
+    },
+    {
+      "seed": 6000,
+      "condition": "founder-pool",
+      "month": 0,
+      "ticks": 1874,
+      "assay": {
+        "escape": 0.8973509933774835,
+        "forage": 0.23447814228545558,
+        "preySurvival": 0.6444444444444445,
+        "catchRate": 0.11
+      }
+    },
+    {
+      "seed": 6000,
+      "condition": "founder-pool",
+      "month": 1,
+      "ticks": 1874,
+      "assay": {
+        "escape": 0.8928571428571429,
+        "forage": 0.342681987136585,
+        "preySurvival": 0.7388888888888889,
+        "catchRate": 0.12333333333333334
+      }
+    },
+    {
+      "seed": 6000,
+      "condition": "founder-pool",
+      "month": 4,
+      "ticks": 1874,
+      "assay": null
+    },
+    {
+      "seed": 6000,
+      "condition": "founder-pool",
+      "month": 8,
+      "ticks": 1874,
+      "assay": null
+    },
+    {
+      "seed": 6000,
+      "condition": "selection-only",
+      "month": 0,
+      "ticks": 4708,
+      "assay": {
+        "escape": 0.8973509933774835,
+        "forage": 0.23447814228545558,
+        "preySurvival": 0.6444444444444445,
+        "catchRate": 0.11
+      }
+    },
+    {
+      "seed": 6000,
+      "condition": "selection-only",
+      "month": 1,
+      "ticks": 4708,
+      "assay": {
+        "escape": 0.8689138576779026,
+        "forage": 0.433163889740014,
+        "preySurvival": 0.7666666666666667,
+        "catchRate": 0.14666666666666667
+      }
+    },
+    {
+      "seed": 6000,
+      "condition": "selection-only",
+      "month": 4,
+      "ticks": 4708,
+      "assay": {
+        "escape": 0.8921568627450981,
+        "forage": 0.7261225799221788,
+        "preySurvival": 0.8666666666666667,
+        "catchRate": 0.22666666666666668
+      }
+    },
+    {
+      "seed": 6000,
+      "condition": "selection-only",
+      "month": 8,
+      "ticks": 4708,
+      "assay": null
+    },
+    {
+      "seed": 6001,
+      "condition": "evolving",
+      "month": 0,
+      "ticks": 8760,
+      "assay": {
+        "escape": 0.8741935483870967,
+        "forage": 0.1878137412888406,
+        "preySurvival": 0.5333333333333333,
+        "catchRate": 0.07060801344914541
+      }
+    },
+    {
+      "seed": 6001,
+      "condition": "evolving",
+      "month": 1,
+      "ticks": 8760,
+      "assay": {
+        "escape": 0.898876404494382,
+        "forage": 0.2654261056309896,
+        "preySurvival": 0.6777777777777778,
+        "catchRate": 0.06
+      }
+    },
+    {
+      "seed": 6001,
+      "condition": "evolving",
+      "month": 4,
+      "ticks": 8760,
+      "assay": {
+        "escape": 0.8603603603603603,
+        "forage": 0.3860621312432608,
+        "preySurvival": 0.7055555555555556,
+        "catchRate": 0.07333333333333333
+      }
+    },
+    {
+      "seed": 6001,
+      "condition": "evolving",
+      "month": 8,
+      "ticks": 8760,
+      "assay": {
+        "escape": 0.9126984126984127,
+        "forage": 0.39798460360465676,
+        "preySurvival": 0.7222222222222222,
+        "catchRate": 0.08333333333333333
+      }
+    },
+    {
+      "seed": 6001,
+      "condition": "founder-pool",
+      "month": 0,
+      "ticks": 8760,
+      "assay": {
+        "escape": 0.8741935483870967,
+        "forage": 0.1878137412888406,
+        "preySurvival": 0.5333333333333333,
+        "catchRate": 0.07060801344914541
+      }
+    },
+    {
+      "seed": 6001,
+      "condition": "founder-pool",
+      "month": 1,
+      "ticks": 8760,
+      "assay": {
+        "escape": 0.911660777385159,
+        "forage": 0.2660738847220055,
+        "preySurvival": 0.7222222222222222,
+        "catchRate": 0.09413083064855023
+      }
+    },
+    {
+      "seed": 6001,
+      "condition": "founder-pool",
+      "month": 4,
+      "ticks": 8760,
+      "assay": {
+        "escape": 0.8853211009174312,
+        "forage": 0.25692124524446097,
+        "preySurvival": 0.6722222222222223,
+        "catchRate": 0.09
+      }
+    },
+    {
+      "seed": 6001,
+      "condition": "founder-pool",
+      "month": 8,
+      "ticks": 8760,
+      "assay": {
+        "escape": 0.8745519713261649,
+        "forage": 0.2821525855531102,
+        "preySurvival": 0.6444444444444445,
+        "catchRate": 0.07333333333333333
+      }
+    },
+    {
+      "seed": 6001,
+      "condition": "selection-only",
+      "month": 0,
+      "ticks": 8760,
+      "assay": {
+        "escape": 0.8741935483870967,
+        "forage": 0.1878137412888406,
+        "preySurvival": 0.5333333333333333,
+        "catchRate": 0.07060801344914541
+      }
+    },
+    {
+      "seed": 6001,
+      "condition": "selection-only",
+      "month": 1,
+      "ticks": 8760,
+      "assay": {
+        "escape": 0.9212827988338192,
+        "forage": 0.4451257839981001,
+        "preySurvival": 0.6666666666666666,
+        "catchRate": 0.07666666666666667
+      }
+    },
+    {
+      "seed": 6001,
+      "condition": "selection-only",
+      "month": 4,
+      "ticks": 8760,
+      "assay": {
+        "escape": 0.89937106918239,
+        "forage": 0.5048355287595695,
+        "preySurvival": 0.6777777777777778,
+        "catchRate": 0.06666666666666667
+      }
+    },
+    {
+      "seed": 6001,
+      "condition": "selection-only",
+      "month": 8,
+      "ticks": 8760,
+      "assay": {
+        "escape": 0.8825910931174089,
+        "forage": 0.433931212657229,
+        "preySurvival": 0.6888888888888889,
+        "catchRate": 0.07666666666666667
+      }
+    },
+    {
+      "seed": 6002,
+      "condition": "evolving",
+      "month": 0,
+      "ticks": 3983,
+      "assay": {
+        "escape": 0.9054545454545454,
+        "forage": 0.23557395594558803,
+        "preySurvival": 0.5833333333333334,
+        "catchRate": 0.06666666666666667
+      }
+    },
+    {
+      "seed": 6002,
+      "condition": "evolving",
+      "month": 1,
+      "ticks": 3983,
+      "assay": {
+        "escape": 0.8987012987012987,
+        "forage": 0.45506191421256925,
+        "preySurvival": 0.6944444444444444,
+        "catchRate": 0.08675100792437092
+      }
+    },
+    {
+      "seed": 6002,
+      "condition": "evolving",
+      "month": 4,
+      "ticks": 3983,
+      "assay": {
+        "escape": 0.9278131634819533,
+        "forage": 0.501972779602065,
+        "preySurvival": 0.8,
+        "catchRate": 0.08333333333333333
+      }
+    },
+    {
+      "seed": 6002,
+      "condition": "evolving",
+      "month": 8,
+      "ticks": 3983,
+      "assay": null
+    },
+    {
+      "seed": 6002,
+      "condition": "founder-pool",
+      "month": 0,
+      "ticks": 8760,
+      "assay": {
+        "escape": 0.9054545454545454,
+        "forage": 0.23557395594558803,
+        "preySurvival": 0.5833333333333334,
+        "catchRate": 0.06666666666666667
+      }
+    },
+    {
+      "seed": 6002,
+      "condition": "founder-pool",
+      "month": 1,
+      "ticks": 8760,
+      "assay": {
+        "escape": 0.889589905362776,
+        "forage": 0.2734729219448163,
+        "preySurvival": 0.6722222222222223,
+        "catchRate": 0.0835421888053467
+      }
+    },
+    {
+      "seed": 6002,
+      "condition": "founder-pool",
+      "month": 4,
+      "ticks": 8760,
+      "assay": {
+        "escape": 0.871244635193133,
+        "forage": 0.28920780858827244,
+        "preySurvival": 0.6666666666666666,
+        "catchRate": 0.06666666666666667
+      }
+    },
+    {
+      "seed": 6002,
+      "condition": "founder-pool",
+      "month": 8,
+      "ticks": 8760,
+      "assay": {
+        "escape": 0.9026217228464419,
+        "forage": 0.2075447598963048,
+        "preySurvival": 0.7611111111111111,
+        "catchRate": 0.08666666666666667
+      }
+    },
+    {
+      "seed": 6002,
+      "condition": "selection-only",
+      "month": 0,
+      "ticks": 5922,
+      "assay": {
+        "escape": 0.9054545454545454,
+        "forage": 0.23557395594558803,
+        "preySurvival": 0.5833333333333334,
+        "catchRate": 0.06666666666666667
+      }
+    },
+    {
+      "seed": 6002,
+      "condition": "selection-only",
+      "month": 1,
+      "ticks": 5922,
+      "assay": {
+        "escape": 0.9022082018927445,
+        "forage": 0.3579472390645917,
+        "preySurvival": 0.7611111111111111,
+        "catchRate": 0.05666666666666667
+      }
+    },
+    {
+      "seed": 6002,
+      "condition": "selection-only",
+      "month": 4,
+      "ticks": 5922,
+      "assay": {
+        "escape": 0.9052631578947369,
+        "forage": 0.4172936456361809,
+        "preySurvival": 0.7277777777777777,
+        "catchRate": 0.10666666666666666
+      }
+    },
+    {
+      "seed": 6002,
+      "condition": "selection-only",
+      "month": 8,
+      "ticks": 5922,
+      "assay": {
+        "escape": 0.9184890656063618,
+        "forage": 0.38560541710761964,
+        "preySurvival": 0.7722222222222223,
+        "catchRate": 0.11
+      }
+    },
+    {
+      "seed": 6003,
+      "condition": "evolving",
+      "month": 0,
+      "ticks": 3392,
+      "assay": {
+        "escape": 0.897196261682243,
+        "forage": 0.16424282571298532,
+        "preySurvival": 0.5055555555555555,
+        "catchRate": 0.12360801781737193
+      }
+    },
+    {
+      "seed": 6003,
+      "condition": "evolving",
+      "month": 1,
+      "ticks": 3392,
+      "assay": {
+        "escape": 0.9061371841155235,
+        "forage": 0.5216651422104731,
+        "preySurvival": 0.6833333333333333,
+        "catchRate": 0.13666666666666666
+      }
+    },
+    {
+      "seed": 6003,
+      "condition": "evolving",
+      "month": 4,
+      "ticks": 3392,
+      "assay": {
+        "escape": 0.9221556886227545,
+        "forage": 0.7637756626975265,
+        "preySurvival": 0.8388888888888889,
+        "catchRate": 0.18333333333333332
+      }
+    },
+    {
+      "seed": 6003,
+      "condition": "evolving",
+      "month": 8,
+      "ticks": 3392,
+      "assay": null
+    },
+    {
+      "seed": 6003,
+      "condition": "founder-pool",
+      "month": 0,
+      "ticks": 2367,
+      "assay": {
+        "escape": 0.897196261682243,
+        "forage": 0.16424282571298532,
+        "preySurvival": 0.5055555555555555,
+        "catchRate": 0.12360801781737193
+      }
+    },
+    {
+      "seed": 6003,
+      "condition": "founder-pool",
+      "month": 1,
+      "ticks": 2367,
+      "assay": {
+        "escape": 0.9236111111111112,
+        "forage": 0.33368488753840253,
+        "preySurvival": 0.7,
+        "catchRate": 0.12056935528886407
+      }
+    },
+    {
+      "seed": 6003,
+      "condition": "founder-pool",
+      "month": 4,
+      "ticks": 2367,
+      "assay": null
+    },
+    {
+      "seed": 6003,
+      "condition": "founder-pool",
+      "month": 8,
+      "ticks": 2367,
+      "assay": null
+    },
+    {
+      "seed": 6003,
+      "condition": "selection-only",
+      "month": 0,
+      "ticks": 7534,
+      "assay": {
+        "escape": 0.897196261682243,
+        "forage": 0.16424282571298532,
+        "preySurvival": 0.5055555555555555,
+        "catchRate": 0.12360801781737193
+      }
+    },
+    {
+      "seed": 6003,
+      "condition": "selection-only",
+      "month": 1,
+      "ticks": 7534,
+      "assay": {
+        "escape": 0.9065040650406504,
+        "forage": 0.4039953829825823,
+        "preySurvival": 0.6555555555555556,
+        "catchRate": 0.15000000000000002
+      }
+    },
+    {
+      "seed": 6003,
+      "condition": "selection-only",
+      "month": 4,
+      "ticks": 7534,
+      "assay": {
+        "escape": 0.9347826086956522,
+        "forage": 0.4380984884606938,
+        "preySurvival": 0.3111111111111111,
+        "catchRate": 0.1403118040089087
+      }
+    },
+    {
+      "seed": 6003,
+      "condition": "selection-only",
+      "month": 8,
+      "ticks": 7534,
+      "assay": {
+        "escape": 0.9347826086956522,
+        "forage": 0.4380984884606938,
+        "preySurvival": 0.3111111111111111,
+        "catchRate": 0.1414141414141414
+      }
+    },
+    {
+      "seed": 6004,
+      "condition": "evolving",
+      "month": 0,
+      "ticks": 8760,
+      "assay": {
+        "escape": 0.8893280632411067,
+        "forage": 0.15142338761178525,
+        "preySurvival": 0.55,
+        "catchRate": 0.060648603116664326
+      }
+    },
+    {
+      "seed": 6004,
+      "condition": "evolving",
+      "month": 1,
+      "ticks": 8760,
+      "assay": {
+        "escape": 0.8862876254180602,
+        "forage": 0.4251920168995283,
+        "preySurvival": 0.7277777777777777,
+        "catchRate": 0.06666666666666667
+      }
+    },
+    {
+      "seed": 6004,
+      "condition": "evolving",
+      "month": 4,
+      "ticks": 8760,
+      "assay": {
+        "escape": 0.8755186721991701,
+        "forage": 0.6113588571703322,
+        "preySurvival": 0.7166666666666667,
+        "catchRate": 0.08666666666666667
+      }
+    },
+    {
+      "seed": 6004,
+      "condition": "evolving",
+      "month": 8,
+      "ticks": 8760,
+      "assay": {
+        "escape": 0.898989898989899,
+        "forage": 0.7110338713057736,
+        "preySurvival": 0.7555555555555555,
+        "catchRate": 0.06666666666666667
+      }
+    },
+    {
+      "seed": 6004,
+      "condition": "founder-pool",
+      "month": 0,
+      "ticks": 8760,
+      "assay": {
+        "escape": 0.8893280632411067,
+        "forage": 0.15142338761178525,
+        "preySurvival": 0.55,
+        "catchRate": 0.060648603116664326
+      }
+    },
+    {
+      "seed": 6004,
+      "condition": "founder-pool",
+      "month": 1,
+      "ticks": 8760,
+      "assay": {
+        "escape": 0.8874458874458875,
+        "forage": 0.2794357583936033,
+        "preySurvival": 0.7444444444444445,
+        "catchRate": 0.06
+      }
+    },
+    {
+      "seed": 6004,
+      "condition": "founder-pool",
+      "month": 4,
+      "ticks": 8760,
+      "assay": {
+        "escape": 0.8896551724137931,
+        "forage": 0.23932220483667432,
+        "preySurvival": 0.6666666666666666,
+        "catchRate": 0.0834144306965105
+      }
+    },
+    {
+      "seed": 6004,
+      "condition": "founder-pool",
+      "month": 8,
+      "ticks": 8760,
+      "assay": {
+        "escape": 0.8928571428571429,
+        "forage": 0.21853729920615533,
+        "preySurvival": 0.7277777777777777,
+        "catchRate": 0.06
+      }
+    },
+    {
+      "seed": 6004,
+      "condition": "selection-only",
+      "month": 0,
+      "ticks": 5680,
+      "assay": {
+        "escape": 0.8893280632411067,
+        "forage": 0.15142338761178525,
+        "preySurvival": 0.55,
+        "catchRate": 0.060648603116664326
+      }
+    },
+    {
+      "seed": 6004,
+      "condition": "selection-only",
+      "month": 1,
+      "ticks": 5680,
+      "assay": {
+        "escape": 0.896551724137931,
+        "forage": 0.3910649268576071,
+        "preySurvival": 0.7111111111111111,
+        "catchRate": 0.06333333333333334
+      }
+    },
+    {
+      "seed": 6004,
+      "condition": "selection-only",
+      "month": 4,
+      "ticks": 5680,
+      "assay": {
+        "escape": 0.8989169675090253,
+        "forage": 0.490361704655647,
+        "preySurvival": 0.7388888888888889,
+        "catchRate": 0.08333333333333333
+      }
+    },
+    {
+      "seed": 6004,
+      "condition": "selection-only",
+      "month": 8,
+      "ticks": 5680,
+      "assay": null
+    },
+    {
+      "seed": 6005,
+      "condition": "evolving",
+      "month": 0,
+      "ticks": 8760,
+      "assay": {
+        "escape": 0.9063670411985019,
+        "forage": 0.21282794586865958,
+        "preySurvival": 0.5611111111111111,
+        "catchRate": 0.08827274013297495
+      }
+    },
+    {
+      "seed": 6005,
+      "condition": "evolving",
+      "month": 1,
+      "ticks": 8760,
+      "assay": {
+        "escape": 0.870722433460076,
+        "forage": 0.4426277238218426,
+        "preySurvival": 0.7444444444444445,
+        "catchRate": 0.16243654822335024
+      }
+    },
+    {
+      "seed": 6005,
+      "condition": "evolving",
+      "month": 4,
+      "ticks": 8760,
+      "assay": {
+        "escape": 0.9312977099236641,
+        "forage": 0.7211353213504871,
+        "preySurvival": 0.8,
+        "catchRate": 0.11333333333333334
+      }
+    },
+    {
+      "seed": 6005,
+      "condition": "evolving",
+      "month": 8,
+      "ticks": 8760,
+      "assay": {
+        "escape": 0.9159159159159159,
+        "forage": 0.8099619284701242,
+        "preySurvival": 0.8277777777777777,
+        "catchRate": 0.13
+      }
+    },
+    {
+      "seed": 6005,
+      "condition": "founder-pool",
+      "month": 0,
+      "ticks": 5365,
+      "assay": {
+        "escape": 0.9063670411985019,
+        "forage": 0.21282794586865958,
+        "preySurvival": 0.5611111111111111,
+        "catchRate": 0.08827274013297495
+      }
+    },
+    {
+      "seed": 6005,
+      "condition": "founder-pool",
+      "month": 1,
+      "ticks": 5365,
+      "assay": {
+        "escape": 0.8852459016393442,
+        "forage": 0.2894109565431781,
+        "preySurvival": 0.7055555555555556,
+        "catchRate": 0.1474448478078749
+      }
+    },
+    {
+      "seed": 6005,
+      "condition": "founder-pool",
+      "month": 4,
+      "ticks": 5365,
+      "assay": {
+        "escape": 0.8826086956521739,
+        "forage": 0.1838455796911435,
+        "preySurvival": 0.6277777777777778,
+        "catchRate": 0.19
+      }
+    },
+    {
+      "seed": 6005,
+      "condition": "founder-pool",
+      "month": 8,
+      "ticks": 5365,
+      "assay": null
+    },
+    {
+      "seed": 6005,
+      "condition": "selection-only",
+      "month": 0,
+      "ticks": 8760,
+      "assay": {
+        "escape": 0.9063670411985019,
+        "forage": 0.21282794586865958,
+        "preySurvival": 0.5611111111111111,
+        "catchRate": 0.08827274013297495
+      }
+    },
+    {
+      "seed": 6005,
+      "condition": "selection-only",
+      "month": 1,
+      "ticks": 8760,
+      "assay": {
+        "escape": 0.8836477987421384,
+        "forage": 0.46672629600312915,
+        "preySurvival": 0.7388888888888889,
+        "catchRate": 0.13764162819974823
+      }
+    },
+    {
+      "seed": 6005,
+      "condition": "selection-only",
+      "month": 4,
+      "ticks": 8760,
+      "assay": {
+        "escape": 0.9246231155778895,
+        "forage": 0.597955330013289,
+        "preySurvival": 0.8055555555555556,
+        "catchRate": 0.1
+      }
+    },
+    {
+      "seed": 6005,
+      "condition": "selection-only",
+      "month": 8,
+      "ticks": 8760,
+      "assay": {
+        "escape": 0.939453125,
+        "forage": 0.8228581075587255,
+        "preySurvival": 0.7888888888888889,
+        "catchRate": 0.07666666666666667
+      }
+    },
+    {
+      "seed": 6006,
+      "condition": "evolving",
+      "month": 0,
+      "ticks": 4338,
+      "assay": {
+        "escape": 0.8888888888888888,
+        "forage": 0.1859496755691157,
+        "preySurvival": 0.5388888888888889,
+        "catchRate": 0.060470324748040316
+      }
+    },
+    {
+      "seed": 6006,
+      "condition": "evolving",
+      "month": 1,
+      "ticks": 4338,
+      "assay": {
+        "escape": 0.868421052631579,
+        "forage": 0.4377597397454328,
+        "preySurvival": 0.7222222222222222,
+        "catchRate": 0.050083472454090144
+      }
+    },
+    {
+      "seed": 6006,
+      "condition": "evolving",
+      "month": 4,
+      "ticks": 4338,
+      "assay": {
+        "escape": 0.9083094555873925,
+        "forage": 0.5577785166571639,
+        "preySurvival": 0.7277777777777777,
+        "catchRate": 0.08336807002917883
+      }
+    },
+    {
+      "seed": 6006,
+      "condition": "evolving",
+      "month": 8,
+      "ticks": 4338,
+      "assay": null
+    },
+    {
+      "seed": 6006,
+      "condition": "founder-pool",
+      "month": 0,
+      "ticks": 8760,
+      "assay": {
+        "escape": 0.8888888888888888,
+        "forage": 0.1859496755691157,
+        "preySurvival": 0.5388888888888889,
+        "catchRate": 0.060470324748040316
+      }
+    },
+    {
+      "seed": 6006,
+      "condition": "founder-pool",
+      "month": 1,
+      "ticks": 8760,
+      "assay": {
+        "escape": 0.8984615384615384,
+        "forage": 0.31147882532740484,
+        "preySurvival": 0.6944444444444444,
+        "catchRate": 0.053985660059046814
+      }
+    },
+    {
+      "seed": 6006,
+      "condition": "founder-pool",
+      "month": 4,
+      "ticks": 8760,
+      "assay": {
+        "escape": 0.9094650205761317,
+        "forage": 0.17938076764962596,
+        "preySurvival": 0.7055555555555556,
+        "catchRate": 0.06333333333333334
+      }
+    },
+    {
+      "seed": 6006,
+      "condition": "founder-pool",
+      "month": 8,
+      "ticks": 8760,
+      "assay": {
+        "escape": 0.897196261682243,
+        "forage": 0.19110479866732333,
+        "preySurvival": 0.7444444444444445,
+        "catchRate": 0.05694347522679693
+      }
+    },
+    {
+      "seed": 6006,
+      "condition": "selection-only",
+      "month": 0,
+      "ticks": 8760,
+      "assay": {
+        "escape": 0.8888888888888888,
+        "forage": 0.1859496755691157,
+        "preySurvival": 0.5388888888888889,
+        "catchRate": 0.060470324748040316
+      }
+    },
+    {
+      "seed": 6006,
+      "condition": "selection-only",
+      "month": 1,
+      "ticks": 8760,
+      "assay": {
+        "escape": 0.9050632911392406,
+        "forage": 0.487868182846462,
+        "preySurvival": 0.7166666666666667,
+        "catchRate": 0.060470324748040316
+      }
+    },
+    {
+      "seed": 6006,
+      "condition": "selection-only",
+      "month": 4,
+      "ticks": 8760,
+      "assay": {
+        "escape": 0.8925619834710744,
+        "forage": 0.6583451404008077,
+        "preySurvival": 0.7666666666666667,
+        "catchRate": 0.09056603773584906
+      }
+    },
+    {
+      "seed": 6006,
+      "condition": "selection-only",
+      "month": 8,
+      "ticks": 8760,
+      "assay": {
+        "escape": 0.8925619834710744,
+        "forage": 0.6583451404008077,
+        "preySurvival": 0.7666666666666667,
+        "catchRate": 0.08723612470292186
+      }
+    },
+    {
+      "seed": 6007,
+      "condition": "evolving",
+      "month": 0,
+      "ticks": 7792,
+      "assay": {
+        "escape": 0.9003021148036254,
+        "forage": 0.2543036679005454,
+        "preySurvival": 0.65,
+        "catchRate": 0.0916030534351145
+      }
+    },
+    {
+      "seed": 6007,
+      "condition": "evolving",
+      "month": 1,
+      "ticks": 7792,
+      "assay": {
+        "escape": 0.911042944785276,
+        "forage": 0.5024985191766786,
+        "preySurvival": 0.7944444444444444,
+        "catchRate": 0.11333333333333334
+      }
+    },
+    {
+      "seed": 6007,
+      "condition": "evolving",
+      "month": 4,
+      "ticks": 7792,
+      "assay": {
+        "escape": 0.8985507246376812,
+        "forage": 0.6654207048372525,
+        "preySurvival": 0.8444444444444444,
+        "catchRate": 0.12333333333333334
+      }
+    },
+    {
+      "seed": 6007,
+      "condition": "evolving",
+      "month": 8,
+      "ticks": 7792,
+      "assay": {
+        "escape": 0.91796875,
+        "forage": 0.6887257482868022,
+        "preySurvival": 0.8833333333333333,
+        "catchRate": 0.14
+      }
+    },
+    {
+      "seed": 6007,
+      "condition": "founder-pool",
+      "month": 0,
+      "ticks": 8760,
+      "assay": {
+        "escape": 0.9003021148036254,
+        "forage": 0.2543036679005454,
+        "preySurvival": 0.65,
+        "catchRate": 0.0916030534351145
+      }
+    },
+    {
+      "seed": 6007,
+      "condition": "founder-pool",
+      "month": 1,
+      "ticks": 8760,
+      "assay": {
+        "escape": 0.8960573476702509,
+        "forage": 0.37030834040555505,
+        "preySurvival": 0.7666666666666667,
+        "catchRate": 0.08
+      }
+    },
+    {
+      "seed": 6007,
+      "condition": "founder-pool",
+      "month": 4,
+      "ticks": 8760,
+      "assay": {
+        "escape": 0.8843283582089553,
+        "forage": 0.27769206736122864,
+        "preySurvival": 0.7388888888888889,
+        "catchRate": 0.08666666666666667
+      }
+    },
+    {
+      "seed": 6007,
+      "condition": "founder-pool",
+      "month": 8,
+      "ticks": 8760,
+      "assay": {
+        "escape": 0.9016949152542373,
+        "forage": 0.36506539886285927,
+        "preySurvival": 0.7166666666666667,
+        "catchRate": 0.10333333333333333
+      }
+    },
+    {
+      "seed": 6007,
+      "condition": "selection-only",
+      "month": 0,
+      "ticks": 8760,
+      "assay": {
+        "escape": 0.9003021148036254,
+        "forage": 0.2543036679005454,
+        "preySurvival": 0.65,
+        "catchRate": 0.0916030534351145
+      }
+    },
+    {
+      "seed": 6007,
+      "condition": "selection-only",
+      "month": 1,
+      "ticks": 8760,
+      "assay": {
+        "escape": 0.8978102189781022,
+        "forage": 0.5769611373240974,
+        "preySurvival": 0.8055555555555556,
+        "catchRate": 0.11666666666666667
+      }
+    },
+    {
+      "seed": 6007,
+      "condition": "selection-only",
+      "month": 4,
+      "ticks": 8760,
+      "assay": {
+        "escape": 0.9033457249070632,
+        "forage": 0.6815702462212535,
+        "preySurvival": 0.8444444444444444,
+        "catchRate": 0.11666666666666667
+      }
+    },
+    {
+      "seed": 6007,
+      "condition": "selection-only",
+      "month": 8,
+      "ticks": 8760,
+      "assay": {
+        "escape": 0.9094076655052264,
+        "forage": 0.665472960002895,
+        "preySurvival": 0.8388888888888889,
+        "catchRate": 0.11666666666666667
+      }
+    },
+    {
+      "seed": 6008,
+      "condition": "evolving",
+      "month": 0,
+      "ticks": 8760,
+      "assay": {
+        "escape": 0.8720379146919431,
+        "forage": 0.19572187270089011,
+        "preySurvival": 0.5888888888888889,
+        "catchRate": 0.08666666666666667
+      }
+    },
+    {
+      "seed": 6008,
+      "condition": "evolving",
+      "month": 1,
+      "ticks": 8760,
+      "assay": {
+        "escape": 0.9137931034482759,
+        "forage": 0.4964810738073999,
+        "preySurvival": 0.75,
+        "catchRate": 0.09333333333333332
+      }
+    },
+    {
+      "seed": 6008,
+      "condition": "evolving",
+      "month": 4,
+      "ticks": 8760,
+      "assay": {
+        "escape": 0.9046052631578947,
+        "forage": 0.5673361219282288,
+        "preySurvival": 0.7611111111111111,
+        "catchRate": 0.08
+      }
+    },
+    {
+      "seed": 6008,
+      "condition": "evolving",
+      "month": 8,
+      "ticks": 8760,
+      "assay": {
+        "escape": 0.9484978540772532,
+        "forage": 1.1330265711756227,
+        "preySurvival": 0.8666666666666667,
+        "catchRate": 0.1
+      }
+    },
+    {
+      "seed": 6008,
+      "condition": "founder-pool",
+      "month": 0,
+      "ticks": 8760,
+      "assay": {
+        "escape": 0.8720379146919431,
+        "forage": 0.19572187270089011,
+        "preySurvival": 0.5888888888888889,
+        "catchRate": 0.08666666666666667
+      }
+    },
+    {
+      "seed": 6008,
+      "condition": "founder-pool",
+      "month": 1,
+      "ticks": 8760,
+      "assay": {
+        "escape": 0.8964285714285715,
+        "forage": 0.33444954377674846,
+        "preySurvival": 0.6666666666666666,
+        "catchRate": 0.08030112923462986
+      }
+    },
+    {
+      "seed": 6008,
+      "condition": "founder-pool",
+      "month": 4,
+      "ticks": 8760,
+      "assay": {
+        "escape": 0.9021739130434783,
+        "forage": 0.23695060529161355,
+        "preySurvival": 0.6,
+        "catchRate": 0.07
+      }
+    },
+    {
+      "seed": 6008,
+      "condition": "founder-pool",
+      "month": 8,
+      "ticks": 8760,
+      "assay": {
+        "escape": 0.8995983935742972,
+        "forage": 0.2639172521283287,
+        "preySurvival": 0.7,
+        "catchRate": 0.06005839010148756
+      }
+    },
+    {
+      "seed": 6008,
+      "condition": "selection-only",
+      "month": 0,
+      "ticks": 8760,
+      "assay": {
+        "escape": 0.8720379146919431,
+        "forage": 0.19572187270089011,
+        "preySurvival": 0.5888888888888889,
+        "catchRate": 0.08666666666666667
+      }
+    },
+    {
+      "seed": 6008,
+      "condition": "selection-only",
+      "month": 1,
+      "ticks": 8760,
+      "assay": {
+        "escape": 0.907563025210084,
+        "forage": 0.4821658468456631,
+        "preySurvival": 0.6944444444444444,
+        "catchRate": 0.08333333333333333
+      }
+    },
+    {
+      "seed": 6008,
+      "condition": "selection-only",
+      "month": 4,
+      "ticks": 8760,
+      "assay": {
+        "escape": 0.8881578947368421,
+        "forage": 0.5487936438392855,
+        "preySurvival": 0.7777777777777778,
+        "catchRate": 0.09333333333333332
+      }
+    },
+    {
+      "seed": 6008,
+      "condition": "selection-only",
+      "month": 8,
+      "ticks": 8760,
+      "assay": {
+        "escape": 0.9164345403899722,
+        "forage": 0.4993397059155456,
+        "preySurvival": 0.7722222222222223,
+        "catchRate": 0.09333333333333332
+      }
+    },
+    {
+      "seed": 6009,
+      "condition": "evolving",
+      "month": 0,
+      "ticks": 3362,
+      "assay": {
+        "escape": 0.8897338403041825,
+        "forage": 0.21344666967608927,
+        "preySurvival": 0.5222222222222223,
+        "catchRate": 0.07074677147669847
+      }
+    },
+    {
+      "seed": 6009,
+      "condition": "evolving",
+      "month": 1,
+      "ticks": 3362,
+      "assay": {
+        "escape": 0.9146919431279621,
+        "forage": 0.56655733032728,
+        "preySurvival": 0.7944444444444444,
+        "catchRate": 0.08363534987454697
+      }
+    },
+    {
+      "seed": 6009,
+      "condition": "evolving",
+      "month": 4,
+      "ticks": 3362,
+      "assay": {
+        "escape": 0.8882978723404256,
+        "forage": 0.6938647321779737,
+        "preySurvival": 0.8277777777777777,
+        "catchRate": 0.04666666666666666
+      }
+    },
+    {
+      "seed": 6009,
+      "condition": "evolving",
+      "month": 8,
+      "ticks": 3362,
+      "assay": null
+    },
+    {
+      "seed": 6009,
+      "condition": "founder-pool",
+      "month": 0,
+      "ticks": 8760,
+      "assay": {
+        "escape": 0.8897338403041825,
+        "forage": 0.21344666967608927,
+        "preySurvival": 0.5222222222222223,
+        "catchRate": 0.07074677147669847
+      }
+    },
+    {
+      "seed": 6009,
+      "condition": "founder-pool",
+      "month": 1,
+      "ticks": 8760,
+      "assay": {
+        "escape": 0.8879668049792531,
+        "forage": 0.282183917009851,
+        "preySurvival": 0.6388888888888888,
+        "catchRate": 0.08666666666666667
+      }
+    },
+    {
+      "seed": 6009,
+      "condition": "founder-pool",
+      "month": 4,
+      "ticks": 8760,
+      "assay": {
+        "escape": 0.8901515151515151,
+        "forage": 0.21206986212522913,
+        "preySurvival": 0.7666666666666667,
+        "catchRate": 0.057062937062937066
+      }
+    },
+    {
+      "seed": 6009,
+      "condition": "founder-pool",
+      "month": 8,
+      "ticks": 8760,
+      "assay": {
+        "escape": 0.89568345323741,
+        "forage": 0.2682499437468426,
+        "preySurvival": 0.7166666666666667,
+        "catchRate": 0.08666666666666667
+      }
+    },
+    {
+      "seed": 6009,
+      "condition": "selection-only",
+      "month": 0,
+      "ticks": 8760,
+      "assay": {
+        "escape": 0.8897338403041825,
+        "forage": 0.21344666967608927,
+        "preySurvival": 0.5222222222222223,
+        "catchRate": 0.07074677147669847
+      }
+    },
+    {
+      "seed": 6009,
+      "condition": "selection-only",
+      "month": 1,
+      "ticks": 8760,
+      "assay": {
+        "escape": 0.8893129770992366,
+        "forage": 0.5078210237233649,
+        "preySurvival": 0.7277777777777777,
+        "catchRate": 0.08096710711273544
+      }
+    },
+    {
+      "seed": 6009,
+      "condition": "selection-only",
+      "month": 4,
+      "ticks": 8760,
+      "assay": {
+        "escape": 0.8953488372093024,
+        "forage": 0.68164572641657,
+        "preySurvival": 0.8333333333333334,
+        "catchRate": 0.11733482329934349
+      }
+    },
+    {
+      "seed": 6009,
+      "condition": "selection-only",
+      "month": 8,
+      "ticks": 8760,
+      "assay": {
+        "escape": 0.8953488372093024,
+        "forage": 0.68164572641657,
+        "preySurvival": 0.8333333333333334,
+        "catchRate": 0.12170385395537525
+      }
+    },
+    {
+      "seed": 6010,
+      "condition": "evolving",
+      "month": 0,
+      "ticks": 6673,
+      "assay": {
+        "escape": 0.8678414096916299,
+        "forage": 0.21097994863254266,
+        "preySurvival": 0.5888888888888889,
+        "catchRate": 0.08236808236808237
+      }
+    },
+    {
+      "seed": 6010,
+      "condition": "evolving",
+      "month": 1,
+      "ticks": 6673,
+      "assay": {
+        "escape": 0.8947368421052632,
+        "forage": 0.40438438326371595,
+        "preySurvival": 0.7666666666666667,
+        "catchRate": 0.12333333333333334
+      }
+    },
+    {
+      "seed": 6010,
+      "condition": "evolving",
+      "month": 4,
+      "ticks": 6673,
+      "assay": {
+        "escape": 0.9095022624434389,
+        "forage": 0.4799049122088313,
+        "preySurvival": 0.8333333333333334,
+        "catchRate": 0.20333333333333337
+      }
+    },
+    {
+      "seed": 6010,
+      "condition": "evolving",
+      "month": 8,
+      "ticks": 6673,
+      "assay": {
+        "escape": 0.8834080717488789,
+        "forage": 0.8162667811920806,
+        "preySurvival": 0.7888888888888889,
+        "catchRate": 0.20666666666666667
+      }
+    },
+    {
+      "seed": 6010,
+      "condition": "founder-pool",
+      "month": 0,
+      "ticks": 3561,
+      "assay": {
+        "escape": 0.8678414096916299,
+        "forage": 0.21097994863254266,
+        "preySurvival": 0.5888888888888889,
+        "catchRate": 0.08236808236808237
+      }
+    },
+    {
+      "seed": 6010,
+      "condition": "founder-pool",
+      "month": 1,
+      "ticks": 3561,
+      "assay": {
+        "escape": 0.8957528957528957,
+        "forage": 0.2992639159914592,
+        "preySurvival": 0.7166666666666667,
+        "catchRate": 0.09666666666666666
+      }
+    },
+    {
+      "seed": 6010,
+      "condition": "founder-pool",
+      "month": 4,
+      "ticks": 3561,
+      "assay": {
+        "escape": 0.8879310344827587,
+        "forage": 0.2747928896869999,
+        "preySurvival": 0.5555555555555556,
+        "catchRate": 0.12724989535370446
+      }
+    },
+    {
+      "seed": 6010,
+      "condition": "founder-pool",
+      "month": 8,
+      "ticks": 3561,
+      "assay": null
+    },
+    {
+      "seed": 6010,
+      "condition": "selection-only",
+      "month": 0,
+      "ticks": 8760,
+      "assay": {
+        "escape": 0.8678414096916299,
+        "forage": 0.21097994863254266,
+        "preySurvival": 0.5888888888888889,
+        "catchRate": 0.08236808236808237
+      }
+    },
+    {
+      "seed": 6010,
+      "condition": "selection-only",
+      "month": 1,
+      "ticks": 8760,
+      "assay": {
+        "escape": 0.9041533546325878,
+        "forage": 0.4043361025325407,
+        "preySurvival": 0.7611111111111111,
+        "catchRate": 0.13
+      }
+    },
+    {
+      "seed": 6010,
+      "condition": "selection-only",
+      "month": 4,
+      "ticks": 8760,
+      "assay": {
+        "escape": 0.9149659863945578,
+        "forage": 0.6723118322360341,
+        "preySurvival": 0.7666666666666667,
+        "catchRate": 0.19333333333333333
+      }
+    },
+    {
+      "seed": 6010,
+      "condition": "selection-only",
+      "month": 8,
+      "ticks": 8760,
+      "assay": {
+        "escape": 0.9276018099547512,
+        "forage": 0.7179051176459722,
+        "preySurvival": 0.6777777777777778,
+        "catchRate": 0.19333333333333333
+      }
+    },
+    {
+      "seed": 6011,
+      "condition": "evolving",
+      "month": 0,
+      "ticks": 2766,
+      "assay": {
+        "escape": 0.8664122137404581,
+        "forage": 0.19678662305436176,
+        "preySurvival": 0.5777777777777777,
+        "catchRate": 0.08694440574056012
+      }
+    },
+    {
+      "seed": 6011,
+      "condition": "evolving",
+      "month": 1,
+      "ticks": 2766,
+      "assay": {
+        "escape": 0.9080882352941176,
+        "forage": 0.3900799325722866,
+        "preySurvival": 0.7444444444444445,
+        "catchRate": 0.09054072935587537
+      }
+    },
+    {
+      "seed": 6011,
+      "condition": "evolving",
+      "month": 4,
+      "ticks": 2766,
+      "assay": null
+    },
+    {
+      "seed": 6011,
+      "condition": "evolving",
+      "month": 8,
+      "ticks": 2766,
+      "assay": null
+    },
+    {
+      "seed": 6011,
+      "condition": "founder-pool",
+      "month": 0,
+      "ticks": 8760,
+      "assay": {
+        "escape": 0.8664122137404581,
+        "forage": 0.19678662305436176,
+        "preySurvival": 0.5777777777777777,
+        "catchRate": 0.08694440574056012
+      }
+    },
+    {
+      "seed": 6011,
+      "condition": "founder-pool",
+      "month": 1,
+      "ticks": 8760,
+      "assay": {
+        "escape": 0.8906882591093117,
+        "forage": 0.3196148050825296,
+        "preySurvival": 0.7611111111111111,
+        "catchRate": 0.07333333333333333
+      }
+    },
+    {
+      "seed": 6011,
+      "condition": "founder-pool",
+      "month": 4,
+      "ticks": 8760,
+      "assay": {
+        "escape": 0.8985507246376812,
+        "forage": 0.34822766058331917,
+        "preySurvival": 0.7444444444444445,
+        "catchRate": 0.08
+      }
+    },
+    {
+      "seed": 6011,
+      "condition": "founder-pool",
+      "month": 8,
+      "ticks": 8760,
+      "assay": {
+        "escape": 0.8693693693693694,
+        "forage": 0.33704182504063634,
+        "preySurvival": 0.6722222222222223,
+        "catchRate": 0.026666666666666665
+      }
+    },
+    {
+      "seed": 6011,
+      "condition": "selection-only",
+      "month": 0,
+      "ticks": 8760,
+      "assay": {
+        "escape": 0.8664122137404581,
+        "forage": 0.19678662305436176,
+        "preySurvival": 0.5777777777777777,
+        "catchRate": 0.08694440574056012
+      }
+    },
+    {
+      "seed": 6011,
+      "condition": "selection-only",
+      "month": 1,
+      "ticks": 8760,
+      "assay": {
+        "escape": 0.9065040650406504,
+        "forage": 0.4660825855892781,
+        "preySurvival": 0.8055555555555556,
+        "catchRate": 0.07
+      }
+    },
+    {
+      "seed": 6011,
+      "condition": "selection-only",
+      "month": 4,
+      "ticks": 8760,
+      "assay": {
+        "escape": 0.93,
+        "forage": 0.3237156211563044,
+        "preySurvival": 0.8777777777777778,
+        "catchRate": 0.09333333333333332
+      }
+    },
+    {
+      "seed": 6011,
+      "condition": "selection-only",
+      "month": 8,
+      "ticks": 8760,
+      "assay": {
+        "escape": 0.9102564102564102,
+        "forage": 0.3562354572749467,
+        "preySurvival": 0.8833333333333333,
+        "catchRate": 0.09333333333333332
+      }
+    },
+    {
+      "seed": 6012,
+      "condition": "evolving",
+      "month": 0,
+      "ticks": 2670,
+      "assay": {
+        "escape": 0.8848920863309353,
+        "forage": 0.19952267574319402,
+        "preySurvival": 0.5722222222222222,
+        "catchRate": 0.04702589223233031
+      }
+    },
+    {
+      "seed": 6012,
+      "condition": "evolving",
+      "month": 1,
+      "ticks": 2670,
+      "assay": {
+        "escape": 0.8862745098039215,
+        "forage": 0.5724768834002012,
+        "preySurvival": 0.7444444444444445,
+        "catchRate": 0.056674538130295875
+      }
+    },
+    {
+      "seed": 6012,
+      "condition": "evolving",
+      "month": 4,
+      "ticks": 2670,
+      "assay": null
+    },
+    {
+      "seed": 6012,
+      "condition": "evolving",
+      "month": 8,
+      "ticks": 2670,
+      "assay": null
+    },
+    {
+      "seed": 6012,
+      "condition": "founder-pool",
+      "month": 0,
+      "ticks": 8760,
+      "assay": {
+        "escape": 0.8848920863309353,
+        "forage": 0.19952267574319402,
+        "preySurvival": 0.5722222222222222,
+        "catchRate": 0.04702589223233031
+      }
+    },
+    {
+      "seed": 6012,
+      "condition": "founder-pool",
+      "month": 1,
+      "ticks": 8760,
+      "assay": {
+        "escape": 0.8796680497925311,
+        "forage": 0.3761571084270939,
+        "preySurvival": 0.7111111111111111,
+        "catchRate": 0.05037078494473206
+      }
+    },
+    {
+      "seed": 6012,
+      "condition": "founder-pool",
+      "month": 4,
+      "ticks": 8760,
+      "assay": {
+        "escape": 0.8813559322033898,
+        "forage": 0.4168819317319802,
+        "preySurvival": 0.7388888888888889,
+        "catchRate": 0.05666666666666667
+      }
+    },
+    {
+      "seed": 6012,
+      "condition": "founder-pool",
+      "month": 8,
+      "ticks": 8760,
+      "assay": {
+        "escape": 0.8888888888888888,
+        "forage": 0.33663822910252866,
+        "preySurvival": 0.6888888888888889,
+        "catchRate": 0.083344909015141
+      }
+    },
+    {
+      "seed": 6012,
+      "condition": "selection-only",
+      "month": 0,
+      "ticks": 2496,
+      "assay": {
+        "escape": 0.8848920863309353,
+        "forage": 0.19952267574319402,
+        "preySurvival": 0.5722222222222222,
+        "catchRate": 0.04702589223233031
+      }
+    },
+    {
+      "seed": 6012,
+      "condition": "selection-only",
+      "month": 1,
+      "ticks": 2496,
+      "assay": {
+        "escape": 0.8916666666666667,
+        "forage": 0.6182908509694661,
+        "preySurvival": 0.75,
+        "catchRate": 0.06344789202727145
+      }
+    },
+    {
+      "seed": 6012,
+      "condition": "selection-only",
+      "month": 4,
+      "ticks": 2496,
+      "assay": null
+    },
+    {
+      "seed": 6012,
+      "condition": "selection-only",
+      "month": 8,
+      "ticks": 2496,
+      "assay": null
+    },
+    {
+      "seed": 6013,
+      "condition": "evolving",
+      "month": 0,
+      "ticks": 2375,
+      "assay": {
+        "escape": 0.8847736625514403,
+        "forage": 0.2377357485674986,
+        "preySurvival": 0.6888888888888889,
+        "catchRate": 0.1
+      }
+    },
+    {
+      "seed": 6013,
+      "condition": "evolving",
+      "month": 1,
+      "ticks": 2375,
+      "assay": {
+        "escape": 0.8832116788321168,
+        "forage": 0.49608779931349417,
+        "preySurvival": 0.7333333333333333,
+        "catchRate": 0.10333333333333333
+      }
+    },
+    {
+      "seed": 6013,
+      "condition": "evolving",
+      "month": 4,
+      "ticks": 2375,
+      "assay": null
+    },
+    {
+      "seed": 6013,
+      "condition": "evolving",
+      "month": 8,
+      "ticks": 2375,
+      "assay": null
+    },
+    {
+      "seed": 6013,
+      "condition": "founder-pool",
+      "month": 0,
+      "ticks": 2723,
+      "assay": {
+        "escape": 0.8847736625514403,
+        "forage": 0.2377357485674986,
+        "preySurvival": 0.6888888888888889,
+        "catchRate": 0.1
+      }
+    },
+    {
+      "seed": 6013,
+      "condition": "founder-pool",
+      "month": 1,
+      "ticks": 2723,
+      "assay": {
+        "escape": 0.8934426229508197,
+        "forage": 0.32938681662914465,
+        "preySurvival": 0.7611111111111111,
+        "catchRate": 0.1
+      }
+    },
+    {
+      "seed": 6013,
+      "condition": "founder-pool",
+      "month": 4,
+      "ticks": 2723,
+      "assay": null
+    },
+    {
+      "seed": 6013,
+      "condition": "founder-pool",
+      "month": 8,
+      "ticks": 2723,
+      "assay": null
+    },
+    {
+      "seed": 6013,
+      "condition": "selection-only",
+      "month": 0,
+      "ticks": 1833,
+      "assay": {
+        "escape": 0.8847736625514403,
+        "forage": 0.2377357485674986,
+        "preySurvival": 0.6888888888888889,
+        "catchRate": 0.1
+      }
+    },
+    {
+      "seed": 6013,
+      "condition": "selection-only",
+      "month": 1,
+      "ticks": 1833,
+      "assay": {
+        "escape": 0.9033613445378151,
+        "forage": 0.4769430504347315,
+        "preySurvival": 0.8055555555555556,
+        "catchRate": 0.11333333333333334
+      }
+    },
+    {
+      "seed": 6013,
+      "condition": "selection-only",
+      "month": 4,
+      "ticks": 1833,
+      "assay": null
+    },
+    {
+      "seed": 6013,
+      "condition": "selection-only",
+      "month": 8,
+      "ticks": 1833,
+      "assay": null
+    },
+    {
+      "seed": 6014,
+      "condition": "evolving",
+      "month": 0,
+      "ticks": 1982,
+      "assay": {
+        "escape": 0.8553719008264463,
+        "forage": 0.21020634708374497,
+        "preySurvival": 0.4777777777777778,
+        "catchRate": 0.09117771211481637
+      }
+    },
+    {
+      "seed": 6014,
+      "condition": "evolving",
+      "month": 1,
+      "ticks": 1982,
+      "assay": {
+        "escape": 0.8912280701754386,
+        "forage": 0.4818880368761892,
+        "preySurvival": 0.7333333333333333,
+        "catchRate": 0.08314087759815243
+      }
+    },
+    {
+      "seed": 6014,
+      "condition": "evolving",
+      "month": 4,
+      "ticks": 1982,
+      "assay": null
+    },
+    {
+      "seed": 6014,
+      "condition": "evolving",
+      "month": 8,
+      "ticks": 1982,
+      "assay": null
+    },
+    {
+      "seed": 6014,
+      "condition": "founder-pool",
+      "month": 0,
+      "ticks": 8760,
+      "assay": {
+        "escape": 0.8553719008264463,
+        "forage": 0.21020634708374497,
+        "preySurvival": 0.4777777777777778,
+        "catchRate": 0.09117771211481637
+      }
+    },
+    {
+      "seed": 6014,
+      "condition": "founder-pool",
+      "month": 1,
+      "ticks": 8760,
+      "assay": {
+        "escape": 0.8922558922558923,
+        "forage": 0.38739486128104694,
+        "preySurvival": 0.65,
+        "catchRate": 0.06425250105678455
+      }
+    },
+    {
+      "seed": 6014,
+      "condition": "founder-pool",
+      "month": 4,
+      "ticks": 8760,
+      "assay": {
+        "escape": 0.8565022421524664,
+        "forage": 0.3501214907576751,
+        "preySurvival": 0.6111111111111112,
+        "catchRate": 0.10333333333333333
+      }
+    },
+    {
+      "seed": 6014,
+      "condition": "founder-pool",
+      "month": 8,
+      "ticks": 8760,
+      "assay": {
+        "escape": 0.8969465648854962,
+        "forage": 0.3580202679290158,
+        "preySurvival": 0.6333333333333333,
+        "catchRate": 0.08348406845693614
+      }
+    },
+    {
+      "seed": 6014,
+      "condition": "selection-only",
+      "month": 0,
+      "ticks": 8760,
+      "assay": {
+        "escape": 0.8553719008264463,
+        "forage": 0.21020634708374497,
+        "preySurvival": 0.4777777777777778,
+        "catchRate": 0.09117771211481637
+      }
+    },
+    {
+      "seed": 6014,
+      "condition": "selection-only",
+      "month": 1,
+      "ticks": 8760,
+      "assay": {
+        "escape": 0.8897338403041825,
+        "forage": 0.4975599418836936,
+        "preySurvival": 0.7388888888888889,
+        "catchRate": 0.09081990189208129
+      }
+    },
+    {
+      "seed": 6014,
+      "condition": "selection-only",
+      "month": 4,
+      "ticks": 8760,
+      "assay": {
+        "escape": 0.8832116788321168,
+        "forage": 0.6847584847772423,
+        "preySurvival": 0.6944444444444444,
+        "catchRate": 0.11333333333333334
+      }
+    },
+    {
+      "seed": 6014,
+      "condition": "selection-only",
+      "month": 8,
+      "ticks": 8760,
+      "assay": {
+        "escape": 0.9172661870503597,
+        "forage": 0.7604913739382532,
+        "preySurvival": 0.7555555555555555,
+        "catchRate": 0.11333333333333334
+      }
+    },
+    {
+      "seed": 6015,
+      "condition": "evolving",
+      "month": 0,
+      "ticks": 1702,
+      "assay": {
+        "escape": 0.8939929328621908,
+        "forage": 0.2555959938645035,
+        "preySurvival": 0.5666666666666667,
+        "catchRate": 0.15000000000000002
+      }
+    },
+    {
+      "seed": 6015,
+      "condition": "evolving",
+      "month": 1,
+      "ticks": 1702,
+      "assay": {
+        "escape": 0.8786610878661087,
+        "forage": 0.44510245721876696,
+        "preySurvival": 0.6555555555555556,
+        "catchRate": 0.15666666666666668
+      }
+    },
+    {
+      "seed": 6015,
+      "condition": "evolving",
+      "month": 4,
+      "ticks": 1702,
+      "assay": null
+    },
+    {
+      "seed": 6015,
+      "condition": "evolving",
+      "month": 8,
+      "ticks": 1702,
+      "assay": null
+    },
+    {
+      "seed": 6015,
+      "condition": "founder-pool",
+      "month": 0,
+      "ticks": 2597,
+      "assay": {
+        "escape": 0.8939929328621908,
+        "forage": 0.2555959938645035,
+        "preySurvival": 0.5666666666666667,
+        "catchRate": 0.15000000000000002
+      }
+    },
+    {
+      "seed": 6015,
+      "condition": "founder-pool",
+      "month": 1,
+      "ticks": 2597,
+      "assay": {
+        "escape": 0.8984962406015038,
+        "forage": 0.2921693084444664,
+        "preySurvival": 0.6944444444444444,
+        "catchRate": 0.1411764705882353
+      }
+    },
+    {
+      "seed": 6015,
+      "condition": "founder-pool",
+      "month": 4,
+      "ticks": 2597,
+      "assay": null
+    },
+    {
+      "seed": 6015,
+      "condition": "founder-pool",
+      "month": 8,
+      "ticks": 2597,
+      "assay": null
+    },
+    {
+      "seed": 6015,
+      "condition": "selection-only",
+      "month": 0,
+      "ticks": 4124,
+      "assay": {
+        "escape": 0.8939929328621908,
+        "forage": 0.2555959938645035,
+        "preySurvival": 0.5666666666666667,
+        "catchRate": 0.15000000000000002
+      }
+    },
+    {
+      "seed": 6015,
+      "condition": "selection-only",
+      "month": 1,
+      "ticks": 4124,
+      "assay": {
+        "escape": 0.8663967611336032,
+        "forage": 0.4829990678207549,
+        "preySurvival": 0.6333333333333333,
+        "catchRate": 0.13333333333333333
+      }
+    },
+    {
+      "seed": 6015,
+      "condition": "selection-only",
+      "month": 4,
+      "ticks": 4124,
+      "assay": {
+        "escape": 0.9253731343283582,
+        "forage": 0.3285008553064256,
+        "preySurvival": 0.8555555555555555,
+        "catchRate": 0.20333333333333337
+      }
+    },
+    {
+      "seed": 6015,
+      "condition": "selection-only",
+      "month": 8,
+      "ticks": 4124,
+      "assay": null
+    },
+    {
+      "seed": 6016,
+      "condition": "evolving",
+      "month": 0,
+      "ticks": 8760,
+      "assay": {
+        "escape": 0.8613445378151261,
+        "forage": 0.23295916621892268,
+        "preySurvival": 0.5777777777777777,
+        "catchRate": 0.14666666666666667
+      }
+    },
+    {
+      "seed": 6016,
+      "condition": "evolving",
+      "month": 1,
+      "ticks": 8760,
+      "assay": {
+        "escape": 0.9061488673139159,
+        "forage": 0.430548088599667,
+        "preySurvival": 0.7833333333333333,
+        "catchRate": 0.12482429013213381
+      }
+    },
+    {
+      "seed": 6016,
+      "condition": "evolving",
+      "month": 4,
+      "ticks": 8760,
+      "assay": {
+        "escape": 0.892018779342723,
+        "forage": 0.2521179480897508,
+        "preySurvival": 0.8611111111111112,
+        "catchRate": 0.13333333333333333
+      }
+    },
+    {
+      "seed": 6016,
+      "condition": "evolving",
+      "month": 8,
+      "ticks": 8760,
+      "assay": {
+        "escape": 0.9025641025641026,
+        "forage": 0.2924916421533745,
+        "preySurvival": 0.8888888888888888,
+        "catchRate": 0.09666666666666666
+      }
+    },
+    {
+      "seed": 6016,
+      "condition": "founder-pool",
+      "month": 0,
+      "ticks": 3911,
+      "assay": {
+        "escape": 0.8613445378151261,
+        "forage": 0.23295916621892268,
+        "preySurvival": 0.5777777777777777,
+        "catchRate": 0.14666666666666667
+      }
+    },
+    {
+      "seed": 6016,
+      "condition": "founder-pool",
+      "month": 1,
+      "ticks": 3911,
+      "assay": {
+        "escape": 0.895397489539749,
+        "forage": 0.2661467437397476,
+        "preySurvival": 0.7055555555555556,
+        "catchRate": 0.1035202448866008
+      }
+    },
+    {
+      "seed": 6016,
+      "condition": "founder-pool",
+      "month": 4,
+      "ticks": 3911,
+      "assay": {
+        "escape": 0.9128630705394191,
+        "forage": 0.21245489572538834,
+        "preySurvival": 0.7388888888888889,
+        "catchRate": 0.09666666666666666
+      }
+    },
+    {
+      "seed": 6016,
+      "condition": "founder-pool",
+      "month": 8,
+      "ticks": 3911,
+      "assay": null
+    },
+    {
+      "seed": 6016,
+      "condition": "selection-only",
+      "month": 0,
+      "ticks": 8760,
+      "assay": {
+        "escape": 0.8613445378151261,
+        "forage": 0.23295916621892268,
+        "preySurvival": 0.5777777777777777,
+        "catchRate": 0.14666666666666667
+      }
+    },
+    {
+      "seed": 6016,
+      "condition": "selection-only",
+      "month": 1,
+      "ticks": 8760,
+      "assay": {
+        "escape": 0.9253731343283582,
+        "forage": 0.4106714832441245,
+        "preySurvival": 0.8111111111111111,
+        "catchRate": 0.11666666666666667
+      }
+    },
+    {
+      "seed": 6016,
+      "condition": "selection-only",
+      "month": 4,
+      "ticks": 8760,
+      "assay": {
+        "escape": 0.8862068965517241,
+        "forage": 0.5499792878038534,
+        "preySurvival": 0.7444444444444445,
+        "catchRate": 0.14666666666666667
+      }
+    },
+    {
+      "seed": 6016,
+      "condition": "selection-only",
+      "month": 8,
+      "ticks": 8760,
+      "assay": {
+        "escape": 0.9017341040462428,
+        "forage": 0.6129018381108325,
+        "preySurvival": 0.8722222222222222,
+        "catchRate": 0.12
+      }
+    },
+    {
+      "seed": 6017,
+      "condition": "evolving",
+      "month": 0,
+      "ticks": 7140,
+      "assay": {
+        "escape": 0.8754098360655738,
+        "forage": 0.24651694122680767,
+        "preySurvival": 0.5388888888888889,
+        "catchRate": 0.07666666666666667
+      }
+    },
+    {
+      "seed": 6017,
+      "condition": "evolving",
+      "month": 1,
+      "ticks": 7140,
+      "assay": {
+        "escape": 0.8989169675090253,
+        "forage": 0.4161226012942917,
+        "preySurvival": 0.8,
+        "catchRate": 0.09042701646664805
+      }
+    },
+    {
+      "seed": 6017,
+      "condition": "evolving",
+      "month": 4,
+      "ticks": 7140,
+      "assay": {
+        "escape": 0.930648769574944,
+        "forage": 0.7180386747906876,
+        "preySurvival": 0.8277777777777777,
+        "catchRate": 0.07333333333333333
+      }
+    },
+    {
+      "seed": 6017,
+      "condition": "evolving",
+      "month": 8,
+      "ticks": 7140,
+      "assay": {
+        "escape": 0.9176201372997712,
+        "forage": 0.6976237729633439,
+        "preySurvival": 0.7833333333333333,
+        "catchRate": 0.10666666666666666
+      }
+    },
+    {
+      "seed": 6017,
+      "condition": "founder-pool",
+      "month": 0,
+      "ticks": 8760,
+      "assay": {
+        "escape": 0.8754098360655738,
+        "forage": 0.24651694122680767,
+        "preySurvival": 0.5388888888888889,
+        "catchRate": 0.07666666666666667
+      }
+    },
+    {
+      "seed": 6017,
+      "condition": "founder-pool",
+      "month": 1,
+      "ticks": 8760,
+      "assay": {
+        "escape": 0.8823529411764706,
+        "forage": 0.34520701161473555,
+        "preySurvival": 0.7388888888888889,
+        "catchRate": 0.07
+      }
+    },
+    {
+      "seed": 6017,
+      "condition": "founder-pool",
+      "month": 4,
+      "ticks": 8760,
+      "assay": {
+        "escape": 0.8739837398373984,
+        "forage": 0.3137466868753221,
+        "preySurvival": 0.7055555555555556,
+        "catchRate": 0.06
+      }
+    },
+    {
+      "seed": 6017,
+      "condition": "founder-pool",
+      "month": 8,
+      "ticks": 8760,
+      "assay": {
+        "escape": 0.8945783132530121,
+        "forage": 0.29771274047830126,
+        "preySurvival": 0.7166666666666667,
+        "catchRate": 0.07
+      }
+    },
+    {
+      "seed": 6017,
+      "condition": "selection-only",
+      "month": 0,
+      "ticks": 5038,
+      "assay": {
+        "escape": 0.8754098360655738,
+        "forage": 0.24651694122680767,
+        "preySurvival": 0.5388888888888889,
+        "catchRate": 0.07666666666666667
+      }
+    },
+    {
+      "seed": 6017,
+      "condition": "selection-only",
+      "month": 1,
+      "ticks": 5038,
+      "assay": {
+        "escape": 0.9049079754601227,
+        "forage": 0.578830840611311,
+        "preySurvival": 0.8,
+        "catchRate": 0.06666666666666667
+      }
+    },
+    {
+      "seed": 6017,
+      "condition": "selection-only",
+      "month": 4,
+      "ticks": 5038,
+      "assay": {
+        "escape": 0.9294871794871795,
+        "forage": 0.7115922932962493,
+        "preySurvival": 0.8,
+        "catchRate": 0.04
+      }
+    },
+    {
+      "seed": 6017,
+      "condition": "selection-only",
+      "month": 8,
+      "ticks": 5038,
+      "assay": null
+    },
+    {
+      "seed": 6018,
+      "condition": "evolving",
+      "month": 0,
+      "ticks": 8760,
+      "assay": {
+        "escape": 0.9021406727828746,
+        "forage": 0.23994020894761145,
+        "preySurvival": 0.5333333333333333,
+        "catchRate": 0.07514944491887277
+      }
+    },
+    {
+      "seed": 6018,
+      "condition": "evolving",
+      "month": 1,
+      "ticks": 8760,
+      "assay": {
+        "escape": 0.8831615120274914,
+        "forage": 0.49461387439310334,
+        "preySurvival": 0.7277777777777777,
+        "catchRate": 0.09124190368910166
+      }
+    },
+    {
+      "seed": 6018,
+      "condition": "evolving",
+      "month": 4,
+      "ticks": 8760,
+      "assay": {
+        "escape": 0.9393939393939394,
+        "forage": 0.7722932061158536,
+        "preySurvival": 0.9,
+        "catchRate": 0.11333333333333334
+      }
+    },
+    {
+      "seed": 6018,
+      "condition": "evolving",
+      "month": 8,
+      "ticks": 8760,
+      "assay": {
+        "escape": 0.9132231404958677,
+        "forage": 0.7674467393224944,
+        "preySurvival": 0.85,
+        "catchRate": 0.09333333333333332
+      }
+    },
+    {
+      "seed": 6018,
+      "condition": "founder-pool",
+      "month": 0,
+      "ticks": 8760,
+      "assay": {
+        "escape": 0.9021406727828746,
+        "forage": 0.23994020894761145,
+        "preySurvival": 0.5333333333333333,
+        "catchRate": 0.07514944491887277
+      }
+    },
+    {
+      "seed": 6018,
+      "condition": "founder-pool",
+      "month": 1,
+      "ticks": 8760,
+      "assay": {
+        "escape": 0.8818897637795275,
+        "forage": 0.3336603204052823,
+        "preySurvival": 0.6666666666666666,
+        "catchRate": 0.10386709479268463
+      }
+    },
+    {
+      "seed": 6018,
+      "condition": "founder-pool",
+      "month": 4,
+      "ticks": 8760,
+      "assay": {
+        "escape": 0.9144981412639405,
+        "forage": 0.25739280335453724,
+        "preySurvival": 0.7,
+        "catchRate": 0.11451024417625597
+      }
+    },
+    {
+      "seed": 6018,
+      "condition": "founder-pool",
+      "month": 8,
+      "ticks": 8760,
+      "assay": {
+        "escape": 0.8947368421052632,
+        "forage": 0.338281430871795,
+        "preySurvival": 0.7388888888888889,
+        "catchRate": 0.08666666666666667
+      }
+    },
+    {
+      "seed": 6018,
+      "condition": "selection-only",
+      "month": 0,
+      "ticks": 8760,
+      "assay": {
+        "escape": 0.9021406727828746,
+        "forage": 0.23994020894761145,
+        "preySurvival": 0.5333333333333333,
+        "catchRate": 0.07514944491887277
+      }
+    },
+    {
+      "seed": 6018,
+      "condition": "selection-only",
+      "month": 1,
+      "ticks": 8760,
+      "assay": {
+        "escape": 0.890625,
+        "forage": 0.40318036097649435,
+        "preySurvival": 0.7222222222222222,
+        "catchRate": 0.07674127624078966
+      }
+    },
+    {
+      "seed": 6018,
+      "condition": "selection-only",
+      "month": 4,
+      "ticks": 8760,
+      "assay": {
+        "escape": 0.9074733096085409,
+        "forage": 0.415904235391559,
+        "preySurvival": 0.7666666666666667,
+        "catchRate": 0.1
+      }
+    },
+    {
+      "seed": 6018,
+      "condition": "selection-only",
+      "month": 8,
+      "ticks": 8760,
+      "assay": {
+        "escape": 0.902834008097166,
+        "forage": 0.4951005373904053,
+        "preySurvival": 0.8,
+        "catchRate": 0.07666666666666667
+      }
+    },
+    {
+      "seed": 6019,
+      "condition": "evolving",
+      "month": 0,
+      "ticks": 2587,
+      "assay": {
+        "escape": 0.8993055555555556,
+        "forage": 0.19405067967120718,
+        "preySurvival": 0.5611111111111111,
+        "catchRate": 0.05333333333333333
+      }
+    },
+    {
+      "seed": 6019,
+      "condition": "evolving",
+      "month": 1,
+      "ticks": 2587,
+      "assay": {
+        "escape": 0.8754325259515571,
+        "forage": 0.4901316978959334,
+        "preySurvival": 0.7111111111111111,
+        "catchRate": 0.06666666666666667
+      }
+    },
+    {
+      "seed": 6019,
+      "condition": "evolving",
+      "month": 4,
+      "ticks": 2587,
+      "assay": null
+    },
+    {
+      "seed": 6019,
+      "condition": "evolving",
+      "month": 8,
+      "ticks": 2587,
+      "assay": null
+    },
+    {
+      "seed": 6019,
+      "condition": "founder-pool",
+      "month": 0,
+      "ticks": 8760,
+      "assay": {
+        "escape": 0.8993055555555556,
+        "forage": 0.19405067967120718,
+        "preySurvival": 0.5611111111111111,
+        "catchRate": 0.05333333333333333
+      }
+    },
+    {
+      "seed": 6019,
+      "condition": "founder-pool",
+      "month": 1,
+      "ticks": 8760,
+      "assay": {
+        "escape": 0.8754578754578755,
+        "forage": 0.32806197684677807,
+        "preySurvival": 0.6555555555555556,
+        "catchRate": 0.05333333333333333
+      }
+    },
+    {
+      "seed": 6019,
+      "condition": "founder-pool",
+      "month": 4,
+      "ticks": 8760,
+      "assay": {
+        "escape": 0.8913738019169329,
+        "forage": 0.3676947570551347,
+        "preySurvival": 0.6111111111111112,
+        "catchRate": 0.06333333333333334
+      }
+    },
+    {
+      "seed": 6019,
+      "condition": "founder-pool",
+      "month": 8,
+      "ticks": 8760,
+      "assay": {
+        "escape": 0.9032258064516129,
+        "forage": 0.2634310338414394,
+        "preySurvival": 0.7277777777777777,
+        "catchRate": 0.06
+      }
+    },
+    {
+      "seed": 6019,
+      "condition": "selection-only",
+      "month": 0,
+      "ticks": 6360,
+      "assay": {
+        "escape": 0.8993055555555556,
+        "forage": 0.19405067967120718,
+        "preySurvival": 0.5611111111111111,
+        "catchRate": 0.05333333333333333
+      }
+    },
+    {
+      "seed": 6019,
+      "condition": "selection-only",
+      "month": 1,
+      "ticks": 6360,
+      "assay": {
+        "escape": 0.884375,
+        "forage": 0.4686299287464241,
+        "preySurvival": 0.7222222222222222,
+        "catchRate": 0.05
+      }
+    },
+    {
+      "seed": 6019,
+      "condition": "selection-only",
+      "month": 4,
+      "ticks": 6360,
+      "assay": {
+        "escape": 0.9036458333333334,
+        "forage": 0.7463519228298022,
+        "preySurvival": 0.7777777777777778,
+        "catchRate": 0.06333333333333334
+      }
+    },
+    {
+      "seed": 6019,
+      "condition": "selection-only",
+      "month": 8,
+      "ticks": 6360,
+      "assay": {
+        "escape": 0.9118457300275482,
+        "forage": 0.5256721727761006,
+        "preySurvival": 0.8166666666666667,
+        "catchRate": 0.05
+      }
+    }
+  ],
+  "runtime": "Node 25.2.1, macOS arm64"
+}

@@ -1,51 +1,93 @@
 import type { Intervention } from '@/sim/sim'
+import type { EvolutionSample, JournalEntry } from '@/sim/evolution'
 import { STAT, STAT_STRIDE, type FrameData } from '@/worker/protocol'
 
-/** Keep every tick for recent playback, and every KEY_EVERY-th tick for scrubbing the whole run. */
+export const HISTORY_HOURS = 8760
+const CAPACITY = HISTORY_HOURS + 1
 const RECENT = 360
 const KEY_EVERY = 3
 
+/** A rolling year of statistics and replay. Memory does not grow with an Endless run. */
 export class RunHistory {
-  readonly horizon: number
-  readonly stats: Float64Array
+  readonly limit: number
+  readonly endless: boolean
+  readonly stats = new Float64Array(CAPACITY * STAT_STRIDE)
   head = 0
+  start = 0
   interventions: { tick: number; action: Intervention }[] = []
+  evolution: EvolutionSample[] = []
+  journal: JournalEntry[] = []
+  private highestGeneration = { prey: 0, pred: 0 }
   private frames = new Map<number, FrameData>()
 
-  constructor(horizon: number) {
-    this.horizon = horizon
-    this.stats = new Float64Array((horizon + 1) * STAT_STRIDE)
-  }
+  constructor(horizon: number, endless = false) { this.limit = horizon; this.endless = endless }
+  get horizon(): number { return this.endless ? Math.max(this.limit, this.head + 300) : this.limit }
+  get firstTick(): number { return Math.max(this.start, this.head - HISTORY_HOURS) }
 
   add(frame: FrameData, row: Float64Array, rowOffset: number): void {
     const t = frame.tick
+    if (this.frames.size === 0) this.start = t
     this.frames.set(t, frame)
-    this.stats.set(row.subarray(rowOffset, rowOffset + STAT_STRIDE), t * STAT_STRIDE)
+    this.stats.set(row.subarray(rowOffset, rowOffset + STAT_STRIDE), (t % CAPACITY) * STAT_STRIDE)
     this.head = Math.max(this.head, t)
     const drop = t - RECENT
-    if (drop > 0 && drop % KEY_EVERY !== 0) this.frames.delete(drop)
+    if (drop > this.start && drop % KEY_EVERY !== 0) this.frames.delete(drop)
+    this.frames.delete(t - HISTORY_HOURS - 1)
+  }
+
+  addEvolution(sample: EvolutionSample): void {
+    const prev = this.evolution.at(-1)
+    if (prev?.tick === sample.tick) return
+    for (const s of ['prey', 'pred'] as const) {
+      const label = s === 'prey' ? 'Rabbit' : 'Fox'
+      if (prev && Math.floor(sample[s].generation / 5) > Math.floor(this.highestGeneration[s] / 5))
+        this.journal.push({ tick: sample.tick, text: `${label} descendants reached generation ${sample[s].generation}.` })
+      this.highestGeneration[s] = Math.max(this.highestGeneration[s], sample[s].generation)
+      if (prev && prev[s].lineages > 1 && sample[s].lineages === 1)
+        this.journal.push({ tick: sample.tick, text: `One founding ${label.toLowerCase()} lineage remains.` })
+    }
+    if (prev && sample.prey.count > 0 && sample.pred.count > 0 && Math.floor(sample.tick / 8760) > Math.floor(prev.tick / 8760))
+      this.journal.push({ tick: sample.tick, text: `Both species reached year ${Math.floor(sample.tick / 8760) + 1}.` })
+    this.journal = this.journal.slice(-80)
+    this.evolution.push(sample)
+    // Preserve the founder reference, plus the most recent daily observations.
+    if (this.evolution.length > 367) this.evolution.splice(1, this.evolution.length - 367)
+  }
+
+  save() {
+    return { stats: this.stats, highestGeneration: this.highestGeneration, head: this.head, start: Math.max(this.firstTick, this.head - RECENT),
+      frames: [...this.frames.entries()].filter(([t]) => t >= this.head - RECENT) }
+  }
+
+  restore(data: ReturnType<RunHistory['save']>): void {
+    this.stats.set(data.stats)
+    this.highestGeneration = data.highestGeneration
+    this.head = data.head
+    this.start = data.start
+    this.frames = new Map(data.frames)
   }
 
   stat(tick: number, key: keyof typeof STAT): number {
-    const t = Math.max(0, Math.min(this.head, Math.floor(tick)))
-    return this.stats[t * STAT_STRIDE + STAT[key]]
+    const t = Math.max(this.firstTick, Math.min(this.head, Math.floor(tick)))
+    return this.stats[(t % CAPACITY) * STAT_STRIDE + STAT[key]]
   }
 
-  /** Frames bracketing a fractional tick, with the blend factor between them. */
   frameAt(tick: number): { a: FrameData; b: FrameData; alpha: number } | null {
-    const t = Math.max(0, Math.min(this.head, tick))
+    const t = Math.max(this.firstTick, Math.min(this.head, tick))
     let lo = Math.floor(t)
     let a = this.frames.get(lo)
-    while (!a && lo > 0) a = this.frames.get(--lo)
-    if (!a) return null
+    while (!a && lo > this.firstTick) a = this.frames.get(--lo)
+    if (!a) {
+      lo = Math.ceil(t)
+      while (!a && lo <= this.head && lo < t + KEY_EVERY + 1) a = this.frames.get(lo++)
+      if (!a) return null
+      lo = a.tick
+    }
     let hi = lo + 1
     let b = this.frames.get(hi)
     while (!b && hi < lo + KEY_EVERY + 1 && hi <= this.head) b = this.frames.get(++hi)
     if (!b) return { a, b: a, alpha: 0 }
     return { a, b, alpha: Math.min(1, Math.max(0, (t - lo) / (hi - lo))) }
   }
-
-  frame(tick: number): FrameData | undefined {
-    return this.frames.get(tick)
-  }
+  frame(tick: number): FrameData | undefined { return this.frames.get(tick) }
 }

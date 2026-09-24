@@ -1,0 +1,1721 @@
+{
+  "start": 5000,
+  "count": 50,
+  "note": "Illustrative fixed threshold strategy, not optimal human play; same starting seeds and four charges with 400-hour cooldown.",
+  "summary": [
+    {
+      "strategy": "untouched",
+      "survived": 18,
+      "count": 50,
+      "meanHours": 5679.16
+    },
+    {
+      "strategy": "watchful",
+      "survived": 23,
+      "count": 50,
+      "meanHours": 6352.62
+    }
+  ],
+  "rows": [
+    {
+      "seed": 5000,
+      "strategy": "untouched",
+      "survived": false,
+      "tick": 6904,
+      "actions": [],
+      "ceilingHits": 0
+    },
+    {
+      "seed": 5000,
+      "strategy": "watchful",
+      "survived": false,
+      "tick": 3084,
+      "actions": [
+        {
+          "tick": 1188,
+          "action": "rain"
+        },
+        {
+          "tick": 2320,
+          "action": "cullPred"
+        },
+        {
+          "tick": 2853,
+          "action": "rain"
+        }
+      ],
+      "ceilingHits": 0
+    },
+    {
+      "seed": 5001,
+      "strategy": "untouched",
+      "survived": false,
+      "tick": 2016,
+      "actions": [],
+      "ceilingHits": 0
+    },
+    {
+      "seed": 5001,
+      "strategy": "watchful",
+      "survived": false,
+      "tick": 5161,
+      "actions": [
+        {
+          "tick": 949,
+          "action": "rain"
+        },
+        {
+          "tick": 1681,
+          "action": "cullPred"
+        },
+        {
+          "tick": 2654,
+          "action": "rain"
+        },
+        {
+          "tick": 4316,
+          "action": "cullPred"
+        }
+      ],
+      "ceilingHits": 0
+    },
+    {
+      "seed": 5002,
+      "strategy": "untouched",
+      "survived": true,
+      "tick": 8760,
+      "actions": [],
+      "ceilingHits": 0
+    },
+    {
+      "seed": 5002,
+      "strategy": "watchful",
+      "survived": false,
+      "tick": 3053,
+      "actions": [
+        {
+          "tick": 1356,
+          "action": "rain"
+        },
+        {
+          "tick": 2561,
+          "action": "cullPred"
+        },
+        {
+          "tick": 2961,
+          "action": "cullPred"
+        }
+      ],
+      "ceilingHits": 0
+    },
+    {
+      "seed": 5003,
+      "strategy": "untouched",
+      "survived": false,
+      "tick": 5330,
+      "actions": [],
+      "ceilingHits": 0
+    },
+    {
+      "seed": 5003,
+      "strategy": "watchful",
+      "survived": true,
+      "tick": 8760,
+      "actions": [
+        {
+          "tick": 604,
+          "action": "rain"
+        },
+        {
+          "tick": 2209,
+          "action": "rain"
+        },
+        {
+          "tick": 2854,
+          "action": "rain"
+        },
+        {
+          "tick": 4095,
+          "action": "cullPred"
+        }
+      ],
+      "ceilingHits": 0
+    },
+    {
+      "seed": 5004,
+      "strategy": "untouched",
+      "survived": false,
+      "tick": 1674,
+      "actions": [],
+      "ceilingHits": 0
+    },
+    {
+      "seed": 5004,
+      "strategy": "watchful",
+      "survived": false,
+      "tick": 3742,
+      "actions": [
+        {
+          "tick": 1364,
+          "action": "cullPred"
+        },
+        {
+          "tick": 1764,
+          "action": "cullPred"
+        },
+        {
+          "tick": 2164,
+          "action": "releasePrey"
+        },
+        {
+          "tick": 2807,
+          "action": "rain"
+        }
+      ],
+      "ceilingHits": 0
+    },
+    {
+      "seed": 5005,
+      "strategy": "untouched",
+      "survived": false,
+      "tick": 4133,
+      "actions": [],
+      "ceilingHits": 0
+    },
+    {
+      "seed": 5005,
+      "strategy": "watchful",
+      "survived": true,
+      "tick": 8760,
+      "actions": [
+        {
+          "tick": 613,
+          "action": "rain"
+        },
+        {
+          "tick": 1013,
+          "action": "rain"
+        },
+        {
+          "tick": 1413,
+          "action": "rain"
+        },
+        {
+          "tick": 1813,
+          "action": "rain"
+        }
+      ],
+      "ceilingHits": 0
+    },
+    {
+      "seed": 5006,
+      "strategy": "untouched",
+      "survived": true,
+      "tick": 8760,
+      "actions": [],
+      "ceilingHits": 0
+    },
+    {
+      "seed": 5006,
+      "strategy": "watchful",
+      "survived": true,
+      "tick": 8760,
+      "actions": [
+        {
+          "tick": 910,
+          "action": "rain"
+        },
+        {
+          "tick": 1310,
+          "action": "rain"
+        },
+        {
+          "tick": 1710,
+          "action": "rain"
+        },
+        {
+          "tick": 2110,
+          "action": "rain"
+        }
+      ],
+      "ceilingHits": 0
+    },
+    {
+      "seed": 5007,
+      "strategy": "untouched",
+      "survived": true,
+      "tick": 8760,
+      "actions": [],
+      "ceilingHits": 0
+    },
+    {
+      "seed": 5007,
+      "strategy": "watchful",
+      "survived": true,
+      "tick": 8760,
+      "actions": [
+        {
+          "tick": 1081,
+          "action": "rain"
+        },
+        {
+          "tick": 3085,
+          "action": "rain"
+        },
+        {
+          "tick": 6160,
+          "action": "cullPred"
+        },
+        {
+          "tick": 7726,
+          "action": "cullPred"
+        }
+      ],
+      "ceilingHits": 0
+    },
+    {
+      "seed": 5008,
+      "strategy": "untouched",
+      "survived": true,
+      "tick": 8760,
+      "actions": [],
+      "ceilingHits": 0
+    },
+    {
+      "seed": 5008,
+      "strategy": "watchful",
+      "survived": false,
+      "tick": 4712,
+      "actions": [
+        {
+          "tick": 804,
+          "action": "rain"
+        },
+        {
+          "tick": 1204,
+          "action": "rain"
+        },
+        {
+          "tick": 1604,
+          "action": "rain"
+        },
+        {
+          "tick": 2006,
+          "action": "rain"
+        }
+      ],
+      "ceilingHits": 0
+    },
+    {
+      "seed": 5009,
+      "strategy": "untouched",
+      "survived": true,
+      "tick": 8760,
+      "actions": [],
+      "ceilingHits": 0
+    },
+    {
+      "seed": 5009,
+      "strategy": "watchful",
+      "survived": true,
+      "tick": 8760,
+      "actions": [
+        {
+          "tick": 784,
+          "action": "rain"
+        },
+        {
+          "tick": 2330,
+          "action": "cullPred"
+        },
+        {
+          "tick": 2730,
+          "action": "cullPred"
+        },
+        {
+          "tick": 4026,
+          "action": "cullPred"
+        }
+      ],
+      "ceilingHits": 0
+    },
+    {
+      "seed": 5010,
+      "strategy": "untouched",
+      "survived": false,
+      "tick": 4668,
+      "actions": [],
+      "ceilingHits": 0
+    },
+    {
+      "seed": 5010,
+      "strategy": "watchful",
+      "survived": false,
+      "tick": 1787,
+      "actions": [
+        {
+          "tick": 247,
+          "action": "rain"
+        },
+        {
+          "tick": 1090,
+          "action": "rain"
+        },
+        {
+          "tick": 1499,
+          "action": "cullPred"
+        }
+      ],
+      "ceilingHits": 0
+    },
+    {
+      "seed": 5011,
+      "strategy": "untouched",
+      "survived": false,
+      "tick": 8434,
+      "actions": [],
+      "ceilingHits": 0
+    },
+    {
+      "seed": 5011,
+      "strategy": "watchful",
+      "survived": false,
+      "tick": 6964,
+      "actions": [
+        {
+          "tick": 635,
+          "action": "rain"
+        },
+        {
+          "tick": 1035,
+          "action": "rain"
+        },
+        {
+          "tick": 1572,
+          "action": "rain"
+        },
+        {
+          "tick": 1979,
+          "action": "rain"
+        }
+      ],
+      "ceilingHits": 0
+    },
+    {
+      "seed": 5012,
+      "strategy": "untouched",
+      "survived": true,
+      "tick": 8760,
+      "actions": [],
+      "ceilingHits": 0
+    },
+    {
+      "seed": 5012,
+      "strategy": "watchful",
+      "survived": true,
+      "tick": 8760,
+      "actions": [
+        {
+          "tick": 511,
+          "action": "rain"
+        },
+        {
+          "tick": 911,
+          "action": "rain"
+        },
+        {
+          "tick": 1425,
+          "action": "rain"
+        },
+        {
+          "tick": 1825,
+          "action": "rain"
+        }
+      ],
+      "ceilingHits": 0
+    },
+    {
+      "seed": 5013,
+      "strategy": "untouched",
+      "survived": true,
+      "tick": 8760,
+      "actions": [],
+      "ceilingHits": 0
+    },
+    {
+      "seed": 5013,
+      "strategy": "watchful",
+      "survived": true,
+      "tick": 8760,
+      "actions": [
+        {
+          "tick": 943,
+          "action": "rain"
+        },
+        {
+          "tick": 1343,
+          "action": "rain"
+        },
+        {
+          "tick": 1743,
+          "action": "rain"
+        },
+        {
+          "tick": 2402,
+          "action": "rain"
+        }
+      ],
+      "ceilingHits": 0
+    },
+    {
+      "seed": 5014,
+      "strategy": "untouched",
+      "survived": true,
+      "tick": 8760,
+      "actions": [],
+      "ceilingHits": 0
+    },
+    {
+      "seed": 5014,
+      "strategy": "watchful",
+      "survived": true,
+      "tick": 8760,
+      "actions": [
+        {
+          "tick": 577,
+          "action": "rain"
+        },
+        {
+          "tick": 977,
+          "action": "rain"
+        },
+        {
+          "tick": 2926,
+          "action": "rain"
+        },
+        {
+          "tick": 4230,
+          "action": "cullPred"
+        }
+      ],
+      "ceilingHits": 0
+    },
+    {
+      "seed": 5015,
+      "strategy": "untouched",
+      "survived": false,
+      "tick": 3033,
+      "actions": [],
+      "ceilingHits": 0
+    },
+    {
+      "seed": 5015,
+      "strategy": "watchful",
+      "survived": true,
+      "tick": 8760,
+      "actions": [
+        {
+          "tick": 386,
+          "action": "rain"
+        },
+        {
+          "tick": 3020,
+          "action": "cullPred"
+        },
+        {
+          "tick": 5538,
+          "action": "rain"
+        },
+        {
+          "tick": 5938,
+          "action": "rain"
+        }
+      ],
+      "ceilingHits": 0
+    },
+    {
+      "seed": 5016,
+      "strategy": "untouched",
+      "survived": false,
+      "tick": 8533,
+      "actions": [],
+      "ceilingHits": 0
+    },
+    {
+      "seed": 5016,
+      "strategy": "watchful",
+      "survived": false,
+      "tick": 7232,
+      "actions": [
+        {
+          "tick": 1511,
+          "action": "rain"
+        },
+        {
+          "tick": 1911,
+          "action": "rain"
+        },
+        {
+          "tick": 2485,
+          "action": "rain"
+        },
+        {
+          "tick": 3342,
+          "action": "cullPred"
+        }
+      ],
+      "ceilingHits": 0
+    },
+    {
+      "seed": 5017,
+      "strategy": "untouched",
+      "survived": false,
+      "tick": 4153,
+      "actions": [],
+      "ceilingHits": 0
+    },
+    {
+      "seed": 5017,
+      "strategy": "watchful",
+      "survived": false,
+      "tick": 3667,
+      "actions": [
+        {
+          "tick": 436,
+          "action": "rain"
+        },
+        {
+          "tick": 1072,
+          "action": "rain"
+        },
+        {
+          "tick": 1472,
+          "action": "rain"
+        },
+        {
+          "tick": 1872,
+          "action": "cullPred"
+        }
+      ],
+      "ceilingHits": 0
+    },
+    {
+      "seed": 5018,
+      "strategy": "untouched",
+      "survived": true,
+      "tick": 8760,
+      "actions": [],
+      "ceilingHits": 0
+    },
+    {
+      "seed": 5018,
+      "strategy": "watchful",
+      "survived": false,
+      "tick": 4080,
+      "actions": [
+        {
+          "tick": 693,
+          "action": "rain"
+        },
+        {
+          "tick": 1101,
+          "action": "rain"
+        },
+        {
+          "tick": 1843,
+          "action": "cullPred"
+        },
+        {
+          "tick": 2243,
+          "action": "cullPred"
+        }
+      ],
+      "ceilingHits": 0
+    },
+    {
+      "seed": 5019,
+      "strategy": "untouched",
+      "survived": false,
+      "tick": 1895,
+      "actions": [],
+      "ceilingHits": 0
+    },
+    {
+      "seed": 5019,
+      "strategy": "watchful",
+      "survived": false,
+      "tick": 2045,
+      "actions": [
+        {
+          "tick": 1031,
+          "action": "rain"
+        },
+        {
+          "tick": 1456,
+          "action": "rain"
+        },
+        {
+          "tick": 1856,
+          "action": "cullPred"
+        }
+      ],
+      "ceilingHits": 0
+    },
+    {
+      "seed": 5020,
+      "strategy": "untouched",
+      "survived": false,
+      "tick": 2130,
+      "actions": [],
+      "ceilingHits": 0
+    },
+    {
+      "seed": 5020,
+      "strategy": "watchful",
+      "survived": true,
+      "tick": 8760,
+      "actions": [
+        {
+          "tick": 655,
+          "action": "rain"
+        },
+        {
+          "tick": 1055,
+          "action": "rain"
+        },
+        {
+          "tick": 1455,
+          "action": "rain"
+        },
+        {
+          "tick": 1855,
+          "action": "rain"
+        }
+      ],
+      "ceilingHits": 0
+    },
+    {
+      "seed": 5021,
+      "strategy": "untouched",
+      "survived": false,
+      "tick": 1659,
+      "actions": [],
+      "ceilingHits": 0
+    },
+    {
+      "seed": 5021,
+      "strategy": "watchful",
+      "survived": false,
+      "tick": 3142,
+      "actions": [
+        {
+          "tick": 834,
+          "action": "rain"
+        },
+        {
+          "tick": 1503,
+          "action": "cullPred"
+        },
+        {
+          "tick": 1903,
+          "action": "cullPred"
+        },
+        {
+          "tick": 2525,
+          "action": "rain"
+        }
+      ],
+      "ceilingHits": 0
+    },
+    {
+      "seed": 5022,
+      "strategy": "untouched",
+      "survived": true,
+      "tick": 8760,
+      "actions": [],
+      "ceilingHits": 0
+    },
+    {
+      "seed": 5022,
+      "strategy": "watchful",
+      "survived": true,
+      "tick": 8760,
+      "actions": [
+        {
+          "tick": 550,
+          "action": "rain"
+        },
+        {
+          "tick": 950,
+          "action": "rain"
+        },
+        {
+          "tick": 1350,
+          "action": "rain"
+        },
+        {
+          "tick": 1756,
+          "action": "rain"
+        }
+      ],
+      "ceilingHits": 0
+    },
+    {
+      "seed": 5023,
+      "strategy": "untouched",
+      "survived": false,
+      "tick": 6857,
+      "actions": [],
+      "ceilingHits": 0
+    },
+    {
+      "seed": 5023,
+      "strategy": "watchful",
+      "survived": false,
+      "tick": 4516,
+      "actions": [
+        {
+          "tick": 2273,
+          "action": "cullPred"
+        },
+        {
+          "tick": 2673,
+          "action": "cullPred"
+        },
+        {
+          "tick": 3324,
+          "action": "rain"
+        },
+        {
+          "tick": 3771,
+          "action": "rain"
+        }
+      ],
+      "ceilingHits": 0
+    },
+    {
+      "seed": 5024,
+      "strategy": "untouched",
+      "survived": false,
+      "tick": 2283,
+      "actions": [],
+      "ceilingHits": 0
+    },
+    {
+      "seed": 5024,
+      "strategy": "watchful",
+      "survived": true,
+      "tick": 8760,
+      "actions": [
+        {
+          "tick": 1851,
+          "action": "cullPred"
+        },
+        {
+          "tick": 3518,
+          "action": "rain"
+        },
+        {
+          "tick": 3918,
+          "action": "cullPred"
+        },
+        {
+          "tick": 4318,
+          "action": "cullPred"
+        }
+      ],
+      "ceilingHits": 0
+    },
+    {
+      "seed": 5025,
+      "strategy": "untouched",
+      "survived": true,
+      "tick": 8760,
+      "actions": [],
+      "ceilingHits": 0
+    },
+    {
+      "seed": 5025,
+      "strategy": "watchful",
+      "survived": true,
+      "tick": 8760,
+      "actions": [
+        {
+          "tick": 2351,
+          "action": "cullPred"
+        },
+        {
+          "tick": 2751,
+          "action": "cullPred"
+        },
+        {
+          "tick": 3336,
+          "action": "rain"
+        },
+        {
+          "tick": 3736,
+          "action": "rain"
+        }
+      ],
+      "ceilingHits": 0
+    },
+    {
+      "seed": 5026,
+      "strategy": "untouched",
+      "survived": false,
+      "tick": 3335,
+      "actions": [],
+      "ceilingHits": 0
+    },
+    {
+      "seed": 5026,
+      "strategy": "watchful",
+      "survived": true,
+      "tick": 8760,
+      "actions": [
+        {
+          "tick": 337,
+          "action": "rain"
+        },
+        {
+          "tick": 837,
+          "action": "rain"
+        },
+        {
+          "tick": 1422,
+          "action": "rain"
+        },
+        {
+          "tick": 1822,
+          "action": "rain"
+        }
+      ],
+      "ceilingHits": 0
+    },
+    {
+      "seed": 5027,
+      "strategy": "untouched",
+      "survived": false,
+      "tick": 2893,
+      "actions": [],
+      "ceilingHits": 0
+    },
+    {
+      "seed": 5027,
+      "strategy": "watchful",
+      "survived": false,
+      "tick": 4653,
+      "actions": [
+        {
+          "tick": 476,
+          "action": "rain"
+        },
+        {
+          "tick": 876,
+          "action": "rain"
+        },
+        {
+          "tick": 1777,
+          "action": "cullPred"
+        },
+        {
+          "tick": 2177,
+          "action": "cullPred"
+        }
+      ],
+      "ceilingHits": 0
+    },
+    {
+      "seed": 5028,
+      "strategy": "untouched",
+      "survived": true,
+      "tick": 8760,
+      "actions": [],
+      "ceilingHits": 0
+    },
+    {
+      "seed": 5028,
+      "strategy": "watchful",
+      "survived": false,
+      "tick": 4348,
+      "actions": [
+        {
+          "tick": 1105,
+          "action": "rain"
+        },
+        {
+          "tick": 1929,
+          "action": "cullPred"
+        },
+        {
+          "tick": 2331,
+          "action": "cullPred"
+        },
+        {
+          "tick": 2998,
+          "action": "rain"
+        }
+      ],
+      "ceilingHits": 0
+    },
+    {
+      "seed": 5029,
+      "strategy": "untouched",
+      "survived": false,
+      "tick": 8535,
+      "actions": [],
+      "ceilingHits": 0
+    },
+    {
+      "seed": 5029,
+      "strategy": "watchful",
+      "survived": true,
+      "tick": 8760,
+      "actions": [
+        {
+          "tick": 1423,
+          "action": "cullPred"
+        },
+        {
+          "tick": 3148,
+          "action": "cullPred"
+        },
+        {
+          "tick": 3548,
+          "action": "cullPred"
+        },
+        {
+          "tick": 4005,
+          "action": "feedFoxes"
+        }
+      ],
+      "ceilingHits": 0
+    },
+    {
+      "seed": 5030,
+      "strategy": "untouched",
+      "survived": false,
+      "tick": 1931,
+      "actions": [],
+      "ceilingHits": 0
+    },
+    {
+      "seed": 5030,
+      "strategy": "watchful",
+      "survived": false,
+      "tick": 4386,
+      "actions": [
+        {
+          "tick": 567,
+          "action": "rain"
+        },
+        {
+          "tick": 1765,
+          "action": "cullPred"
+        },
+        {
+          "tick": 2165,
+          "action": "cullPred"
+        },
+        {
+          "tick": 2854,
+          "action": "rain"
+        }
+      ],
+      "ceilingHits": 0
+    },
+    {
+      "seed": 5031,
+      "strategy": "untouched",
+      "survived": false,
+      "tick": 2678,
+      "actions": [],
+      "ceilingHits": 0
+    },
+    {
+      "seed": 5031,
+      "strategy": "watchful",
+      "survived": false,
+      "tick": 3967,
+      "actions": [
+        {
+          "tick": 549,
+          "action": "rain"
+        },
+        {
+          "tick": 3383,
+          "action": "cullPred"
+        },
+        {
+          "tick": 3783,
+          "action": "cullPred"
+        }
+      ],
+      "ceilingHits": 0
+    },
+    {
+      "seed": 5032,
+      "strategy": "untouched",
+      "survived": false,
+      "tick": 6960,
+      "actions": [],
+      "ceilingHits": 0
+    },
+    {
+      "seed": 5032,
+      "strategy": "watchful",
+      "survived": false,
+      "tick": 8388,
+      "actions": [
+        {
+          "tick": 774,
+          "action": "rain"
+        },
+        {
+          "tick": 1174,
+          "action": "rain"
+        },
+        {
+          "tick": 2422,
+          "action": "cullPred"
+        },
+        {
+          "tick": 2822,
+          "action": "cullPred"
+        }
+      ],
+      "ceilingHits": 0
+    },
+    {
+      "seed": 5033,
+      "strategy": "untouched",
+      "survived": false,
+      "tick": 1651,
+      "actions": [],
+      "ceilingHits": 0
+    },
+    {
+      "seed": 5033,
+      "strategy": "watchful",
+      "survived": false,
+      "tick": 1515,
+      "actions": [
+        {
+          "tick": 1007,
+          "action": "rain"
+        },
+        {
+          "tick": 1407,
+          "action": "cullPred"
+        }
+      ],
+      "ceilingHits": 0
+    },
+    {
+      "seed": 5034,
+      "strategy": "untouched",
+      "survived": true,
+      "tick": 8760,
+      "actions": [],
+      "ceilingHits": 0
+    },
+    {
+      "seed": 5034,
+      "strategy": "watchful",
+      "survived": true,
+      "tick": 8760,
+      "actions": [
+        {
+          "tick": 537,
+          "action": "rain"
+        },
+        {
+          "tick": 937,
+          "action": "rain"
+        },
+        {
+          "tick": 1337,
+          "action": "rain"
+        },
+        {
+          "tick": 2696,
+          "action": "cullPred"
+        }
+      ],
+      "ceilingHits": 0
+    },
+    {
+      "seed": 5035,
+      "strategy": "untouched",
+      "survived": false,
+      "tick": 2859,
+      "actions": [],
+      "ceilingHits": 0
+    },
+    {
+      "seed": 5035,
+      "strategy": "watchful",
+      "survived": false,
+      "tick": 4624,
+      "actions": [
+        {
+          "tick": 496,
+          "action": "rain"
+        },
+        {
+          "tick": 896,
+          "action": "rain"
+        },
+        {
+          "tick": 2400,
+          "action": "rain"
+        },
+        {
+          "tick": 2848,
+          "action": "rain"
+        }
+      ],
+      "ceilingHits": 0
+    },
+    {
+      "seed": 5036,
+      "strategy": "untouched",
+      "survived": true,
+      "tick": 8760,
+      "actions": [],
+      "ceilingHits": 0
+    },
+    {
+      "seed": 5036,
+      "strategy": "watchful",
+      "survived": true,
+      "tick": 8760,
+      "actions": [
+        {
+          "tick": 702,
+          "action": "rain"
+        },
+        {
+          "tick": 1102,
+          "action": "rain"
+        },
+        {
+          "tick": 1502,
+          "action": "rain"
+        },
+        {
+          "tick": 1926,
+          "action": "rain"
+        }
+      ],
+      "ceilingHits": 0
+    },
+    {
+      "seed": 5037,
+      "strategy": "untouched",
+      "survived": false,
+      "tick": 3510,
+      "actions": [],
+      "ceilingHits": 0
+    },
+    {
+      "seed": 5037,
+      "strategy": "watchful",
+      "survived": false,
+      "tick": 3288,
+      "actions": [
+        {
+          "tick": 636,
+          "action": "rain"
+        },
+        {
+          "tick": 1036,
+          "action": "rain"
+        },
+        {
+          "tick": 1436,
+          "action": "cullPred"
+        },
+        {
+          "tick": 1836,
+          "action": "cullPred"
+        }
+      ],
+      "ceilingHits": 0
+    },
+    {
+      "seed": 5038,
+      "strategy": "untouched",
+      "survived": false,
+      "tick": 2318,
+      "actions": [],
+      "ceilingHits": 0
+    },
+    {
+      "seed": 5038,
+      "strategy": "watchful",
+      "survived": false,
+      "tick": 2116,
+      "actions": [
+        {
+          "tick": 287,
+          "action": "rain"
+        },
+        {
+          "tick": 687,
+          "action": "rain"
+        },
+        {
+          "tick": 1108,
+          "action": "rain"
+        },
+        {
+          "tick": 1508,
+          "action": "rain"
+        }
+      ],
+      "ceilingHits": 0
+    },
+    {
+      "seed": 5039,
+      "strategy": "untouched",
+      "survived": false,
+      "tick": 3382,
+      "actions": [],
+      "ceilingHits": 0
+    },
+    {
+      "seed": 5039,
+      "strategy": "watchful",
+      "survived": false,
+      "tick": 8097,
+      "actions": [
+        {
+          "tick": 666,
+          "action": "rain"
+        },
+        {
+          "tick": 1066,
+          "action": "rain"
+        },
+        {
+          "tick": 1528,
+          "action": "rain"
+        },
+        {
+          "tick": 1939,
+          "action": "cullPred"
+        }
+      ],
+      "ceilingHits": 0
+    },
+    {
+      "seed": 5040,
+      "strategy": "untouched",
+      "survived": false,
+      "tick": 3876,
+      "actions": [],
+      "ceilingHits": 0
+    },
+    {
+      "seed": 5040,
+      "strategy": "watchful",
+      "survived": false,
+      "tick": 3971,
+      "actions": [
+        {
+          "tick": 753,
+          "action": "rain"
+        },
+        {
+          "tick": 1153,
+          "action": "rain"
+        },
+        {
+          "tick": 1698,
+          "action": "cullPred"
+        },
+        {
+          "tick": 2098,
+          "action": "cullPred"
+        }
+      ],
+      "ceilingHits": 0
+    },
+    {
+      "seed": 5041,
+      "strategy": "untouched",
+      "survived": false,
+      "tick": 2323,
+      "actions": [],
+      "ceilingHits": 0
+    },
+    {
+      "seed": 5041,
+      "strategy": "watchful",
+      "survived": false,
+      "tick": 4777,
+      "actions": [
+        {
+          "tick": 1469,
+          "action": "cullPred"
+        },
+        {
+          "tick": 2332,
+          "action": "rain"
+        },
+        {
+          "tick": 2732,
+          "action": "cullPred"
+        },
+        {
+          "tick": 3536,
+          "action": "rain"
+        }
+      ],
+      "ceilingHits": 8611
+    },
+    {
+      "seed": 5042,
+      "strategy": "untouched",
+      "survived": false,
+      "tick": 5408,
+      "actions": [],
+      "ceilingHits": 0
+    },
+    {
+      "seed": 5042,
+      "strategy": "watchful",
+      "survived": true,
+      "tick": 8760,
+      "actions": [
+        {
+          "tick": 742,
+          "action": "rain"
+        },
+        {
+          "tick": 1142,
+          "action": "rain"
+        },
+        {
+          "tick": 2626,
+          "action": "rain"
+        },
+        {
+          "tick": 3499,
+          "action": "cullPred"
+        }
+      ],
+      "ceilingHits": 0
+    },
+    {
+      "seed": 5043,
+      "strategy": "untouched",
+      "survived": true,
+      "tick": 8760,
+      "actions": [],
+      "ceilingHits": 0
+    },
+    {
+      "seed": 5043,
+      "strategy": "watchful",
+      "survived": true,
+      "tick": 8760,
+      "actions": [
+        {
+          "tick": 943,
+          "action": "rain"
+        },
+        {
+          "tick": 3718,
+          "action": "cullPred"
+        },
+        {
+          "tick": 4249,
+          "action": "cullPred"
+        },
+        {
+          "tick": 5130,
+          "action": "rain"
+        }
+      ],
+      "ceilingHits": 0
+    },
+    {
+      "seed": 5044,
+      "strategy": "untouched",
+      "survived": false,
+      "tick": 2617,
+      "actions": [],
+      "ceilingHits": 0
+    },
+    {
+      "seed": 5044,
+      "strategy": "watchful",
+      "survived": false,
+      "tick": 6771,
+      "actions": [
+        {
+          "tick": 837,
+          "action": "rain"
+        },
+        {
+          "tick": 1297,
+          "action": "rain"
+        },
+        {
+          "tick": 1700,
+          "action": "rain"
+        },
+        {
+          "tick": 2100,
+          "action": "rain"
+        }
+      ],
+      "ceilingHits": 0
+    },
+    {
+      "seed": 5045,
+      "strategy": "untouched",
+      "survived": true,
+      "tick": 8760,
+      "actions": [],
+      "ceilingHits": 0
+    },
+    {
+      "seed": 5045,
+      "strategy": "watchful",
+      "survived": true,
+      "tick": 8760,
+      "actions": [
+        {
+          "tick": 2263,
+          "action": "cullPred"
+        },
+        {
+          "tick": 2663,
+          "action": "cullPred"
+        },
+        {
+          "tick": 3303,
+          "action": "rain"
+        },
+        {
+          "tick": 3703,
+          "action": "rain"
+        }
+      ],
+      "ceilingHits": 0
+    },
+    {
+      "seed": 5046,
+      "strategy": "untouched",
+      "survived": false,
+      "tick": 3733,
+      "actions": [],
+      "ceilingHits": 0
+    },
+    {
+      "seed": 5046,
+      "strategy": "watchful",
+      "survived": false,
+      "tick": 2065,
+      "actions": [
+        {
+          "tick": 1288,
+          "action": "rain"
+        },
+        {
+          "tick": 1688,
+          "action": "cullPred"
+        }
+      ],
+      "ceilingHits": 0
+    },
+    {
+      "seed": 5047,
+      "strategy": "untouched",
+      "survived": true,
+      "tick": 8760,
+      "actions": [],
+      "ceilingHits": 0
+    },
+    {
+      "seed": 5047,
+      "strategy": "watchful",
+      "survived": true,
+      "tick": 8760,
+      "actions": [
+        {
+          "tick": 667,
+          "action": "rain"
+        },
+        {
+          "tick": 1161,
+          "action": "rain"
+        },
+        {
+          "tick": 1561,
+          "action": "rain"
+        },
+        {
+          "tick": 1961,
+          "action": "cullPred"
+        }
+      ],
+      "ceilingHits": 0
+    },
+    {
+      "seed": 5048,
+      "strategy": "untouched",
+      "survived": false,
+      "tick": 4567,
+      "actions": [],
+      "ceilingHits": 0
+    },
+    {
+      "seed": 5048,
+      "strategy": "watchful",
+      "survived": true,
+      "tick": 8760,
+      "actions": [
+        {
+          "tick": 628,
+          "action": "rain"
+        },
+        {
+          "tick": 2689,
+          "action": "rain"
+        },
+        {
+          "tick": 3089,
+          "action": "cullPred"
+        },
+        {
+          "tick": 3489,
+          "action": "cullPred"
+        }
+      ],
+      "ceilingHits": 0
+    },
+    {
+      "seed": 5049,
+      "strategy": "untouched",
+      "survived": true,
+      "tick": 8760,
+      "actions": [],
+      "ceilingHits": 0
+    },
+    {
+      "seed": 5049,
+      "strategy": "watchful",
+      "survived": true,
+      "tick": 8760,
+      "actions": [
+        {
+          "tick": 582,
+          "action": "rain"
+        },
+        {
+          "tick": 1008,
+          "action": "rain"
+        },
+        {
+          "tick": 1408,
+          "action": "rain"
+        },
+        {
+          "tick": 1808,
+          "action": "rain"
+        }
+      ],
+      "ceilingHits": 0
+    }
+  ],
+  "parameters": {
+    "horizon": 8760,
+    "patches": 19,
+    "patchStock": 30,
+    "regrowEvery": 9,
+    "sproutPerDay": 2,
+    "seedSpread": 0.5,
+    "witherHours": 240,
+    "maxBushes": 48,
+    "patchSpacing": 0.15,
+    "eatR": 0.008,
+    "feedR": 0.02,
+    "birthR": 0.02,
+    "foodScent": 0.3,
+    "wallView": 0.1,
+    "geneInit": 1,
+    "mutationRate": 0.03,
+    "mutationSigma": 0.1,
+    "founderEnergy": 0.75,
+    "prey": {
+      "initial": 160,
+      "adultAge": 50,
+      "birthGap": 135,
+      "litter": 2,
+      "lifespan": 840,
+      "maxEnergy": 180,
+      "metabolism": 0.35,
+      "speedCost": 0.5,
+      "mealEnergy": 55,
+      "breedEnergy": 0.65,
+      "childEnergy": 0.45,
+      "visionUpkeep": 0.2,
+      "step": 0.0125,
+      "baseStep": 0.01,
+      "view": [
+        0.2,
+        0.2
+      ],
+      "turn": [
+        1,
+        1
+      ]
+    },
+    "pred": {
+      "initial": 6,
+      "adultAge": 130,
+      "birthGap": 350,
+      "litter": 1,
+      "lifespan": 1000,
+      "maxEnergy": 240,
+      "metabolism": 0.15,
+      "speedCost": 0.9,
+      "mealEnergy": 90,
+      "breedEnergy": 0.95,
+      "childEnergy": 0.6,
+      "visionUpkeep": 0.05,
+      "step": 0.014,
+      "baseStep": 0.014,
+      "view": [
+        0.13,
+        1.3
+      ],
+      "turn": [
+        0.2,
+        0.8
+      ]
+    },
+    "eco": {
+      "hidden": 0,
+      "maxHidden": 12,
+      "growRate": 0,
+      "memory": false,
+      "sexual": false,
+      "heredity": true,
+      "mateR": 0.1,
+      "kinR": 0.12,
+      "cover": 8,
+      "coverR": 0.07,
+      "coverSight": 0.04,
+      "coverSlow": 0.75,
+      "brainUpkeep": 0.01,
+      "ceilingPrey": 800,
+      "ceilingPred": 400
+    }
+  },
+  "runtime": "Node 25.2.1, macOS arm64"
+}

@@ -10,7 +10,6 @@
     "lint": "oxlint",
     "test": "vitest run",
     "typecheck": "tsc -b",
-    "fixtures": "python3 reference/make_fixtures.py",
     "sweep": "tsx scripts/sweep.ts",
     "pick": "tsx scripts/pick.ts"
   },

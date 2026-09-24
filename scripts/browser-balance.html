@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="en">
+<meta charset="utf-8">
+<title>Meadow browser balance check</title>
+<h1>Meadow browser balance check</h1>
+<p>Development tool: runs the default meadow without interventions for seeds 5000–5049.</p>
+<button id="start">Run 50 seeds</button>
+<p id="status" role="status">Ready</p>
+<a id="download" hidden download="balance-browser.json">Download JSON report</a>
+<pre id="summary"></pre>
+<script type="module">
+  const button = document.querySelector('#start')
+  const status = document.querySelector('#status')
+  const link = document.querySelector('#download')
+  let url
+  button.onclick = () => {
+    button.disabled = true
+    link.hidden = true
+    status.textContent = 'Starting…'
+    const worker = new Worker(new URL('./browser-balance.worker.ts', import.meta.url), {type:'module'})
+    worker.onerror = event => { status.textContent = `Failed: ${event.message}`; worker.terminate(); button.disabled = false }
+    worker.onmessage = event => {
+      if (!event.data.result) { status.textContent = `${event.data.progress}/50 seeds`; return }
+      const result = {...event.data.result, runtime:navigator.userAgent}
+      if (url) URL.revokeObjectURL(url)
+      url = URL.createObjectURL(new Blob([JSON.stringify(result,null,2)], {type:'application/json'}))
+      link.href = url
+      link.hidden = false
+      const invalid = result.rows.filter(row => row.safetyLimitHits > 0).length
+      status.textContent = `${result.survived}/50 survived; ${invalid} runs hit a safety ceiling.`
+      document.querySelector('#summary').textContent = JSON.stringify({survived:result.survived,count:50,invalid},null,2)
+      button.disabled = false
+      worker.terminate()
+    }
+    worker.postMessage({start:5000,count:50})
+  }
+</script>
+</html>

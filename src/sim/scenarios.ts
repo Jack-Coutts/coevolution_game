@@ -15,7 +15,7 @@ export interface Scenario {
   markers: { tick: number; label: string }[]
 }
 
-const HORIZON = 8000
+const HORIZON = 8760
 const NOV_1 = tickAt(2)
 const DEC_1 = tickAt(3)
 const MAR_1 = tickAt(6)
@@ -24,10 +24,10 @@ const MAY_1 = tickAt(8)
 export const SCENARIOS: Scenario[] = [
   {
     id: 'stable',
-    name: 'Stable meadow',
-    tagline: 'A tuned balance. Keep it that way.',
+    name: 'Open meadow',
+    tagline: 'Watch, adapt, and keep both species alive.',
     description:
-      'The sweep-tuned starting balance. Most meadows survive the year untouched. Your levers can improve it or break it.',
+      'A meadow with room for booms and busts. Read the warning signs and intervene before either species disappears.',
     disturbance: { regrow: [], metabolism: [], arrivals: [] },
     spans: [],
     markers: [],
@@ -47,11 +47,11 @@ export const SCENARIOS: Scenario[] = [
     name: 'Fox invasion',
     tagline: 'A pack of 14 moves in on 1 November.',
     description:
-      'On 1 November, 14 well-fed foxes arrive from the edge of the meadow, and room for 14 more foxes opens up. Can the rabbits absorb the pressure without being eaten out?',
+      'On 1 November, 14 well-fed foxes arrive from the edge of the meadow. Can the rabbits absorb the pressure without being eaten out?',
     disturbance: {
       regrow: [],
       metabolism: [],
-      arrivals: [{ tick: NOV_1, species: 'pred', count: 14, capBoost: 14 }],
+      arrivals: [{ tick: NOV_1, species: 'pred', count: 14 }],
     },
     spans: [],
     markers: [{ tick: NOV_1, label: 'Foxes arrive' }],
@@ -75,3 +75,12 @@ export const SCENARIOS: Scenario[] = [
 export const SCENARIO_BY_ID: Record<ScenarioId, Scenario> = Object.fromEntries(
   SCENARIOS.map((s) => [s.id, s]),
 ) as Record<ScenarioId, Scenario>
+
+/** Seasonal spans in the visible window. Invasions are a one-time event; weather recurs. */
+export function visibleSpans(scenario: Scenario, from: number, to: number, endless: boolean): Scenario['spans'] {
+  if (!endless) return scenario.spans
+  const out: Scenario['spans'] = []
+  for (let year = Math.floor(from / 8760); year <= Math.floor(to / 8760); year++)
+    for (const span of scenario.spans) out.push({ ...span, from: span.from + year * 8760, to: span.to + year * 8760 })
+  return out.filter(s => s.to >= from && s.from <= to)
+}

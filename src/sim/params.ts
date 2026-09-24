@@ -1,17 +1,9 @@
-export type Rules = 'classic' | 'energy'
-
 export interface SpeciesParams {
   initial: number
-  cap: number
   adultAge: number
   birthGap: number
   litter: number
   lifespan: number
-  /** Classic rules: meals needed to breed. */
-  mealsToBreed: number
-  /** Classic rules: ticks without a meal before starving. */
-  starve: number
-  /** Energy rules. */
   maxEnergy: number
   metabolism: number
   speedCost: number
@@ -24,20 +16,54 @@ export interface SpeciesParams {
   visionUpkeep: number
   /** Max step length per tick. */
   step: number
-  /** The benchmark step: the reference speed for the speed cost. */
+  /** Reference speed for the speed cost: moving at this step costs exactly `speedCost`. */
   baseStep: number
-  /** Classic rules only; under energy rules pace always spans 0..1. */
-  minPace: number
   view: [number, number]
   turn: [number, number]
 }
 
+/** Ecology and evolution settings that are not player levers. */
+export interface EcoParams {
+  /** Hidden neurons founders start with (0 = a linear brain). */
+  hidden: number
+  maxHidden: number
+  /** Chance per birth that the brain grows one neutral hidden neuron. */
+  growRate: number
+  memory: boolean
+  /** Births need a nearby adult mate; the child's genes cross over from both parents. */
+  sexual: boolean
+  /** false = founder-pool control: newborns sample fixed founder genomes independently of parent success. */
+  heredity: boolean
+  mateR: number
+  kinR: number
+  /** Tall-grass patches that hide rabbits and slow movement. */
+  cover: number
+  coverR: number
+  /** Within this distance a predator still sees prey hidden in cover. */
+  coverSight: number
+  /** Step multiplier inside cover. */
+  coverSlow: number
+  /** Energy per hour per hidden neuron. */
+  brainUpkeep: number
+  /** Births stop here so a runaway population cannot freeze the tab. Normal play stays far below. */
+  ceilingPrey: number
+  ceilingPred: number
+}
+
 export interface SimParams {
-  rules: Rules
   horizon: number
+  endless?: boolean
   patches: number
   patchStock: number
   regrowEvery: number
+  /** New bushes per day in spring-summer terms; seasons scale it. */
+  sproutPerDay: number
+  /** Chance a sprout lands near an existing bush rather than anywhere. */
+  seedSpread: number
+  /** Hours a bush can stay grazed down (below WITHER_LEVEL of its stock) before it withers. */
+  witherHours: number
+  /** Technical ceiling on live bushes. */
+  maxBushes: number
   patchSpacing: number
   eatR: number
   feedR: number
@@ -47,25 +73,45 @@ export interface SimParams {
   geneInit: number
   mutationRate: number
   mutationSigma: number
-  gapFromOwnBirth: boolean
   founderEnergy: number
   prey: SpeciesParams
   pred: SpeciesParams
+  eco: EcoParams
 }
 
-export const PREY_SENSES = 11
-export const PRED_SENSES = 11
-
-/** The benchmark world and rules exactly as in coevo.py. */
-export function benchmarkParams(): SimParams {
+export function defaultEco(): EcoParams {
   return {
-    rules: 'classic',
-    horizon: 8000,
+    hidden: 0,
+    maxHidden: 12,
+    growRate: 0,
+    memory: false,
+    sexual: false,
+    heredity: true,
+    mateR: 0.1,
+    kinR: 0.12,
+    cover: 8,
+    coverR: 0.07,
+    coverSight: 0.04,
+    coverSlow: 0.75,
+    brainUpkeep: 0.01,
+    ceilingPrey: 800,
+    ceilingPred: 400,
+  }
+}
+
+/** The world's fixed physics; levers overwrite the tunable parts (see levers.ts). */
+export function defaultParams(): SimParams {
+  return {
+    horizon: 8760,
     patches: 10,
     patchStock: 30,
     regrowEvery: 15,
+    sproutPerDay: 2,
+    seedSpread: 0.5,
+    witherHours: 240,
+    maxBushes: 48,
     patchSpacing: 0.15,
-    eatR: 0.025,
+    eatR: 0.008,
     feedR: 0.02,
     birthR: 0.02,
     foodScent: 0.3,
@@ -73,17 +119,13 @@ export function benchmarkParams(): SimParams {
     geneInit: 1.0,
     mutationRate: 0.1,
     mutationSigma: 0.1,
-    gapFromOwnBirth: false,
     founderEnergy: 0.75,
     prey: {
       initial: 30,
-      cap: 150,
       adultAge: 80,
       birthGap: 150,
       litter: 1,
       lifespan: 600,
-      mealsToBreed: 2,
-      starve: 100,
       maxEnergy: 100,
       metabolism: 0.35,
       speedCost: 0.65,
@@ -93,39 +135,27 @@ export function benchmarkParams(): SimParams {
       visionUpkeep: 0.2,
       step: 0.01,
       baseStep: 0.01,
-      minPace: 1.0,
       view: [0.2, 0.2],
       turn: [1.0, 1.0],
     },
     pred: {
       initial: 6,
-      cap: 40,
       adultAge: 100,
       birthGap: 200,
       litter: 1,
       lifespan: 700,
-      mealsToBreed: 2,
-      starve: 150,
       maxEnergy: 160,
       metabolism: 0.35,
       speedCost: 0.65,
       mealEnergy: 90,
       breedEnergy: 0.7,
       childEnergy: 0.4,
-      visionUpkeep: 0.2,
+      visionUpkeep: 0.05,
       step: 0.014,
       baseStep: 0.014,
-      minPace: 0.3,
       view: [0.1, 1.0],
       turn: [0.2, 0.8],
     },
-  }
-}
-
-export function cloneParams(p: SimParams): SimParams {
-  return {
-    ...p,
-    prey: { ...p.prey, view: [...p.prey.view], turn: [...p.prey.turn] },
-    pred: { ...p.pred, view: [...p.pred.view], turn: [...p.pred.turn] },
+    eco: defaultEco(),
   }
 }

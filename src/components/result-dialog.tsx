@@ -1,6 +1,13 @@
 import { Lightbulb, RotateCcw, Star, Trophy } from 'lucide-react'
 import { Button } from '@/components/ui/button'
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog'
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog'
 import type { Snapshot } from '@/game/controller'
 import { formatDuration } from '@/sim/time'
 import { cn } from '@/lib/utils'
@@ -8,24 +15,22 @@ import { cn } from '@/lib/utils'
 const STARS = [
   { tick: 90 * 24, label: '3 months' },
   { tick: 210 * 24, label: '7 months' },
-  { tick: 8000, label: 'Full year' },
+  { tick: 8760, label: 'Full year' },
 ]
 
 interface Props {
   snap: Snapshot
   open: boolean
   onOpenChange: (open: boolean) => void
-  unspent: number
   onRetune: () => void
   onReplay: () => void
 }
 
-export function ResultDialog({ snap, open, onOpenChange, unspent, onRetune, onReplay }: Props) {
+export function ResultDialog({ snap, open, onOpenChange, onRetune, onReplay }: Props) {
   const end = snap.end
   if (!end || !snap.explanation || snap.score === null) return null
   const e = snap.explanation
   const stars = STARS.filter((s) => end.tick >= s.tick).length
-  const bonus = snap.score - end.tick
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-lg">
@@ -39,27 +44,25 @@ export function ResultDialog({ snap, open, onOpenChange, unspent, onRetune, onRe
               />
             ))}
           </div>
-          <DialogTitle className="text-xl">{end.survived ? 'The meadow made it through the year.' : 'The meadow collapsed.'}</DialogTitle>
+          <DialogTitle className="text-xl">
+            {end.survived ? 'The meadow made it through the year.' : 'The meadow collapsed.'}
+          </DialogTitle>
           <DialogDescription className="text-[15px] text-foreground/90">{e.headline}</DialogDescription>
         </DialogHeader>
 
         <p className="text-sm text-muted-foreground">{e.detail}</p>
 
-        <div className="grid grid-cols-3 gap-2 rounded-lg border bg-muted/30 p-3 text-center">
-          <div>
-            <div className="text-xs text-muted-foreground">Survived</div>
-            <div className="text-sm font-semibold">{formatDuration(end.tick)}</div>
-          </div>
-          <div>
-            <div className="text-xs text-muted-foreground">Budget bonus</div>
-            <div className="text-sm font-semibold tabular">
-              {end.survived ? `+${bonus}` : '—'}
-              {end.survived && <span className="ml-1 text-xs font-normal text-muted-foreground">({Math.max(0, unspent)} pts)</span>}
-            </div>
-          </div>
+        <div className="grid grid-cols-2 gap-2 rounded-lg border bg-muted/30 p-3 text-center sm:grid-cols-4">
+          <Cell label="Survived" value={formatDuration(end.tick)} />
+          <Cell label="Budget bonus" value={end.survived ? `+${snap.score.budgetBonus}` : '—'} />
+          <Cell
+            label="Calm bonus"
+            value={end.survived ? `+${snap.score.calmBonus}` : '—'}
+            hint={`${snap.interventions.length} intervention${snap.interventions.length === 1 ? '' : 's'}`}
+          />
           <div>
             <div className="text-xs text-muted-foreground">Score</div>
-            <div className="text-lg font-semibold text-primary tabular">{snap.score.toLocaleString()}</div>
+            <div className="text-lg font-semibold text-primary tabular">{snap.score.total.toLocaleString()}</div>
           </div>
         </div>
 
@@ -70,7 +73,8 @@ export function ResultDialog({ snap, open, onOpenChange, unspent, onRetune, onRe
               <span className="font-medium text-amber-200">New best for this scenario and seed!</span>
             ) : (
               <span className="text-muted-foreground">
-                Best for this scenario and seed: <span className="text-foreground tabular">{snap.best.score.toLocaleString()}</span>
+                Best for this scenario and seed:{' '}
+                <span className="text-foreground tabular">{snap.best.score.toLocaleString()}</span>
               </span>
             )}
           </div>
@@ -99,5 +103,15 @@ export function ResultDialog({ snap, open, onOpenChange, unspent, onRetune, onRe
         </DialogFooter>
       </DialogContent>
     </Dialog>
+  )
+}
+
+function Cell({ label, value, hint }: { label: string; value: string; hint?: string }) {
+  return (
+    <div>
+      <div className="text-xs text-muted-foreground">{label}</div>
+      <div className="text-sm font-semibold tabular">{value}</div>
+      {hint && <div className="text-[11px] text-muted-foreground">{hint}</div>}
+    </div>
   )
 }

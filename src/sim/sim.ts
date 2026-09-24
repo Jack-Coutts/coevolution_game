@@ -1,8 +1,23 @@
-import { PRED_SENSES, PREY_SENSES, type SimParams, type SpeciesParams } from './params'
-import { PyRandom } from './rng'
+import {
+  bodyGene,
+  crossover,
+  mutateGenome,
+  N_IN,
+  N_OUT,
+  OUT,
+  randomGenome,
+  SENSE,
+  think,
+  traits,
+  type Genome,
+  type Traits,
+} from './brain'
+import type { SimParams, SpeciesParams } from './params'
+import { Rng } from './rng'
+import { calendar, type Season } from './time'
 
 export type Species = 'prey' | 'pred'
-export type Intervention = 'rain' | 'releasePrey' | 'cullPred' | 'releasePred'
+export type Intervention = 'rain' | 'releasePrey' | 'cullPred' | 'releasePred' | 'plantBushes' | 'feedFoxes' | 'illnessPrey' | 'illnessPred'
 
 export interface Window {
   from: number
@@ -14,7 +29,6 @@ export interface Arrival {
   tick: number
   species: Species
   count: number
-  capBoost: number
 }
 
 /** Scenario disturbances. They use their own RNG so the animals' random stream is untouched. */
@@ -26,156 +40,30 @@ export interface Disturbance {
 
 export const NO_DISTURBANCE: Disturbance = { regrow: [], metabolism: [], arrivals: [] }
 
-export type DeathCause = 'starved' | 'eaten' | 'old'
+export type DeathCause = 'starved' | 'eaten' | 'old' | 'illness'
 
 export interface TickEvent {
-  kind: 'eaten' | 'born' | 'starved' | 'old' | 'arrived' | 'released' | 'culled'
+  kind: 'eaten' | 'born' | 'starved' | 'old' | 'arrived' | 'released' | 'culled' | 'sprouted' | 'withered' | 'illness'
   species: Species
   x: number
   y: number
 }
 
-export class Animal {
+export interface Bush {
   id: number
   x: number
   y: number
-  hx: number
-  hy: number
-  age = 0
-  hunger = 0
-  meals = 0
-  /** Age at which it last gave birth; -1 until it first does. */
-  lastBirth = -1
-  genes: number[]
-  view: number
-  maxTurn: number
-  energy: number
-  pace = 0
-  gen: number
-
-  constructor(
-    id: number,
-    x: number,
-    y: number,
-    heading: number,
-    genes: number[],
-    viewRange: [number, number],
-    turnRange: [number, number],
-    energy: number,
-    gen: number,
-  ) {
-    this.id = id
-    this.x = x
-    this.y = y
-    this.hx = Math.cos(heading)
-    this.hy = Math.sin(heading)
-    this.genes = genes
-    this.view = trait(genes[genes.length - 2], viewRange)
-    this.maxTurn = trait(genes[genes.length - 1], turnRange)
-    this.energy = energy
-    this.gen = gen
-  }
+  stock: number
+  /** Consecutive hours below WITHER_LEVEL of full stock. */
+  grazedFor: number
+  /** Hours since it sprouted. */
+  age: number
 }
 
-function trait(g: number, span: [number, number]): number {
-  const [lo, hi] = span
-  return lo + ((hi - lo) * (Math.min(1.0, Math.max(-1.0, g)) + 1.0)) / 2
-}
-
-function randomGenes(rng: PyRandom, nSenses: number, geneInit: number): number[] {
-  const genes: number[] = []
-  for (let i = 0; i < 2 * nSenses + 1; i++) genes.push(rng.uniform(-geneInit, geneInit))
-  genes.push(rng.uniform(-1.0, 1.0))
-  genes.push(rng.uniform(-1.0, 1.0))
-  return genes
-}
-
-function mutate(rng: PyRandom, genes: number[], rate: number, sigma: number): number[] {
-  const out = new Array<number>(genes.length)
-  for (let i = 0; i < genes.length; i++) {
-    out[i] = rng.random() < rate ? genes[i] + rng.gauss(0.0, sigma) : genes[i]
-  }
-  return out
-}
-
-const senses = new Float64Array(11)
-let outTurn = 0
-let outPace = 0
-
-function think(genes: number[], n: number): void {
-  let turn = 0.0
-  let pace = genes[n]
-  for (let i = 0; i < n; i++) {
-    const v = senses[i]
-    turn += genes[i] * v
-    pace += genes[n + 1 + i] * v
-  }
-  outTurn = Math.tanh(turn)
-  outPace = 0.5 + 0.5 * Math.tanh(pace)
-}
-
-let relL = 0
-let relA = 0
-let relC = 0
-
-function relative(a: Animal, tx: number, ty: number, reach: number): void {
-  const dx = tx - a.x
-  const dy = ty - a.y
-  const d = Math.sqrt(dx * dx + dy * dy)
-  if (d < 1e-12) {
-    relL = 0.0
-    relA = 0.0
-    relC = 1.0
-    return
-  }
-  const ux = dx / d
-  const uy = dy / d
-  relL = a.hx * uy - a.hy * ux
-  relA = a.hx * ux + a.hy * uy
-  relC = Math.max(0.0, 1.0 - d / reach)
-}
-
-function wallAhead(a: Animal, wallView: number): number {
-  const hx = a.hx
-  const hy = a.hy
-  const tx = hx > 1e-9 ? (1.0 - a.x) / hx : hx < -1e-9 ? a.x / -hx : 9.0
-  const ty = hy > 1e-9 ? (1.0 - a.y) / hy : hy < -1e-9 ? a.y / -hy : 9.0
-  return Math.max(0.0, 1.0 - Math.min(tx, ty) / wallView)
-}
-
-function nearest(a: Animal, others: Animal[], reach: number): Animal | null {
-  let best = reach * reach
-  let found: Animal | null = null
-  const x = a.x
-  const y = a.y
-  for (let i = 0; i < others.length; i++) {
-    const o = others[i]
-    const dx = o.x - x
-    const dy = o.y - y
-    const d2 = dx * dx + dy * dy
-    if (d2 < best) {
-      best = d2
-      found = o
-    }
-  }
-  return found
-}
-
-/** Turn by the controller's output, then take one step along the new heading. Returns the step. */
-function steer(a: Animal, turn: number, pace: number, minPace: number, limit: number): number {
-  const angle = a.maxTurn * turn
-  const c = Math.cos(angle)
-  const s = Math.sin(angle)
-  const hx = a.hx * c - a.hy * s
-  const hy = a.hx * s + a.hy * c
-  const n = Math.sqrt(hx * hx + hy * hy)
-  a.hx = hx / n
-  a.hy = hy / n
-  const step = limit * (minPace + (1.0 - minPace) * pace)
-  a.x = Math.min(1.0, Math.max(0.0, a.x + a.hx * step))
-  a.y = Math.min(1.0, Math.max(0.0, a.y + a.hy * step))
-  return step
-}
+const WITHER_LEVEL = 0.15
+const SPROUT_STOCK = 3
+const SPROUT_GAP = 0.05
+const SPROUT_SEASON: Record<Season, number> = { autumn: 0.7, winter: 0.45, spring: 1.35, summer: 1 }
 
 export interface World {
   patches: [number, number][]
@@ -184,7 +72,7 @@ export interface World {
 }
 
 export function placeWorld(seed: number, p: SimParams): World {
-  const rng = new PyRandom(seed)
+  const rng = new Rng(seed)
   const patches: [number, number][] = []
   const sp2 = p.patchSpacing * p.patchSpacing
   for (let k = 0; k < p.patches; k++) {
@@ -217,116 +105,297 @@ export interface Counters {
   preyStarved: number
   preyEaten: number
   preyOld: number
+  predCulled: number
+  preyIllness: number
+  predIllness: number
   predStarved: number
   predOld: number
 }
 
+/** A species as data: what it eats, its body, and its population ceiling. */
+export interface SpeciesDef {
+  key: Species
+  eatsPlants: boolean
+  eats: Species[]
+  body: SpeciesParams
+  ceiling: number
+}
+
+export function speciesDefs(p: SimParams): Record<Species, SpeciesDef> {
+  return {
+    prey: { key: 'prey', eatsPlants: true, eats: [], body: p.prey, ceiling: p.eco.ceilingPrey },
+    pred: { key: 'pred', eatsPlants: false, eats: ['prey'], body: p.pred, ceiling: p.eco.ceilingPred },
+  }
+}
+
+const SPECIES: Species[] = ['prey', 'pred']
+
+export class Creature {
+  readonly id: number
+  readonly species: Species
+  x: number
+  y: number
+  hx: number
+  hy: number
+  readonly brain: Genome
+  energy: number
+  readonly gen: number
+  lineage: number
+  readonly parent: number
+  readonly view: number
+  readonly maxTurn: number
+  age = 0
+  hunger = 0
+  meals = 0
+  lastBirth = -1
+  kits = 0
+  pace = 0
+  mem = 0
+  illUntil = 0
+  immuneUntil = 0
+  inCover = false
+  /** Tick a predator first came close; -1 when not being chased. */
+  threatSince = -1
+
+  constructor(
+    id: number,
+    species: Species,
+    x: number,
+    y: number,
+    heading: number,
+    brain: Genome,
+    body: SpeciesParams,
+    energy: number,
+    gen: number,
+    lineage: number,
+    parent: number,
+  ) {
+    this.id = id
+    this.species = species
+    this.x = x
+    this.y = y
+    this.hx = Math.cos(heading)
+    this.hy = Math.sin(heading)
+    this.brain = brain
+    this.energy = energy
+    this.gen = gen
+    this.lineage = lineage
+    this.parent = parent
+    this.view = trait(bodyGene(brain, 0), body.view)
+    this.maxTurn = trait(bodyGene(brain, 1), body.turn)
+  }
+}
+
+function trait(g: number, span: [number, number]): number {
+  const [lo, hi] = span
+  return lo + ((hi - lo) * (Math.min(1, Math.max(-1, g)) + 1)) / 2
+}
+
+const CELL = 0.1
+const CELLS = 10
+
+/** Uniform grid over the unit square for neighbour queries. */
+class Grid {
+  private cells: Creature[][] = Array.from({ length: CELLS * CELLS }, () => [])
+
+  build(pop: Creature[]): void {
+    for (const c of this.cells) c.length = 0
+    for (const a of pop) this.cells[cellOf(a.x, a.y)].push(a)
+  }
+
+  each(x: number, y: number, r: number, fn: (a: Creature) => void): void {
+    const x0 = Math.max(0, Math.floor((x - r) / CELL))
+    const x1 = Math.min(CELLS - 1, Math.floor((x + r) / CELL))
+    const y0 = Math.max(0, Math.floor((y - r) / CELL))
+    const y1 = Math.min(CELLS - 1, Math.floor((y + r) / CELL))
+    for (let gy = y0; gy <= y1; gy++) for (let gx = x0; gx <= x1; gx++) for (const a of this.cells[gy * CELLS + gx]) fn(a)
+  }
+}
+
+function cellOf(x: number, y: number): number {
+  const gx = Math.min(CELLS - 1, Math.floor(x / CELL))
+  const gy = Math.min(CELLS - 1, Math.floor(y / CELL))
+  return gy * CELLS + gx
+}
+
+export interface EvoCounters {
+  /** Chases: a predator came within CHASE_R of a prey. */
+  encounters: number
+  escapes: number
+  caught: number
+  preyHours: number
+  preyIntake: number
+  predHours: number
+  predHungryHours: number
+}
+
+const CHASE_R = 0.06
+const CHASE_TICKS = 24
+
+export interface EcoOptions {
+  record?: boolean
+  /** Assays: seed each population with these genomes instead of random founders. */
+  genomes?: Partial<Record<Species, Genome[]>>
+  counts?: Partial<Record<Species, number>>
+  noBirths?: boolean
+  noAging?: boolean
+}
+
+/** The meadow: species-generic ecology, energy, brains, births and deaths. */
 export class Sim {
   readonly p: SimParams
   readonly seed: number
-  readonly patches: [number, number][]
+  bushes: Bush[] = []
+  readonly cover: [number, number][]
   readonly dist: Disturbance
-  stock: number[]
-  prey: Animal[]
-  preds: Animal[]
+  readonly defs: Record<Species, SpeciesDef>
+  pops: Record<Species, Creature[]>
   tick = 0
   ended = false
-  counters: Counters = {
-    preyBorn: 0,
-    predBorn: 0,
-    preyStarved: 0,
-    preyEaten: 0,
-    preyOld: 0,
-    predStarved: 0,
-    predOld: 0,
-  }
+  counters: Counters = { preyBorn: 0, predBorn: 0, preyStarved: 0, preyEaten: 0, preyOld: 0, predStarved: 0, predOld: 0, predCulled: 0, preyIllness: 0, predIllness: 0 }
+  evo: EvoCounters = { encounters: 0, escapes: 0, caught: 0, preyHours: 0, preyIntake: 0, predHours: 0, predHungryHours: 0 }
   lastBirth = { prey: 0, pred: 0 }
   events: TickEvent[] = []
-  private rng: PyRandom
-  private evRng: PyRandom
-  private nextPreyId: number
-  private nextPredId: number
+  private founders: Record<Species, Genome[]> = { prey: [], pred: [] }
+  ceilingHits = 0
+  private rng: Rng
+  private evRng: Rng
+  private nextId = { prey: 0, pred: 0 }
   private regrowAcc = 0
-  private capBoost = { prey: 0, pred: 0 }
+  private sproutAcc = 0
+  private nextBush = 0
+  private foodRng: Rng
   private pending: Intervention[] = []
-  private recordEvents: boolean
+  private grids: Record<Species, Grid> = { prey: new Grid(), pred: new Grid() }
+  private opts: EcoOptions
+  private x = new Float64Array(N_IN)
+  private hid = new Float64Array(64)
+  private out = new Float64Array(N_OUT)
 
-  constructor(p: SimParams, seed: number, dist: Disturbance = NO_DISTURBANCE, recordEvents = false) {
+  constructor(p: SimParams, seed: number, dist: Disturbance = NO_DISTURBANCE, opts: EcoOptions = {}) {
     this.p = p
     this.seed = seed
     this.dist = dist
-    this.recordEvents = recordEvents
+    this.opts = opts
+    this.defs = speciesDefs(p)
     const world = placeWorld(seed, p)
-    this.patches = world.patches
-    this.rng = new PyRandom(seed + 10000)
-    this.evRng = new PyRandom(seed + 20000)
-    const rng = this.rng
-    this.prey = world.prey.map(
-      ([x, y], i) =>
-        new Animal(
-          i,
-          x,
-          y,
-          rng.uniform(0, 2 * Math.PI),
-          randomGenes(rng, PREY_SENSES, p.geneInit),
-          p.prey.view,
-          p.prey.turn,
-          p.founderEnergy * p.prey.maxEnergy,
-          0,
-        ),
-    )
-    this.preds = world.preds.map(
-      ([x, y], i) =>
-        new Animal(
-          i,
-          x,
-          y,
-          rng.uniform(0, 2 * Math.PI),
-          randomGenes(rng, PRED_SENSES, p.geneInit),
-          p.pred.view,
-          p.pred.turn,
-          p.founderEnergy * p.pred.maxEnergy,
-          0,
-        ),
-    )
-    this.stock = new Array<number>(p.patches).fill(p.patchStock)
-    this.nextPreyId = this.prey.length
-    this.nextPredId = this.preds.length
+    this.cover = placeCover(seed, p, world.patches)
+    this.foodRng = new Rng(seed + 40000)
+    for (const [x, y] of world.patches) this.bushes.push({ id: this.nextBush++, x, y, stock: p.patchStock, grazedFor: 0, age: 9999 })
+    this.rng = new Rng(seed + 10000)
+    this.evRng = new Rng(seed + 20000)
+    const starts: Record<Species, [number, number][]> = { prey: world.prey, pred: world.preds }
+    this.pops = { prey: [], pred: [] }
+    for (const s of SPECIES) {
+      const given = opts.genomes?.[s]
+      const n = opts.counts?.[s] ?? starts[s].length
+      for (let i = 0; i < n; i++) {
+        const [x, y] = starts[s][i] ?? [this.rng.random(), this.rng.random()]
+        const brain = given?.length ? given[i % given.length] : randomGenome(this.rng, p.eco.hidden, p.geneInit)
+        const a = this.spawn(s, x, y, brain, p.founderEnergy * this.defs[s].body.maxEnergy, 0, -1)
+        this.pops[s].push(a)
+      }
+    }
+    for (const s of SPECIES) this.founders[s] = this.pops[s].map(a => a.brain)
+    for (const s of SPECIES) for (const a of this.pops[s]) a.inCover = this.inCover(a.x, a.y)
+  }
+
+  /** Structured-cloneable checkpoint, including every random stream and pending action. */
+  save() {
+    return {
+      version: 2 as const, p: this.p, seed: this.seed, dist: this.dist, opts: this.opts,
+      pops: this.pops, founders: this.founders, bushes: this.bushes,
+      tick: this.tick, ended: this.ended, counters: this.counters, evo: this.evo,
+      lastBirth: this.lastBirth, nextId: this.nextId, nextBush: this.nextBush,
+      regrowAcc: this.regrowAcc, sproutAcc: this.sproutAcc, pending: this.pending,
+      ceilingHits: this.ceilingHits,
+      rng: this.rng.save(), evRng: this.evRng.save(), foodRng: this.foodRng.save(),
+    }
+  }
+
+  static restore(data: ReturnType<Sim['save']>): Sim {
+    if (data.version !== 2) throw new Error('Unsupported meadow save version')
+    const s = new Sim(data.p, data.seed, data.dist, data.opts)
+    for (const key of ['pops', 'founders', 'bushes', 'tick', 'ended', 'counters', 'evo', 'lastBirth',
+      'nextId', 'nextBush', 'regrowAcc', 'sproutAcc', 'pending', 'ceilingHits'] as const) {
+      Object.assign(s, { [key]: structuredClone(data[key]) })
+    }
+    s.rng.restore(data.rng)
+    s.evRng.restore(data.evRng)
+    s.foodRng.restore(data.foodRng)
+    return s
+  }
+
+  get prey(): Creature[] {
+    return this.pops.prey
+  }
+
+  get preds(): Creature[] {
+    return this.pops.pred
   }
 
   get survived(): boolean {
-    return this.tick === this.p.horizon && this.prey.length > 0 && this.preds.length > 0
+    return !this.p.endless && this.tick >= this.p.horizon && this.prey.length > 0 && this.preds.length > 0
   }
 
   queue(action: Intervention): void {
     this.pending.push(action)
   }
 
+  /** Performance ceiling. Ecology, not this number, is what limits a normal meadow. */
+  cap(s: Species): number {
+    return this.defs[s].ceiling
+  }
+
   regrowFactor(tick: number): number {
     let f = 1
+    if (this.p.endless) tick %= 8760
     for (const w of this.dist.regrow) if (tick >= w.from && tick < w.to) f *= w.factor
     return f
   }
 
   metabolismFactor(tick: number): number {
     let f = 1
+    if (this.p.endless) tick %= 8760
     for (const w of this.dist.metabolism) if (tick >= w.from && tick < w.to) f *= w.factor
     return f
   }
 
-  cap(species: Species): number {
-    return (species === 'prey' ? this.p.prey.cap : this.p.pred.cap) + this.capBoost[species]
+  traits(s: Species): Traits | null {
+    const pop = this.pops[s]
+    if (pop.length === 0) return null
+    const sum: Traits = { cruise: 0, sprint: 0, chase: 0, flee: 0, forage: 0, herd: 0, hide: 0 }
+    for (const a of pop) {
+      const t = traits(a.brain, this.defs[s].eatsPlants)
+      for (const k of Object.keys(sum) as (keyof Traits)[]) sum[k] += t[k]
+    }
+    for (const k of Object.keys(sum) as (keyof Traits)[]) sum[k] /= pop.length
+    return sum
   }
 
-  private emit(kind: TickEvent['kind'], species: Species, a: Animal): void {
-    if (this.recordEvents) this.events.push({ kind, species, x: a.x, y: a.y })
+  find(s: Species, id: number): Creature | undefined {
+    return this.pops[s].find((a) => a.id === id)
   }
 
-  /** Advance one tick. Returns false once the run has ended. */
+  private spawn(s: Species, x: number, y: number, brain: Genome, energy: number, gen: number, parent: number): Creature {
+    const id = this.nextId[s]++
+    const lineage = parent < 0 ? id : -1
+    return new Creature(id, s, x, y, this.rng.uniform(0, 2 * Math.PI), brain, this.defs[s].body, energy, gen, lineage, parent)
+  }
+
+  private emit(kind: TickEvent['kind'], species: Species, a: { x: number; y: number }): void {
+    if (this.opts.record) this.events.push({ kind, species, x: a.x, y: a.y })
+  }
+
+  inCover(x: number, y: number): boolean {
+    const r2 = this.p.eco.coverR * this.p.eco.coverR
+    for (const [cx, cy] of this.cover) if ((cx - x) ** 2 + (cy - y) ** 2 <= r2) return true
+    return false
+  }
+
   step(): boolean {
     if (this.ended) return false
     const p = this.p
-    const energy = p.rules === 'energy'
     this.events.length = 0
     this.tick += 1
     const tick = this.tick
@@ -335,274 +404,418 @@ export class Sim {
     for (const action of this.pending) this.intervene(action)
     this.pending.length = 0
 
-    // 1. age
-    for (const a of this.prey) {
-      a.age += 1
-      a.hunger += 1
-    }
-    for (const a of this.preds) {
-      a.age += 1
-      a.hunger += 1
+    for (const s of SPECIES) {
+      for (const a of this.pops[s]) {
+        if (!this.opts.noAging) a.age += 1
+        a.hunger += 1
+      }
+      this.grids[s].build(this.pops[s])
     }
 
-    const met = energy ? this.metabolismFactor(tick) : 1
+    this.spreadIllness()
+    const met = this.metabolismFactor(tick)
+    for (const s of SPECIES) for (const a of this.pops[s]) this.move(a, met)
+    for (const s of SPECIES) this.grids[s].build(this.pops[s])
 
-    // 2. prey move
-    const stock = this.stock
-    const patches = this.patches
-    const stockedIdx: number[] = []
-    for (let k = 0; k < patches.length; k++) if (stock[k] >= 1) stockedIdx.push(k)
-    const pp = p.prey
-    for (const a of this.prey) {
-      let fl = 0.0
-      let fa = 0.0
-      let fc = 0.0
-      if (stockedIdx.length > 0) {
-        let bestD = Infinity
-        let bx = 0
-        let by = 0
-        for (const k of stockedIdx) {
-          const [px, py] = patches[k]
-          const d = (px - a.x) ** 2 + (py - a.y) ** 2
-          if (d < bestD) {
-            bestD = d
-            bx = px
-            by = py
-          }
-        }
-        relative(a, bx, by, p.foodScent)
-        fl = relL
-        fa = relA
-        fc = relC
-      }
-      let pl = 0.0
-      let pa = 0.0
-      let pc = 0.0
-      const q = nearest(a, this.preds, a.view)
-      if (q !== null) {
-        relative(a, q.x, q.y, a.view)
-        pl = relL
-        pa = relA
-        pc = relC
-      }
-      const h = energy ? 1 - a.energy / pp.maxEnergy : a.hunger / pp.starve
-      senses[0] = fl
-      senses[1] = fa
-      senses[2] = fc
-      senses[3] = h * fl
-      senses[4] = h * fa
-      senses[5] = h * fc
-      senses[6] = pl
-      senses[7] = pa
-      senses[8] = pc
-      senses[9] = h
-      senses[10] = wallAhead(a, p.wallView)
-      think(a.genes, PREY_SENSES)
-      const step = steer(a, outTurn, outPace, energy ? 0 : pp.minPace, pp.step)
-      a.pace = step / pp.step
-      if (energy) this.spend(a, pp, step, met)
-    }
+    this.graze()
+    this.hunt(tick)
 
-    // 3. predators move
-    const dp = p.pred
-    for (const a of this.preds) {
-      let ql = 0.0
-      let qa = 0.0
-      let qc = 0.0
-      const q = nearest(a, this.prey, a.view)
-      if (q !== null) {
-        relative(a, q.x, q.y, a.view)
-        ql = relL
-        qa = relA
-        qc = relC
-      }
-      let bestD = Infinity
-      let bx = 0
-      let by = 0
-      for (let k = 0; k < patches.length; k++) {
-        const [px, py] = patches[k]
-        const d = (px - a.x) ** 2 + (py - a.y) ** 2
-        if (d < bestD) {
-          bestD = d
-          bx = px
-          by = py
-        }
-      }
-      relative(a, bx, by, p.foodScent)
-      const h = energy ? 1 - a.energy / dp.maxEnergy : a.hunger / dp.starve
-      senses[0] = ql
-      senses[1] = qa
-      senses[2] = qc
-      senses[3] = h * ql
-      senses[4] = h * qa
-      senses[5] = h * qc
-      senses[6] = relL
-      senses[7] = relA
-      senses[8] = relC
-      senses[9] = h
-      senses[10] = wallAhead(a, p.wallView)
-      think(a.genes, PRED_SENSES)
-      const step = steer(a, outTurn, outPace, energy ? 0 : dp.minPace, dp.step)
-      a.pace = step / dp.step
-      if (energy) this.spend(a, dp, step, met)
-    }
+    for (const s of SPECIES) this.pops[s] = this.cull(s)
 
-    // 4. prey feed
-    const feed2 = p.feedR * p.feedR
-    const preyFull = pp.maxEnergy - 0.5 * pp.mealEnergy
-    for (const a of this.prey) {
-      if (energy && a.energy > preyFull) continue
-      let best = feed2
-      let bk = -1
-      for (let k = 0; k < patches.length; k++) {
-        if (stock[k] >= 1) {
-          const [x, y] = patches[k]
-          const d2 = (x - a.x) ** 2 + (y - a.y) ** 2
-          if (d2 <= best) {
-            best = d2
-            bk = k
-          }
-        }
-      }
-      if (bk >= 0) {
-        stock[bk] -= 1
-        a.hunger = 0
-        a.meals += 1
-        if (energy) a.energy = Math.min(pp.maxEnergy, a.energy + pp.mealEnergy)
-      }
-    }
+    if (!this.opts.noBirths) for (const s of SPECIES) for (const parent of this.pops[s].slice()) this.giveBirth(parent)
 
-    // 5. predators hunt
-    const eat2 = p.eatR * p.eatR
-    const predFull = dp.maxEnergy - 0.5 * dp.mealEnergy
-    const survivors: Animal[] = []
-    for (const a of this.prey) {
-      let best = eat2
-      let hunter: Animal | null = null
-      for (const q of this.preds) {
-        if (energy && q.energy > predFull) continue
-        const d2 = (q.x - a.x) ** 2 + (q.y - a.y) ** 2
-        if (d2 <= best) {
-          best = d2
-          hunter = q
-        }
-      }
-      if (hunter === null) {
-        survivors.push(a)
-      } else {
-        hunter.hunger = 0
-        hunter.meals += 1
-        if (energy) hunter.energy = Math.min(dp.maxEnergy, hunter.energy + dp.mealEnergy)
-        this.counters.preyEaten += 1
-        this.emit('eaten', 'prey', a)
-      }
-    }
-    this.prey = survivors
+    this.growFood(tick)
 
-    // 6. starvation and old age
-    this.prey = this.cull(this.prey, pp, 'prey', energy)
-    this.preds = this.cull(this.preds, dp, 'pred', energy)
-
-    // 7. births, prey then predators, lowest parent id first
-    const preyParents = this.prey.slice()
-    for (const parent of preyParents) this.giveBirth(parent, 'prey', energy)
-    const predParents = this.preds.slice()
-    for (const parent of predParents) this.giveBirth(parent, 'pred', energy)
-
-    // 8. regrow
-    this.regrowAcc += this.regrowFactor(tick)
-    if (this.regrowAcc >= p.regrowEvery) {
-      this.regrowAcc -= p.regrowEvery
-      for (let k = 0; k < stock.length; k++) if (stock[k] < p.patchStock) stock[k] += 1
-    }
-
-    // 9. extinction ends the run
-    if (this.prey.length === 0 || this.preds.length === 0 || tick >= p.horizon) {
+    this.evo.preyHours += this.prey.length
+    this.evo.predHours += this.preds.length
+    if (this.prey.length === 0 || this.preds.length === 0 || (!p.endless && tick >= p.horizon)) {
       this.ended = true
       return false
     }
     return true
   }
 
-  private spend(a: Animal, sp: SpeciesParams, step: number, met: number): void {
-    const r = step / sp.baseStep
-    a.energy -= (sp.metabolism + sp.visionUpkeep * a.view) * met + sp.speedCost * r * r
+/** Regrow, wither and sprout. Bushes are not permanent: overgrazed ones die and new ones appear. */
+  private growFood(tick: number): void {
+    const p = this.p
+    const f = this.regrowFactor(tick)
+    this.regrowAcc += f
+    const regrow = this.regrowAcc >= p.regrowEvery
+    if (regrow) this.regrowAcc -= p.regrowEvery
+    const low = WITHER_LEVEL * p.patchStock
+    const kept: Bush[] = []
+    for (const b of this.bushes) {
+      b.age++
+      if (regrow && b.stock < p.patchStock) b.stock += 1
+      b.grazedFor = b.stock < low ? b.grazedFor + 1 : 0
+      if (b.grazedFor >= p.witherHours) {
+        this.emit('withered', 'prey', b)
+        continue
+      }
+      kept.push(b)
+    }
+    this.bushes = kept
+    this.sproutAcc += (p.sproutPerDay / 24) * f * SPROUT_SEASON[calendar(tick).season]
+    const rng = this.foodRng
+    while (this.sproutAcc >= 1) {
+      this.sproutAcc -= 1
+      if (this.bushes.length >= p.maxBushes) continue
+      const near = this.bushes.length > 0 && rng.random() < p.seedSpread
+      let x: number
+      let y: number
+      if (near) {
+        const parent = this.bushes[Math.floor(rng.random() * this.bushes.length)]
+        x = parent.x + rng.gauss(0, 0.08)
+        y = parent.y + rng.gauss(0, 0.08)
+      } else {
+        x = rng.random()
+        y = rng.random()
+      }
+      x = Math.min(0.97, Math.max(0.03, x))
+      y = Math.min(0.97, Math.max(0.03, y))
+      if (this.bushes.some((b) => (b.x - x) ** 2 + (b.y - y) ** 2 < SPROUT_GAP * SPROUT_GAP)) continue
+      const b: Bush = { id: this.nextBush++, x, y, stock: SPROUT_STOCK, grazedFor: 0, age: 0 }
+      this.bushes.push(b)
+      this.emit('sprouted', 'prey', b)
+    }
   }
 
-  private cull(pop: Animal[], sp: SpeciesParams, species: Species, energy: boolean): Animal[] {
-    const alive: Animal[] = []
+  /** Fill `this.x` with the creature's senses, by category: threat, food, kin, self, cover. */
+  private sense(a: Creature): void {
+    const x = this.x
+    const def = this.defs[a.species]
+    const p = this.p
+    x.fill(0)
+
+    let t1: Creature | null = null
+    let t2: Creature | null = null
+    let d1 = Infinity
+    let d2 = Infinity
+    let count = 0
+    for (const s of SPECIES) {
+      if (!this.defs[s].eats.includes(a.species)) continue
+      const r = a.view
+      this.grids[s].each(a.x, a.y, r, (o) => {
+        const d = (o.x - a.x) ** 2 + (o.y - a.y) ** 2
+        if (d >= r * r) return
+        count++
+        if (d < d1) {
+          t2 = t1
+          d2 = d1
+          t1 = o
+          d1 = d
+        } else if (d < d2) {
+          t2 = o
+          d2 = d
+        }
+      })
+    }
+    if (t1) relative(a, (t1 as Creature).x, (t1 as Creature).y, a.view, x, SENSE.threat1)
+    if (t2) relative(a, (t2 as Creature).x, (t2 as Creature).y, a.view, x, SENSE.threat2)
+    x[SENSE.threatCount] = Math.min(1, count / 5)
+    if (a.species === 'prey') {
+      const near = t1 ? Math.sqrt(d1) : Infinity
+      if (near < CHASE_R && a.threatSince < 0) {
+        a.threatSince = this.tick
+        this.evo.encounters++
+      }
+    }
+
+    if (def.eatsPlants) {
+      let k1 = -1
+      let k2 = -1
+      let e1 = Infinity
+      let e2 = Infinity
+      const bushes = this.bushes
+      for (let k = 0; k < bushes.length; k++) {
+        const b = bushes[k]
+        if (b.stock < 1) continue
+        const d = (b.x - a.x) ** 2 + (b.y - a.y) ** 2
+        if (d < e1) {
+          k2 = k1
+          e2 = e1
+          k1 = k
+          e1 = d
+        } else if (d < e2) {
+          k2 = k
+          e2 = d
+        }
+      }
+      if (k1 >= 0) {
+        relative(a, bushes[k1].x, bushes[k1].y, p.foodScent, x, SENSE.food1)
+        x[SENSE.foodAmount] = bushes[k1].stock / p.patchStock
+      }
+      if (k2 >= 0) relative(a, bushes[k2].x, bushes[k2].y, p.foodScent, x, SENSE.food2)
+    } else {
+      let f1: Creature | null = null
+      let f2: Creature | null = null
+      let e1 = Infinity
+      let e2 = Infinity
+      let n = 0
+      const sight2 = p.eco.coverSight * p.eco.coverSight
+      for (const s of def.eats) {
+        const r = a.view
+        this.grids[s].each(a.x, a.y, r, (o) => {
+          const d = (o.x - a.x) ** 2 + (o.y - a.y) ** 2
+          if (d >= r * r || (o.inCover && d > sight2)) return
+          n++
+          if (d < e1) {
+            f2 = f1
+            e2 = e1
+            f1 = o
+            e1 = d
+          } else if (d < e2) {
+            f2 = o
+            e2 = d
+          }
+        })
+      }
+      if (f1) relative(a, (f1 as Creature).x, (f1 as Creature).y, a.view, x, SENSE.food1)
+      if (f2) relative(a, (f2 as Creature).x, (f2 as Creature).y, a.view, x, SENSE.food2)
+      x[SENSE.foodAmount] = Math.min(1, n / 10)
+    }
+
+    const kr = p.eco.kinR
+    let kx = 0
+    let ky = 0
+    let kn = 0
+    this.grids[a.species].each(a.x, a.y, kr, (o) => {
+      if (o === a) return
+      const d = (o.x - a.x) ** 2 + (o.y - a.y) ** 2
+      if (d >= kr * kr) return
+      kx += o.x
+      ky += o.y
+      kn++
+    })
+    if (kn > 0) {
+      relative(a, kx / kn, ky / kn, kr, x, SENSE.kin)
+      x[SENSE.kin + 2] = Math.min(1, kn / 8)
+    }
+
+    x[SENSE.hunger] = 1 - a.energy / def.body.maxEnergy
+    x[SENSE.inCover] = a.inCover ? 1 : 0
+    x[SENSE.wall] = wallAhead(a, p.wallView)
+    x[SENSE.memory] = a.mem
+    x[SENSE.bias] = 1
+
+    if (this.cover.length > 0) {
+      let best = Infinity
+      let bx = 0
+      let by = 0
+      for (const [cx, cy] of this.cover) {
+        const d = (cx - a.x) ** 2 + (cy - a.y) ** 2
+        if (d < best) {
+          best = d
+          bx = cx
+          by = cy
+        }
+      }
+      relative(a, bx, by, 0.3, x, SENSE.cover)
+      if (a.inCover) x[SENSE.cover + 2] = 1
+    }
+  }
+
+  private move(a: Creature, met: number): void {
+    const body = this.defs[a.species].body
+    const eco = this.p.eco
+    this.sense(a)
+    think(a.brain, this.x, this.hid, this.out)
+    const turn = Math.tanh(this.out[OUT.turn])
+    const pace = 0.5 + 0.5 * Math.tanh(this.out[OUT.pace])
+    a.mem = eco.memory ? Math.tanh(this.out[OUT.memory]) : 0
+    const angle = a.maxTurn * turn
+    const c = Math.cos(angle)
+    const s = Math.sin(angle)
+    const hx = a.hx * c - a.hy * s
+    const hy = a.hx * s + a.hy * c
+    const n = Math.sqrt(hx * hx + hy * hy)
+    a.hx = hx / n
+    a.hy = hy / n
+    const step = body.step * pace * (a.inCover ? eco.coverSlow : 1)
+    a.x = Math.min(1, Math.max(0, a.x + a.hx * step))
+    a.y = Math.min(1, Math.max(0, a.y + a.hy * step))
+    a.pace = step / body.step
+    a.inCover = this.cover.length > 0 && this.inCover(a.x, a.y)
+    const r = step / body.baseStep
+    a.energy -=
+      (body.metabolism + body.visionUpkeep * a.view + eco.brainUpkeep * a.brain.nHid) * met + body.speedCost * r * r + (a.illUntil > this.tick ? 0.65 : 0)
+  }
+
+  private graze(): void {
+    const p = this.p
+    const body = p.prey
+    const feed2 = p.feedR * p.feedR
+    const full = body.maxEnergy - 0.5 * body.mealEnergy
+    for (const s of SPECIES) {
+      if (!this.defs[s].eatsPlants) continue
+      for (const a of this.pops[s]) {
+        if (a.energy > full) continue
+        let best = feed2
+        let bk = -1
+        for (let k = 0; k < this.bushes.length; k++) {
+          const b = this.bushes[k]
+          if (b.stock < 1) continue
+          const d2 = (b.x - a.x) ** 2 + (b.y - a.y) ** 2
+          if (d2 <= best) {
+            best = d2
+            bk = k
+          }
+        }
+        if (bk >= 0) {
+          this.bushes[bk].stock -= 1
+          a.hunger = 0
+          a.meals += 1
+          const gain = Math.min(this.defs[s].body.maxEnergy - a.energy, this.defs[s].body.mealEnergy)
+          a.energy += gain
+          this.evo.preyIntake += gain
+        }
+      }
+    }
+  }
+
+  private hunt(tick: number): void {
+    const eat2 = this.p.eatR * this.p.eatR
+    for (const s of SPECIES) {
+      const def = this.defs[s]
+      if (def.eats.length === 0) continue
+      const full = def.body.maxEnergy - 0.5 * def.body.mealEnergy
+      for (const a of this.pops[s]) if (a.energy <= full) this.evo.predHungryHours++
+      for (const victim of def.eats) {
+        const survivors: Creature[] = []
+        for (const a of this.pops[victim]) {
+          let best = eat2
+          let hunter: Creature | null = null
+          this.grids[s].each(a.x, a.y, this.p.eatR, (q) => {
+            if (q.energy > full) return
+            const d2 = (q.x - a.x) ** 2 + (q.y - a.y) ** 2
+            if (d2 <= best) {
+              best = d2
+              hunter = q
+            }
+          })
+          if (hunter === null) {
+            if (a.threatSince >= 0 && tick - a.threatSince >= CHASE_TICKS) {
+              a.threatSince = -1
+              this.evo.escapes++
+            }
+            survivors.push(a)
+            continue
+          }
+          const h = hunter as Creature
+          h.hunger = 0
+          h.meals += 1
+          h.energy = Math.min(def.body.maxEnergy, h.energy + def.body.mealEnergy)
+          if (a.threatSince >= 0) this.evo.caught++
+          this.counters.preyEaten += 1
+          this.emit('eaten', victim, a)
+        }
+        this.pops[victim] = survivors
+      }
+    }
+  }
+
+  private cull(s: Species): Creature[] {
+    const body = this.defs[s].body
+    const alive: Creature[] = []
     const c = this.counters
-    for (const a of pop) {
-      const starved = energy ? a.energy <= 0 : a.hunger >= sp.starve
-      const old = a.age >= sp.lifespan
+    for (const a of this.pops[s]) {
+      const starved = a.energy <= 0
+      const old = a.age >= body.lifespan
       if (!starved && !old) {
         alive.push(a)
         continue
       }
-      if (starved) {
-        if (species === 'prey') c.preyStarved += 1
+      if (s === 'prey' && a.threatSince >= 0) a.threatSince = -1
+      if (starved && a.illUntil > this.tick) {
+        if (s === 'prey') c.preyIllness++
+        else c.predIllness++
+        this.emit('illness', s, a)
+      } else if (starved) {
+        if (s === 'prey') c.preyStarved += 1
         else c.predStarved += 1
-        this.emit('starved', species, a)
+        this.emit('starved', s, a)
       } else {
-        if (species === 'prey') c.preyOld += 1
+        if (s === 'prey') c.preyOld += 1
         else c.predOld += 1
-        this.emit('old', species, a)
+        this.emit('old', s, a)
       }
     }
     return alive
   }
 
-  private giveBirth(parent: Animal, species: Species, energy: boolean): void {
+  private findMate(parent: Creature): Creature | null {
+    const r = this.p.eco.mateR
+    const adult = this.defs[parent.species].body.adultAge
+    let best = r * r
+    let mate: Creature | null = null
+    this.grids[parent.species].each(parent.x, parent.y, r, (o) => {
+      if (o === parent || o.age < adult || o.energy <= 0) return
+      const d = (o.x - parent.x) ** 2 + (o.y - parent.y) ** 2
+      if (d < best) {
+        best = d
+        mate = o
+      }
+    })
+    return mate
+  }
+
+  private giveBirth(parent: Creature): void {
     const p = this.p
-    const sp = species === 'prey' ? p.prey : p.pred
-    const pop = species === 'prey' ? this.prey : this.preds
-    const cap = this.cap(species)
-    let since: number
-    if (parent.lastBirth < 0) since = p.gapFromOwnBirth ? parent.age : sp.birthGap
-    else since = parent.age - parent.lastBirth
-    if (pop.length >= cap || parent.age < sp.adultAge || since < sp.birthGap) return
-    const childCost = sp.childEnergy * sp.maxEnergy
-    if (energy) {
-      if (parent.energy < sp.breedEnergy * sp.maxEnergy || parent.energy <= childCost) return
-    } else if (parent.meals < sp.mealsToBreed) {
-      return
-    }
+    const s = parent.species
+    const body = this.defs[s].body
+    const pop = this.pops[s]
+    const cap = this.cap(s)
+    const since = parent.lastBirth < 0 ? body.birthGap : parent.age - parent.lastBirth
+    if (pop.length >= cap) { this.ceilingHits++; return }
+    if (parent.age < body.adultAge || since < body.birthGap) return
+    const childCost = body.childEnergy * body.maxEnergy
+    if (parent.energy < body.breedEnergy * body.maxEnergy || parent.energy <= childCost) return
+    const mate = p.eco.sexual ? this.findMate(parent) : null
+    if (p.eco.sexual && !mate) return
     const rng = this.rng
-    for (let n = 0; n < sp.litter; n++) {
-      if (pop.length >= cap) break
-      if (energy && parent.energy <= childCost) break
+    for (let n = 0; n < body.litter; n++) {
+      if (pop.length >= cap || parent.energy <= childCost) break
       const angle = rng.uniform(0, 2 * Math.PI)
       const r = p.birthR * Math.sqrt(rng.random())
-      const x = Math.min(1.0, Math.max(0.0, parent.x + r * Math.cos(angle)))
-      const y = Math.min(1.0, Math.max(0.0, parent.y + r * Math.sin(angle)))
-      const heading = rng.uniform(0, 2 * Math.PI)
-      const genes = mutate(rng, parent.genes, p.mutationRate, p.mutationSigma)
-      const id = species === 'prey' ? this.nextPreyId++ : this.nextPredId++
-      const child = new Animal(id, x, y, heading, genes, sp.view, sp.turn, childCost, parent.gen + 1)
-      if (energy) parent.energy -= childCost
+      const x = Math.min(1, Math.max(0, parent.x + r * Math.cos(angle)))
+      const y = Math.min(1, Math.max(0, parent.y + r * Math.sin(angle)))
+      let brain: Genome
+      if (!p.eco.heredity) brain = this.founders[s][Math.floor(rng.random() * this.founders[s].length)]
+      else {
+        const base = mate ? crossover(rng, parent.brain, mate.brain) : parent.brain
+        brain = mutateGenome(rng, base, p.mutationRate, p.mutationSigma, p.eco.growRate, p.eco.maxHidden)
+      }
+      const gen = Math.max(parent.gen, mate?.gen ?? 0) + 1
+      const child = this.spawn(s, x, y, brain, childCost, gen, parent.id)
+      child.lineage = p.eco.heredity ? parent.lineage : child.id
+      child.inCover = this.cover.length > 0 && this.inCover(x, y)
+      parent.energy -= childCost
+      parent.kits += 1
       pop.push(child)
-      if (species === 'prey') this.counters.preyBorn += 1
+      if (s === 'prey') this.counters.preyBorn += 1
       else this.counters.predBorn += 1
-      this.emit('born', species, child)
+      this.emit('born', s, child)
     }
     parent.meals = 0
     parent.lastBirth = parent.age
-    this.lastBirth[species] = this.tick
+    this.lastBirth[s] = this.tick
   }
 
-  /** A newcomer cloned (with mutation) from a random living animal, or a random founder. */
-  private newcomer(species: Species, x: number, y: number, fullEnergy: boolean): Animal {
-    const p = this.p
+  private newcomer(s: Species, x: number, y: number): Creature {
     const ev = this.evRng
-    const sp = species === 'prey' ? p.prey : p.pred
-    const pop = species === 'prey' ? this.prey : this.preds
-    const genes =
-      pop.length > 0
-        ? mutate(ev, pop[Math.floor(ev.random() * pop.length)].genes, p.mutationRate, p.mutationSigma)
-        : randomGenes(ev, species === 'prey' ? PREY_SENSES : PRED_SENSES, p.geneInit)
-    const id = species === 'prey' ? this.nextPreyId++ : this.nextPredId++
-    const e = (fullEnergy ? 1 : p.founderEnergy) * sp.maxEnergy
-    return new Animal(id, x, y, ev.uniform(0, 2 * Math.PI), genes, sp.view, sp.turn, e, 0)
+    const p = this.p
+    const pop = this.pops[s]
+    const ancestor = pop.length ? pop[Math.floor(ev.random() * pop.length)] : null
+    const brain = !p.eco.heredity && this.founders[s].length
+      ? this.founders[s][Math.floor(ev.random() * this.founders[s].length)]
+      : ancestor
+        ? mutateGenome(ev, ancestor.brain, p.mutationRate, p.mutationSigma, 0, p.eco.maxHidden)
+        : randomGenome(ev, p.eco.hidden, p.geneInit)
+    const inherited = p.eco.heredity && ancestor
+    const a = this.spawn(s, x, y, brain, this.defs[s].body.maxEnergy, inherited ? ancestor.gen + 1 : 0, inherited ? ancestor.id : -1)
+    if (inherited) a.lineage = ancestor.lineage
+    a.inCover = this.cover.length > 0 && this.inCover(x, y)
+    return a
   }
 
   private edgePoint(): [number, number] {
@@ -621,31 +834,74 @@ export class Sim {
   }
 
   private arrive(arr: Arrival): void {
-    this.capBoost[arr.species] += arr.capBoost
-    const pop = arr.species === 'prey' ? this.prey : this.preds
     const [ex, ey] = this.edgePoint()
-    for (let i = 0; i < arr.count; i++) {
+    const room = Math.max(0, this.cap(arr.species) - this.pops[arr.species].length)
+    if (arr.count > room) this.ceilingHits += arr.count - room
+    for (let i = 0; i < Math.min(arr.count, room); i++) {
       const x = Math.min(1, Math.max(0, ex + this.evRng.uniform(-0.05, 0.05)))
       const y = Math.min(1, Math.max(0, ey + this.evRng.uniform(-0.05, 0.05)))
-      const a = this.newcomer(arr.species, x, y, true)
-      pop.push(a)
+      const a = this.newcomer(arr.species, x, y)
+      this.pops[arr.species].push(a)
       this.emit('arrived', arr.species, a)
+    }
+  }
+
+  private infect(a: Creature): void {
+    a.illUntil = this.tick + 240
+    a.immuneUntil = this.tick + 720
+  }
+
+  /** Abstract game illness: local spread, extra energy costs, then recovery and temporary immunity. */
+  private spreadIllness(): void {
+    if (this.tick % 6 !== 0) return
+    for (const s of SPECIES) {
+      const sick = this.pops[s].filter(a => a.illUntil > this.tick)
+      const exposed = new Set<Creature>()
+      for (const a of sick) this.grids[s].each(a.x, a.y, 0.045, b => {
+        if (b.immuneUntil > this.tick || (a.x - b.x) ** 2 + (a.y - b.y) ** 2 > 0.045 ** 2) return
+        if (this.evRng.random() < 0.15) exposed.add(b)
+      })
+      for (const a of exposed) this.infect(a)
     }
   }
 
   private intervene(action: Intervention): void {
     const ev = this.evRng
     switch (action) {
+      case 'illnessPrey':
+      case 'illnessPred': {
+        const species = action === 'illnessPrey' ? 'prey' : 'pred'
+        const available = this.pops[species].filter(a => a.immuneUntil <= this.tick)
+        const n = Math.min(6, Math.max(1, Math.ceil(available.length * 0.2)))
+        for (let i = 0; i < n && available.length; i++) {
+          const at = Math.floor(ev.random() * available.length)
+          this.infect(available.splice(at, 1)[0])
+        }
+        break
+      }
+      case 'plantBushes':
+        for (let i = 0; i < 4 && this.bushes.length < this.p.maxBushes; i++) {
+          const bush = { id: this.nextBush++, x: ev.uniform(0.05, 0.95), y: ev.uniform(0.05, 0.95),
+            stock: this.p.patchStock / 2, grazedFor: 0, age: 0 }
+          this.bushes.push(bush)
+          this.emit('sprouted', 'prey', bush)
+        }
+        break
+      case 'feedFoxes':
+        for (const a of this.preds) a.energy = this.p.pred.maxEnergy
+        break
       case 'rain':
-        this.stock.fill(this.p.patchStock)
+        for (const b of this.bushes) b.stock = this.p.patchStock
         break
       case 'releasePrey': {
         const room = Math.max(0, this.cap('prey') - this.prey.length)
+        if (room < 8) this.ceilingHits += 8 - room
         for (let i = 0; i < Math.min(8, room); i++) {
-          const [px, py] = this.patches[Math.floor(ev.random() * this.patches.length)]
+          const spot = this.bushes.length ? this.bushes[Math.floor(ev.random() * this.bushes.length)] : { x: 0.5, y: 0.5 }
+          const [px, py] = [spot.x, spot.y]
           const x = Math.min(1, Math.max(0, px + ev.uniform(-0.04, 0.04)))
           const y = Math.min(1, Math.max(0, py + ev.uniform(-0.04, 0.04)))
-          const a = this.newcomer('prey', x, y, true)
+          const a = this.newcomer('prey', x, y)
           this.prey.push(a)
           this.emit('released', 'prey', a)
         }
@@ -653,9 +909,10 @@ export class Sim {
       }
       case 'releasePred': {
         const room = Math.max(0, this.cap('pred') - this.preds.length)
+        if (room < 3) this.ceilingHits += 3 - room
         const [ex, ey] = this.edgePoint()
         for (let i = 0; i < Math.min(3, room); i++) {
-          const a = this.newcomer('pred', ex, ey, true)
+          const a = this.newcomer('pred', ex, ey)
           this.preds.push(a)
           this.emit('released', 'pred', a)
         }
@@ -665,6 +922,7 @@ export class Sim {
         const n = Math.floor(this.preds.length / 3)
         for (let i = 0; i < n && this.preds.length > 1; i++) {
           const k = Math.floor(ev.random() * this.preds.length)
+          this.counters.predCulled++
           this.emit('culled', 'pred', this.preds[k])
           this.preds.splice(k, 1)
         }
@@ -677,6 +935,48 @@ export class Sim {
     }
   }
 }
+
+function relative(a: Creature, tx: number, ty: number, reach: number, x: Float64Array, at: number): void {
+  const dx = tx - a.x
+  const dy = ty - a.y
+  const d = Math.sqrt(dx * dx + dy * dy)
+  if (d < 1e-12) {
+    x[at + 2] = 1
+    return
+  }
+  const ux = dx / d
+  const uy = dy / d
+  x[at] = a.hx * uy - a.hy * ux
+  x[at + 1] = a.hx * ux + a.hy * uy
+  x[at + 2] = Math.max(0, 1 - d / reach)
+}
+
+function wallAhead(a: Creature, wallView: number): number {
+  const tx = a.hx > 1e-9 ? (1 - a.x) / a.hx : a.hx < -1e-9 ? a.x / -a.hx : 9
+  const ty = a.hy > 1e-9 ? (1 - a.y) / a.hy : a.hy < -1e-9 ? a.y / -a.hy : 9
+  return Math.max(0, 1 - Math.min(tx, ty) / wallView)
+}
+
+/** Tall-grass patches, kept off the bushes so hiding and eating are a trade-off. */
+export function placeCover(seed: number, p: SimParams, patches: [number, number][]): [number, number][] {
+  const rng = new Rng(seed + 30000)
+  const out: [number, number][] = []
+  const r = p.eco.coverR
+  for (let i = 0; i < p.eco.cover; i++) {
+    for (let t = 0; t < 200; t++) {
+      const x = r + rng.random() * (1 - 2 * r)
+      const y = r + rng.random() * (1 - 2 * r)
+      const clearBush = patches.every(([px, py]) => (px - x) ** 2 + (py - y) ** 2 >= (r + 0.04) ** 2)
+      const clearCover = out.every(([cx, cy]) => (cx - x) ** 2 + (cy - y) ** 2 >= (2 * r) ** 2)
+      if (clearBush && clearCover) {
+        out.push([x, y])
+        break
+      }
+    }
+  }
+  return out
+}
+
 
 export interface RunResult {
   seed: number

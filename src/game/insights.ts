@@ -1,4 +1,3 @@
-import type { SimParams } from '@/sim/params'
 import type { Scenario } from '@/sim/scenarios'
 import { dateLabel, formatDuration } from '@/sim/time'
 import type { EndInfo } from '@/worker/protocol'
@@ -23,7 +22,7 @@ const WINDOW = 240
 const AHEAD = 300
 
 function trend(h: RunHistory, key: 'prey' | 'pred', tick: number): number {
-  const from = Math.max(0, tick - WINDOW)
+  const from = Math.max(h.firstTick, tick - WINDOW)
   const n = tick - from
   if (n < 24) return 0
   let sx = 0
@@ -43,7 +42,7 @@ function trend(h: RunHistory, key: 'prey' | 'pred', tick: number): number {
 }
 
 export function forecast(h: RunHistory, tick: number): Forecast | null {
-  if (tick < 48) return null
+  if (tick - h.firstTick < 48) return null
   const ahead = Math.min(AHEAD, h.horizon - tick)
   const project = (key: 'prey' | 'pred') => {
     const now = h.stat(tick, key)
@@ -52,18 +51,17 @@ export function forecast(h: RunHistory, tick: number): Forecast | null {
   return { prey: project('prey'), pred: project('pred'), ahead }
 }
 
-export function hints(h: RunHistory, tick: number, p: SimParams, cap: { prey: number; pred: number }): Hint[] {
+export function hints(h: RunHistory, tick: number): Hint[] {
   const out: Hint[] = []
-  if (tick < 24) return out
+  if (tick - h.firstTick < 24) return out
   const prey = h.stat(tick, 'prey')
   const pred = h.stat(tick, 'pred')
-  const past = Math.max(0, tick - WINDOW)
+  const past = Math.max(h.firstTick, tick - WINDOW)
   const prey0 = h.stat(past, 'prey')
   const pred0 = h.stat(past, 'pred')
   const stock = h.stat(tick, 'stock')
   const predE = h.stat(tick, 'predEnergy')
   const preyE = h.stat(tick, 'preyEnergy')
-  const energyWord = p.rules === 'energy' ? 'energy' : 'fullness'
   const preyGrowth = prey0 > 0 ? prey / prey0 - 1 : 0
   const predGrowth = pred0 > 0 ? pred / pred0 - 1 : 0
 
@@ -85,14 +83,14 @@ export function hints(h: RunHistory, tick: number, p: SimParams, cap: { prey: nu
     out.push({
       id: 'foxhungry',
       tone: 'warn',
-      text: `Foxes are running on empty (mean ${energyWord} ${Math.round(predE * 100)}%). Starvation is coming unless rabbits get easier to catch.`,
+      text: `Foxes are running on empty (mean energy ${Math.round(predE * 100)}%). Starvation is coming unless rabbits get easier to catch.`,
     })
   }
   if (prey > 0 && preyE < 0.3) {
     out.push({
       id: 'preyhungry',
       tone: 'warn',
-      text: `Rabbits are underfed (mean ${energyWord} ${Math.round(preyE * 100)}%). Many will starve before they can breed.`,
+      text: `Rabbits are underfed (mean energy ${Math.round(preyE * 100)}%). Many will starve before they can breed.`,
     })
   }
   if (pred > 0 && pred <= 3) {
@@ -108,11 +106,17 @@ export function hints(h: RunHistory, tick: number, p: SimParams, cap: { prey: nu
       text: `Bushes are nearly bare (${Math.round(stock * 100)}%). Rabbits eat every berry as it regrows, so food caps the warren.`,
     })
   }
-  if (prey >= cap.prey - 1) {
-    out.push({ id: 'preycap', tone: 'info', text: 'The warren is at its cap, so no rabbits can be born until some die.' })
-  }
-  if (pred >= cap.pred - 1 && prey / Math.max(1, pred) < 8) {
-    out.push({ id: 'predcap', tone: 'info', text: 'Foxes are at their cap. The cap is what is holding the hunting pressure back.' })
+  const kits = h.stat(tick, 'predBorn') - h.stat(past, 'predBorn')
+  const foxOld = h.stat(tick, 'predOld') - h.stat(past, 'predOld')
+  if (foxOld >= 1) {
+    out.push({
+      id: 'replace',
+      tone: kits >= foxOld ? 'info' : 'warn',
+      text:
+        kits >= foxOld
+          ? `Kits are replacing the foxes that die of old age (${kits} in the last 10 days).`
+          : `Old foxes are dying faster than kits replace them (${kits} kits and ${Math.round(foxOld)} deaths of old age in 10 days).`,
+    })
   }
   if (predGrowth > 0.5 && pred >= 6) {
     out.push({
@@ -169,7 +173,7 @@ function avg(h: RunHistory, key: Parameters<RunHistory['stat']>[1], from: number
 
 function lastBirthTick(h: RunHistory, key: 'preyBorn' | 'predBorn', end: number): number | null {
   const total = h.stat(end, key)
-  for (let t = end; t >= 0; t--) if (h.stat(t, key) < total) return t + 1
+  for (let t = end; t >= h.firstTick; t--) if (h.stat(t, key) < total) return t + 1
   return null
 }
 
@@ -179,7 +183,7 @@ function inSpan(scenario: Scenario, tick: number): string | null {
   return null
 }
 
-export function explain(h: RunHistory, end: EndInfo, p: SimParams, scenario: Scenario): Explanation {
+export function explain(h: RunHistory, end: EndInfo, scenario: Scenario): Explanation {
   const T = end.tick
   const when = `${dateLabel(T)} (day ${Math.floor(T / 24) + 1})`
   if (end.survived) {
@@ -189,9 +193,18 @@ export function explain(h: RunHistory, end: EndInfo, p: SimParams, scenario: Sce
       suggestions: ['Try a harder scenario, or win with more of the budget unspent for a higher score.'],
     }
   }
-  const from = Math.max(0, T - 300)
-  const context = inSpan(scenario, T)
+  const from = Math.max(h.firstTick, T - 300)
+  const context = inSpan(scenario, h.endless ? T % 8760 : T)
   const ctx = context ? ` This happened during the ${context.toLowerCase()} period.` : ''
+  const species = end.predEnd === 0 ? 'pred' : 'prey'
+  const illness = delta(h, species === 'pred' ? 'predIllness' : 'preyIllness', from, T)
+  const other = delta(h, species === 'pred' ? 'predStarved' : 'preyStarved', from, T) +
+    delta(h, species === 'pred' ? 'predOld' : 'preyOld', from, T) + (species === 'prey' ? delta(h, 'preyEaten', from, T) : 0)
+  if (illness > 0 && illness >= other) return {
+    headline: `${species === 'pred' ? 'Foxes' : 'Rabbits'} died out during illness on ${when}.`,
+    detail: `${illness} animals ran out of energy while ill in the final observation window. Illness adds energy costs and spreads locally.${ctx}`,
+    suggestions: ['Use illness earlier, while the population has a larger reserve', 'Prefer a precise fox cull when numbers are already low', 'Support food supplies while ill animals recover'],
+  }
   if (end.predEnd === 0) {
     const starved = delta(h, 'predStarved', from, T)
     const old = delta(h, 'predOld', from, T)
@@ -203,7 +216,7 @@ export function explain(h: RunHistory, end: EndInfo, p: SimParams, scenario: Sce
         headline: `The last foxes died of old age on ${when}.`,
         detail: `No cub was born ${lastCub ? `after ${dateLabel(lastCub)}` : 'at all'}, so the old foxes had no successors.${ctx}`,
         suggestions: [
-          p.rules === 'energy' ? 'Lower the fox breed threshold' : 'Lower the fox meals to breed',
+          'Lower the fox breed threshold',
           'Bring the fox first-birth age earlier',
           'Give foxes a longer lifespan',
         ],
@@ -220,9 +233,9 @@ export function explain(h: RunHistory, end: EndInfo, p: SimParams, scenario: Sce
       detail: `${starved} foxes starved and ${old} died of old age in their last 12 days.${ctx}`,
       suggestions:
         preyAvg < 25
-          ? ['Give rabbits more food (bushes, regrowth)', 'Lower the fox cap so rabbits can rebuild', 'Start with more rabbits']
+          ? ['Give rabbits more food (bushes, regrowth, sprout rate)', 'Start with fewer foxes', 'Start with more rabbits']
           : [
-              p.rules === 'energy' ? 'Raise the energy per rabbit, or lower fox metabolism' : 'Lengthen the fox starvation time',
+              'Raise the energy per rabbit, or lower fox metabolism',
               'Widen the fox sense range',
               'Slow the rabbits (their max speed)',
             ],
@@ -236,7 +249,7 @@ export function explain(h: RunHistory, end: EndInfo, p: SimParams, scenario: Sce
     return {
       headline: `Rabbits were eaten out on ${when}.`,
       detail: `${eaten} of the last ${eaten + starved + old} rabbit deaths were to foxes, with about 1 fox for every ${(1 / Math.max(ratio, 1e-6)).toFixed(1)} rabbits.${ctx}`,
-      suggestions: ['Lower the fox cap', 'Raise the rabbit cap, or speed up rabbit breeding', 'Give rabbits more speed or sense range'],
+      suggestions: ['Start with fewer foxes', 'Speed up rabbit breeding', 'Give rabbits more speed or sense range'],
     }
   }
   if (starved >= old) {
@@ -246,7 +259,7 @@ export function explain(h: RunHistory, end: EndInfo, p: SimParams, scenario: Sce
       detail: `${starved} rabbits starved in their last 12 days, with bushes averaging ${Math.round(stock * 100)}% full.${ctx}`,
       suggestions:
         stock < 0.3
-          ? ['Add bushes or speed up regrowth', 'Lower the rabbit cap so they do not overgraze', 'Raise the energy per berry']
+          ? ['Add bushes or speed up regrowth', 'Start with fewer rabbits so they do not overgraze', 'Raise the energy per berry']
           : ['Lower rabbit metabolism or speed cost', 'Raise rabbit max energy'],
     }
   }
@@ -254,7 +267,7 @@ export function explain(h: RunHistory, end: EndInfo, p: SimParams, scenario: Sce
     headline: `The last rabbits died of old age on ${when}.`,
     detail: `Too few young were born to replace them.${ctx}`,
     suggestions: [
-      p.rules === 'energy' ? 'Lower the rabbit breed threshold' : 'Lower the rabbit meals to breed',
+      'Lower the rabbit breed threshold',
       'Shorten the rabbit birth gap',
     ],
   }

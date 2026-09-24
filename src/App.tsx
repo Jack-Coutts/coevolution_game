@@ -1,31 +1,28 @@
-import { useEffect, useMemo, useRef, useState } from 'react'
-import { CalendarDays, Dices, FlaskConical, Trophy } from 'lucide-react'
+import { EvolutionPanel, type AnimalSelection } from '@/components/evolution-panel'
+import { Button } from '@/components/ui/button'
+import { readSave, type MeadowSave } from '@/game/saves'
+import { useEffect, useRef, useState } from 'react'
 import { Guide } from '@/components/guide'
+import { MeadowSettings } from '@/components/meadow-settings'
 import { LeverPanel } from '@/components/lever-panel'
 import { ResultDialog } from '@/components/result-dialog'
 import { RunPanel } from '@/components/run-panel'
 import { Timeline } from '@/components/timeline'
 import { Transport } from '@/components/transport'
-import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
-import { Label } from '@/components/ui/label'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { Switch } from '@/components/ui/switch'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group'
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
+import { TooltipProvider } from '@/components/ui/tooltip'
 import { WorldView } from '@/components/world-view'
-import { SPEEDS, type Mode } from '@/game/controller'
-import { presetFor } from '@/game/presets'
-import { dailySeed, scoreFor } from '@/game/scores'
+import { SPEEDS } from '@/game/controller'
+import { STABLE_PRESET } from '@/game/presets'
+import { seedOf, type SeedChoice } from '@/game/seed'
 import { useAnimalIcons } from '@/hooks/use-animal-icons'
 import { useGame } from '@/hooks/use-game'
 import { BUDGET, spent, type LeverValues } from '@/sim/levers'
-import type { Rules } from '@/sim/params'
 import { SCENARIO_BY_ID, SCENARIOS, type ScenarioId } from '@/sim/scenarios'
 
-type SeedMode = 'daily' | 'custom'
-type Tab = 'levers' | 'run' | 'guide'
+type Tab = 'levers' | 'run' | 'evolution' | 'guide'
 
 function useViewport(): { w: number; h: number } {
   const [v, setV] = useState({ w: window.innerWidth, h: window.innerHeight })
@@ -37,30 +34,53 @@ function useViewport(): { w: number; h: number } {
   return v
 }
 
+function initialState(): { scenario: ScenarioId; seed: SeedChoice } {
+  const q = new URLSearchParams(window.location.search)
+  const sc = q.get('scenario')
+  const seed = Number(q.get('seed'))
+  return {
+    scenario: sc && sc in SCENARIO_BY_ID ? (sc as ScenarioId) : 'stable',
+    seed:
+      q.has('seed') && Number.isFinite(seed) ? { kind: 'custom', seed: Math.abs(Math.trunc(seed)) } : { kind: 'daily' },
+  }
+}
+
+const initial = initialState()
+
 export default function App() {
   const [game, snap] = useGame()
   const icons = useAnimalIcons()
-  const [rules, setRules] = useState<Rules>('energy')
-  const base = useMemo(() => presetFor(rules), [rules])
-  const [levers, setLevers] = useState<LeverValues>(() => presetFor('energy'))
-  const [scenario, setScenario] = useState<ScenarioId>('stable')
-  const [seedMode, setSeedMode] = useState<SeedMode>('daily')
-  const [customSeed, setCustomSeed] = useState(7)
-  const [mode, setMode] = useState<Mode>('plan')
+  const [endless, setEndless] = useState(false)
+  const [selected, setSelected] = useState<AnimalSelection | null>(null)
+  const [loadStatus, setLoadStatus] = useState('')
+  const pendingSave = useRef<MeadowSave | null>(null)
+  const base = STABLE_PRESET
+  const [levers, setLevers] = useState<LeverValues>(STABLE_PRESET)
+  const [scenario, setScenario] = useState<ScenarioId>(initial.scenario)
+  const [seedChoice, setSeedChoice] = useState<SeedChoice>(initial.seed)
   const [tab, setTab] = useState<Tab>('levers')
   const [dismissed, setDismissed] = useState(-1)
   const [resetKey, setResetKey] = useState(0)
-  const seed = seedMode === 'daily' ? dailySeed() : customSeed
+  const seed = seedOf(seedChoice)
   const vp = useViewport()
   const desktop = vp.w >= 1024
   const worldMax = desktop ? Math.max(360, Math.min(860, vp.h - 330)) : vp.w - 24
 
   useEffect(() => {
-    game.configure({ rules, levers, base, scenario, seed, mode })
-  }, [game, rules, levers, base, scenario, seed, mode, resetKey])
+    if (pendingSave.current) { game.restore(pendingSave.current); pendingSave.current = null }
+    else game.configure({ levers, base, scenario, seed, endless })
+  }, [game, levers, base, scenario, seed, endless, resetKey])
+
+  useEffect(() => {
+    const q = new URLSearchParams()
+    if (scenario !== 'stable') q.set('scenario', scenario)
+    if (seedChoice.kind === 'custom') q.set('seed', String(seedChoice.seed))
+    const search = q.toString()
+    window.history.replaceState(null, '', `${window.location.pathname}${search ? `?${search}` : ''}`)
+  }, [scenario, seedChoice])
 
   const locked = snap.phase === 'running' || snap.phase === 'ended'
-  const left = BUDGET - spent(levers, base, rules)
+  const left = BUDGET - spent(levers, base)
 
   const prevPhase = useRef(snap.phase)
   useEffect(() => {
@@ -68,7 +88,7 @@ export default function App() {
     prevPhase.current = snap.phase
   }, [snap.phase, tab])
 
-  const reset = () => setResetKey((k) => k + 1)
+  const reset = () => { setSelected(null); setResetKey((k) => k + 1) }
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
@@ -117,7 +137,21 @@ export default function App() {
     return () => window.removeEventListener('keydown', onKey)
   }, [game, left])
 
-  const best = scoreFor({ rules, scenario, seed, mode })
+  const resume = async () => {
+    try {
+      const saved = await readSave()
+      if (!saved) { setLoadStatus('No saved meadow on this device yet.'); return }
+      setSelected(null)
+      pendingSave.current = saved
+      setLevers(saved.config.levers)
+      setScenario(saved.config.scenario)
+      setSeedChoice({ kind: 'custom', seed: saved.config.seed })
+      setEndless(saved.config.endless)
+      setResetKey(k => k + 1)
+      setTab('evolution')
+      setLoadStatus('')
+    } catch { setLoadStatus('Could not load this meadow. Device storage may be unavailable, or the save is incompatible.') }
+  }
   const sc = SCENARIO_BY_ID[scenario]
 
   return (
@@ -131,16 +165,16 @@ export default function App() {
             </div>
             <div className="leading-tight">
               <h1 className="text-lg font-semibold tracking-tight">Coevolution</h1>
-              <p className="text-xs text-muted-foreground">Meadow Keeper · keep both species alive for a year</p>
+              <p className="hidden text-xs text-muted-foreground sm:block">Meadow Keeper · {endless ? 'a world that keeps evolving' : 'keep both species alive for a year'}</p>
             </div>
           </div>
 
-          <div className="flex flex-1 flex-wrap items-center justify-end gap-2">
+          <div className="ml-auto flex items-center gap-2">
             <Select value={scenario} onValueChange={(v) => setScenario(v as ScenarioId)}>
-              <SelectTrigger className="w-[190px]" aria-label="Scenario">
+              <SelectTrigger disabled={locked} className="w-[150px] sm:w-[170px]" aria-label="Scenario">
                 <SelectValue />
               </SelectTrigger>
-              <SelectContent>
+              <SelectContent align="end">
                 {SCENARIOS.map((s) => (
                   <SelectItem key={s.id} value={s.id}>
                     {s.name}
@@ -148,80 +182,10 @@ export default function App() {
                 ))}
               </SelectContent>
             </Select>
-
-            <ToggleGroup
-              type="single"
-              variant="outline"
-              value={mode}
-              onValueChange={(v) => v && setMode(v as Mode)}
-              aria-label="Mode"
-            >
-              <ToggleGroupItem value="plan" className="px-3">
-                Plan
-              </ToggleGroupItem>
-              <ToggleGroupItem value="live" className="px-3">
-                Live
-              </ToggleGroupItem>
-            </ToggleGroup>
-
-            <div className="flex items-center gap-1">
-              <Select value={seedMode} onValueChange={(v) => setSeedMode(v as SeedMode)}>
-                <SelectTrigger className="w-[150px]" aria-label="Seed">
-                  <CalendarDays className="size-4 opacity-70" />
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="daily">Daily meadow</SelectItem>
-                  <SelectItem value="custom">Seed #{customSeed}</SelectItem>
-                </SelectContent>
-              </Select>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Button
-                    variant="outline"
-                    size="icon"
-                    aria-label="New random meadow"
-                    onClick={() => {
-                      setCustomSeed(Math.floor(Math.random() * 100000))
-                      setSeedMode('custom')
-                    }}
-                  >
-                    <Dices />
-                  </Button>
-                </TooltipTrigger>
-                <TooltipContent>New random meadow</TooltipContent>
-              </Tooltip>
-            </div>
-
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <div className="flex items-center gap-2 rounded-md border px-2.5 py-1.5">
-                  <FlaskConical className="size-4 text-muted-foreground" />
-                  <Label htmlFor="classic" className="text-xs">
-                    Classic rules
-                  </Label>
-                  <Switch
-                    id="classic"
-                    checked={rules === 'classic'}
-                    onCheckedChange={(on) => {
-                      const r: Rules = on ? 'classic' : 'energy'
-                      setRules(r)
-                      setLevers(presetFor(r))
-                    }}
-                  />
-                </div>
-              </TooltipTrigger>
-              <TooltipContent className="max-w-72">
-                The original benchmark rules: starvation by hours since the last meal, and breeding by meals. With the
-                default levers they reproduce the benchmark exactly. Energy rules are the game default.
-              </TooltipContent>
-            </Tooltip>
-
-            <div className="flex items-center gap-1.5 rounded-md border px-2.5 py-1.5 text-xs" title="Best score for this scenario, seed and mode">
-              <Trophy className="size-4 text-amber-300" />
-              <span className="text-muted-foreground">Best</span>
-              <span className="font-semibold tabular">{best ? best.score.toLocaleString() : '—'}</span>
-            </div>
+            <select aria-label="Run duration" className="rounded-md border bg-background px-2 py-2 text-xs" value={endless ? 'endless' : 'year'} disabled={locked} onChange={e => setEndless(e.target.value === 'endless')}>
+              <option value="year">One year</option><option value="endless">Endless</option>
+            </select>
+            <MeadowSettings onPractice={() => { setSelected(null); setLevers(STABLE_PRESET); setScenario('stable'); setSeedChoice({ kind: 'custom', seed: 5007 }); setEndless(false); reset() }} locked={locked} choice={seedChoice} onChange={setSeedChoice} />
           </div>
         </header>
 
@@ -232,12 +196,16 @@ export default function App() {
                 <span className="font-medium">{sc.name}</span>
                 <span className="text-muted-foreground"> · {sc.tagline}</span>
               </p>
-              <span className="hidden text-xs text-muted-foreground sm:inline">
-                {rules === 'classic' ? 'Classic benchmark rules' : 'Energy rules'} · {mode === 'live' ? 'Live' : 'Plan'} mode ·
-                seed {seed}
+              <span className="hidden text-xs text-muted-foreground tabular sm:inline">
+                {seedChoice.kind === 'daily' ? "Today's meadow" : 'Seed'} {seed}
               </span>
             </div>
-            <WorldView maxSize={worldMax} />
+            <WorldView maxSize={worldMax} selected={selected} onSelect={a => { setSelected(a); setTab('evolution') }} />
+            <div className="flex flex-wrap items-center justify-center gap-2 text-xs">
+              <Button size="xs" variant="outline" disabled={snap.phase === 'loading'} onClick={() => { setLoadStatus(''); game.save() }}>Save meadow</Button>
+              <Button size="xs" variant="outline" onClick={() => void resume()}>Resume saved meadow</Button>
+              <span role="status" className="text-muted-foreground">{loadStatus || snap.saveStatus}</span>
+            </div>
             <Card className="gap-2 p-3">
               <Transport onReset={reset} />
               <Timeline />
@@ -260,26 +228,29 @@ export default function App() {
                   <TabsList className="w-full">
                     <TabsTrigger value="levers">Levers</TabsTrigger>
                     <TabsTrigger value="run">Field notes</TabsTrigger>
-                    <TabsTrigger value="guide">How to play</TabsTrigger>
+                    <TabsTrigger value="evolution">Evolution</TabsTrigger>
+                    <TabsTrigger value="guide">Guide</TabsTrigger>
                   </TabsList>
                 </div>
                 <div className="min-h-0 flex-1 overflow-y-auto p-3 lg:max-h-[calc(100vh-7rem)]">
                   <TabsContent value="levers" className="mt-0">
                     <LeverPanel
-                      rules={rules}
                       levers={levers}
                       base={base}
                       locked={locked}
                       onChange={(id, v) => setLevers((prev) => ({ ...prev, [id]: v }))}
-                      onResetLevers={() => setLevers(presetFor(rules))}
+                      onResetLevers={() => setLevers(STABLE_PRESET)}
                       onUnlock={reset}
                     />
                   </TabsContent>
                   <TabsContent value="run" className="mt-0">
-                    <RunPanel onSwitchLive={() => setMode('live')} />
+                    <RunPanel />
+                  </TabsContent>
+                  <TabsContent value="evolution" className="mt-0">
+                    <EvolutionPanel selected={selected} onSelect={setSelected} />
                   </TabsContent>
                   <TabsContent value="guide" className="mt-0">
-                    <Guide rules={rules} />
+                    <Guide />
                   </TabsContent>
                 </div>
               </Tabs>
@@ -296,7 +267,6 @@ export default function App() {
         snap={snap}
         open={snap.phase === 'ended' && dismissed !== snap.runId}
         onOpenChange={(o) => !o && setDismissed(snap.runId)}
-        unspent={Math.round(left * 10) / 10}
         onRetune={() => {
           setDismissed(snap.runId)
           setTab('levers')
