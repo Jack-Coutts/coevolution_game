@@ -63,7 +63,7 @@ export interface Bush {
 const WITHER_LEVEL = 0.15
 const SPROUT_STOCK = 3
 const SPROUT_GAP = 0.05
-const SPROUT_SEASON: Record<Season, number> = { autumn: 0.7, winter: 0.2, spring: 1.6, summer: 1 }
+const SPROUT_SEASON: Record<Season, number> = { autumn: 0.7, winter: 0.45, spring: 1.35, summer: 1 }
 
 export interface World {
   patches: [number, number][]
@@ -378,6 +378,7 @@ export class Sim {
 
     const met = this.metabolismFactor(tick)
     for (const s of SPECIES) for (const a of this.pops[s]) this.move(a, met)
+    for (const s of SPECIES) this.grids[s].build(this.pops[s])
 
     this.graze()
     this.hunt(tick)

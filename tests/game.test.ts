@@ -77,6 +77,19 @@ describe('simulation', () => {
     }
   })
 
+  it('catches a rabbit that shares the fox’s position', () => {
+    const s = new Sim(p, 4)
+    const fox = s.preds[0]
+    const rabbit = s.prey[0]
+    fox.x = 0.4
+    fox.y = 0.4
+    rabbit.x = 0.4
+    rabbit.y = 0.4
+    s.step()
+    expect(s.prey.includes(rabbit)).toBe(false)
+    expect(s.counters.preyEaten).toBeGreaterThanOrEqual(1)
+  })
+
   it('kills an animal whose energy runs out', () => {
     const s = new Sim(p, 2)
     const victim = s.prey[0]
