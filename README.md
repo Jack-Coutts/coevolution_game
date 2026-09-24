@@ -46,6 +46,22 @@ npm run lint
 | <kbd>Home</kbd> <kbd>End</kbd> | Jump to the start, or back to live |
 | <kbd>R</kbd> | Reset the run |
 
+## Deploy
+
+The site is served from GitHub Pages at https://jack-coutts.github.io/coevolution_game/.
+
+- **Base path.** Production builds use the base `/coevolution_game/`, and dev keeps `/`. The
+  Web Worker, fonts and favicon all resolve under that base.
+- **Workflow.** `.github/workflows/deploy.yml` runs on every push to `main`, or manually with
+  **Run workflow**. It runs `npm ci`, `npm test` and `npm run build`, then publishes `dist/`.
+- **One-time setup.** In the repo, set **Settings → Pages → Source** to **GitHub Actions**.
+
+To check a production build locally:
+
+```bash
+npm run build && npx vite preview --base /coevolution_game/   # http://localhost:47322/coevolution_game/
+```
+
 ## Layout
 
 | Path | What it is |
