@@ -101,6 +101,13 @@ export function hints(h: RunHistory, tick: number, p: SimParams, cap: { prey: nu
   if (prey > 0 && prey <= 12) {
     out.push({ id: 'fewprey', tone: 'danger', text: `Only ${prey} rabbits left.` })
   }
+  if (prey > 0 && stock < 0.12 && preyE >= 0.3) {
+    out.push({
+      id: 'bare',
+      tone: 'info',
+      text: `Bushes are nearly bare (${Math.round(stock * 100)}%). Rabbits eat every berry as it regrows, so food caps the warren.`,
+    })
+  }
   if (prey >= cap.prey - 1) {
     out.push({ id: 'preycap', tone: 'info', text: 'The warren is at its cap, so no rabbits can be born until some die.' })
   }
@@ -204,7 +211,7 @@ export function explain(h: RunHistory, end: EndInfo, p: SimParams, scenario: Sce
     }
     const reason =
       preyAvg < 25
-        ? `there were too few rabbits to live on (about ${Math.round(preyAvg)} in the last two weeks)`
+        ? `there were too few rabbits to live on (about ${Math.round(preyAvg)} over the last 12 days)`
         : spread > 0.12
           ? `rabbits were too spread out to catch (${Math.round(preyAvg)} of them, scattered away from the bushes)`
           : `foxes could not catch the ${Math.round(preyAvg)} rabbits around them`

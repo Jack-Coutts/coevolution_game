@@ -30,8 +30,8 @@ const FX_MS: Record<Fx['kind'], number> = {
   culled: 900,
 }
 
-const RABBIT_LEN = 0.027
-const FOX_LEN = 0.044
+const RABBIT_LEN = 0.033
+const FOX_LEN = 0.052
 const BUSH_R = 0.03
 const MARGIN = 0.025
 
@@ -105,11 +105,13 @@ export class WorldRenderer {
     return [(px / this.size - MARGIN) / f, (py / this.size - MARGIN) / f]
   }
 
-  addEvents(frame: FrameData, now: number): void {
+  /** `busy` (fast playback) keeps only the dramatic effects. */
+  addEvents(frame: FrameData, now: number, busy: boolean): void {
     const ev = frame.events
     for (let i = 0; i < ev.length; i += EVENT_STRIDE) {
       const kind = EVENT_KIND[ev[i]]
       if (kind === 'old') continue
+      if (busy && (kind === 'born' || kind === 'starved')) continue
       this.fx.push({ kind, species: ev[i + 1], x: ev[i + 2], y: ev[i + 3], t0: now })
     }
     if (this.fx.length > 240) this.fx.splice(0, this.fx.length - 240)
@@ -276,17 +278,17 @@ export class WorldRenderer {
         }
         case 'born': {
           if (layer !== 'under') break
-          ctx.strokeStyle = f.species ? `rgba(255, 190, 120, ${0.7 * (1 - t)})` : `rgba(235, 250, 220, ${0.7 * (1 - t)})`
-          ctx.lineWidth = 1.2
+          ctx.strokeStyle = f.species ? `rgba(255, 190, 120, ${0.5 * (1 - t)})` : `rgba(235, 250, 220, ${0.4 * (1 - t)})`
+          ctx.lineWidth = 1
           ctx.beginPath()
-          ctx.arc(x, y, inner * (0.006 + 0.016 * t), 0, Math.PI * 2)
+          ctx.arc(x, y, inner * (0.005 + 0.01 * t), 0, Math.PI * 2)
           ctx.stroke()
           break
         }
         case 'starved':
         case 'old': {
           if (layer !== 'under') break
-          ctx.fillStyle = `rgba(120, 110, 95, ${0.35 * (1 - t)})`
+          ctx.fillStyle = `rgba(120, 110, 95, ${0.22 * (1 - t)})`
           ctx.beginPath()
           ctx.arc(x, y, inner * (0.008 + 0.01 * t), 0, Math.PI * 2)
           ctx.fill()

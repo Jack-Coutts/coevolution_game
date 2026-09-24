@@ -358,7 +358,7 @@ export class GameController {
       }
     }
     if (!this.end && this.phase === 'running' && this.playing && !this.inflight) {
-      const lead = Math.max(6, tps * 0.35)
+      const lead = Math.max(6, tps * 0.25)
       if (h.head < this.displayTick + lead) {
         this.inflight = true
         this.send({ type: 'advance', runId: this.runId, target: Math.ceil(this.displayTick + lead) })
@@ -369,7 +369,7 @@ export class GameController {
       if (this.playing && t > this.lastFxTick && t - this.lastFxTick < 40) {
         for (let k = this.lastFxTick + 1; k <= t; k++) {
           const f = h.frame(k)
-          if (f) this.renderer.addEvents(f, now)
+          if (f) this.renderer.addEvents(f, now, tps > 72)
         }
       }
       this.lastFxTick = t

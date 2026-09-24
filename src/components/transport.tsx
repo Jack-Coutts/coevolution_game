@@ -8,7 +8,7 @@ import { formatDuration } from '@/sim/time'
 
 export function Transport({ onReset }: { onReset: () => void }) {
   const [game, snap] = useGame()
-  const behind = snap.head - snap.tick > 24
+  const behind = !snap.atLive && snap.phase !== 'loading'
   return (
     <div className="flex flex-wrap items-center gap-2">
       <div className="flex items-center gap-1">

@@ -56,8 +56,8 @@ export function WorldView({ maxSize }: { maxSize: number }) {
               <div className="text-sm font-semibold tabular">
                 {cal.day} {cal.monthLong} <span className="font-normal text-white/70">· {clockLabel(snap.tick)}</span>
               </div>
-              <div className="flex items-center gap-1 text-[11px] text-white/70 capitalize">
-                <SeasonIcon className="size-3" /> {cal.season} · day {cal.dayOfRun} of 334
+              <div className="flex items-center gap-1 text-[11px] text-white/70">
+                <SeasonIcon className="size-3" /> <span className="capitalize">{cal.season}</span> · day {cal.dayOfRun} of 334
               </div>
             </div>
           </div>

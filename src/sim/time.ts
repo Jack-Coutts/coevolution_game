@@ -1,8 +1,8 @@
 /**
  * Natural-time labels. The simulation runs in ticks; the UI shows 1 tick = 1 hour,
- * starting 1 September 06:00 (non-leap year). Durations count a month as 30 days.
+ * starting 1 September 08:00 (non-leap year). Durations count a month as 30 days.
  */
-export const START_HOUR = 6
+export const START_HOUR = 8
 export const HOURS_PER_DAY = 24
 export const DAYS_PER_MONTH = 30
 
@@ -121,6 +121,7 @@ export function formatHours(ticks: number): string {
 /** Light level 0 (midnight) .. 1 (noon). */
 export function daylight(tick: number): number {
   const hour = (((tick + START_HOUR) % HOURS_PER_DAY) + HOURS_PER_DAY) % HOURS_PER_DAY
-  const x = Math.cos(((hour - 13) / 24) * 2 * Math.PI)
-  return Math.min(1, Math.max(0, 0.5 + 0.75 * x))
+  // sunrise ~06:00, sunset ~20:00
+  const d = Math.cos(((hour - 13) / 24) * 2 * Math.PI)
+  return Math.min(1, Math.max(0, (d + 0.259) / 0.5 + 0.5))
 }

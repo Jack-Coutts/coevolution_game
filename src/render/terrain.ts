@@ -39,9 +39,9 @@ export function paintTerrain(size: number, seed: number, patches: [number, numbe
   const S = size
 
   const base = ctx.createLinearGradient(0, 0, S, S)
-  base.addColorStop(0, '#86a860')
-  base.addColorStop(0.5, '#7b9f57')
-  base.addColorStop(1, '#6f9350')
+  base.addColorStop(0, '#98bb68')
+  base.addColorStop(0.5, '#8cb160')
+  base.addColorStop(1, '#80a657')
   ctx.fillStyle = base
   ctx.fillRect(0, 0, S, S)
 
@@ -122,7 +122,7 @@ export function paintTerrain(size: number, seed: number, patches: [number, numbe
   // soft vignette
   const v = ctx.createRadialGradient(S / 2, S / 2, S * 0.35, S / 2, S / 2, S * 0.75)
   v.addColorStop(0, 'rgba(0,0,0,0)')
-  v.addColorStop(1, 'rgba(20, 35, 15, 0.28)')
+  v.addColorStop(1, 'rgba(20, 35, 15, 0.18)')
   ctx.fillStyle = v
   ctx.fillRect(0, 0, S, S)
 

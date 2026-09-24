@@ -143,11 +143,11 @@ function drawFox(ctx: CanvasRenderingContext2D, L: number, phase: number): void 
 
   // body
   const body = ctx.createLinearGradient(0, -0.16 * L, 0, 0.16 * L)
-  body.addColorStop(0, '#b4521c')
-  body.addColorStop(0.5, '#d7722f')
-  body.addColorStop(1, '#b4521c')
+  body.addColorStop(0, '#a94b18')
+  body.addColorStop(0.5, '#dc7732')
+  body.addColorStop(1, '#a94b18')
   ctx.fillStyle = body
-  ellipse(ctx, -0.02 * L, 0, 0.34 * L, 0.15 * L)
+  ellipse(ctx, -0.02 * L, 0, 0.35 * L, 0.175 * L)
   ctx.fill()
   ctx.fillStyle = 'rgba(110, 45, 15, 0.35)'
   ellipse(ctx, -0.05 * L, 0, 0.26 * L, 0.045 * L)
@@ -223,8 +223,13 @@ export function animalIcon(kind: 'prey' | 'pred', px: number): string {
   const [c, ctx] = makeCanvas(px * 2)
   ctx.scale(2, 2)
   ctx.translate(px / 2, px / 2)
-  ctx.rotate(-Math.PI / 2)
-  if (kind === 'prey') drawRabbit(ctx, px * 0.62, 0.1)
-  else drawFox(ctx, px * 0.5, 0.1)
+  ctx.rotate(-Math.PI / 4)
+  if (kind === 'prey') {
+    ctx.translate(px * 0.04, 0)
+    drawRabbit(ctx, px * 0.9, 0.1)
+  } else {
+    ctx.translate(px * 0.14, 0)
+    drawFox(ctx, px * 0.78, 0.1)
+  }
   return c.toDataURL()
 }

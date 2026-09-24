@@ -52,7 +52,7 @@ export default function App() {
   const seed = seedMode === 'daily' ? dailySeed() : customSeed
   const vp = useViewport()
   const desktop = vp.w >= 1024
-  const worldMax = desktop ? Math.max(360, Math.min(860, vp.h - 250)) : vp.w - 24
+  const worldMax = desktop ? Math.max(360, Math.min(860, vp.h - 300)) : vp.w - 24
 
   useEffect(() => {
     game.configure({ rules, levers, base, scenario, seed, mode })
