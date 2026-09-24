@@ -1,0 +1,75 @@
+{
+  "source": "coevolution_demo/coevo.py (GAP_FROM_OWN_BIRTH = False)",
+  "runs": [
+    {
+      "seed": 0,
+      "survival_ticks": 354,
+      "survived": false,
+      "prey_end": 15,
+      "predator_end": 0
+    },
+    {
+      "seed": 1,
+      "survival_ticks": 659,
+      "survived": false,
+      "prey_end": 5,
+      "predator_end": 0
+    },
+    {
+      "seed": 2,
+      "survival_ticks": 695,
+      "survived": false,
+      "prey_end": 10,
+      "predator_end": 0
+    },
+    {
+      "seed": 3,
+      "survival_ticks": 295,
+      "survived": false,
+      "prey_end": 20,
+      "predator_end": 0
+    },
+    {
+      "seed": 4,
+      "survival_ticks": 371,
+      "survived": false,
+      "prey_end": 0,
+      "predator_end": 2
+    },
+    {
+      "seed": 5,
+      "survival_ticks": 1014,
+      "survived": false,
+      "prey_end": 48,
+      "predator_end": 0
+    },
+    {
+      "seed": 6,
+      "survival_ticks": 635,
+      "survived": false,
+      "prey_end": 21,
+      "predator_end": 0
+    },
+    {
+      "seed": 7,
+      "survival_ticks": 350,
+      "survived": false,
+      "prey_end": 31,
+      "predator_end": 0
+    },
+    {
+      "seed": 8,
+      "survival_ticks": 274,
+      "survived": false,
+      "prey_end": 15,
+      "predator_end": 0
+    },
+    {
+      "seed": 9,
+      "survival_ticks": 321,
+      "survived": false,
+      "prey_end": 21,
+      "predator_end": 0
+    }
+  ]
+}
