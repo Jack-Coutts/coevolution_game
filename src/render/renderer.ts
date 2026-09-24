@@ -169,7 +169,11 @@ export class WorldRenderer {
       const [x, y] = this.toCanvas(px, py, this.size)
       const s = sprite.size
       ctx.drawImage(sprite.twigs, x - s / 2, y - s / 2, s, s)
-      if (stock[i] >= 1) {
+      if (stock[i] < 1) {
+        ctx.globalAlpha = 0.75
+        ctx.drawImage(sprite.foliage, x - (s * 0.34) / 2, y - (s * 0.34) / 2, s * 0.34, s * 0.34)
+        ctx.globalAlpha = 1
+      } else {
         const k = 0.42 + 0.58 * f
         ctx.drawImage(sprite.foliage, x - (s * k) / 2, y - (s * k) / 2, s * k, s * k)
         const r = BUSH_R * inner * k

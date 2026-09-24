@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button'
 import { Progress } from '@/components/ui/progress'
 import { Slider } from '@/components/ui/slider'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
-import { useAnimalIcons } from '@/components/world-view'
+import { useAnimalIcons } from '@/hooks/use-animal-icons'
 import {
   BUDGET,
   clampLever,
@@ -43,7 +43,12 @@ export function LeverPanel({ rules, levers, base, locked, onChange, onResetLever
 
   return (
     <div className="flex flex-col gap-3">
-      <div className={cn('rounded-lg border p-3', over ? 'border-destructive/60 bg-destructive/10' : 'bg-muted/40')}>
+      <div
+        className={cn(
+          'sticky top-0 z-10 rounded-lg border p-3 shadow-md backdrop-blur-md',
+          over ? 'border-destructive/60 bg-[oklch(0.24_0.05_25/0.92)]' : 'bg-[oklch(0.23_0.014_155/0.92)]',
+        )}
+      >
         <div className="flex items-baseline justify-between gap-2">
           <div className="text-sm font-medium">Tuning budget</div>
           <div className={cn('text-sm tabular', over ? 'text-destructive' : 'text-foreground')}>
@@ -217,7 +222,7 @@ function LeverRow({
         value={[value]}
         disabled={locked}
         onValueChange={([v]) => onChange(def.id, clampLever(def, v))}
-        aria-label={def.label}
+        aria-label={def.species ? `${def.species === 'prey' ? 'Rabbit' : 'Fox'} ${def.label.toLowerCase()}` : def.label}
       />
     </div>
   )

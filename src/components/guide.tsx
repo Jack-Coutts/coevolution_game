@@ -1,4 +1,4 @@
-import { useAnimalIcons } from '@/components/world-view'
+import { useAnimalIcons } from '@/hooks/use-animal-icons'
 import type { Rules } from '@/sim/params'
 
 const KEYS: [string, string][] = [
@@ -55,7 +55,7 @@ export function Guide({ rules }: { rules: Rules }) {
               These rules match the original benchmark exactly.
             </li>
           )}
-          <li>Animals die of old age at their lifespan.</li>
+          <li>Animals die of old age at their lifespan. A dashed ring marks an animal close to starving.</li>
         </ul>
       </section>
       <section>

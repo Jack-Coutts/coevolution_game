@@ -14,10 +14,11 @@ import { Switch } from '@/components/ui/switch'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
-import { useAnimalIcons, WorldView } from '@/components/world-view'
+import { WorldView } from '@/components/world-view'
 import { SPEEDS, type Mode } from '@/game/controller'
 import { presetFor } from '@/game/presets'
 import { dailySeed, scoreFor } from '@/game/scores'
+import { useAnimalIcons } from '@/hooks/use-animal-icons'
 import { useGame } from '@/hooks/use-game'
 import { BUDGET, spent, type LeverValues } from '@/sim/levers'
 import type { Rules } from '@/sim/params'
@@ -52,7 +53,7 @@ export default function App() {
   const seed = seedMode === 'daily' ? dailySeed() : customSeed
   const vp = useViewport()
   const desktop = vp.w >= 1024
-  const worldMax = desktop ? Math.max(360, Math.min(860, vp.h - 300)) : vp.w - 24
+  const worldMax = desktop ? Math.max(360, Math.min(860, vp.h - 330)) : vp.w - 24
 
   useEffect(() => {
     game.configure({ rules, levers, base, scenario, seed, mode })

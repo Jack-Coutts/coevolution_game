@@ -81,8 +81,8 @@ function drawRabbit(ctx: CanvasRenderingContext2D, L: number, phase: number): vo
     ctx.save()
     ctx.translate(0.22 * L, s * 0.07 * L)
     ctx.rotate(s * (0.22 + 0.04 * swing))
-    ctx.fillStyle = '#86705a'
-    ellipse(ctx, -0.17 * L, 0, 0.2 * L, 0.055 * L)
+    ctx.fillStyle = '#6c5744'
+    ellipse(ctx, -0.18 * L, 0, 0.22 * L, 0.06 * L)
     ctx.fill()
     ctx.fillStyle = 'rgba(214, 160, 150, 0.7)'
     ellipse(ctx, -0.15 * L, 0, 0.14 * L, 0.025 * L)

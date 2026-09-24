@@ -18,7 +18,7 @@ export function Timeline() {
   const [game, snap] = useGame()
   const canvas = useRef<HTMLCanvasElement>(null)
   const wrap = useRef<HTMLDivElement>(null)
-  const [hover, setHover] = useState<{ x: number; tick: number } | null>(null)
+  const [hover, setHover] = useState<{ x: number; tick: number; width: number } | null>(null)
   const dragging = useRef(false)
 
   const tickFromX = (clientX: number): number => {
@@ -201,7 +201,7 @@ export function Timeline() {
   const onMove = (e: React.PointerEvent) => {
     const tick = tickFromX(e.clientX)
     const r = canvas.current?.getBoundingClientRect()
-    setHover(r ? { x: e.clientX - r.left, tick } : null)
+    setHover(r ? { x: e.clientX - r.left, tick, width: r.width } : null)
     if (dragging.current) game.seek(tick)
   }
   const onUp = () => {
@@ -228,7 +228,7 @@ export function Timeline() {
       {hover && ht !== null && (
         <div
           className="pointer-events-none absolute top-0 z-10 -translate-x-1/2 rounded-md border bg-popover/95 px-2 py-1 text-[11px] whitespace-nowrap shadow-lg tabular"
-          style={{ left: Math.max(60, Math.min(hover.x, (wrap.current?.clientWidth ?? 0) - 60)) }}
+          style={{ left: Math.max(60, Math.min(hover.x, hover.width - 60)) }}
         >
           <span className="font-medium">{dateLabel(ht)}</span>
           <span className="ml-2 text-rabbit">{game.history.stat(ht, 'prey')} rabbits</span>

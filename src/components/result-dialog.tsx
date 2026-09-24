@@ -5,7 +5,7 @@ import type { Snapshot } from '@/game/controller'
 import { formatDuration } from '@/sim/time'
 import { cn } from '@/lib/utils'
 
-export const STARS = [
+const STARS = [
   { tick: 90 * 24, label: '3 months' },
   { tick: 210 * 24, label: '7 months' },
   { tick: 8000, label: 'Full year' },

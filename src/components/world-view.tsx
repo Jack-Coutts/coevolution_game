@@ -1,8 +1,8 @@
-import { useEffect, useMemo, useRef } from 'react'
+import { useEffect, useRef } from 'react'
 import { Flower2, Leaf, Moon, Play, Snowflake, Sun, SunDim } from 'lucide-react'
 import { Button } from '@/components/ui/button'
+import { useAnimalIcons } from '@/hooks/use-animal-icons'
 import { useGame } from '@/hooks/use-game'
-import { animalIcon } from '@/render/sprites'
 import { calendar, clockLabel, daylight, type Season } from '@/sim/time'
 import { cn } from '@/lib/utils'
 
@@ -11,10 +11,6 @@ const SEASON_ICON: Record<Season, typeof Leaf> = {
   winter: Snowflake,
   spring: Flower2,
   summer: Sun,
-}
-
-export function useAnimalIcons(): { rabbit: string; fox: string } {
-  return useMemo(() => ({ rabbit: animalIcon('prey', 40), fox: animalIcon('pred', 40) }), [])
 }
 
 export function WorldView({ maxSize }: { maxSize: number }) {

@@ -3,7 +3,7 @@ import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Progress } from '@/components/ui/progress'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
-import { useAnimalIcons } from '@/components/world-view'
+import { useAnimalIcons } from '@/hooks/use-animal-icons'
 import { CHARGES, COOLDOWN } from '@/game/controller'
 import { forecast, type Tone } from '@/game/insights'
 import { useGame } from '@/hooks/use-game'
@@ -18,7 +18,7 @@ const TONE: Record<Tone, { icon: typeof Info; cls: string }> = {
   danger: { icon: OctagonAlert, cls: 'border-red-400/35 bg-red-400/10 text-red-100' },
 }
 
-export const ACTIONS: { id: Intervention; label: string; blurb: string }[] = [
+const ACTIONS: { id: Intervention; label: string; blurb: string }[] = [
   { id: 'rain', label: 'Rain', blurb: 'Refill every bush to full.' },
   { id: 'releasePrey', label: 'Release rabbits', blurb: '+8 rabbits near the bushes, bred from living ones.' },
   { id: 'cullPred', label: 'Cull foxes', blurb: 'Remove a third of the foxes.' },
