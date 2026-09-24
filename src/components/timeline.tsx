@@ -94,8 +94,8 @@ export function Timeline() {
       if (head > 0) {
         ctx.beginPath()
         ctx.moveTo(xOf(0), PAD_T + ih)
-        for (let t = 0; t <= head; t += step) ctx.lineTo(xOf(t), PAD_T + ih - st[t * STAT_STRIDE + STAT.stock] * ih)
-        ctx.lineTo(xOf(head), PAD_T + ih - st[head * STAT_STRIDE + STAT.stock] * ih)
+        for (let t = 0; t <= head; t += step) ctx.lineTo(xOf(t), PAD_T + ih - Math.min(1, st[t * STAT_STRIDE + STAT.stock]) * ih)
+        ctx.lineTo(xOf(head), PAD_T + ih - Math.min(1, st[head * STAT_STRIDE + STAT.stock]) * ih)
         ctx.lineTo(xOf(head), PAD_T + ih)
         ctx.closePath()
         ctx.fillStyle = BERRY

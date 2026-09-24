@@ -39,5 +39,6 @@ export const STABLE_PRESET: LeverValues = {
   'food.patches': 19,
   'food.stock': 30,
   'food.regrow': 9,
+  'food.sprout': 2,
   'evo.mutation': 0.1,
 }

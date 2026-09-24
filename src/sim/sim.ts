@@ -14,6 +14,7 @@ import {
 } from './brain'
 import type { SimParams, SpeciesParams } from './params'
 import { Rng } from './rng'
+import { calendar, type Season } from './time'
 
 export type Species = 'prey' | 'pred'
 export type Intervention = 'rain' | 'releasePrey' | 'cullPred' | 'releasePred'
@@ -43,11 +44,27 @@ export const NO_DISTURBANCE: Disturbance = { regrow: [], metabolism: [], arrival
 export type DeathCause = 'starved' | 'eaten' | 'old'
 
 export interface TickEvent {
-  kind: 'eaten' | 'born' | 'starved' | 'old' | 'arrived' | 'released' | 'culled'
+  kind: 'eaten' | 'born' | 'starved' | 'old' | 'arrived' | 'released' | 'culled' | 'sprouted' | 'withered'
   species: Species
   x: number
   y: number
 }
+
+export interface Bush {
+  id: number
+  x: number
+  y: number
+  stock: number
+  /** Consecutive hours below WITHER_LEVEL of full stock. */
+  grazedFor: number
+  /** Hours since it sprouted. */
+  age: number
+}
+
+const WITHER_LEVEL = 0.15
+const SPROUT_STOCK = 3
+const SPROUT_GAP = 0.05
+const SPROUT_SEASON: Record<Season, number> = { autumn: 0.7, winter: 0.2, spring: 1.6, summer: 1 }
 
 export interface World {
   patches: [number, number][]
@@ -224,11 +241,10 @@ export interface EcoOptions {
 export class Sim {
   readonly p: SimParams
   readonly seed: number
-  readonly patches: [number, number][]
+  bushes: Bush[] = []
   readonly cover: [number, number][]
   readonly dist: Disturbance
   readonly defs: Record<Species, SpeciesDef>
-  stock: number[]
   pops: Record<Species, Creature[]>
   tick = 0
   ended = false
@@ -240,6 +256,9 @@ export class Sim {
   private evRng: Rng
   private nextId = { prey: 0, pred: 0 }
   private regrowAcc = 0
+  private sproutAcc = 0
+  private nextBush = 0
+  private foodRng: Rng
   private capBoost = { prey: 0, pred: 0 }
   private pending: Intervention[] = []
   private grids: Record<Species, Grid> = { prey: new Grid(), pred: new Grid() }
@@ -255,11 +274,11 @@ export class Sim {
     this.opts = opts
     this.defs = speciesDefs(p)
     const world = placeWorld(seed, p)
-    this.patches = world.patches
     this.cover = placeCover(seed, p, world.patches)
+    this.foodRng = new Rng(seed + 40000)
+    for (const [x, y] of world.patches) this.bushes.push({ id: this.nextBush++, x, y, stock: p.patchStock, grazedFor: 0, age: 9999 })
     this.rng = new Rng(seed + 10000)
     this.evRng = new Rng(seed + 20000)
-    this.stock = new Array<number>(p.patches).fill(p.patchStock)
     const starts: Record<Species, [number, number][]> = { prey: world.prey, pred: world.preds }
     this.pops = { prey: [], pred: [] }
     for (const s of SPECIES) {
@@ -368,11 +387,7 @@ export class Sim {
 
     if (!this.opts.noBirths) for (const s of SPECIES) for (const parent of this.pops[s].slice()) this.giveBirth(parent)
 
-    this.regrowAcc += this.regrowFactor(tick)
-    if (this.regrowAcc >= p.regrowEvery) {
-      this.regrowAcc -= p.regrowEvery
-      for (let k = 0; k < this.stock.length; k++) if (this.stock[k] < p.patchStock) this.stock[k] += 1
-    }
+    this.growFood(tick)
 
     this.evo.preyHours += this.prey.length
     this.evo.predHours += this.preds.length
@@ -381,6 +396,51 @@ export class Sim {
       return false
     }
     return true
+  }
+
+/** Regrow, wither and sprout. Bushes are not permanent: overgrazed ones die and new ones appear. */
+  private growFood(tick: number): void {
+    const p = this.p
+    const f = this.regrowFactor(tick)
+    this.regrowAcc += f
+    const regrow = this.regrowAcc >= p.regrowEvery
+    if (regrow) this.regrowAcc -= p.regrowEvery
+    const low = WITHER_LEVEL * p.patchStock
+    const kept: Bush[] = []
+    for (const b of this.bushes) {
+      b.age++
+      if (regrow && b.stock < p.patchStock) b.stock += 1
+      b.grazedFor = b.stock < low ? b.grazedFor + 1 : 0
+      if (b.grazedFor >= p.witherHours) {
+        this.emit('withered', 'prey', b)
+        continue
+      }
+      kept.push(b)
+    }
+    this.bushes = kept
+    this.sproutAcc += (p.sproutPerDay / 24) * f * SPROUT_SEASON[calendar(tick).season]
+    const rng = this.foodRng
+    while (this.sproutAcc >= 1) {
+      this.sproutAcc -= 1
+      if (this.bushes.length >= p.maxBushes) continue
+      const near = this.bushes.length > 0 && rng.random() < p.seedSpread
+      let x: number
+      let y: number
+      if (near) {
+        const parent = this.bushes[Math.floor(rng.random() * this.bushes.length)]
+        x = parent.x + rng.gauss(0, 0.08)
+        y = parent.y + rng.gauss(0, 0.08)
+      } else {
+        x = rng.random()
+        y = rng.random()
+      }
+      x = Math.min(0.97, Math.max(0.03, x))
+      y = Math.min(0.97, Math.max(0.03, y))
+      if (this.bushes.some((b) => (b.x - x) ** 2 + (b.y - y) ** 2 < SPROUT_GAP * SPROUT_GAP)) continue
+      const b: Bush = { id: this.nextBush++, x, y, stock: SPROUT_STOCK, grazedFor: 0, age: 0 }
+      this.bushes.push(b)
+      this.emit('sprouted', 'prey', b)
+    }
   }
 
   /** Fill `this.x` with the creature's senses, by category: threat, food, kin, self, cover. */
@@ -429,10 +489,11 @@ export class Sim {
       let k2 = -1
       let e1 = Infinity
       let e2 = Infinity
-      for (let k = 0; k < this.patches.length; k++) {
-        if (this.stock[k] < 1) continue
-        const [px, py] = this.patches[k]
-        const d = (px - a.x) ** 2 + (py - a.y) ** 2
+      const bushes = this.bushes
+      for (let k = 0; k < bushes.length; k++) {
+        const b = bushes[k]
+        if (b.stock < 1) continue
+        const d = (b.x - a.x) ** 2 + (b.y - a.y) ** 2
         if (d < e1) {
           k2 = k1
           e2 = e1
@@ -444,10 +505,10 @@ export class Sim {
         }
       }
       if (k1 >= 0) {
-        relative(a, this.patches[k1][0], this.patches[k1][1], p.foodScent, x, SENSE.food1)
-        x[SENSE.foodAmount] = this.stock[k1] / p.patchStock
+        relative(a, bushes[k1].x, bushes[k1].y, p.foodScent, x, SENSE.food1)
+        x[SENSE.foodAmount] = bushes[k1].stock / p.patchStock
       }
-      if (k2 >= 0) relative(a, this.patches[k2][0], this.patches[k2][1], p.foodScent, x, SENSE.food2)
+      if (k2 >= 0) relative(a, bushes[k2].x, bushes[k2].y, p.foodScent, x, SENSE.food2)
     } else {
       let f1: Creature | null = null
       let f2: Creature | null = null
@@ -554,17 +615,17 @@ export class Sim {
         if (a.energy > full) continue
         let best = feed2
         let bk = -1
-        for (let k = 0; k < this.patches.length; k++) {
-          if (this.stock[k] < 1) continue
-          const [x, y] = this.patches[k]
-          const d2 = (x - a.x) ** 2 + (y - a.y) ** 2
+        for (let k = 0; k < this.bushes.length; k++) {
+          const b = this.bushes[k]
+          if (b.stock < 1) continue
+          const d2 = (b.x - a.x) ** 2 + (b.y - a.y) ** 2
           if (d2 <= best) {
             best = d2
             bk = k
           }
         }
         if (bk >= 0) {
-          this.stock[bk] -= 1
+          this.bushes[bk].stock -= 1
           a.hunger = 0
           a.meals += 1
           const gain = Math.min(this.defs[s].body.maxEnergy - a.energy, this.defs[s].body.mealEnergy)
@@ -741,12 +802,13 @@ export class Sim {
     const ev = this.evRng
     switch (action) {
       case 'rain':
-        this.stock.fill(this.p.patchStock)
+        for (const b of this.bushes) b.stock = this.p.patchStock
         break
       case 'releasePrey': {
         const room = Math.max(0, this.cap('prey') - this.prey.length)
         for (let i = 0; i < Math.min(8, room); i++) {
-          const [px, py] = this.patches[Math.floor(ev.random() * this.patches.length)]
+          const spot = this.bushes.length ? this.bushes[Math.floor(ev.random() * this.bushes.length)] : { x: 0.5, y: 0.5 }
+          const [px, py] = [spot.x, spot.y]
           const x = Math.min(1, Math.max(0, px + ev.uniform(-0.04, 0.04)))
           const y = Math.min(1, Math.max(0, py + ev.uniform(-0.04, 0.04)))
           const a = this.newcomer('prey', x, y)

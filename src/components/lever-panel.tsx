@@ -256,11 +256,11 @@ function SpeciesReadout({
 }
 
 function FoodReadout({ params }: { params: SimParams }) {
-  const perDay = (params.patches * 24) / params.regrowEvery
-  const energy = ` (${Math.round(perDay * params.prey.mealEnergy)} energy)`
   return (
     <p className="mt-1 rounded-md bg-muted/40 px-2 py-1.5 text-[11px] text-muted-foreground">
-      The meadow regrows {Math.round(perDay)} berries a day{energy}. Each bush holds {params.patchStock}.
+      Each bush regrows {Math.round(24 / params.regrowEvery)} berries a day and holds {params.patchStock}. About{' '}
+      {params.sproutPerDay.toFixed(1)} new bushes sprout a day in summer, more in spring and few in winter. A bush grazed
+      down for {Math.round(params.witherHours / 24)} days withers.
     </p>
   )
 }

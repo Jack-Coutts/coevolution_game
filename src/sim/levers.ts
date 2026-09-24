@@ -2,7 +2,7 @@ import { defaultParams, type SimParams, type SpeciesParams } from './params'
 import { formatHours } from './time'
 
 export type LeverGroup = 'populations' | 'lifecycle' | 'energy' | 'movement' | 'food' | 'evolution'
-export type LeverUnit = 'count' | 'hours' | 'energy' | 'perHour' | 'mult' | 'percent'
+export type LeverUnit = 'count' | 'hours' | 'energy' | 'perHour' | 'perDay' | 'mult' | 'percent'
 export type LeverSpecies = 'prey' | 'pred' | null
 
 export interface LeverDef {
@@ -264,8 +264,8 @@ export const LEVERS: LeverDef[] = [
     id: 'food.patches',
     group: 'food',
     species: null,
-    label: 'Berry bushes',
-    hint: 'Number of bushes, spread across the meadow.',
+    label: 'Starting bushes',
+    hint: 'Bushes at the start. Overgrazed bushes wither and new ones sprout, so food moves around.',
     min: 4,
     max: 24,
     step: 1,
@@ -298,6 +298,19 @@ export const LEVERS: LeverDef[] = [
     unit: 'hours',
     boost: -1,
     cost: 2,
+  },
+  {
+    id: 'food.sprout',
+    group: 'food',
+    species: null,
+    label: 'Sprouting',
+    hint: 'New bushes per day, most in spring, few in winter. Half sprout near a bush, half anywhere.',
+    min: 0,
+    max: 6,
+    step: 0.25,
+    unit: 'perDay',
+    boost: 1,
+    cost: 1,
   },
   {
     id: 'evo.mutation',
@@ -355,6 +368,7 @@ export function defaultLevers(): LeverValues {
     'food.patches': p.patches,
     'food.stock': p.patchStock,
     'food.regrow': p.regrowEvery,
+    'food.sprout': p.sproutPerDay,
     'evo.mutation': p.mutationRate,
   }
 }
@@ -393,6 +407,7 @@ export function deriveParams(v: LeverValues): SimParams {
   p.patches = v['food.patches']
   p.patchStock = v['food.stock']
   p.regrowEvery = v['food.regrow']
+  p.sproutPerDay = v['food.sprout']
   p.mutationRate = v['evo.mutation']
   return p
 }
@@ -426,6 +441,8 @@ export function formatLever(def: LeverDef, value: number): string {
       return String(Math.round(value))
     case 'perHour':
       return `${value.toFixed(2)}/h`
+    case 'perDay':
+      return `${value.toFixed(2)}/day`
     case 'mult':
       return `${value.toFixed(value * 100 % 10 === 0 ? 1 : 2)}×`
     case 'percent':

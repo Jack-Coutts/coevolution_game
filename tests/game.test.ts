@@ -155,3 +155,31 @@ describe('hunting', () => {
     expect(s.counters.preyEaten - eaten).toBeGreaterThanOrEqual(1)
   })
 })
+
+describe('food', () => {
+  it('withers a bush that stays grazed down for the wither time', () => {
+    const p = deriveParams(STABLE_PRESET)
+    p.regrowEvery = 1e9
+    p.sproutPerDay = 0
+    const s = new Sim(p, 6)
+    const bush = s.bushes[0]
+    bush.stock = 0
+    for (let t = 1; t < p.witherHours; t++) s.step()
+    expect(s.bushes.includes(bush)).toBe(true)
+    s.step()
+    expect(s.bushes.includes(bush)).toBe(false)
+  })
+
+  it('sprouts new bushes at the same places for the same seed', () => {
+    const p = deriveParams(STABLE_PRESET)
+    p.sproutPerDay = 24
+    const run = () => {
+      const s = new Sim(p, 8)
+      for (let t = 0; t < 72; t++) s.step()
+      return s.bushes.map((b) => [b.id, b.x, b.y])
+    }
+    const a = run()
+    expect(a.length).toBeGreaterThan(p.patches)
+    expect(run()).toEqual(a)
+  })
+})

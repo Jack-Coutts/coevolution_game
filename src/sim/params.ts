@@ -56,6 +56,14 @@ export interface SimParams {
   patches: number
   patchStock: number
   regrowEvery: number
+  /** New bushes per day in spring-summer terms; seasons scale it. */
+  sproutPerDay: number
+  /** Chance a sprout lands near an existing bush rather than anywhere. */
+  seedSpread: number
+  /** Hours a bush can stay grazed down (below WITHER_LEVEL of its stock) before it withers. */
+  witherHours: number
+  /** Technical ceiling on live bushes. */
+  maxBushes: number
   patchSpacing: number
   eatR: number
   feedR: number
@@ -98,6 +106,10 @@ export function defaultParams(): SimParams {
     patches: 10,
     patchStock: 30,
     regrowEvery: 15,
+    sproutPerDay: 2,
+    seedSpread: 0.5,
+    witherHours: 120,
+    maxBushes: 48,
     patchSpacing: 0.15,
     eatR: 0.025,
     feedR: 0.02,

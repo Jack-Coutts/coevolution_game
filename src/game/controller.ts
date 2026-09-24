@@ -42,6 +42,7 @@ export interface Snapshot {
   prey: number
   pred: number
   stock: number
+  bushes: number
   preyEnergy: number
   predEnergy: number
   predKits10d: number
@@ -73,7 +74,7 @@ export class GameController {
   params: SimParams | null = null
   scenario: Scenario = SCENARIO_BY_ID.stable
   config: RunConfig | null = null
-  patches: [number, number][] = []
+  cover: [number, number][] = []
   private worker: Worker
   private renderer: WorldRenderer | null = null
   private runId = 0
@@ -113,7 +114,7 @@ export class GameController {
 
   attachCanvas(canvas: HTMLCanvasElement | null): void {
     this.renderer = canvas ? new WorldRenderer(canvas) : null
-    if (this.renderer && this.params) this.renderer.setWorld(this.patches, this.config?.seed ?? 0, this.params.patchStock)
+    if (this.renderer && this.params) this.renderer.setWorld(this.cover, this.config?.seed ?? 0, this.params.patchStock)
   }
 
   resize(cssSize: number): void {
@@ -159,6 +160,7 @@ export class GameController {
       prey: h.stat(t, 'prey'),
       pred: h.stat(t, 'pred'),
       stock: h.stat(t, 'stock'),
+      bushes: h.stat(t, 'bushes'),
       preyEnergy: h.stat(t, 'preyEnergy'),
       predEnergy: h.stat(t, 'predEnergy'),
       predKits10d: h.stat(t, 'predBorn') - h.stat(Math.max(0, t - 240), 'predBorn'),
@@ -219,11 +221,11 @@ export class GameController {
     if (msg.runId !== this.runId) return
     switch (msg.type) {
       case 'ready':
-        this.patches = msg.patches
+        this.cover = msg.cover
         this.history.add(msg.frame, msg.stats, 0)
         this.phase = 'planning'
         if (this.renderer && this.params && this.config) {
-          this.renderer.setWorld(msg.patches, this.config.seed, this.params.patchStock)
+          this.renderer.setWorld(msg.cover, this.config.seed, this.params.patchStock)
         }
         this.notify(true)
         break

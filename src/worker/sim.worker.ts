@@ -2,6 +2,7 @@
 import { Sim } from '@/sim/sim'
 import {
   ANIMAL_STRIDE,
+  BUSH_STRIDE,
   EVENT_KIND,
   EVENT_STRIDE,
   STAT,
@@ -38,6 +39,22 @@ function packAnimals(s: Sim, species: 'prey' | 'pred'): Float32Array {
   return out
 }
 
+const SPROUT_HOURS = 48
+
+function packBushes(s: Sim): Float32Array {
+  const out = new Float32Array(s.bushes.length * BUSH_STRIDE)
+  s.bushes.forEach((b, i) => {
+    const o = i * BUSH_STRIDE
+    out[o] = b.id
+    out[o + 1] = b.x
+    out[o + 2] = b.y
+    out[o + 3] = b.stock / s.p.patchStock
+    out[o + 4] = Math.min(1, b.age / SPROUT_HOURS)
+    out[o + 5] = b.grazedFor / s.p.witherHours
+  })
+  return out
+}
+
 function frame(s: Sim): FrameData {
   const events = new Float32Array(s.events.length * EVENT_STRIDE)
   s.events.forEach((e, i) => {
@@ -51,7 +68,7 @@ function frame(s: Sim): FrameData {
     tick: s.tick,
     prey: packAnimals(s, 'prey'),
     preds: packAnimals(s, 'pred'),
-    stock: Float32Array.from(s.stock),
+    bushes: packBushes(s),
     events,
   }
 }
@@ -62,7 +79,8 @@ function writeStats(s: Sim, out: Float64Array, row: number): void {
     arr.length ? arr.reduce((t, a) => t + a[key], 0) / arr.length / max : 0
   out[o + STAT.prey] = s.prey.length
   out[o + STAT.pred] = s.preds.length
-  out[o + STAT.stock] = s.stock.reduce((t, v) => t + v, 0) / (s.p.patchStock * s.stock.length)
+  out[o + STAT.stock] = s.bushes.reduce((t, b) => t + b.stock, 0) / (s.p.patchStock * s.p.patches)
+  out[o + STAT.bushes] = s.bushes.length
   out[o + STAT.preyEnergy] = mean(s.prey, 'energy', s.p.prey.maxEnergy)
   out[o + STAT.predEnergy] = mean(s.preds, 'energy', s.p.pred.maxEnergy)
   out[o + STAT.preyPace] = mean(s.prey, 'pace', 1)
@@ -79,7 +97,7 @@ function writeStats(s: Sim, out: Float64Array, row: number): void {
   let spread = 0
   for (const a of s.prey) {
     let best = Infinity
-    for (const [px, py] of s.patches) best = Math.min(best, (px - a.x) ** 2 + (py - a.y) ** 2)
+    for (const b of s.bushes) best = Math.min(best, (b.x - a.x) ** 2 + (b.y - a.y) ** 2)
     spread += Math.sqrt(best)
   }
   out[o + STAT.preySpread] = s.prey.length ? spread / s.prey.length : 0
@@ -104,7 +122,7 @@ ctx.onmessage = (ev: MessageEvent<ToWorker>) => {
       const stats = new Float64Array(STAT_STRIDE)
       writeStats(sim, stats, 0)
       const f = frame(sim)
-      post({ type: 'ready', runId, patches: sim.patches, frame: f, stats }, [stats.buffer])
+      post({ type: 'ready', runId, cover: sim.cover, frame: f, stats }, [stats.buffer])
       break
     }
     case 'advance': {

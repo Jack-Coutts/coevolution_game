@@ -22,10 +22,13 @@ export const STAT = {
   predOld: 13,
   preySpread: 14,
   predView: 15,
+  bushes: 16,
 } as const
-export const STAT_STRIDE = 16
+export const STAT_STRIDE = 17
 
-export const EVENT_KIND = ['eaten', 'born', 'starved', 'old', 'arrived', 'released', 'culled'] as const
+export const BUSH_STRIDE = 6
+
+export const EVENT_KIND = ['eaten', 'born', 'starved', 'old', 'arrived', 'released', 'culled', 'sprouted', 'withered'] as const
 /** Per-event floats: kind index, species (0 prey / 1 pred), x, y. */
 export const EVENT_STRIDE = 4
 
@@ -33,7 +36,8 @@ export interface FrameData {
   tick: number
   prey: Float32Array
   preds: Float32Array
-  stock: Float32Array
+  /** Per bush: id, x, y, fullness (0..1), grown (0..1 after sprouting), withering (0..1). */
+  bushes: Float32Array
   events: Float32Array
 }
 
@@ -50,6 +54,6 @@ export interface EndInfo {
 }
 
 export type FromWorker =
-  | { type: 'ready'; runId: number; patches: [number, number][]; frame: FrameData; stats: Float64Array }
+  | { type: 'ready'; runId: number; cover: [number, number][]; frame: FrameData; stats: Float64Array }
   | { type: 'frames'; runId: number; frames: FrameData[]; stats: Float64Array; head: number; end: EndInfo | null }
   | { type: 'intervened'; runId: number; action: Intervention; tick: number }

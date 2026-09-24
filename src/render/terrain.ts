@@ -171,6 +171,15 @@ function paintSnow(size: number, seed: number): HTMLCanvasElement {
   return c
 }
 
+/** Soft grazed earth drawn under each bush, wherever it grows. */
+export function paintEarth(cssSize: number, dpr: number): HTMLCanvasElement {
+  const [c, ctx] = canvas(cssSize * dpr)
+  const S = cssSize * dpr
+  blob(ctx, S / 2, S / 2, S / 2, 'rgba(150, 128, 82, ALPHA)', 0.45)
+  blob(ctx, S / 2, S / 2, S * 0.3, 'rgba(128, 104, 66, ALPHA)', 0.35)
+  return c
+}
+
 export interface BushSprite {
   foliage: HTMLCanvasElement
   twigs: HTMLCanvasElement

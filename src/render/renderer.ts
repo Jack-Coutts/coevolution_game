@@ -1,6 +1,6 @@
-import { ANIMAL_STRIDE, EVENT_KIND, EVENT_STRIDE, type FrameData } from '@/worker/protocol'
+import { ANIMAL_STRIDE, BUSH_STRIDE, EVENT_KIND, EVENT_STRIDE, type FrameData } from '@/worker/protocol'
 import { foxSheet, GAIT_FRAMES, rabbitSheet, type SpriteSheet } from './sprites'
-import { paintBush, paintTerrain, type BushSprite, type TerrainLayers } from './terrain'
+import { paintBush, paintEarth, paintTerrain, type BushSprite, type TerrainLayers } from './terrain'
 
 export interface Weather {
   /** 0 = midnight .. 1 = full day. */
@@ -28,6 +28,8 @@ const FX_MS: Record<Fx['kind'], number> = {
   arrived: 1400,
   released: 1100,
   culled: 900,
+  sprouted: 1400,
+  withered: 1400,
 }
 
 /** Fox births and deaths are rare and matter, so they get longer, always-on markers. */
@@ -47,12 +49,12 @@ export class WorldRenderer {
   private size = 0
   private dpr = 1
   private seed = 0
-  private patches: [number, number][] = []
   private patchStock = 30
   private terrain: TerrainLayers | null = null
   private rabbits: SpriteSheet | null = null
   private foxes: SpriteSheet | null = null
-  private bushes: BushSprite[] = []
+  private bushSprites = new Map<number, BushSprite>()
+  private earth: HTMLCanvasElement | null = null
   private fx: Fx[] = []
   private idIndex = new Map<number, number>()
   private worldKey = ''
@@ -64,13 +66,12 @@ export class WorldRenderer {
     this.ctx = ctx
   }
 
-  setWorld(patches: [number, number][], seed: number, patchStock: number): void {
-    const key = `${seed}:${patches.map(([x, y]) => `${x},${y}`).join(';')}`
+  setWorld(cover: [number, number][], seed: number, patchStock: number): void {
+    const key = `${seed}:${cover.map(([x, y]) => `${x},${y}`).join(';')}`
     this.patchStock = patchStock
     this.fx = []
     if (key === this.worldKey) return
     this.worldKey = key
-    this.patches = patches
     this.seed = seed
     this.rebuild()
   }
@@ -90,10 +91,11 @@ export class WorldRenderer {
   private rebuild(): void {
     if (!this.size) return
     const inner = this.size * (1 - 2 * MARGIN)
-    this.terrain = paintTerrain(this.size * this.dpr, this.seed, this.patches.map(([x, y]) => this.toCanvas(x, y, 1)))
+    this.terrain = paintTerrain(this.size * this.dpr, this.seed, [])
+    this.earth = paintEarth(this.size * 0.12, this.dpr)
     this.rabbits = rabbitSheet(RABBIT_LEN * inner, this.dpr)
     this.foxes = foxSheet(FOX_LEN * inner, this.dpr)
-    this.bushes = this.patches.map((_, i) => paintBush(BUSH_R * inner, this.dpr, this.seed * 31 + i))
+    this.bushSprites.clear()
   }
 
   /** Unit world coords to canvas coords as a fraction (scale=1) or CSS px (scale=size). */
@@ -119,6 +121,7 @@ export class WorldRenderer {
       const fox = ev[i + 1] === 1
       if (kind === 'old' && !fox) continue
       if (busy && !fox && (kind === 'born' || kind === 'starved')) continue
+      if (busy && kind === 'sprouted' && this.fx.length > 12) continue
       this.fx.push({ kind, species: ev[i + 1], x: ev[i + 2], y: ev[i + 3], t0: now })
     }
     const cap = busy ? 24 : 240
@@ -149,7 +152,7 @@ export class WorldRenderer {
     }
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0)
 
-    this.drawBushes(b.stock)
+    this.drawBushes(b.bushes)
     this.drawFx(now, 'under')
     this.drawAnimals(a.prey, b.prey, alpha, this.rabbits, RABBIT_LEN, now, 2.4)
     this.drawAnimals(a.preds, b.preds, alpha, this.foxes, FOX_LEN, now, 1.8)
@@ -167,38 +170,63 @@ export class WorldRenderer {
     }
   }
 
-  private drawBushes(stock: Float32Array): void {
+  private bushSprite(id: number): BushSprite {
+    let sprite = this.bushSprites.get(id)
+    if (!sprite) {
+      const inner = this.size * (1 - 2 * MARGIN)
+      sprite = paintBush(BUSH_R * inner, this.dpr, this.seed * 31 + id)
+      this.bushSprites.set(id, sprite)
+    }
+    return sprite
+  }
+
+  /** Bushes come and go: a sprout grows in over two days, an overgrazed bush browns and shrinks before it withers. */
+  private drawBushes(bushes: Float32Array): void {
     const ctx = this.ctx
     const inner = this.size * (1 - 2 * MARGIN)
-    this.patches.forEach(([px, py], i) => {
-      const sprite = this.bushes[i]
-      if (!sprite) return
-      const f = Math.max(0, Math.min(1, stock[i] / this.patchStock))
-      const [x, y] = this.toCanvas(px, py, this.size)
+    const live = new Set<number>()
+    for (let i = 0; i < bushes.length; i += BUSH_STRIDE) {
+      const id = bushes[i]
+      live.add(id)
+      const fullness = bushes[i + 3]
+      const grown = bushes[i + 4]
+      const wither = Math.min(1, bushes[i + 5])
+      const sprite = this.bushSprite(id)
+      const [x, y] = this.toCanvas(bushes[i + 1], bushes[i + 2], this.size)
       const s = sprite.size
-      ctx.drawImage(sprite.twigs, x - s / 2, y - s / 2, s, s)
-      if (stock[i] < 1) {
-        ctx.globalAlpha = 0.75
-        ctx.drawImage(sprite.foliage, x - (s * 0.34) / 2, y - (s * 0.34) / 2, s * 0.34, s * 0.34)
+      const g = 0.25 + 0.75 * (1 - (1 - grown) ** 2)
+      if (this.earth) {
+        const e = this.earth.width / this.dpr
+        ctx.globalAlpha = 0.25 + 0.5 * grown
+        ctx.drawImage(this.earth, x - e / 2, y - e / 2, e, e)
         ctx.globalAlpha = 1
-      } else {
-        const k = 0.42 + 0.58 * f
-        ctx.drawImage(sprite.foliage, x - (s * k) / 2, y - (s * k) / 2, s * k, s * k)
-        const r = BUSH_R * inner * k
-        const n = Math.round(f * sprite.berries.length)
-        for (let j = 0; j < n; j++) {
-          const [bx, by] = sprite.berries[j]
-          ctx.fillStyle = j % 3 === 0 ? '#7a1f3d' : '#b3263e'
-          ctx.beginPath()
-          ctx.arc(x + bx * r, y + by * r, Math.max(1.2, r * 0.085), 0, Math.PI * 2)
-          ctx.fill()
-          ctx.fillStyle = 'rgba(255,255,255,0.55)'
-          ctx.beginPath()
-          ctx.arc(x + bx * r - r * 0.025, y + by * r - r * 0.025, Math.max(0.4, r * 0.028), 0, Math.PI * 2)
-          ctx.fill()
-        }
       }
-    })
+      ctx.drawImage(sprite.twigs, x - (s * g) / 2, y - (s * g) / 2, s * g, s * g)
+      const k = (fullness * this.patchStock < 1 ? 0.34 : 0.42 + 0.58 * fullness) * g * (1 - 0.45 * wither)
+      ctx.globalAlpha = (fullness * this.patchStock < 1 ? 0.75 : 1) * (1 - 0.55 * wither)
+      ctx.drawImage(sprite.foliage, x - (s * k) / 2, y - (s * k) / 2, s * k, s * k)
+      ctx.globalAlpha = 1
+      if (wither > 0.2) {
+        ctx.fillStyle = `rgba(150, 110, 55, ${0.45 * wither})`
+        ctx.beginPath()
+        ctx.arc(x, y, (s * k) / 2.6, 0, Math.PI * 2)
+        ctx.fill()
+      }
+      const r = BUSH_R * inner * k
+      const n = Math.round(fullness * sprite.berries.length)
+      for (let j = 0; j < n; j++) {
+        const [bx, by] = sprite.berries[j]
+        ctx.fillStyle = j % 3 === 0 ? '#7a1f3d' : '#b3263e'
+        ctx.beginPath()
+        ctx.arc(x + bx * r, y + by * r, Math.max(1.2, r * 0.085), 0, Math.PI * 2)
+        ctx.fill()
+        ctx.fillStyle = 'rgba(255,255,255,0.55)'
+        ctx.beginPath()
+        ctx.arc(x + bx * r - r * 0.025, y + by * r - r * 0.025, Math.max(0.4, r * 0.028), 0, Math.PI * 2)
+        ctx.fill()
+      }
+    }
+    if (this.bushSprites.size > live.size + 32) for (const id of this.bushSprites.keys()) if (!live.has(id)) this.bushSprites.delete(id)
   }
 
   private drawAnimals(
@@ -336,6 +364,32 @@ export class WorldRenderer {
           ctx.beginPath()
           ctx.arc(x, y, inner * (0.012 + 0.03 * t), 0, Math.PI * 2)
           ctx.stroke()
+          break
+        }
+        case 'sprouted': {
+          if (layer !== 'under') break
+          ctx.strokeStyle = `rgba(190, 240, 140, ${0.8 * (1 - t)})`
+          ctx.lineWidth = 1.5
+          for (let k = 0; k < 5; k++) {
+            const a = (k / 5) * Math.PI * 2 + t * 1.5
+            const d = inner * (0.012 + 0.02 * t)
+            ctx.beginPath()
+            ctx.moveTo(x + Math.cos(a) * d * 0.5, y + Math.sin(a) * d * 0.5)
+            ctx.lineTo(x + Math.cos(a) * d, y + Math.sin(a) * d)
+            ctx.stroke()
+          }
+          break
+        }
+        case 'withered': {
+          if (layer !== 'over') break
+          for (let k = 0; k < 6; k++) {
+            const a = (k / 6) * Math.PI * 2 + f.x * 30
+            const d = inner * (0.01 + 0.03 * t)
+            ctx.fillStyle = `rgba(160, 115, 55, ${0.8 * (1 - t)})`
+            ctx.beginPath()
+            ctx.ellipse(x + Math.cos(a) * d, y + Math.sin(a) * d + inner * 0.01 * t, inner * 0.005, inner * 0.0025, a, 0, Math.PI * 2)
+            ctx.fill()
+          }
           break
         }
         default: {
