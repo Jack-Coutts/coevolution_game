@@ -114,7 +114,7 @@ export class GameController {
 
   attachCanvas(canvas: HTMLCanvasElement | null): void {
     this.renderer = canvas ? new WorldRenderer(canvas) : null
-    if (this.renderer && this.params) this.renderer.setWorld(this.cover, this.config?.seed ?? 0, this.params.patchStock)
+    if (this.renderer && this.params) this.renderer.setWorld(this.cover, this.params.eco.coverR, this.config?.seed ?? 0, this.params.patchStock)
   }
 
   resize(cssSize: number): void {
@@ -225,7 +225,7 @@ export class GameController {
         this.history.add(msg.frame, msg.stats, 0)
         this.phase = 'planning'
         if (this.renderer && this.params && this.config) {
-          this.renderer.setWorld(msg.cover, this.config.seed, this.params.patchStock)
+          this.renderer.setWorld(msg.cover, this.params.eco.coverR, this.config.seed, this.params.patchStock)
         }
         this.notify(true)
         break

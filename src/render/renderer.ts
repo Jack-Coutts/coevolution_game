@@ -58,6 +58,8 @@ export class WorldRenderer {
   private fx: Fx[] = []
   private idIndex = new Map<number, number>()
   private worldKey = ''
+  private cover: [number, number][] = []
+  private coverR = 0
 
   constructor(canvas: HTMLCanvasElement) {
     this.canvas = canvas
@@ -66,12 +68,14 @@ export class WorldRenderer {
     this.ctx = ctx
   }
 
-  setWorld(cover: [number, number][], seed: number, patchStock: number): void {
+  setWorld(cover: [number, number][], coverR: number, seed: number, patchStock: number): void {
     const key = `${seed}:${cover.map(([x, y]) => `${x},${y}`).join(';')}`
     this.patchStock = patchStock
     this.fx = []
     if (key === this.worldKey) return
     this.worldKey = key
+    this.cover = cover
+    this.coverR = coverR
     this.seed = seed
     this.rebuild()
   }
@@ -91,7 +95,12 @@ export class WorldRenderer {
   private rebuild(): void {
     if (!this.size) return
     const inner = this.size * (1 - 2 * MARGIN)
-    this.terrain = paintTerrain(this.size * this.dpr, this.seed, [])
+    this.terrain = paintTerrain(
+      this.size * this.dpr,
+      this.seed,
+      this.cover.map(([x, y]) => this.toCanvas(x, y, 1)),
+      this.coverR * (1 - 2 * MARGIN),
+    )
     this.earth = paintEarth(this.size * 0.12, this.dpr)
     this.rabbits = rabbitSheet(RABBIT_LEN * inner, this.dpr)
     this.foxes = foxSheet(FOX_LEN * inner, this.dpr)
@@ -156,6 +165,9 @@ export class WorldRenderer {
     this.drawFx(now, 'under')
     this.drawAnimals(a.prey, b.prey, alpha, this.rabbits, RABBIT_LEN, now, 2.4)
     this.drawAnimals(a.preds, b.preds, alpha, this.foxes, FOX_LEN, now, 1.8)
+    ctx.setTransform(1, 0, 0, 1, 0, 0)
+    ctx.drawImage(this.terrain.grass, 0, 0)
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0)
     this.drawFx(now, 'over')
 
     const night = (1 - weather.daylight) * weather.nightAmp

@@ -35,6 +35,8 @@ function packAnimals(s: Sim, species: 'prey' | 'pred'): Float32Array {
     out[o + 5] = a.energy / sp.maxEnergy
     out[o + 6] = Math.min(1, a.age / sp.adultAge)
     out[o + 7] = a.pace
+    out[o + 8] = a.inCover ? 1 : 0
+    out[o + 9] = a.gen
   }
   return out
 }

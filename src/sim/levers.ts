@@ -313,6 +313,19 @@ export const LEVERS: LeverDef[] = [
     cost: 1,
   },
   {
+    id: 'habitat.cover',
+    group: 'food',
+    species: null,
+    label: 'Tall grass',
+    hint: 'Patches of tall grass. Foxes cannot see a rabbit hiding in it unless they are very close, and everyone moves slower in it.',
+    min: 0,
+    max: 16,
+    step: 1,
+    unit: 'count',
+    boost: 1,
+    cost: 1,
+  },
+  {
     id: 'evo.mutation',
     group: 'evolution',
     species: null,
@@ -334,7 +347,7 @@ export const GROUPS: { id: LeverGroup; label: string; blurb: string }[] = [
   { id: 'lifecycle', label: 'Life cycle', blurb: 'When animals breed, how often, and how long they live.' },
   { id: 'energy', label: 'Energy', blurb: 'The fuel tank: what living, moving and eating are worth.' },
   { id: 'movement', label: 'Senses & movement', blurb: 'How fast they run, how far they see, how sharply they turn.' },
-  { id: 'food', label: 'Food', blurb: 'The berry bushes rabbits graze.' },
+  { id: 'food', label: 'Food & habitat', blurb: 'Berry bushes that come and go, and tall grass to hide in.' },
   { id: 'evolution', label: 'Evolution', blurb: 'How quickly genes change between parent and child.' },
 ]
 
@@ -369,6 +382,7 @@ export function defaultLevers(): LeverValues {
     'food.stock': p.patchStock,
     'food.regrow': p.regrowEvery,
     'food.sprout': p.sproutPerDay,
+    'habitat.cover': p.eco.cover,
     'evo.mutation': p.mutationRate,
   }
 }
@@ -408,6 +422,7 @@ export function deriveParams(v: LeverValues): SimParams {
   p.patchStock = v['food.stock']
   p.regrowEvery = v['food.regrow']
   p.sproutPerDay = v['food.sprout']
+  p.eco.cover = v['habitat.cover']
   p.mutationRate = v['evo.mutation']
   return p
 }

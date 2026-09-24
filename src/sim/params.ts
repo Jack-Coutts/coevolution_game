@@ -89,7 +89,7 @@ export function defaultEco(): EcoParams {
     heredity: true,
     mateR: 0.1,
     kinR: 0.12,
-    cover: 0,
+    cover: 8,
     coverR: 0.07,
     coverSight: 0.04,
     coverSlow: 0.75,

@@ -30,10 +30,12 @@ function blob(ctx: CanvasRenderingContext2D, x: number, y: number, r: number, co
 export interface TerrainLayers {
   base: HTMLCanvasElement
   snow: HTMLCanvasElement
+  /** Tall grass, drawn over the animals so anything inside it is half hidden. */
+  grass: HTMLCanvasElement
 }
 
 /** The meadow at `size` device pixels. Patches are in unit coordinates. */
-export function paintTerrain(size: number, seed: number, patches: [number, number][]): TerrainLayers {
+export function paintTerrain(size: number, seed: number, cover: [number, number][], coverR: number): TerrainLayers {
   const rand = mulberry32(seed * 7919 + 17)
   const [c, ctx] = canvas(size)
   const S = size
@@ -62,13 +64,8 @@ export function paintTerrain(size: number, seed: number, patches: [number, numbe
     blob(ctx, rand() * S, rand() * S, S * (0.06 + rand() * 0.08), 'rgba(58, 96, 60, ALPHA)', 0.22)
   }
 
-  // grazed earth around each bush
-  for (const [px, py] of patches) {
-    const x = px * S
-    const y = py * S
-    blob(ctx, x, y, S * 0.06, 'rgba(150, 128, 82, ALPHA)', 0.45)
-    blob(ctx, x, y, S * 0.035, 'rgba(128, 104, 66, ALPHA)', 0.35)
-  }
+  // darker, lusher ground under the tall grass
+  for (const [cx, cy] of cover) blob(ctx, cx * S, cy * S, coverR * S * 1.25, 'rgba(52, 88, 40, ALPHA)', 0.5)
 
   // grass tufts
   const tufts = Math.round((S * S) / 90)
@@ -114,7 +111,7 @@ export function paintTerrain(size: number, seed: number, patches: [number, numbe
   for (let tries = 0; tries < 200 && placed < 7; tries++) {
     const x = rand()
     const y = rand()
-    if (patches.some(([px, py]) => (px - x) ** 2 + (py - y) ** 2 < 0.08 ** 2)) continue
+    if (cover.some(([px, py]) => (px - x) ** 2 + (py - y) ** 2 < 0.1 ** 2)) continue
     placed++
     drawRock(ctx, x * S, y * S, S * (0.008 + rand() * 0.012), rand)
   }
@@ -126,7 +123,7 @@ export function paintTerrain(size: number, seed: number, patches: [number, numbe
   ctx.fillStyle = v
   ctx.fillRect(0, 0, S, S)
 
-  return { base: c, snow: paintSnow(size, seed) }
+  return { base: c, snow: paintSnow(size, seed), grass: paintTallGrass(size, seed, cover, coverR) }
 }
 
 function drawRock(ctx: CanvasRenderingContext2D, x: number, y: number, r: number, rand: () => number): void {
@@ -154,6 +151,33 @@ function drawRock(ctx: CanvasRenderingContext2D, x: number, y: number, r: number
   ctx.beginPath()
   ctx.ellipse(x + r * 0.2, y + r * 0.35, r * 0.4, r * 0.2, 0.3, 0, Math.PI * 2)
   ctx.fill()
+}
+
+function paintTallGrass(size: number, seed: number, cover: [number, number][], coverR: number): HTMLCanvasElement {
+  const rand = mulberry32(seed * 131 + 11)
+  const [c, ctx] = canvas(size)
+  const S = size
+  ctx.lineCap = 'round'
+  for (const [cx, cy] of cover) {
+    const blades = Math.round(coverR * coverR * S * S * 0.09)
+    for (let i = 0; i < blades; i++) {
+      const a = rand() * Math.PI * 2
+      const d = coverR * S * Math.sqrt(rand())
+      const x = cx * S + Math.cos(a) * d
+      const y = cy * S + Math.sin(a) * d
+      const len = S * (0.01 + rand() * 0.012)
+      const lean = -Math.PI / 2 + (rand() - 0.5) * 1.1
+      const shade = rand()
+      ctx.strokeStyle =
+        shade < 0.4 ? 'rgba(62, 104, 44, 0.8)' : shade < 0.8 ? 'rgba(96, 140, 60, 0.75)' : 'rgba(170, 186, 100, 0.7)'
+      ctx.lineWidth = Math.max(1, S * 0.0022)
+      ctx.beginPath()
+      ctx.moveTo(x, y)
+      ctx.quadraticCurveTo(x + Math.cos(lean) * len * 0.5, y + Math.sin(lean) * len * 0.6, x + Math.cos(lean + 0.3) * len, y + Math.sin(lean + 0.3) * len)
+      ctx.stroke()
+    }
+  }
+  return c
 }
 
 function paintSnow(size: number, seed: number): HTMLCanvasElement {

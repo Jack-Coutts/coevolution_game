@@ -1,8 +1,8 @@
 import type { SimParams } from '@/sim/params'
 import type { Disturbance, Intervention } from '@/sim/sim'
 
-/** Per-animal floats in a frame: id, x, y, hx, hy, energy (0..1), maturity (0..1), pace (0..1). */
-export const ANIMAL_STRIDE = 8
+/** Per-animal floats in a frame: id, x, y, hx, hy, energy (0..1), maturity (0..1), pace (0..1), in cover (0/1), generation. */
+export const ANIMAL_STRIDE = 10
 
 /** Per-tick stats row. */
 export const STAT = {
