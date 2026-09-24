@@ -1,0 +1,492 @@
+{
+  "parameters": {
+    "horizon": 8760,
+    "patches": 19,
+    "patchStock": 30,
+    "regrowEvery": 9,
+    "sproutPerDay": 2,
+    "seedSpread": 0.5,
+    "witherHours": 240,
+    "maxBushes": 48,
+    "patchSpacing": 0.15,
+    "eatR": 0.008,
+    "feedR": 0.02,
+    "birthR": 0.02,
+    "foodScent": 0.3,
+    "wallView": 0.1,
+    "geneInit": 1,
+    "mutationRate": 0.03,
+    "mutationSigma": 0.1,
+    "founderEnergy": 0.75,
+    "prey": {
+      "initial": 160,
+      "adultAge": 50,
+      "birthGap": 135,
+      "litter": 2,
+      "lifespan": 840,
+      "maxEnergy": 180,
+      "metabolism": 0.35,
+      "speedCost": 0.5,
+      "mealEnergy": 55,
+      "breedEnergy": 0.65,
+      "childEnergy": 0.45,
+      "visionUpkeep": 0.2,
+      "step": 0.0125,
+      "baseStep": 0.01,
+      "view": [
+        0.2,
+        0.2
+      ],
+      "turn": [
+        1,
+        1
+      ]
+    },
+    "pred": {
+      "initial": 6,
+      "adultAge": 130,
+      "birthGap": 350,
+      "litter": 1,
+      "lifespan": 1000,
+      "maxEnergy": 240,
+      "metabolism": 0.15,
+      "speedCost": 0.9,
+      "mealEnergy": 90,
+      "breedEnergy": 0.95,
+      "childEnergy": 0.6,
+      "visionUpkeep": 0.05,
+      "step": 0.014,
+      "baseStep": 0.014,
+      "view": [
+        0.13,
+        1.3
+      ],
+      "turn": [
+        0.2,
+        0.8
+      ]
+    },
+    "eco": {
+      "hidden": 0,
+      "maxHidden": 12,
+      "growRate": 0,
+      "memory": false,
+      "sexual": false,
+      "heredity": true,
+      "mateR": 0.1,
+      "kinR": 0.12,
+      "cover": 8,
+      "coverR": 0.07,
+      "coverSight": 0.04,
+      "coverSlow": 0.75,
+      "brainUpkeep": 0.01,
+      "ceilingPrey": 800,
+      "ceilingPred": 400
+    }
+  },
+  "survived": 23,
+  "count": 50,
+  "rows": [
+    {
+      "seed": 5000,
+      "survived": true,
+      "tick": 8760,
+      "prey": 31,
+      "foxes": 40,
+      "safetyLimitHits": 0
+    },
+    {
+      "seed": 5001,
+      "survived": false,
+      "tick": 2795,
+      "prey": 0,
+      "foxes": 69,
+      "safetyLimitHits": 0
+    },
+    {
+      "seed": 5002,
+      "survived": true,
+      "tick": 8760,
+      "prey": 86,
+      "foxes": 119,
+      "safetyLimitHits": 0
+    },
+    {
+      "seed": 5003,
+      "survived": true,
+      "tick": 8760,
+      "prey": 120,
+      "foxes": 85,
+      "safetyLimitHits": 0
+    },
+    {
+      "seed": 5004,
+      "survived": false,
+      "tick": 2136,
+      "prey": 0,
+      "foxes": 19,
+      "safetyLimitHits": 0
+    },
+    {
+      "seed": 5005,
+      "survived": true,
+      "tick": 8760,
+      "prey": 93,
+      "foxes": 24,
+      "safetyLimitHits": 0
+    },
+    {
+      "seed": 5006,
+      "survived": true,
+      "tick": 8760,
+      "prey": 68,
+      "foxes": 64,
+      "safetyLimitHits": 0
+    },
+    {
+      "seed": 5007,
+      "survived": true,
+      "tick": 8760,
+      "prey": 308,
+      "foxes": 155,
+      "safetyLimitHits": 0
+    },
+    {
+      "seed": 5008,
+      "survived": true,
+      "tick": 8760,
+      "prey": 198,
+      "foxes": 1,
+      "safetyLimitHits": 0
+    },
+    {
+      "seed": 5009,
+      "survived": true,
+      "tick": 8760,
+      "prey": 296,
+      "foxes": 20,
+      "safetyLimitHits": 0
+    },
+    {
+      "seed": 5010,
+      "survived": false,
+      "tick": 2149,
+      "prey": 0,
+      "foxes": 52,
+      "safetyLimitHits": 0
+    },
+    {
+      "seed": 5011,
+      "survived": false,
+      "tick": 8379,
+      "prey": 0,
+      "foxes": 43,
+      "safetyLimitHits": 0
+    },
+    {
+      "seed": 5012,
+      "survived": true,
+      "tick": 8760,
+      "prey": 248,
+      "foxes": 65,
+      "safetyLimitHits": 0
+    },
+    {
+      "seed": 5013,
+      "survived": false,
+      "tick": 3089,
+      "prey": 132,
+      "foxes": 0,
+      "safetyLimitHits": 0
+    },
+    {
+      "seed": 5014,
+      "survived": true,
+      "tick": 8760,
+      "prey": 85,
+      "foxes": 156,
+      "safetyLimitHits": 0
+    },
+    {
+      "seed": 5015,
+      "survived": false,
+      "tick": 6971,
+      "prey": 0,
+      "foxes": 36,
+      "safetyLimitHits": 0
+    },
+    {
+      "seed": 5016,
+      "survived": true,
+      "tick": 8760,
+      "prey": 116,
+      "foxes": 130,
+      "safetyLimitHits": 0
+    },
+    {
+      "seed": 5017,
+      "survived": false,
+      "tick": 3612,
+      "prey": 70,
+      "foxes": 0,
+      "safetyLimitHits": 0
+    },
+    {
+      "seed": 5018,
+      "survived": false,
+      "tick": 3208,
+      "prey": 0,
+      "foxes": 36,
+      "safetyLimitHits": 0
+    },
+    {
+      "seed": 5019,
+      "survived": false,
+      "tick": 1996,
+      "prey": 0,
+      "foxes": 96,
+      "safetyLimitHits": 0
+    },
+    {
+      "seed": 5020,
+      "survived": true,
+      "tick": 8760,
+      "prey": 101,
+      "foxes": 10,
+      "safetyLimitHits": 0
+    },
+    {
+      "seed": 5021,
+      "survived": false,
+      "tick": 2708,
+      "prey": 0,
+      "foxes": 77,
+      "safetyLimitHits": 0
+    },
+    {
+      "seed": 5022,
+      "survived": true,
+      "tick": 8760,
+      "prey": 127,
+      "foxes": 94,
+      "safetyLimitHits": 0
+    },
+    {
+      "seed": 5023,
+      "survived": false,
+      "tick": 7210,
+      "prey": 0,
+      "foxes": 58,
+      "safetyLimitHits": 0
+    },
+    {
+      "seed": 5024,
+      "survived": false,
+      "tick": 2904,
+      "prey": 0,
+      "foxes": 87,
+      "safetyLimitHits": 0
+    },
+    {
+      "seed": 5025,
+      "survived": true,
+      "tick": 8760,
+      "prey": 46,
+      "foxes": 60,
+      "safetyLimitHits": 0
+    },
+    {
+      "seed": 5026,
+      "survived": true,
+      "tick": 8760,
+      "prey": 258,
+      "foxes": 14,
+      "safetyLimitHits": 0
+    },
+    {
+      "seed": 5027,
+      "survived": false,
+      "tick": 3219,
+      "prey": 0,
+      "foxes": 57,
+      "safetyLimitHits": 0
+    },
+    {
+      "seed": 5028,
+      "survived": false,
+      "tick": 4904,
+      "prey": 0,
+      "foxes": 61,
+      "safetyLimitHits": 0
+    },
+    {
+      "seed": 5029,
+      "survived": false,
+      "tick": 2756,
+      "prey": 0,
+      "foxes": 40,
+      "safetyLimitHits": 0
+    },
+    {
+      "seed": 5030,
+      "survived": false,
+      "tick": 2104,
+      "prey": 0,
+      "foxes": 8,
+      "safetyLimitHits": 0
+    },
+    {
+      "seed": 5031,
+      "survived": false,
+      "tick": 4632,
+      "prey": 0,
+      "foxes": 5,
+      "safetyLimitHits": 0
+    },
+    {
+      "seed": 5032,
+      "survived": false,
+      "tick": 6459,
+      "prey": 0,
+      "foxes": 111,
+      "safetyLimitHits": 0
+    },
+    {
+      "seed": 5033,
+      "survived": false,
+      "tick": 1329,
+      "prey": 0,
+      "foxes": 37,
+      "safetyLimitHits": 0
+    },
+    {
+      "seed": 5034,
+      "survived": true,
+      "tick": 8760,
+      "prey": 88,
+      "foxes": 10,
+      "safetyLimitHits": 0
+    },
+    {
+      "seed": 5035,
+      "survived": true,
+      "tick": 8760,
+      "prey": 129,
+      "foxes": 25,
+      "safetyLimitHits": 0
+    },
+    {
+      "seed": 5036,
+      "survived": true,
+      "tick": 8760,
+      "prey": 327,
+      "foxes": 76,
+      "safetyLimitHits": 0
+    },
+    {
+      "seed": 5037,
+      "survived": false,
+      "tick": 1538,
+      "prey": 0,
+      "foxes": 66,
+      "safetyLimitHits": 0
+    },
+    {
+      "seed": 5038,
+      "survived": false,
+      "tick": 2196,
+      "prey": 0,
+      "foxes": 86,
+      "safetyLimitHits": 0
+    },
+    {
+      "seed": 5039,
+      "survived": false,
+      "tick": 3461,
+      "prey": 0,
+      "foxes": 3,
+      "safetyLimitHits": 0
+    },
+    {
+      "seed": 5040,
+      "survived": false,
+      "tick": 6457,
+      "prey": 0,
+      "foxes": 13,
+      "safetyLimitHits": 0
+    },
+    {
+      "seed": 5041,
+      "survived": false,
+      "tick": 3708,
+      "prey": 0,
+      "foxes": 21,
+      "safetyLimitHits": 0
+    },
+    {
+      "seed": 5042,
+      "survived": true,
+      "tick": 8760,
+      "prey": 98,
+      "foxes": 50,
+      "safetyLimitHits": 0
+    },
+    {
+      "seed": 5043,
+      "survived": false,
+      "tick": 2408,
+      "prey": 195,
+      "foxes": 0,
+      "safetyLimitHits": 0
+    },
+    {
+      "seed": 5044,
+      "survived": false,
+      "tick": 3070,
+      "prey": 0,
+      "foxes": 56,
+      "safetyLimitHits": 0
+    },
+    {
+      "seed": 5045,
+      "survived": true,
+      "tick": 8760,
+      "prey": 136,
+      "foxes": 16,
+      "safetyLimitHits": 0
+    },
+    {
+      "seed": 5046,
+      "survived": false,
+      "tick": 7328,
+      "prey": 0,
+      "foxes": 6,
+      "safetyLimitHits": 0
+    },
+    {
+      "seed": 5047,
+      "survived": true,
+      "tick": 8760,
+      "prey": 234,
+      "foxes": 41,
+      "safetyLimitHits": 0
+    },
+    {
+      "seed": 5048,
+      "survived": true,
+      "tick": 8760,
+      "prey": 484,
+      "foxes": 6,
+      "safetyLimitHits": 0
+    },
+    {
+      "seed": 5049,
+      "survived": true,
+      "tick": 8760,
+      "prey": 174,
+      "foxes": 54,
+      "safetyLimitHits": 0
+    }
+  ],
+  "runtime": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/153.0.0.0 Safari/537.36"
+}
