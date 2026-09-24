@@ -1,27 +1,24 @@
 import { useEffect, useRef, useState } from 'react'
-import { CalendarDays, Dices, Trophy } from 'lucide-react'
 import { Guide } from '@/components/guide'
+import { MeadowSettings } from '@/components/meadow-settings'
 import { LeverPanel } from '@/components/lever-panel'
 import { ResultDialog } from '@/components/result-dialog'
 import { RunPanel } from '@/components/run-panel'
 import { Timeline } from '@/components/timeline'
 import { Transport } from '@/components/transport'
-import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group'
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
+import { TooltipProvider } from '@/components/ui/tooltip'
 import { WorldView } from '@/components/world-view'
-import { SPEEDS, type Mode } from '@/game/controller'
+import { SPEEDS } from '@/game/controller'
 import { STABLE_PRESET } from '@/game/presets'
-import { dailySeed, scoreFor } from '@/game/scores'
+import { seedOf, type SeedChoice } from '@/game/seed'
 import { useAnimalIcons } from '@/hooks/use-animal-icons'
 import { useGame } from '@/hooks/use-game'
 import { BUDGET, spent, type LeverValues } from '@/sim/levers'
 import { SCENARIO_BY_ID, SCENARIOS, type ScenarioId } from '@/sim/scenarios'
 
-type SeedMode = 'daily' | 'custom'
 type Tab = 'levers' | 'run' | 'guide'
 
 function useViewport(): { w: number; h: number } {
@@ -34,26 +31,45 @@ function useViewport(): { w: number; h: number } {
   return v
 }
 
+function initialState(): { scenario: ScenarioId; seed: SeedChoice } {
+  const q = new URLSearchParams(window.location.search)
+  const sc = q.get('scenario')
+  const seed = Number(q.get('seed'))
+  return {
+    scenario: sc && sc in SCENARIO_BY_ID ? (sc as ScenarioId) : 'stable',
+    seed:
+      q.has('seed') && Number.isFinite(seed) ? { kind: 'custom', seed: Math.abs(Math.trunc(seed)) } : { kind: 'daily' },
+  }
+}
+
+const initial = initialState()
+
 export default function App() {
   const [game, snap] = useGame()
   const icons = useAnimalIcons()
   const base = STABLE_PRESET
   const [levers, setLevers] = useState<LeverValues>(STABLE_PRESET)
-  const [scenario, setScenario] = useState<ScenarioId>('stable')
-  const [seedMode, setSeedMode] = useState<SeedMode>('daily')
-  const [customSeed, setCustomSeed] = useState(7)
-  const [mode, setMode] = useState<Mode>('plan')
+  const [scenario, setScenario] = useState<ScenarioId>(initial.scenario)
+  const [seedChoice, setSeedChoice] = useState<SeedChoice>(initial.seed)
   const [tab, setTab] = useState<Tab>('levers')
   const [dismissed, setDismissed] = useState(-1)
   const [resetKey, setResetKey] = useState(0)
-  const seed = seedMode === 'daily' ? dailySeed() : customSeed
+  const seed = seedOf(seedChoice)
   const vp = useViewport()
   const desktop = vp.w >= 1024
   const worldMax = desktop ? Math.max(360, Math.min(860, vp.h - 330)) : vp.w - 24
 
   useEffect(() => {
-    game.configure({ levers, base, scenario, seed, mode })
-  }, [game, levers, base, scenario, seed, mode, resetKey])
+    game.configure({ levers, base, scenario, seed })
+  }, [game, levers, base, scenario, seed, resetKey])
+
+  useEffect(() => {
+    const q = new URLSearchParams()
+    if (scenario !== 'stable') q.set('scenario', scenario)
+    if (seedChoice.kind === 'custom') q.set('seed', String(seedChoice.seed))
+    const search = q.toString()
+    window.history.replaceState(null, '', `${window.location.pathname}${search ? `?${search}` : ''}`)
+  }, [scenario, seedChoice])
 
   const locked = snap.phase === 'running' || snap.phase === 'ended'
   const left = BUDGET - spent(levers, base)
@@ -113,7 +129,6 @@ export default function App() {
     return () => window.removeEventListener('keydown', onKey)
   }, [game, left])
 
-  const best = scoreFor({ scenario, seed, mode })
   const sc = SCENARIO_BY_ID[scenario]
 
   return (
@@ -127,16 +142,16 @@ export default function App() {
             </div>
             <div className="leading-tight">
               <h1 className="text-lg font-semibold tracking-tight">Coevolution</h1>
-              <p className="text-xs text-muted-foreground">Meadow Keeper · keep both species alive for a year</p>
+              <p className="hidden text-xs text-muted-foreground sm:block">Meadow Keeper · keep both species alive for a year</p>
             </div>
           </div>
 
-          <div className="flex flex-1 flex-wrap items-center justify-end gap-2">
+          <div className="ml-auto flex items-center gap-2">
             <Select value={scenario} onValueChange={(v) => setScenario(v as ScenarioId)}>
-              <SelectTrigger className="w-[190px]" aria-label="Scenario">
+              <SelectTrigger className="w-[150px] sm:w-[170px]" aria-label="Scenario">
                 <SelectValue />
               </SelectTrigger>
-              <SelectContent>
+              <SelectContent align="end">
                 {SCENARIOS.map((s) => (
                   <SelectItem key={s.id} value={s.id}>
                     {s.name}
@@ -144,56 +159,7 @@ export default function App() {
                 ))}
               </SelectContent>
             </Select>
-
-            <ToggleGroup
-              type="single"
-              variant="outline"
-              value={mode}
-              onValueChange={(v) => v && setMode(v as Mode)}
-              aria-label="Mode"
-            >
-              <ToggleGroupItem value="plan" className="px-3">
-                Plan
-              </ToggleGroupItem>
-              <ToggleGroupItem value="live" className="px-3">
-                Live
-              </ToggleGroupItem>
-            </ToggleGroup>
-
-            <div className="flex items-center gap-1">
-              <Select value={seedMode} onValueChange={(v) => setSeedMode(v as SeedMode)}>
-                <SelectTrigger className="w-[150px]" aria-label="Seed">
-                  <CalendarDays className="size-4 opacity-70" />
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="daily">Daily meadow</SelectItem>
-                  <SelectItem value="custom">Seed #{customSeed}</SelectItem>
-                </SelectContent>
-              </Select>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Button
-                    variant="outline"
-                    size="icon"
-                    aria-label="New random meadow"
-                    onClick={() => {
-                      setCustomSeed(Math.floor(Math.random() * 100000))
-                      setSeedMode('custom')
-                    }}
-                  >
-                    <Dices />
-                  </Button>
-                </TooltipTrigger>
-                <TooltipContent>New random meadow</TooltipContent>
-              </Tooltip>
-            </div>
-
-            <div className="flex items-center gap-1.5 rounded-md border px-2.5 py-1.5 text-xs" title="Best score for this scenario, seed and mode">
-              <Trophy className="size-4 text-amber-300" />
-              <span className="text-muted-foreground">Best</span>
-              <span className="font-semibold tabular">{best ? best.score.toLocaleString() : '—'}</span>
-            </div>
+            <MeadowSettings choice={seedChoice} onChange={setSeedChoice} />
           </div>
         </header>
 
@@ -204,9 +170,8 @@ export default function App() {
                 <span className="font-medium">{sc.name}</span>
                 <span className="text-muted-foreground"> · {sc.tagline}</span>
               </p>
-              <span className="hidden text-xs text-muted-foreground sm:inline">
-                {mode === 'live' ? 'Live' : 'Plan'} mode ·
-                seed {seed}
+              <span className="hidden text-xs text-muted-foreground tabular sm:inline">
+                {seedChoice.kind === 'daily' ? "Today's meadow" : 'Seed'} {seed}
               </span>
             </div>
             <WorldView maxSize={worldMax} />
@@ -247,7 +212,7 @@ export default function App() {
                     />
                   </TabsContent>
                   <TabsContent value="run" className="mt-0">
-                    <RunPanel onSwitchLive={() => setMode('live')} />
+                    <RunPanel />
                   </TabsContent>
                   <TabsContent value="guide" className="mt-0">
                     <Guide />
@@ -267,7 +232,6 @@ export default function App() {
         snap={snap}
         open={snap.phase === 'ended' && dismissed !== snap.runId}
         onOpenChange={(o) => !o && setDismissed(snap.runId)}
-        unspent={Math.round(left * 10) / 10}
         onRetune={() => {
           setDismissed(snap.runId)
           setTab('levers')

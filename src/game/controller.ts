@@ -8,9 +8,8 @@ import { STAT_STRIDE, type EndInfo, type FrameData, type FromWorker, type ToWork
 import SimWorker from '@/worker/sim.worker.ts?worker'
 import { RunHistory } from './history'
 import { explain, hints, type Explanation, type Hint } from './insights'
-import { recordScore, scoreFor, type BestScore } from './scores'
+import { recordScore, scoreFor, scoreRun, type BestScore, type ScoreBreakdown } from './scores'
 
-export type Mode = 'plan' | 'live'
 export type Phase = 'loading' | 'planning' | 'running' | 'ended'
 
 export interface RunConfig {
@@ -18,7 +17,6 @@ export interface RunConfig {
   base: LeverValues
   scenario: ScenarioId
   seed: number
-  mode: Mode
 }
 
 export const SPEEDS = [
@@ -49,11 +47,10 @@ export interface Snapshot {
   predKits10d: number
   end: EndInfo | null
   explanation: Explanation | null
-  score: number | null
+  score: ScoreBreakdown | null
   best: BestScore | null
   newBest: boolean
   hints: Hint[]
-  mode: Mode
   charges: number
   cooldownUntil: number
   atLive: boolean
@@ -96,7 +93,7 @@ export class GameController {
   private lastNotify = 0
   private finalized = false
   private explanation: Explanation | null = null
-  private score: number | null = null
+  private score: ScoreBreakdown | null = null
   private best: BestScore | null = null
   private newBest = false
   private hintCache: { tick: number; hints: Hint[] } = { tick: -1, hints: [] }
@@ -171,7 +168,6 @@ export class GameController {
       best: this.best,
       newBest: this.newBest,
       hints: this.hintCache.hints,
-      mode: this.config?.mode ?? 'plan',
       charges: this.charges,
       cooldownUntil: this.cooldownUntil,
       atLive: this.atLive(),
@@ -295,7 +291,6 @@ export class GameController {
 
   canIntervene(): boolean {
     return (
-      this.config?.mode === 'live' &&
       this.phase === 'running' &&
       !this.end &&
       this.charges > 0 &&
@@ -338,11 +333,11 @@ export class GameController {
     this.phase = 'ended'
     this.playing = false
     this.explanation = explain(this.history, this.end, this.scenario)
-    const unspent = this.budgetLeft()
-    this.score = this.end.tick + (this.end.survived ? Math.round(25 * Math.max(0, unspent)) : 0)
+    const used = spent(this.config.levers, this.config.base)
+    this.score = scoreRun(this.end.tick, this.end.survived, used, this.history.interventions.length)
     const prev = this.best
-    this.best = recordScore(this.config, this.score, this.end.tick)
-    this.newBest = !prev || this.score > prev.score
+    this.best = recordScore(this.config, this.score.total, this.end.tick)
+    this.newBest = !prev || this.score.total > prev.score
   }
 
   private loop(now: number): void {

@@ -10,9 +10,10 @@ goal is to keep **both** species alive for a full year: 8,000 hours, from 1 Sept
     with the square of speed.
   - Genes choose each animal's pace, so sprinting trades against endurance.
   - Breeding is gated on energy.
-- **Modes.** Plan (tune, then watch), or Live (4 interventions on a cooldown).
+- **One flow.** Tune the levers within a budget, release the animals, then use up to 4
+  interventions on a cooldown. A full year with fewer interventions scores higher.
 - **Scenarios.** Stable meadow, Drought, Fox invasion and Harsh winter.
-- **Also included.** A daily seed, best scores stored locally, and a population timeline
+- **Also included.** A daily seed and shareable seed links (in the settings menu), best scores stored locally, and a population timeline
   that doubles as a scrubber. It also shows a trend forecast, boom and bust hints, and a
   plain-language explanation when a run fails.
 

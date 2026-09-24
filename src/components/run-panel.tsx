@@ -1,10 +1,11 @@
-import { AlertTriangle, CheckCircle2, CloudRain, Crosshair, Info, OctagonAlert, TrendingUp } from 'lucide-react'
+import { AlertTriangle, CheckCircle2, CloudRain, Crosshair, Info, OctagonAlert, TrendingUp, Trophy } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Progress } from '@/components/ui/progress'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
 import { useAnimalIcons } from '@/hooks/use-animal-icons'
 import { CHARGES, COOLDOWN } from '@/game/controller'
+import { CALM_BONUS } from '@/game/scores'
 import { forecast, type Tone } from '@/game/insights'
 import { useGame } from '@/hooks/use-game'
 import type { Intervention } from '@/sim/sim'
@@ -25,11 +26,10 @@ const ACTIONS: { id: Intervention; label: string; blurb: string }[] = [
   { id: 'releasePred', label: 'Release foxes', blurb: '+3 fed foxes at the meadow edge.' },
 ]
 
-export function RunPanel({ onSwitchLive }: { onSwitchLive: () => void }) {
+export function RunPanel() {
   const [game, snap] = useGame()
   const icons = useAnimalIcons()
   const f = snap.tick > 48 && !snap.end && snap.atLive ? forecast(game.history, snap.tick) : null
-  const live = snap.mode === 'live'
   const cooling = snap.head < snap.cooldownUntil
   const coolLeft = Math.max(0, snap.cooldownUntil - snap.head)
   const canAct = game.canIntervene()
@@ -53,6 +53,8 @@ export function RunPanel({ onSwitchLive }: { onSwitchLive: () => void }) {
 
   return (
     <div className="flex flex-col gap-4">
+      <BestScore />
+
       <section>
         <h3 className="mb-2 text-xs font-semibold tracking-wide text-muted-foreground uppercase">Field notes</h3>
         {snap.tick < 24 ? (
@@ -96,55 +98,45 @@ export function RunPanel({ onSwitchLive }: { onSwitchLive: () => void }) {
       <section>
         <div className="mb-2 flex items-center justify-between">
           <h3 className="text-xs font-semibold tracking-wide text-muted-foreground uppercase">Interventions</h3>
-          {live && (
-            <div className="flex items-center gap-1" aria-label={`${snap.charges} of ${CHARGES} left`}>
-              {Array.from({ length: CHARGES }, (_, i) => (
-                <span key={i} className={cn('size-2 rounded-full', i < snap.charges ? 'bg-primary' : 'bg-muted')} />
-              ))}
-            </div>
-          )}
-        </div>
-        {!live ? (
-          <div className="rounded-lg border border-dashed p-3 text-sm text-muted-foreground">
-            In Plan mode you set the levers and watch. Switch to Live mode for {CHARGES} emergency interventions.
-            <Button variant="outline" size="sm" className="mt-2 w-full" onClick={onSwitchLive}>
-              Switch to Live mode
-            </Button>
+          <div className="flex items-center gap-1" aria-label={`${snap.charges} of ${CHARGES} left`}>
+            {Array.from({ length: CHARGES }, (_, i) => (
+              <span key={i} className={cn('size-2 rounded-full', i < snap.charges ? 'bg-primary' : 'bg-muted')} />
+            ))}
           </div>
-        ) : (
-          <>
-            <div className="grid grid-cols-2 gap-2">
-              {ACTIONS.map((a) => (
-                <Tooltip key={a.id}>
-                  <TooltipTrigger asChild>
-                    <Button
-                      variant="outline"
-                      className="h-auto justify-start gap-2 py-2 text-left"
-                      disabled={!canAct}
-                      onClick={() => game.intervene(a.id)}
-                    >
-                      {actionIcon(a.id)}
-                      <span className="text-[13px]">{a.label}</span>
-                    </Button>
-                  </TooltipTrigger>
-                  <TooltipContent>{a.blurb}</TooltipContent>
-                </Tooltip>
-              ))}
-            </div>
-            <p className="mt-2 text-xs text-muted-foreground">
-              {snap.phase !== 'running'
-                ? 'Available once the run starts.'
-                : snap.charges === 0
-                  ? 'All interventions used.'
-                  : !snap.atLive
-                    ? 'You are replaying the past. Return to live to intervene.'
-                    : cooling
-                      ? `Recharging: ready in ${formatDuration(coolLeft)}.`
-                      : `Ready. There is a ${formatDuration(COOLDOWN)} cooldown between interventions.`}
-            </p>
-            {cooling && <Progress value={100 - (coolLeft / COOLDOWN) * 100} className="mt-1 h-1" />}
-          </>
-        )}
+        </div>
+        <div className="grid grid-cols-2 gap-2">
+          {ACTIONS.map((a) => (
+            <Tooltip key={a.id}>
+              <TooltipTrigger asChild>
+                <Button
+                  variant="outline"
+                  className="h-auto justify-start gap-2 py-2 text-left"
+                  disabled={!canAct}
+                  onClick={() => game.intervene(a.id)}
+                >
+                  {actionIcon(a.id)}
+                  <span className="text-[13px]">{a.label}</span>
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>{a.blurb}</TooltipContent>
+            </Tooltip>
+          ))}
+        </div>
+        <p className="mt-2 text-xs text-muted-foreground">
+          {snap.phase !== 'running'
+            ? 'Available once the run starts.'
+            : snap.charges === 0
+              ? 'All interventions used.'
+              : !snap.atLive
+                ? 'You are replaying the past. Return to live to intervene.'
+                : cooling
+                  ? `Recharging: ready in ${formatDuration(coolLeft)}.`
+                  : `Ready. There is a ${formatDuration(COOLDOWN)} cooldown between interventions.`}
+        </p>
+        {cooling && <Progress value={100 - (coolLeft / COOLDOWN) * 100} className="mt-1 h-1" />}
+        <p className="mt-2 text-[11px] text-muted-foreground">
+          A full year with no interventions earns +{CALM_BONUS[0]}, and each one used lowers that bonus by 100.
+        </p>
       </section>
 
       {(snap.interventions.length > 0 || game.scenario.markers.length > 0 || game.scenario.spans.length > 0) && (
@@ -180,5 +172,17 @@ export function RunPanel({ onSwitchLive }: { onSwitchLive: () => void }) {
         </section>
       )}
     </div>
+  )
+}
+
+function BestScore() {
+  const [, snap] = useGame()
+  if (!snap.best) return null
+  return (
+    <section className="flex items-center gap-2 rounded-lg border bg-muted/30 px-3 py-2 text-sm">
+      <Trophy className="size-4 text-amber-300" />
+      <span className="text-muted-foreground">Your best on this meadow</span>
+      <span className="ml-auto font-semibold tabular">{snap.best.score.toLocaleString()}</span>
+    </section>
   )
 }

@@ -134,17 +134,18 @@ pressure.
 | Fox invasion | 4/10 | 10/10 | 0.5 |
 | Harsh winter | 2/10 | 7/10 | 10.5 |
 
-## Modes
+## One flow: setup, then run
 
-- **Plan.** Set the levers, then watch. There are no interventions.
-- **Live.** The same run, plus 4 interventions with a shared 400-hour cooldown. They work only
-  when you are watching live, not while you replay the past.
+- **Setup.** Adjust levers within the budget, then press "Release the animals". Levers lock
+  while a run is going. Reset to retune.
+- **Run.** 4 interventions are available throughout, with a shared 400-hour cooldown. They
+  work only when you are watching live, not while you replay the past.
   - Rain: refill every bush.
   - Release rabbits: +8 near the bushes, cloned with mutation from living rabbits.
   - Cull foxes: remove a third of them.
   - Release foxes: +3 at the edge.
-
-Levers lock while a run is going. Reset to retune.
+- **Header.** Only the scenario picker and one settings menu. The menu holds today's meadow
+  or a custom seed, and "Copy link to this meadow" (the URL carries `scenario` and `seed`).
 
 ## Scenarios
 
@@ -160,10 +161,14 @@ Levers lock while a run is going. Reset to retune.
 
 ## Scoring
 
-- **Score** = hours survived. A full year also earns +25 for each unspent budget point, and
-  refunded points count.
+- **Score** = hours survived. Bonuses count only for a full year, so they can't be banked
+  by an early collapse:
+  - Budget bonus: 10 per unspent budget point, at most 300. Refunds only cancel spending,
+    so weakening everything can't earn more than leaving every lever alone.
+  - Calm bonus: 400 for no interventions, 100 less for each one used, 0 for all 4.
 - **Stars** at 3 months, 7 months and the full year.
-- The best score is kept in `localStorage` for each ruleset, scenario, seed and mode.
+- The best score is kept in `localStorage` for each scenario and seed. It shows in the run
+  panel and the result dialog.
 
 ## Feedback
 

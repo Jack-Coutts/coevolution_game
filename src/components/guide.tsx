@@ -15,14 +15,16 @@ export function Guide() {
       <section>
         <h3 className="mb-1 font-semibold">Goal</h3>
         <p className="text-muted-foreground">
-          Keep <b className="text-rabbit">rabbits</b> and <b className="text-fox">foxes</b> alive together from 1 September to
-          the end of July (11 months 3 days). If either species dies out, the run ends.
+          Keep <b className="text-rabbit">rabbits</b> and <b className="text-fox">foxes</b> alive together from 1
+          September to the end of July (11 months 3 days). If either species dies out, the run ends.
         </p>
       </section>
       <section className="grid grid-cols-2 gap-2">
         <div className="flex items-center gap-2 rounded-lg border p-2">
           <img src={icons.rabbit} alt="" className="size-8" />
-          <span className="text-xs text-muted-foreground">Rabbits graze the berry bushes. Bushes shrink as they are eaten.</span>
+          <span className="text-xs text-muted-foreground">
+            Rabbits graze the berry bushes. Bushes shrink as they are eaten.
+          </span>
         </div>
         <div className="flex items-center gap-2 rounded-lg border p-2">
           <img src={icons.fox} alt="" className="size-8" />
@@ -37,29 +39,30 @@ export function Guide() {
             random, and good hunters and foragers arise only through inheritance and mutation.
           </li>
           <li>
-                Every hour costs energy: a base metabolism, vision upkeep, and a speed cost that grows with the square of
-                speed. Sprinting drains the tank fast, and cruising lasts.
-              </li>
-              <li>Genes choose the pace every hour, so evolution trades bursts to flee or chase against endurance.</li>
-              <li>
-                Breeding needs adult age, the birth gap, and energy above the breed threshold. The parent pays child energy
-                to each young.
-              </li>
+            Every hour costs energy: a base metabolism, vision upkeep, and a speed cost that grows with the square of
+            speed. Sprinting drains the tank fast, and cruising lasts.
+          </li>
+          <li>Genes choose the pace every hour, so evolution trades bursts to flee or chase against endurance.</li>
+          <li>
+            Breeding needs adult age, the birth gap, and energy above the breed threshold. The parent pays child energy
+            to each young.
+          </li>
           <li>Animals die of old age at their lifespan. A dashed ring marks an animal close to starving.</li>
         </ul>
       </section>
       <section>
-        <h3 className="mb-1 font-semibold">Modes</h3>
+        <h3 className="mb-1 font-semibold">Setup, then run</h3>
         <p className="text-muted-foreground">
-          <b className="text-foreground">Plan</b>: tune, press play, and watch. <b className="text-foreground">Live</b>: four
-          interventions (rain, release or cull) with a cooldown. Best scores are kept separately for each mode.
+          Tune the levers within the budget, then release the animals. During the run you have four interventions (rain,
+          release rabbits or foxes, cull foxes), each followed by a cooldown.
         </p>
       </section>
       <section>
         <h3 className="mb-1 font-semibold">Score</h3>
         <p className="text-muted-foreground">
-          One point per hour survived, up to 8,000. A full year adds 25 points for every unspent budget point. The daily
-          seed is the same meadow for everyone today.
+          One point per hour survived, up to 8,000. A full year also earns 10 points for every budget point you did not
+          spend (refunds only cancel spending), and a calm bonus of 400 for no interventions, 100 less for each one
+          used. The daily meadow is the same for everyone today.
         </p>
       </section>
       <section>

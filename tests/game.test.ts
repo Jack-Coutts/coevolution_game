@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { STABLE_PRESET } from '@/game/presets'
+import { scoreRun } from '@/game/scores'
 import { BUDGET, deriveParams, LEVERS, spent } from '@/sim/levers'
 import { SCENARIO_BY_ID } from '@/sim/scenarios'
 import { runHeadless, Sim } from '@/sim/sim'
@@ -115,4 +116,14 @@ describe('stable preset', () => {
     const runs = Array.from({ length: 10 }, (_, s) => runHeadless(p, s))
     expect(runs.filter((r) => r.survived).length).toBeGreaterThanOrEqual(7)
   }, 60_000)
+})
+
+describe('score', () => {
+  it('pays bonuses only for a full year, capped so weakening levers cannot inflate them', () => {
+    expect(scoreRun(5000, false, 0, 0)).toEqual({ hours: 5000, budgetBonus: 0, calmBonus: 0, total: 5000 })
+    expect(scoreRun(8000, true, 0, 0)).toEqual({ hours: 8000, budgetBonus: 300, calmBonus: 400, total: 8700 })
+    expect(scoreRun(8000, true, -12, 0).total).toBe(8700)
+    expect(scoreRun(8000, true, 20, 2)).toEqual({ hours: 8000, budgetBonus: 100, calmBonus: 200, total: 8300 })
+    expect(scoreRun(8000, true, 35, 4).total).toBe(8000)
+  })
 })
