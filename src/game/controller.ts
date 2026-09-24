@@ -2,7 +2,7 @@ import { BUDGET, deriveParams, spent, type LeverValues } from '@/sim/levers'
 import type { SimParams } from '@/sim/params'
 import { SCENARIO_BY_ID, type Scenario, type ScenarioId } from '@/sim/scenarios'
 import type { Intervention } from '@/sim/sim'
-import { daylight, tickAt } from '@/sim/time'
+import { tickAt } from '@/sim/time'
 import { WorldRenderer, type Weather } from '@/render/renderer'
 import { STAT_STRIDE, type EndInfo, type FrameData, type FromWorker, type ToWorker } from '@/worker/protocol'
 import SimWorker from '@/worker/sim.worker.ts?worker'
@@ -315,14 +315,10 @@ export class GameController {
   }
 
   weather(tick: number): Weather {
-    const tps = SPEEDS[this.speed].tps
-    const nightAmp = !this.playing || tps <= 24 ? 1 : tps <= 72 ? 0.35 : 0
     const harsh = this.scenario.spans.some((s) => s.tone === 'winter')
     let dry = 0.35 * span(tick, SUMMER, Infinity)
     for (const s of this.scenario.spans) if (s.tone === 'drought') dry = Math.max(dry, span(tick, s.from, s.to))
     return {
-      daylight: daylight(tick),
-      nightAmp,
       snow: span(tick, WINTER[0], WINTER[1]) * (harsh ? 0.95 : 0.4),
       warm: span(tick, -Infinity, WINTER[0]),
       dry,

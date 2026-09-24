@@ -65,7 +65,7 @@ npm run build && npx vite preview --base /coevolution_game/   # http://localhost
 | `src/sim/` | Pure TypeScript simulation with no DOM: `rng.ts` (seeded Mersenne Twister), `params.ts`, `sim.ts` (energy rules), `levers.ts` (levers, budget, trade-offs), `scenarios.ts`, `time.ts` (natural-time labels) |
 | `src/worker/` | Web Worker that runs the sim and streams frames and per-tick stats |
 | `src/game/` | Controller (clock, playback, interventions), run history, insights (hints, forecast, failure explanations), scores, presets |
-| `src/render/` | Canvas 2D renderer: procedural top-down rabbits and foxes, meadow, bushes, weather and night |
+| `src/render/` | Canvas 2D renderer: procedural top-down rabbits and foxes, meadow, bushes and seasonal weather |
 | `src/components/` | React, Tailwind and shadcn/ui interface |
 | `tests/` | Vitest: `rng.test.ts`, and `game.test.ts` for reproducibility, energy and birth rules, levers, time and the preset |
 | `scripts/` | The offline lever sweep and the scenario ranking used to pick the stable preset |

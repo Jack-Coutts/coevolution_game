@@ -3,10 +3,6 @@ import { foxSheet, GAIT_FRAMES, rabbitSheet, type SpriteSheet } from './sprites'
 import { paintBush, paintEarth, paintTerrain, type BushSprite, type TerrainLayers } from './terrain'
 
 export interface Weather {
-  /** 0 = midnight .. 1 = full day. */
-  daylight: number
-  /** How strongly night is shown (fades at fast playback). */
-  nightAmp: number
   snow: number
   warm: number
   dry: number
@@ -142,7 +138,7 @@ export class WorldRenderer {
   }
 
   draw(a: FrameData, b: FrameData, alpha: number, weather: Weather, now: number): void {
-    const { ctx, size, dpr } = this
+    const { ctx, dpr } = this
     if (!this.terrain || !this.rabbits || !this.foxes) return
     ctx.setTransform(1, 0, 0, 1, 0, 0)
     ctx.drawImage(this.terrain.base, 0, 0)
@@ -169,17 +165,6 @@ export class WorldRenderer {
     ctx.drawImage(this.terrain.grass, 0, 0)
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0)
     this.drawFx(now, 'over')
-
-    const night = (1 - weather.daylight) * weather.nightAmp
-    if (night > 0.01) {
-      ctx.fillStyle = `rgba(14, 22, 52, ${0.5 * night})`
-      ctx.fillRect(0, 0, size, size)
-    }
-    const dusk = Math.max(0, 1 - Math.abs(weather.daylight - 0.45) / 0.25) * weather.nightAmp
-    if (dusk > 0.01) {
-      ctx.fillStyle = `rgba(240, 150, 70, ${0.1 * dusk})`
-      ctx.fillRect(0, 0, size, size)
-    }
   }
 
   private bushSprite(id: number): BushSprite {

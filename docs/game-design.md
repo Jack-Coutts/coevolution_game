@@ -28,8 +28,7 @@ UI shows natural time only.
   ends on 31 July at 16:00, which is "11 months 3 days", counting a month as 30 days for
   durations.
 - **What is shown in natural time.**
-  - A clock with the date, the day of the run and the season.
-  - A day and night cycle, with dusk tints. It fades at 3 d/s and above to avoid flicker.
+  - A clock with the date, the time of day, the day of the run and the season.
   - The timeline axis, in months.
   - Ages, gaps and lifespans in days and hours, costs "per hour", and regrowth as "every N h".
   - Playback speeds: 12 h/s, 1 d/s, 3 d/s, 1 wk/s (the default), 2 wk/s and 1 mo/s.
