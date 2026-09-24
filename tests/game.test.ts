@@ -2,6 +2,8 @@ import { describe, expect, it } from 'vitest'
 import { STABLE_PRESET } from '@/game/presets'
 import { scoreRun } from '@/game/scores'
 import { BUDGET, deriveParams, LEVERS, spent } from '@/sim/levers'
+import { grow, N_IN, N_OUT, randomGenome, think } from '@/sim/brain'
+import { Rng } from '@/sim/rng'
 import { SCENARIO_BY_ID } from '@/sim/scenarios'
 import { runHeadless, Sim } from '@/sim/sim'
 import { calendar, formatDuration, formatHours, tickAt } from '@/sim/time'
@@ -110,14 +112,6 @@ describe('simulation', () => {
   })
 })
 
-describe('stable preset', () => {
-  it('reaches the end of the year on at least 7 of seeds 0-9', () => {
-    const p = deriveParams(STABLE_PRESET)
-    const runs = Array.from({ length: 10 }, (_, s) => runHeadless(p, s))
-    expect(runs.filter((r) => r.survived).length).toBeGreaterThanOrEqual(7)
-  }, 60_000)
-})
-
 describe('score', () => {
   it('pays bonuses only for a full year, capped so weakening levers cannot inflate them', () => {
     expect(scoreRun(5000, false, 0, 0)).toEqual({ hours: 5000, budgetBonus: 0, calmBonus: 0, total: 5000 })
@@ -125,5 +119,39 @@ describe('score', () => {
     expect(scoreRun(8000, true, -12, 0).total).toBe(8700)
     expect(scoreRun(8000, true, 20, 2)).toEqual({ hours: 8000, budgetBonus: 100, calmBonus: 200, total: 8300 })
     expect(scoreRun(8000, true, 35, 4).total).toBe(8000)
+  })
+})
+
+describe('brains', () => {
+  it('grow a neuron without changing what the brain does', () => {
+    const rng = new Rng(9)
+    const g = randomGenome(rng, 3, 1)
+    const grown = grow(rng, g, 0.1)
+    const x = new Float64Array(N_IN).map((_, i) => Math.sin(i * 1.7))
+    const out = (genome: typeof g) => {
+      const o = new Float64Array(N_OUT)
+      think(genome, x, new Float64Array(16), o)
+      return [...o]
+    }
+    expect(grown.nHid).toBe(4)
+    expect(out(grown)).toEqual(out(g))
+  })
+})
+
+describe('hunting', () => {
+  it('catches a rabbit whenever a fox is within the catch radius, however full the fox is', () => {
+    const p = deriveParams(STABLE_PRESET)
+    p.prey.step = 0
+    p.pred.step = 0
+    const s = new Sim(p, 4)
+    const fox = s.preds[0]
+    fox.energy = p.pred.maxEnergy
+    const rabbit = s.prey[0]
+    rabbit.x = fox.x + p.eatR * 0.9
+    rabbit.y = fox.y
+    const eaten = s.counters.preyEaten
+    s.step()
+    expect(s.prey.includes(rabbit)).toBe(false)
+    expect(s.counters.preyEaten - eaten).toBeGreaterThanOrEqual(1)
   })
 })

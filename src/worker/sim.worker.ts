@@ -100,7 +100,7 @@ ctx.onmessage = (ev: MessageEvent<ToWorker>) => {
   switch (msg.type) {
     case 'init': {
       runId = msg.runId
-      sim = new Sim(msg.params, msg.seed, msg.disturbance, true)
+      sim = new Sim(msg.params, msg.seed, msg.disturbance, { record: true })
       const stats = new Float64Array(STAT_STRIDE)
       writeStats(sim, stats, 0)
       const f = frame(sim)

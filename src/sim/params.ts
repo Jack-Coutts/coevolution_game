@@ -23,6 +23,34 @@ export interface SpeciesParams {
   turn: [number, number]
 }
 
+/** Ecology and evolution settings that are not player levers. */
+export interface EcoParams {
+  /** Hidden neurons founders start with (0 = a linear brain). */
+  hidden: number
+  maxHidden: number
+  /** Chance per birth that the brain grows one neutral hidden neuron. */
+  growRate: number
+  memory: boolean
+  /** Births need a nearby adult mate; the child's genes cross over from both parents. */
+  sexual: boolean
+  /** false = frozen-genes control: every newborn gets fresh random genes. */
+  heredity: boolean
+  mateR: number
+  kinR: number
+  /** Tall-grass patches that hide rabbits and slow movement. */
+  cover: number
+  coverR: number
+  /** Within this distance a predator still sees prey hidden in cover. */
+  coverSight: number
+  /** Step multiplier inside cover. */
+  coverSlow: number
+  /** Energy per hour per hidden neuron. */
+  brainUpkeep: number
+  /** Technical population ceilings (performance only). */
+  ceilingPrey: number
+  ceilingPred: number
+}
+
 export interface SimParams {
   horizon: number
   patches: number
@@ -40,10 +68,28 @@ export interface SimParams {
   founderEnergy: number
   prey: SpeciesParams
   pred: SpeciesParams
+  eco: EcoParams
 }
 
-export const PREY_SENSES = 11
-export const PRED_SENSES = 11
+export function defaultEco(): EcoParams {
+  return {
+    hidden: 4,
+    maxHidden: 12,
+    growRate: 0.02,
+    memory: true,
+    sexual: false,
+    heredity: true,
+    mateR: 0.1,
+    kinR: 0.12,
+    cover: 0,
+    coverR: 0.07,
+    coverSight: 0.04,
+    coverSlow: 0.75,
+    brainUpkeep: 0.01,
+    ceilingPrey: 600,
+    ceilingPred: 200,
+  }
+}
 
 /** The world's fixed physics; levers overwrite the tunable parts (see levers.ts). */
 export function defaultParams(): SimParams {
@@ -100,13 +146,6 @@ export function defaultParams(): SimParams {
       view: [0.1, 1.0],
       turn: [0.2, 0.8],
     },
-  }
-}
-
-export function cloneParams(p: SimParams): SimParams {
-  return {
-    ...p,
-    prey: { ...p.prey, view: [...p.prey.view], turn: [...p.prey.turn] },
-    pred: { ...p.pred, view: [...p.pred.view], turn: [...p.pred.turn] },
+    eco: defaultEco(),
   }
 }
