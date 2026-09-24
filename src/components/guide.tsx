@@ -1,5 +1,4 @@
 import { useAnimalIcons } from '@/hooks/use-animal-icons'
-import type { Rules } from '@/sim/params'
 
 const KEYS: [string, string][] = [
   ['Space', 'Play / pause'],
@@ -9,7 +8,7 @@ const KEYS: [string, string][] = [
   ['R', 'Reset the run'],
 ]
 
-export function Guide({ rules }: { rules: Rules }) {
+export function Guide() {
   const icons = useAnimalIcons()
   return (
     <div className="flex flex-col gap-4 text-sm leading-relaxed">
@@ -37,9 +36,7 @@ export function Guide({ rules }: { rules: Rules }) {
             Nobody tells them what to do. Each animal steers with a tiny brain whose weights are its genes. Founders are
             random, and good hunters and foragers arise only through inheritance and mutation.
           </li>
-          {rules === 'energy' ? (
-            <>
-              <li>
+          <li>
                 Every hour costs energy: a base metabolism, vision upkeep, and a speed cost that grows with the square of
                 speed. Sprinting drains the tank fast, and cruising lasts.
               </li>
@@ -48,13 +45,6 @@ export function Guide({ rules }: { rules: Rules }) {
                 Breeding needs adult age, the birth gap, and energy above the breed threshold. The parent pays child energy
                 to each young.
               </li>
-            </>
-          ) : (
-            <li>
-              Classic benchmark rules: an animal starves after a fixed time without a meal and breeds after enough meals.
-              These rules match the original benchmark exactly.
-            </li>
-          )}
           <li>Animals die of old age at their lifespan. A dashed ring marks an animal close to starving.</li>
         </ul>
       </section>

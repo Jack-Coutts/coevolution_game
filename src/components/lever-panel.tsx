@@ -13,18 +13,17 @@ import {
   formatLever,
   GROUPS,
   leverCost,
-  leversFor,
+  LEVERS,
   spent,
   type LeverDef,
   type LeverGroup,
   type LeverValues,
 } from '@/sim/levers'
-import type { Rules, SimParams, SpeciesParams } from '@/sim/params'
+import type { SimParams, SpeciesParams } from '@/sim/params'
 import { formatHours } from '@/sim/time'
 import { cn } from '@/lib/utils'
 
 interface Props {
-  rules: Rules
   levers: LeverValues
   base: LeverValues
   locked: boolean
@@ -33,12 +32,12 @@ interface Props {
   onUnlock: () => void
 }
 
-export function LeverPanel({ rules, levers, base, locked, onChange, onResetLevers, onUnlock }: Props) {
-  const used = spent(levers, base, rules)
+export function LeverPanel({ levers, base, locked, onChange, onResetLevers, onUnlock }: Props) {
+  const used = spent(levers, base)
   const left = Math.round((BUDGET - used) * 10) / 10
   const over = left < 0
-  const params = deriveParams(levers, rules)
-  const defs = leversFor(rules)
+  const params = deriveParams(levers)
+  const defs = LEVERS
   const changed = defs.filter((d) => Math.abs(levers[d.id] - base[d.id]) > 1e-9).length
 
   return (
@@ -170,7 +169,7 @@ function GroupBody({
             .map((d) => (
               <LeverRow key={d.id} def={d} value={levers[d.id]} base={base[d.id]} locked={locked} onChange={onChange} />
             ))}
-          <SpeciesReadout group={group} sp={s === 'prey' ? params.prey : params.pred} rules={params.rules} species={s} />
+          <SpeciesReadout group={group} sp={s === 'prey' ? params.prey : params.pred} species={s} />
         </div>
       ))}
     </>
@@ -236,24 +235,19 @@ function lasts(sp: SpeciesParams, pace: number, view: number): number {
 function SpeciesReadout({
   group,
   sp,
-  rules,
   species,
 }: {
   group: LeverGroup
   sp: SpeciesParams
-  rules: Rules
   species: 'prey' | 'pred'
 }) {
   const view = (sp.view[0] + sp.view[1]) / 2
   let text: string | null = null
-  if (group === 'energy' && rules === 'energy') {
+  if (group === 'energy') {
     text = `On a full tank: resting ${formatHours(lasts(sp, 0, view))}, cruising ${formatHours(lasts(sp, 0.5, view))}, sprinting ${formatHours(lasts(sp, 1, view))}.`
   } else if (group === 'lifecycle') {
     const gap = `Birth gap with litter: ${formatHours(sp.birthGap)}.`
-    text =
-      rules === 'energy'
-        ? `${gap} Breeds at ${Math.round(sp.breedEnergy * sp.maxEnergy)} energy and gives each young ${Math.round(sp.childEnergy * sp.maxEnergy)}.`
-        : `${gap} Starves after ${formatHours(sp.starve)} without food.`
+    text = `${gap} Breeds at ${Math.round(sp.breedEnergy * sp.maxEnergy)} energy and gives each young ${Math.round(sp.childEnergy * sp.maxEnergy)}.`
   } else if (group === 'movement') {
     text = `Top speed ${(sp.step * 100).toFixed(2)} meadow-%/h. ${species === 'prey' ? 'Spots foxes' : 'Sees rabbits'} at ${Math.round(sp.view[0] * 100)}${sp.view[1] !== sp.view[0] ? `–${Math.round(sp.view[1] * 100)}` : ''}% of the meadow.`
   }
@@ -263,7 +257,7 @@ function SpeciesReadout({
 
 function FoodReadout({ params }: { params: SimParams }) {
   const perDay = (params.patches * 24) / params.regrowEvery
-  const energy = params.rules === 'energy' ? ` (${Math.round(perDay * params.prey.mealEnergy)} energy)` : ''
+  const energy = ` (${Math.round(perDay * params.prey.mealEnergy)} energy)`
   return (
     <p className="mt-1 rounded-md bg-muted/40 px-2 py-1.5 text-[11px] text-muted-foreground">
       The meadow regrows {Math.round(perDay)} berries a day{energy}. Each bush holds {params.patchStock}.

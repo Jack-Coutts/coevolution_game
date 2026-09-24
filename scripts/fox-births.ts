@@ -11,7 +11,7 @@ import { Sim } from '../src/sim/sim'
 
 const from = Number(process.argv[2] ?? 0)
 const n = Number(process.argv[3] ?? 5)
-const p = deriveParams(STABLE_PRESET, 'energy')
+const p = deriveParams(STABLE_PRESET)
 const dp = p.pred
 
 for (const sc of SCENARIOS) {

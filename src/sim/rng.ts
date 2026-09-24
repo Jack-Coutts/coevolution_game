@@ -1,12 +1,12 @@
 /**
- * Mersenne Twister MT19937 matching CPython's `random.Random(int)`: same seeding
- * (init_by_array over the 32-bit words of |seed|), `random()`, `uniform()` and `gauss()`.
+ * Seeded Mersenne Twister (MT19937, seeded with init_by_array over the 32-bit words of
+ * |seed|). Every random draw in the game goes through one of these, so a seed replays exactly.
  */
 const N = 624
 const M = 397
 const TWO_PI = 2.0 * Math.PI
 
-export class PyRandom {
+export class Rng {
   private mt = new Uint32Array(N)
   private mti = N + 1
   private gaussNext: number | null = null
@@ -90,7 +90,7 @@ export class PyRandom {
     return y >>> 0
   }
 
-  /** Float in [0, 1) with 53 bits of randomness, identical to CPython's genrand_res53. */
+  /** Float in [0, 1) with 53 bits of randomness. */
   random(): number {
     const a = this.genrandInt32() >>> 5
     const b = this.genrandInt32() >>> 6

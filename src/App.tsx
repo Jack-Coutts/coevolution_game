@@ -1,5 +1,5 @@
-import { useEffect, useMemo, useRef, useState } from 'react'
-import { CalendarDays, Dices, FlaskConical, Trophy } from 'lucide-react'
+import { useEffect, useRef, useState } from 'react'
+import { CalendarDays, Dices, Trophy } from 'lucide-react'
 import { Guide } from '@/components/guide'
 import { LeverPanel } from '@/components/lever-panel'
 import { ResultDialog } from '@/components/result-dialog'
@@ -8,20 +8,17 @@ import { Timeline } from '@/components/timeline'
 import { Transport } from '@/components/transport'
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
-import { Label } from '@/components/ui/label'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { Switch } from '@/components/ui/switch'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
 import { WorldView } from '@/components/world-view'
 import { SPEEDS, type Mode } from '@/game/controller'
-import { presetFor } from '@/game/presets'
+import { STABLE_PRESET } from '@/game/presets'
 import { dailySeed, scoreFor } from '@/game/scores'
 import { useAnimalIcons } from '@/hooks/use-animal-icons'
 import { useGame } from '@/hooks/use-game'
 import { BUDGET, spent, type LeverValues } from '@/sim/levers'
-import type { Rules } from '@/sim/params'
 import { SCENARIO_BY_ID, SCENARIOS, type ScenarioId } from '@/sim/scenarios'
 
 type SeedMode = 'daily' | 'custom'
@@ -40,9 +37,8 @@ function useViewport(): { w: number; h: number } {
 export default function App() {
   const [game, snap] = useGame()
   const icons = useAnimalIcons()
-  const [rules, setRules] = useState<Rules>('energy')
-  const base = useMemo(() => presetFor(rules), [rules])
-  const [levers, setLevers] = useState<LeverValues>(() => presetFor('energy'))
+  const base = STABLE_PRESET
+  const [levers, setLevers] = useState<LeverValues>(STABLE_PRESET)
   const [scenario, setScenario] = useState<ScenarioId>('stable')
   const [seedMode, setSeedMode] = useState<SeedMode>('daily')
   const [customSeed, setCustomSeed] = useState(7)
@@ -56,11 +52,11 @@ export default function App() {
   const worldMax = desktop ? Math.max(360, Math.min(860, vp.h - 330)) : vp.w - 24
 
   useEffect(() => {
-    game.configure({ rules, levers, base, scenario, seed, mode })
-  }, [game, rules, levers, base, scenario, seed, mode, resetKey])
+    game.configure({ levers, base, scenario, seed, mode })
+  }, [game, levers, base, scenario, seed, mode, resetKey])
 
   const locked = snap.phase === 'running' || snap.phase === 'ended'
-  const left = BUDGET - spent(levers, base, rules)
+  const left = BUDGET - spent(levers, base)
 
   const prevPhase = useRef(snap.phase)
   useEffect(() => {
@@ -117,7 +113,7 @@ export default function App() {
     return () => window.removeEventListener('keydown', onKey)
   }, [game, left])
 
-  const best = scoreFor({ rules, scenario, seed, mode })
+  const best = scoreFor({ scenario, seed, mode })
   const sc = SCENARIO_BY_ID[scenario]
 
   return (
@@ -193,30 +189,6 @@ export default function App() {
               </Tooltip>
             </div>
 
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <div className="flex items-center gap-2 rounded-md border px-2.5 py-1.5">
-                  <FlaskConical className="size-4 text-muted-foreground" />
-                  <Label htmlFor="classic" className="text-xs">
-                    Classic rules
-                  </Label>
-                  <Switch
-                    id="classic"
-                    checked={rules === 'classic'}
-                    onCheckedChange={(on) => {
-                      const r: Rules = on ? 'classic' : 'energy'
-                      setRules(r)
-                      setLevers(presetFor(r))
-                    }}
-                  />
-                </div>
-              </TooltipTrigger>
-              <TooltipContent className="max-w-72">
-                The original benchmark rules: starvation by hours since the last meal, and breeding by meals. With the
-                default levers they reproduce the benchmark exactly. Energy rules are the game default.
-              </TooltipContent>
-            </Tooltip>
-
             <div className="flex items-center gap-1.5 rounded-md border px-2.5 py-1.5 text-xs" title="Best score for this scenario, seed and mode">
               <Trophy className="size-4 text-amber-300" />
               <span className="text-muted-foreground">Best</span>
@@ -233,7 +205,7 @@ export default function App() {
                 <span className="text-muted-foreground"> · {sc.tagline}</span>
               </p>
               <span className="hidden text-xs text-muted-foreground sm:inline">
-                {rules === 'classic' ? 'Classic benchmark rules' : 'Energy rules'} · {mode === 'live' ? 'Live' : 'Plan'} mode ·
+                {mode === 'live' ? 'Live' : 'Plan'} mode ·
                 seed {seed}
               </span>
             </div>
@@ -266,12 +238,11 @@ export default function App() {
                 <div className="min-h-0 flex-1 overflow-y-auto p-3 lg:max-h-[calc(100vh-7rem)]">
                   <TabsContent value="levers" className="mt-0">
                     <LeverPanel
-                      rules={rules}
                       levers={levers}
                       base={base}
                       locked={locked}
                       onChange={(id, v) => setLevers((prev) => ({ ...prev, [id]: v }))}
-                      onResetLevers={() => setLevers(presetFor(rules))}
+                      onResetLevers={() => setLevers(STABLE_PRESET)}
                       onUnlock={reset}
                     />
                   </TabsContent>
@@ -279,7 +250,7 @@ export default function App() {
                     <RunPanel onSwitchLive={() => setMode('live')} />
                   </TabsContent>
                   <TabsContent value="guide" className="mt-0">
-                    <Guide rules={rules} />
+                    <Guide />
                   </TabsContent>
                 </div>
               </Tabs>

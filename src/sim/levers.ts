@@ -1,4 +1,4 @@
-import { benchmarkParams, type Rules, type SimParams, type SpeciesParams } from './params'
+import { defaultParams, type SimParams, type SpeciesParams } from './params'
 import { formatHours } from './time'
 
 export type LeverGroup = 'populations' | 'lifecycle' | 'energy' | 'movement' | 'food' | 'evolution'
@@ -19,7 +19,6 @@ export interface LeverDef {
   boost: 1 | -1 | 0
   /** Points per step in the boost direction. The other direction refunds half. */
   cost: number
-  rules: 'both' | Rules
 }
 
 export type LeverValues = Record<string, number>
@@ -44,7 +43,6 @@ function species(
       unit: 'hours',
       boost: -1,
       cost: 1,
-      rules: 'both',
     },
     {
       id: `${s}.birthGap`,
@@ -58,7 +56,6 @@ function species(
       unit: 'hours',
       boost: -1,
       cost: 1,
-      rules: 'both',
     },
     {
       id: `${s}.litter`,
@@ -72,7 +69,6 @@ function species(
       unit: 'count',
       boost: 1,
       cost: 4,
-      rules: 'both',
     },
     {
       id: `${s}.lifespan`,
@@ -86,7 +82,6 @@ function species(
       unit: 'hours',
       boost: 1,
       cost: 1,
-      rules: 'both',
     },
     {
       id: `${s}.breedEnergy`,
@@ -100,7 +95,6 @@ function species(
       unit: 'percent',
       boost: -1,
       cost: 1,
-      rules: 'energy',
     },
     {
       id: `${s}.childEnergy`,
@@ -114,35 +108,6 @@ function species(
       unit: 'percent',
       boost: 0,
       cost: 0,
-      rules: 'energy',
-    },
-    {
-      id: `${s}.mealsToBreed`,
-      group: 'lifecycle',
-      species: s,
-      label: 'Meals to breed',
-      hint: 'Meals needed since its last birth.',
-      min: 1,
-      max: 5,
-      step: 1,
-      unit: 'count',
-      boost: -1,
-      cost: 4,
-      rules: 'classic',
-    },
-    {
-      id: `${s}.starve`,
-      group: 'lifecycle',
-      species: s,
-      label: 'Starvation time',
-      hint: 'Hours without a meal before it starves. Faster, longer-sighted animals starve sooner.',
-      min: 60,
-      max: 300,
-      step: 10,
-      unit: 'hours',
-      boost: 1,
-      cost: 1,
-      rules: 'classic',
     },
     {
       id: `${s}.maxEnergy`,
@@ -156,7 +121,6 @@ function species(
       unit: 'energy',
       boost: 1,
       cost: 1,
-      rules: 'energy',
     },
     {
       id: `${s}.metabolism`,
@@ -170,21 +134,19 @@ function species(
       unit: 'perHour',
       boost: -1,
       cost: 2,
-      rules: 'energy',
     },
     {
       id: `${s}.speedCost`,
       group: 'energy',
       species: s,
       label: 'Speed cost',
-      hint: 'Extra energy per hour at the benchmark top speed. Grows with speed squared.',
+      hint: 'Extra energy per hour when running at the standard top speed. Grows with speed squared.',
       min: 0.2,
       max: 1.5,
       step: 0.05,
       unit: 'perHour',
       boost: -1,
       cost: 1,
-      rules: 'energy',
     },
     {
       id: `${s}.mealEnergy`,
@@ -198,21 +160,19 @@ function species(
       unit: 'energy',
       boost: 1,
       cost: 1,
-      rules: 'energy',
     },
     {
       id: `${s}.speed`,
       group: 'movement',
       species: s,
       label: 'Max speed',
-      hint: 'Top speed versus the benchmark. Faster costs energy (or starves sooner in classic).',
+      hint: 'Top speed versus the standard. Faster costs energy, quadratically.',
       min: 0.6,
       max: 1.5,
       step: 0.05,
       unit: 'mult',
       boost: 1,
       cost: 2,
-      rules: 'both',
     },
     {
       id: `${s}.sense`,
@@ -228,7 +188,6 @@ function species(
       unit: 'mult',
       boost: 1,
       cost: 1,
-      rules: 'both',
     },
     {
       id: `${s}.turn`,
@@ -242,7 +201,6 @@ function species(
       unit: 'mult',
       boost: 1,
       cost: 1,
-      rules: 'both',
     },
   ]
 }
@@ -260,7 +218,6 @@ export const LEVERS: LeverDef[] = [
     unit: 'count',
     boost: 1,
     cost: 1,
-    rules: 'both',
   },
   {
     id: 'pred.initial',
@@ -274,7 +231,6 @@ export const LEVERS: LeverDef[] = [
     unit: 'count',
     boost: 1,
     cost: 1,
-    rules: 'both',
   },
   {
     id: 'prey.cap',
@@ -288,7 +244,6 @@ export const LEVERS: LeverDef[] = [
     unit: 'count',
     boost: 1,
     cost: 1,
-    rules: 'both',
   },
   {
     id: 'pred.cap',
@@ -302,7 +257,6 @@ export const LEVERS: LeverDef[] = [
     unit: 'count',
     boost: 1,
     cost: 1,
-    rules: 'both',
   },
   ...species('prey', 'rabbit'),
   ...species('pred', 'fox'),
@@ -318,7 +272,6 @@ export const LEVERS: LeverDef[] = [
     unit: 'count',
     boost: 1,
     cost: 2,
-    rules: 'both',
   },
   {
     id: 'food.stock',
@@ -332,7 +285,6 @@ export const LEVERS: LeverDef[] = [
     unit: 'count',
     boost: 1,
     cost: 1,
-    rules: 'both',
   },
   {
     id: 'food.regrow',
@@ -346,7 +298,6 @@ export const LEVERS: LeverDef[] = [
     unit: 'hours',
     boost: -1,
     cost: 2,
-    rules: 'both',
   },
   {
     id: 'evo.mutation',
@@ -360,7 +311,6 @@ export const LEVERS: LeverDef[] = [
     unit: 'percent',
     boost: 0,
     cost: 0,
-    rules: 'both',
   },
 ]
 
@@ -375,9 +325,6 @@ export const GROUPS: { id: LeverGroup; label: string; blurb: string }[] = [
   { id: 'evolution', label: 'Evolution', blurb: 'How quickly genes change between parent and child.' },
 ]
 
-export function leversFor(rules: Rules): LeverDef[] {
-  return LEVERS.filter((l) => l.rules === 'both' || l.rules === rules)
-}
 
 function speciesValues(prefix: string, sp: SpeciesParams): LeverValues {
   return {
@@ -389,8 +336,6 @@ function speciesValues(prefix: string, sp: SpeciesParams): LeverValues {
     [`${prefix}.lifespan`]: sp.lifespan,
     [`${prefix}.breedEnergy`]: sp.breedEnergy,
     [`${prefix}.childEnergy`]: sp.childEnergy,
-    [`${prefix}.mealsToBreed`]: sp.mealsToBreed,
-    [`${prefix}.starve`]: sp.starve,
     [`${prefix}.maxEnergy`]: sp.maxEnergy,
     [`${prefix}.metabolism`]: sp.metabolism,
     [`${prefix}.speedCost`]: sp.speedCost,
@@ -401,9 +346,9 @@ function speciesValues(prefix: string, sp: SpeciesParams): LeverValues {
   }
 }
 
-/** Lever values that reproduce the benchmark world. */
-export function benchmarkLevers(): LeverValues {
-  const p = benchmarkParams()
+/** Lever values of the default world, before any preset. */
+export function defaultLevers(): LeverValues {
+  const p = defaultParams()
   return {
     ...speciesValues('prey', p.prey),
     ...speciesValues('pred', p.pred),
@@ -414,7 +359,7 @@ export function benchmarkLevers(): LeverValues {
   }
 }
 
-function applySpecies(sp: SpeciesParams, v: LeverValues, prefix: string, rules: Rules): void {
+function applySpecies(sp: SpeciesParams, v: LeverValues, prefix: string): void {
   const g = (k: string) => v[`${prefix}.${k}`]
   const speed = g('speed')
   const sense = g('sense')
@@ -428,8 +373,6 @@ function applySpecies(sp: SpeciesParams, v: LeverValues, prefix: string, rules: 
   sp.lifespan = g('lifespan')
   sp.breedEnergy = g('breedEnergy')
   sp.childEnergy = g('childEnergy')
-  sp.mealsToBreed = g('mealsToBreed')
-  sp.starve = rules === 'classic' ? classicStarve(g('starve'), speed, sense) : g('starve')
   sp.maxEnergy = g('maxEnergy')
   sp.metabolism = g('metabolism')
   sp.speedCost = g('speedCost')
@@ -443,17 +386,10 @@ export function litterGap(gap: number, litter: number): number {
   return Math.round(gap * (1 + 0.5 * (litter - 1)))
 }
 
-/** Classic rules' built-in cost: moving faster or seeing further makes an animal starve sooner. */
-export function classicStarve(starve: number, speed: number, sense: number): number {
-  const load = 1 + 0.6 * Math.max(0, speed - 1) + 0.3 * Math.max(0, sense - 1)
-  return load === 1 ? starve : Math.round(starve / load)
-}
-
-export function deriveParams(v: LeverValues, rules: Rules): SimParams {
-  const p = benchmarkParams()
-  p.rules = rules
-  applySpecies(p.prey, v, 'prey', rules)
-  applySpecies(p.pred, v, 'pred', rules)
+export function deriveParams(v: LeverValues): SimParams {
+  const p = defaultParams()
+  applySpecies(p.prey, v, 'prey')
+  applySpecies(p.pred, v, 'pred')
   p.patches = v['food.patches']
   p.patchStock = v['food.stock']
   p.regrowEvery = v['food.regrow']
@@ -461,16 +397,16 @@ export function deriveParams(v: LeverValues, rules: Rules): SimParams {
   return p
 }
 
-/** Points spent moving from `base` to `v`, for the levers used by `rules`. */
+/** Points spent moving from `base` to `v`. */
 export function leverCost(def: LeverDef, value: number, base: number): number {
   if (def.boost === 0) return 0
   const steps = ((value - base) / def.step) * def.boost
   return steps >= 0 ? steps * def.cost : steps * def.cost * 0.5
 }
 
-export function spent(v: LeverValues, base: LeverValues, rules: Rules): number {
+export function spent(v: LeverValues, base: LeverValues): number {
   let total = 0
-  for (const def of leversFor(rules)) total += leverCost(def, v[def.id], base[def.id])
+  for (const def of LEVERS) total += leverCost(def, v[def.id], base[def.id])
   return Math.round(total * 10) / 10
 }
 

@@ -1,5 +1,3 @@
-export type Rules = 'classic' | 'energy'
-
 export interface SpeciesParams {
   initial: number
   cap: number
@@ -7,11 +5,6 @@ export interface SpeciesParams {
   birthGap: number
   litter: number
   lifespan: number
-  /** Classic rules: meals needed to breed. */
-  mealsToBreed: number
-  /** Classic rules: ticks without a meal before starving. */
-  starve: number
-  /** Energy rules. */
   maxEnergy: number
   metabolism: number
   speedCost: number
@@ -24,16 +17,13 @@ export interface SpeciesParams {
   visionUpkeep: number
   /** Max step length per tick. */
   step: number
-  /** The benchmark step: the reference speed for the speed cost. */
+  /** Reference speed for the speed cost: moving at this step costs exactly `speedCost`. */
   baseStep: number
-  /** Classic rules only; under energy rules pace always spans 0..1. */
-  minPace: number
   view: [number, number]
   turn: [number, number]
 }
 
 export interface SimParams {
-  rules: Rules
   horizon: number
   patches: number
   patchStock: number
@@ -47,7 +37,6 @@ export interface SimParams {
   geneInit: number
   mutationRate: number
   mutationSigma: number
-  gapFromOwnBirth: boolean
   founderEnergy: number
   prey: SpeciesParams
   pred: SpeciesParams
@@ -56,10 +45,9 @@ export interface SimParams {
 export const PREY_SENSES = 11
 export const PRED_SENSES = 11
 
-/** The benchmark world and rules exactly as in coevo.py. */
-export function benchmarkParams(): SimParams {
+/** The world's fixed physics; levers overwrite the tunable parts (see levers.ts). */
+export function defaultParams(): SimParams {
   return {
-    rules: 'classic',
     horizon: 8000,
     patches: 10,
     patchStock: 30,
@@ -73,7 +61,6 @@ export function benchmarkParams(): SimParams {
     geneInit: 1.0,
     mutationRate: 0.1,
     mutationSigma: 0.1,
-    gapFromOwnBirth: false,
     founderEnergy: 0.75,
     prey: {
       initial: 30,
@@ -82,8 +69,6 @@ export function benchmarkParams(): SimParams {
       birthGap: 150,
       litter: 1,
       lifespan: 600,
-      mealsToBreed: 2,
-      starve: 100,
       maxEnergy: 100,
       metabolism: 0.35,
       speedCost: 0.65,
@@ -93,7 +78,6 @@ export function benchmarkParams(): SimParams {
       visionUpkeep: 0.2,
       step: 0.01,
       baseStep: 0.01,
-      minPace: 1.0,
       view: [0.2, 0.2],
       turn: [1.0, 1.0],
     },
@@ -104,8 +88,6 @@ export function benchmarkParams(): SimParams {
       birthGap: 200,
       litter: 1,
       lifespan: 700,
-      mealsToBreed: 2,
-      starve: 150,
       maxEnergy: 160,
       metabolism: 0.35,
       speedCost: 0.65,
@@ -115,7 +97,6 @@ export function benchmarkParams(): SimParams {
       visionUpkeep: 0.2,
       step: 0.014,
       baseStep: 0.014,
-      minPace: 0.3,
       view: [0.1, 1.0],
       turn: [0.2, 0.8],
     },

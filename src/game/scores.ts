@@ -8,8 +8,8 @@ export interface BestScore {
 
 const PREFIX = 'coevo-game:best:'
 
-function key(c: Pick<RunConfig, 'rules' | 'scenario' | 'seed' | 'mode'>): string {
-  return `${PREFIX}${c.rules}:${c.scenario}:${c.seed}:${c.mode}`
+function key(c: Pick<RunConfig, 'scenario' | 'seed' | 'mode'>): string {
+  return `${PREFIX}${c.scenario}:${c.seed}:${c.mode}`
 }
 
 function read(k: string): BestScore | null {
@@ -21,7 +21,7 @@ function read(k: string): BestScore | null {
   }
 }
 
-export function scoreFor(c: Pick<RunConfig, 'rules' | 'scenario' | 'seed' | 'mode'>): BestScore | null {
+export function scoreFor(c: Pick<RunConfig, 'scenario' | 'seed' | 'mode'>): BestScore | null {
   return read(key(c))
 }
 

@@ -1,5 +1,5 @@
 import { PRED_SENSES, PREY_SENSES, type SimParams, type SpeciesParams } from './params'
-import { PyRandom } from './rng'
+import { Rng } from './rng'
 
 export type Species = 'prey' | 'pred'
 export type Intervention = 'rain' | 'releasePrey' | 'cullPred' | 'releasePred'
@@ -82,7 +82,7 @@ function trait(g: number, span: [number, number]): number {
   return lo + ((hi - lo) * (Math.min(1.0, Math.max(-1.0, g)) + 1.0)) / 2
 }
 
-function randomGenes(rng: PyRandom, nSenses: number, geneInit: number): number[] {
+function randomGenes(rng: Rng, nSenses: number, geneInit: number): number[] {
   const genes: number[] = []
   for (let i = 0; i < 2 * nSenses + 1; i++) genes.push(rng.uniform(-geneInit, geneInit))
   genes.push(rng.uniform(-1.0, 1.0))
@@ -90,7 +90,7 @@ function randomGenes(rng: PyRandom, nSenses: number, geneInit: number): number[]
   return genes
 }
 
-function mutate(rng: PyRandom, genes: number[], rate: number, sigma: number): number[] {
+function mutate(rng: Rng, genes: number[], rate: number, sigma: number): number[] {
   const out = new Array<number>(genes.length)
   for (let i = 0; i < genes.length; i++) {
     out[i] = rng.random() < rate ? genes[i] + rng.gauss(0.0, sigma) : genes[i]
@@ -162,7 +162,7 @@ function nearest(a: Animal, others: Animal[], reach: number): Animal | null {
 }
 
 /** Turn by the controller's output, then take one step along the new heading. Returns the step. */
-function steer(a: Animal, turn: number, pace: number, minPace: number, limit: number): number {
+function steer(a: Animal, turn: number, pace: number, limit: number): number {
   const angle = a.maxTurn * turn
   const c = Math.cos(angle)
   const s = Math.sin(angle)
@@ -171,7 +171,7 @@ function steer(a: Animal, turn: number, pace: number, minPace: number, limit: nu
   const n = Math.sqrt(hx * hx + hy * hy)
   a.hx = hx / n
   a.hy = hy / n
-  const step = limit * (minPace + (1.0 - minPace) * pace)
+  const step = limit * pace
   a.x = Math.min(1.0, Math.max(0.0, a.x + a.hx * step))
   a.y = Math.min(1.0, Math.max(0.0, a.y + a.hy * step))
   return step
@@ -184,7 +184,7 @@ export interface World {
 }
 
 export function placeWorld(seed: number, p: SimParams): World {
-  const rng = new PyRandom(seed)
+  const rng = new Rng(seed)
   const patches: [number, number][] = []
   const sp2 = p.patchSpacing * p.patchSpacing
   for (let k = 0; k < p.patches; k++) {
@@ -242,8 +242,8 @@ export class Sim {
   }
   lastBirth = { prey: 0, pred: 0 }
   events: TickEvent[] = []
-  private rng: PyRandom
-  private evRng: PyRandom
+  private rng: Rng
+  private evRng: Rng
   private nextPreyId: number
   private nextPredId: number
   private regrowAcc = 0
@@ -258,8 +258,8 @@ export class Sim {
     this.recordEvents = recordEvents
     const world = placeWorld(seed, p)
     this.patches = world.patches
-    this.rng = new PyRandom(seed + 10000)
-    this.evRng = new PyRandom(seed + 20000)
+    this.rng = new Rng(seed + 10000)
+    this.evRng = new Rng(seed + 20000)
     const rng = this.rng
     this.prey = world.prey.map(
       ([x, y], i) =>
@@ -326,7 +326,6 @@ export class Sim {
   step(): boolean {
     if (this.ended) return false
     const p = this.p
-    const energy = p.rules === 'energy'
     this.events.length = 0
     this.tick += 1
     const tick = this.tick
@@ -345,7 +344,7 @@ export class Sim {
       a.hunger += 1
     }
 
-    const met = energy ? this.metabolismFactor(tick) : 1
+    const met = this.metabolismFactor(tick)
 
     // 2. prey move
     const stock = this.stock
@@ -385,7 +384,7 @@ export class Sim {
         pa = relA
         pc = relC
       }
-      const h = energy ? 1 - a.energy / pp.maxEnergy : a.hunger / pp.starve
+      const h = 1 - a.energy / pp.maxEnergy
       senses[0] = fl
       senses[1] = fa
       senses[2] = fc
@@ -398,9 +397,9 @@ export class Sim {
       senses[9] = h
       senses[10] = wallAhead(a, p.wallView)
       think(a.genes, PREY_SENSES)
-      const step = steer(a, outTurn, outPace, energy ? 0 : pp.minPace, pp.step)
+      const step = steer(a, outTurn, outPace, pp.step)
       a.pace = step / pp.step
-      if (energy) this.spend(a, pp, step, met)
+      this.spend(a, pp, step, met)
     }
 
     // 3. predators move
@@ -429,7 +428,7 @@ export class Sim {
         }
       }
       relative(a, bx, by, p.foodScent)
-      const h = energy ? 1 - a.energy / dp.maxEnergy : a.hunger / dp.starve
+      const h = 1 - a.energy / dp.maxEnergy
       senses[0] = ql
       senses[1] = qa
       senses[2] = qc
@@ -442,16 +441,16 @@ export class Sim {
       senses[9] = h
       senses[10] = wallAhead(a, p.wallView)
       think(a.genes, PRED_SENSES)
-      const step = steer(a, outTurn, outPace, energy ? 0 : dp.minPace, dp.step)
+      const step = steer(a, outTurn, outPace, dp.step)
       a.pace = step / dp.step
-      if (energy) this.spend(a, dp, step, met)
+      this.spend(a, dp, step, met)
     }
 
     // 4. prey feed
     const feed2 = p.feedR * p.feedR
     const preyFull = pp.maxEnergy - 0.5 * pp.mealEnergy
     for (const a of this.prey) {
-      if (energy && a.energy > preyFull) continue
+      if (a.energy > preyFull) continue
       let best = feed2
       let bk = -1
       for (let k = 0; k < patches.length; k++) {
@@ -468,7 +467,7 @@ export class Sim {
         stock[bk] -= 1
         a.hunger = 0
         a.meals += 1
-        if (energy) a.energy = Math.min(pp.maxEnergy, a.energy + pp.mealEnergy)
+        a.energy = Math.min(pp.maxEnergy, a.energy + pp.mealEnergy)
       }
     }
 
@@ -480,7 +479,7 @@ export class Sim {
       let best = eat2
       let hunter: Animal | null = null
       for (const q of this.preds) {
-        if (energy && q.energy > predFull) continue
+        if (q.energy > predFull) continue
         const d2 = (q.x - a.x) ** 2 + (q.y - a.y) ** 2
         if (d2 <= best) {
           best = d2
@@ -492,7 +491,7 @@ export class Sim {
       } else {
         hunter.hunger = 0
         hunter.meals += 1
-        if (energy) hunter.energy = Math.min(dp.maxEnergy, hunter.energy + dp.mealEnergy)
+        hunter.energy = Math.min(dp.maxEnergy, hunter.energy + dp.mealEnergy)
         this.counters.preyEaten += 1
         this.emit('eaten', 'prey', a)
       }
@@ -500,14 +499,14 @@ export class Sim {
     this.prey = survivors
 
     // 6. starvation and old age
-    this.prey = this.cull(this.prey, pp, 'prey', energy)
-    this.preds = this.cull(this.preds, dp, 'pred', energy)
+    this.prey = this.cull(this.prey, pp, 'prey')
+    this.preds = this.cull(this.preds, dp, 'pred')
 
     // 7. births, prey then predators, lowest parent id first
     const preyParents = this.prey.slice()
-    for (const parent of preyParents) this.giveBirth(parent, 'prey', energy)
+    for (const parent of preyParents) this.giveBirth(parent, 'prey')
     const predParents = this.preds.slice()
-    for (const parent of predParents) this.giveBirth(parent, 'pred', energy)
+    for (const parent of predParents) this.giveBirth(parent, 'pred')
 
     // 8. regrow
     this.regrowAcc += this.regrowFactor(tick)
@@ -529,11 +528,11 @@ export class Sim {
     a.energy -= (sp.metabolism + sp.visionUpkeep * a.view) * met + sp.speedCost * r * r
   }
 
-  private cull(pop: Animal[], sp: SpeciesParams, species: Species, energy: boolean): Animal[] {
+  private cull(pop: Animal[], sp: SpeciesParams, species: Species): Animal[] {
     const alive: Animal[] = []
     const c = this.counters
     for (const a of pop) {
-      const starved = energy ? a.energy <= 0 : a.hunger >= sp.starve
+      const starved = a.energy <= 0
       const old = a.age >= sp.lifespan
       if (!starved && !old) {
         alive.push(a)
@@ -552,25 +551,21 @@ export class Sim {
     return alive
   }
 
-  private giveBirth(parent: Animal, species: Species, energy: boolean): void {
+  private giveBirth(parent: Animal, species: Species): void {
     const p = this.p
     const sp = species === 'prey' ? p.prey : p.pred
     const pop = species === 'prey' ? this.prey : this.preds
     const cap = this.cap(species)
     let since: number
-    if (parent.lastBirth < 0) since = p.gapFromOwnBirth ? parent.age : sp.birthGap
+    if (parent.lastBirth < 0) since = sp.birthGap
     else since = parent.age - parent.lastBirth
     if (pop.length >= cap || parent.age < sp.adultAge || since < sp.birthGap) return
     const childCost = sp.childEnergy * sp.maxEnergy
-    if (energy) {
-      if (parent.energy < sp.breedEnergy * sp.maxEnergy || parent.energy <= childCost) return
-    } else if (parent.meals < sp.mealsToBreed) {
-      return
-    }
+    if (parent.energy < sp.breedEnergy * sp.maxEnergy || parent.energy <= childCost) return
     const rng = this.rng
     for (let n = 0; n < sp.litter; n++) {
       if (pop.length >= cap) break
-      if (energy && parent.energy <= childCost) break
+      if (parent.energy <= childCost) break
       const angle = rng.uniform(0, 2 * Math.PI)
       const r = p.birthR * Math.sqrt(rng.random())
       const x = Math.min(1.0, Math.max(0.0, parent.x + r * Math.cos(angle)))
@@ -579,7 +574,7 @@ export class Sim {
       const genes = mutate(rng, parent.genes, p.mutationRate, p.mutationSigma)
       const id = species === 'prey' ? this.nextPreyId++ : this.nextPredId++
       const child = new Animal(id, x, y, heading, genes, sp.view, sp.turn, childCost, parent.gen + 1)
-      if (energy) parent.energy -= childCost
+      parent.energy -= childCost
       pop.push(child)
       if (species === 'prey') this.counters.preyBorn += 1
       else this.counters.predBorn += 1

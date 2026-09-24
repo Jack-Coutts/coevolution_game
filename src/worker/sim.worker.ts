@@ -22,7 +22,6 @@ const CHUNK_MS = 24
 function packAnimals(s: Sim, species: 'prey' | 'pred'): Float32Array {
   const pop = species === 'prey' ? s.prey : s.preds
   const sp = species === 'prey' ? s.p.prey : s.p.pred
-  const energyRules = s.p.rules === 'energy'
   const out = new Float32Array(pop.length * ANIMAL_STRIDE)
   for (let i = 0; i < pop.length; i++) {
     const a = pop[i]
@@ -32,7 +31,7 @@ function packAnimals(s: Sim, species: 'prey' | 'pred'): Float32Array {
     out[o + 2] = a.y
     out[o + 3] = a.hx
     out[o + 4] = a.hy
-    out[o + 5] = energyRules ? a.energy / sp.maxEnergy : 1 - a.hunger / sp.starve
+    out[o + 5] = a.energy / sp.maxEnergy
     out[o + 6] = Math.min(1, a.age / sp.adultAge)
     out[o + 7] = a.pace
   }
@@ -61,21 +60,11 @@ function writeStats(s: Sim, out: Float64Array, row: number): void {
   const o = row * STAT_STRIDE
   const mean = (arr: { energy: number; pace: number; hunger: number }[], key: 'energy' | 'pace', max: number) =>
     arr.length ? arr.reduce((t, a) => t + a[key], 0) / arr.length / max : 0
-  const energyRules = s.p.rules === 'energy'
   out[o + STAT.prey] = s.prey.length
   out[o + STAT.pred] = s.preds.length
   out[o + STAT.stock] = s.stock.reduce((t, v) => t + v, 0) / (s.p.patchStock * s.stock.length)
-  if (energyRules) {
-    out[o + STAT.preyEnergy] = mean(s.prey, 'energy', s.p.prey.maxEnergy)
-    out[o + STAT.predEnergy] = mean(s.preds, 'energy', s.p.pred.maxEnergy)
-  } else {
-    out[o + STAT.preyEnergy] = s.prey.length
-      ? 1 - s.prey.reduce((t, a) => t + a.hunger, 0) / s.prey.length / s.p.prey.starve
-      : 0
-    out[o + STAT.predEnergy] = s.preds.length
-      ? 1 - s.preds.reduce((t, a) => t + a.hunger, 0) / s.preds.length / s.p.pred.starve
-      : 0
-  }
+  out[o + STAT.preyEnergy] = mean(s.prey, 'energy', s.p.prey.maxEnergy)
+  out[o + STAT.predEnergy] = mean(s.preds, 'energy', s.p.pred.maxEnergy)
   out[o + STAT.preyPace] = mean(s.prey, 'pace', 1)
   out[o + STAT.predPace] = mean(s.preds, 'pace', 1)
   const c = s.counters

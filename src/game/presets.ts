@@ -1,12 +1,11 @@
-import { benchmarkLevers, type LeverValues } from '@/sim/levers'
-import type { Rules } from '@/sim/params'
+import { defaultLevers, type LeverValues } from '@/sim/levers'
 
 /**
- * "Stable meadow": found by the offline sweep (scripts/sweep.ts) under the energy rules.
+ * "Stable meadow": found by the offline sweep (scripts/sweep.ts).
  * Seeds 0-9: 10/10 reach 8,000 ticks. Held-out seeds 100-149: 47/50.
  */
 export const STABLE_PRESET: LeverValues = {
-  ...benchmarkLevers(),
+  ...defaultLevers(),
   'prey.initial': 100,
   'pred.initial': 9,
   'prey.cap': 190,
@@ -41,8 +40,4 @@ export const STABLE_PRESET: LeverValues = {
   'food.stock': 30,
   'food.regrow': 9,
   'evo.mutation': 0.1,
-}
-
-export function presetFor(rules: Rules): LeverValues {
-  return rules === 'energy' ? { ...STABLE_PRESET } : benchmarkLevers()
 }

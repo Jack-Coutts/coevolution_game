@@ -1,5 +1,5 @@
 import { BUDGET, deriveParams, spent, type LeverValues } from '@/sim/levers'
-import type { Rules, SimParams } from '@/sim/params'
+import type { SimParams } from '@/sim/params'
 import { SCENARIO_BY_ID, type Scenario, type ScenarioId } from '@/sim/scenarios'
 import type { Intervention } from '@/sim/sim'
 import { daylight, tickAt } from '@/sim/time'
@@ -14,7 +14,6 @@ export type Mode = 'plan' | 'live'
 export type Phase = 'loading' | 'planning' | 'running' | 'ended'
 
 export interface RunConfig {
-  rules: Rules
   levers: LeverValues
   base: LeverValues
   scenario: ScenarioId
@@ -150,7 +149,7 @@ export class GameController {
     if (p && this.hintCache.tick !== t) {
       this.hintCache = {
         tick: t,
-        hints: hints(h, t, p, { prey: p.prey.cap, pred: p.pred.cap }),
+        hints: hints(h, t, { prey: p.prey.cap, pred: p.pred.cap }),
       }
     }
     return {
@@ -188,7 +187,7 @@ export class GameController {
   /** Start a fresh run at tick 0 (planning phase). */
   configure(config: RunConfig): void {
     this.config = config
-    this.params = deriveParams(config.levers, config.rules)
+    this.params = deriveParams(config.levers)
     this.scenario = SCENARIO_BY_ID[config.scenario]
     this.runId += 1
     this.history = new RunHistory(this.params.horizon)
@@ -315,7 +314,7 @@ export class GameController {
 
   budgetLeft(): number {
     if (!this.config) return BUDGET
-    return BUDGET - spent(this.config.levers, this.config.base, this.config.rules)
+    return BUDGET - spent(this.config.levers, this.config.base)
   }
 
   weather(tick: number): Weather {
@@ -338,7 +337,7 @@ export class GameController {
     this.finalized = true
     this.phase = 'ended'
     this.playing = false
-    this.explanation = explain(this.history, this.end, this.params, this.scenario)
+    this.explanation = explain(this.history, this.end, this.scenario)
     const unspent = this.budgetLeft()
     this.score = this.end.tick + (this.end.survived ? Math.round(25 * Math.max(0, unspent)) : 0)
     const prev = this.best

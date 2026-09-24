@@ -1,7 +1,6 @@
 # Coevolution: Meadow Keeper (game design)
 
-A browser game built on a TypeScript port of the Coevolution benchmark. It is a standalone
-repo (`coevolution_game`), and the benchmark (`coevolution_demo`) is unchanged.
+A browser game about an evolving predator and prey ecosystem, in the `coevolution_game` repo.
 
 ## Core loop
 
@@ -22,7 +21,7 @@ You win only when **both** species are alive at the horizon.
 
 ## Time (what players see)
 
-Ticks stay internal. The simulation, the parity test and the stored data all use ticks. The
+Ticks stay internal. The simulation, the tests and the stored data all use ticks. The
 UI shows natural time only.
 
 - **Clock.** 1 tick is 1 hour. A run starts on 1 September at 08:00. The 8,000-hour horizon
@@ -42,15 +41,15 @@ UI shows natural time only.
 ## Rules
 
 Every animal takes exactly one step per tick, with its step length capped by its max speed.
-There are no sub-steps and no fewer, larger steps. Senses, genes, the one-layer controller,
-and inheritance with mutation (with random founders) are the benchmark's.
+There are no sub-steps and no fewer, larger steps. Animals steer with an evolved controller
+whose weights are their genes. Founders are random, and children inherit with mutation.
 
-**Energy rules (game default)**
+**Energy rules**
 
 - Each animal has energy, capped at a maximum. It dies of old age, or when its energy reaches
   0.
-- Each tick it pays `metabolism + vision upkeep × view range + speed cost × (step / benchmark step)²`.
-  A sprint at full benchmark speed costs 4 times the movement energy of a cruise at half
+- Each tick it pays `metabolism + vision upkeep × view range + speed cost × (step / standard step)²`.
+  A sprint at full standard speed costs 4 times the movement energy of a cruise at half
   speed.
 - Pace is chosen every tick by the genes, for both species, from standing still up to max
   speed.
@@ -58,34 +57,22 @@ and inheritance with mutation (with random founders) are the benchmark's.
   - A rabbit eats one berry unit per tick when it is at a stocked bush and not full. Each
     berry gives it the energy per berry.
   - A fox kills a rabbit in reach when it is not full, and gains the energy per rabbit.
-- Breeding needs adult age, the birth gap since the parent's last birth (the benchmark's
-  reading 2), and energy at or above the breed threshold.
+- Breeding needs adult age, the birth gap since the parent's last birth, and energy at or
+  above the breed threshold.
   - The parent pays the child energy for each young, and that energy seeds the young.
   - A litter of L young lengthens the gap by a factor of `1 + 0.5 (L − 1)`.
 - Founders start with 75% energy.
-- Scenario and intervention randomness uses a separate RNG, so the animals' random stream
-  stays the benchmark's.
-
-**Classic benchmark rules (toggle)**
-
-- The benchmark's own rules:
-  - Starvation is counted in ticks since the last meal.
-  - Breeding needs meals.
-  - Rabbits always walk at full step.
-- With the benchmark levers this matches `coevo.py` on seeds 0 to 9. Survival ticks, prey at
-  the end and predators at the end all match exactly. A Vitest parity test checks it, using a
-  port of CPython's Mersenne Twister (`random`, `uniform`, `gauss`).
-- Its own built-in cost: a speed or sense range above the benchmark shortens the starvation
-  time.
+- Scenario and intervention randomness uses a separate RNG, so a disturbance never shifts
+  the animals' random stream before it starts.
 
 ## Levers
 
 | Group | Levers (each species separately where it applies) |
 | --- | --- |
 | Populations | Starting rabbits and foxes, rabbit cap, fox cap |
-| Life cycle | First-birth age, birth gap, litter size, lifespan, breed threshold and child energy (energy rules), meals to breed and starvation time (classic rules) |
+| Life cycle | First-birth age, birth gap, litter size, lifespan, breed threshold, child energy |
 | Energy | Max energy, metabolism, speed cost, energy per berry or per rabbit |
-| Senses and movement | Max speed (0.6 to 1.5 times the benchmark), sense range, turning |
+| Senses and movement | Max speed (0.6 to 1.5 times the standard), sense range, turning |
 | Food | Bush count, berries per bush, regrowth interval |
 | Evolution | Mutation rate |
 
@@ -218,8 +205,8 @@ Levers lock while a run is going. Reset to retune.
   - The meadow is calm and procedural: grass tufts, wildflower drifts, rocks, and grazed
     earth under the bushes.
   - Bushes shrink with their stock and show berries in proportion to it.
-- **Tests.** 22 Vitest tests:
-  - Parity on seeds 0 to 9, and the RNG.
+- **Tests.** Vitest:
+  - The RNG, reproducibility, starvation and births.
   - Time labels, the lever grid and budget, and the litter cost.
   - Energy rules: determinism, at most one capped step per tick, the quadratic cost, and
     scenario RNG isolation.
