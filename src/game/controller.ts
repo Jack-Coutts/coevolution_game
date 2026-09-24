@@ -47,6 +47,7 @@ export interface Snapshot {
   stock: number
   preyEnergy: number
   predEnergy: number
+  predKits10d: number
   end: EndInfo | null
   explanation: Explanation | null
   score: number | null
@@ -164,6 +165,7 @@ export class GameController {
       stock: h.stat(t, 'stock'),
       preyEnergy: h.stat(t, 'preyEnergy'),
       predEnergy: h.stat(t, 'predEnergy'),
+      predKits10d: h.stat(t, 'predBorn') - h.stat(Math.max(0, t - 240), 'predBorn'),
       end: this.end,
       explanation: this.explanation,
       score: this.score,

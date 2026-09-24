@@ -111,8 +111,13 @@ export function hints(h: RunHistory, tick: number, p: SimParams, cap: { prey: nu
   if (prey >= cap.prey - 1) {
     out.push({ id: 'preycap', tone: 'info', text: 'The warren is at its cap, so no rabbits can be born until some die.' })
   }
-  if (pred >= cap.pred - 1 && prey / Math.max(1, pred) < 8) {
-    out.push({ id: 'predcap', tone: 'info', text: 'Foxes are at their cap. The cap is what is holding the hunting pressure back.' })
+  if (pred >= cap.pred) {
+    const kits = h.stat(tick, 'predBorn') - h.stat(past, 'predBorn')
+    out.push({
+      id: 'predcap',
+      tone: 'info',
+      text: `Foxes are at their cap of ${cap.pred}, so a kit is born only when an old fox dies (${kits} kit${kits === 1 ? '' : 's'} in the last 10 days).`,
+    })
   }
   if (predGrowth > 0.5 && pred >= 6) {
     out.push({

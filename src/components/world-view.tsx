@@ -59,7 +59,7 @@ export function WorldView({ maxSize }: { maxSize: number }) {
           </div>
           <div className="flex items-center gap-1.5 rounded-lg bg-black/55 px-2 py-1.5 text-white shadow-lg backdrop-blur-md">
             <Count icon={icons.rabbit} value={snap.prey} label="rabbits" tone="text-rabbit" />
-            <Count icon={icons.fox} value={snap.pred} label="foxes" tone="text-fox" />
+            <Count icon={icons.fox} value={snap.pred} label={`foxes · ${snap.predKits10d} kits born in the last 10 days`} tone="text-fox" />
             <div className="flex items-center gap-1 pl-1 text-sm tabular" title="Berries on the bushes">
               <span className="inline-block size-2.5 rounded-full bg-[#b3263e] ring-2 ring-[#4f7d34]" />
               <span className="font-semibold text-berry">{Math.round(snap.stock * 100)}%</span>

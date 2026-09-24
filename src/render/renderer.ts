@@ -30,6 +30,12 @@ const FX_MS: Record<Fx['kind'], number> = {
   culled: 900,
 }
 
+/** Fox births and deaths are rare and matter, so they get longer, always-on markers. */
+function fxDuration(f: Fx): number {
+  if (f.species === 1 && (f.kind === 'born' || f.kind === 'old')) return 1800
+  return FX_MS[f.kind]
+}
+
 const RABBIT_LEN = 0.033
 const FOX_LEN = 0.052
 const BUSH_R = 0.03
@@ -110,8 +116,9 @@ export class WorldRenderer {
     const ev = frame.events
     for (let i = 0; i < ev.length; i += EVENT_STRIDE) {
       const kind = EVENT_KIND[ev[i]]
-      if (kind === 'old') continue
-      if (busy && (kind === 'born' || kind === 'starved')) continue
+      const fox = ev[i + 1] === 1
+      if (kind === 'old' && !fox) continue
+      if (busy && !fox && (kind === 'born' || kind === 'starved')) continue
       this.fx.push({ kind, species: ev[i + 1], x: ev[i + 2], y: ev[i + 3], t0: now })
     }
     const cap = busy ? 24 : 240
@@ -259,9 +266,9 @@ export class WorldRenderer {
     const ctx = this.ctx
     const S = this.size
     const inner = S * (1 - 2 * MARGIN)
-    this.fx = this.fx.filter((f) => now - f.t0 < FX_MS[f.kind])
+    this.fx = this.fx.filter((f) => now - f.t0 < fxDuration(f))
     for (const f of this.fx) {
-      const t = (now - f.t0) / FX_MS[f.kind]
+      const t = (now - f.t0) / fxDuration(f)
       const [x, y] = this.toCanvas(f.x, f.y, S)
       switch (f.kind) {
         case 'eaten': {
@@ -282,6 +289,26 @@ export class WorldRenderer {
           break
         }
         case 'born': {
+          if (f.species === 1) {
+            if (layer !== 'over') break
+            const pulse = 1 - t
+            ctx.strokeStyle = `rgba(255, 170, 90, ${0.95 * pulse})`
+            ctx.lineWidth = 2
+            ctx.beginPath()
+            ctx.arc(x, y, inner * (0.014 + 0.03 * t), 0, Math.PI * 2)
+            ctx.stroke()
+            ctx.strokeStyle = `rgba(255, 235, 200, ${0.7 * pulse})`
+            ctx.lineWidth = 1
+            ctx.beginPath()
+            ctx.arc(x, y, inner * (0.008 + 0.018 * t), 0, Math.PI * 2)
+            ctx.stroke()
+            ctx.fillStyle = `rgba(255, 245, 225, ${0.9 * pulse})`
+            ctx.font = `600 ${Math.max(9, inner * 0.018)}px Geist Variable, sans-serif`
+            ctx.textAlign = 'center'
+            ctx.fillText('kit', x, y - inner * (0.03 + 0.02 * t))
+            ctx.textAlign = 'left'
+            break
+          }
           if (layer !== 'under') break
           ctx.strokeStyle = f.species ? `rgba(255, 190, 120, ${0.5 * (1 - t)})` : `rgba(235, 250, 220, ${0.4 * (1 - t)})`
           ctx.lineWidth = 1
@@ -293,7 +320,7 @@ export class WorldRenderer {
         case 'starved':
         case 'old': {
           if (layer !== 'under') break
-          ctx.fillStyle = `rgba(120, 110, 95, ${0.22 * (1 - t)})`
+          ctx.fillStyle = f.species === 1 ? `rgba(90, 80, 70, ${0.4 * (1 - t)})` : `rgba(120, 110, 95, ${0.22 * (1 - t)})`
           ctx.beginPath()
           ctx.arc(x, y, inner * (0.008 + 0.01 * t), 0, Math.PI * 2)
           ctx.fill()
