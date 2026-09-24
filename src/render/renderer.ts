@@ -114,7 +114,8 @@ export class WorldRenderer {
       if (busy && (kind === 'born' || kind === 'starved')) continue
       this.fx.push({ kind, species: ev[i + 1], x: ev[i + 2], y: ev[i + 3], t0: now })
     }
-    if (this.fx.length > 240) this.fx.splice(0, this.fx.length - 240)
+    const cap = busy ? 24 : 240
+    if (this.fx.length > cap) this.fx.splice(0, this.fx.length - cap)
   }
 
   clearFx(): void {
