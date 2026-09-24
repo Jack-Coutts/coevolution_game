@@ -1,10 +1,9 @@
 /**
  * Common-garden assay: does evolution make rabbits and foxes better at living?
  *
- * 1. Run each seed twice for up to a year, evolving and frozen (no heredity: newborns get
- *    fresh random genes), and snapshot every living genome at months 1, 4 and 8.
- * 2. Drop each snapshot into fixed arenas against fixed opponents (a pooled month-8 sample,
- *    or month 4, from separate reference runs), with births and ageing off, and measure behaviour.
+ * 1. Run each seed in three conditions for up to a year, evolving and founder-pool control (newborns sample the original fixed genomes
+ *    independently of parental reproductive success), plus selection-only (mutation off), and snapshot genomes at months 0, 1, 4 and 8.
+ * 2. Drop each snapshot into fixed arenas against fixed opponents (pooled founders from independent seeds 900–903), with births and ageing off, and measure behaviour.
  *
  *   npx tsx scripts/evo-assay.ts [variant] [seeds] [--json out.json]
  *
@@ -17,14 +16,15 @@ import { deriveParams } from '../src/sim/levers'
 import type { EcoParams, SimParams } from '../src/sim/params'
 import { Sim, type Species } from '../src/sim/sim'
 
-const MONTHS = [1, 4, 8]
+const MONTHS = [0, 1, 4, 8]
 const ARENAS = [4242, 4243, 4244]
 const ARENA_TICKS = 240
 const ARENA = { prey: 60, pred: 10 }
 
 export const VARIANTS: Record<string, Partial<EcoParams>> = {
   linear: { hidden: 0, memory: false, growRate: 0 },
-  brain: {},
+  brain: { hidden: 4, memory: true, growRate: 0 },
+  growing: { hidden: 4, memory: true, growRate: 0.02 },
   sexual: { sexual: true },
   cover: { cover: 8 },
 }
@@ -37,14 +37,14 @@ export function params(variant: string, eco: Partial<EcoParams> = {}): SimParams
 
 type Snap = Partial<Record<Species, Genome[]>>
 
-export function evolve(p: SimParams, seed: number): { snaps: Map<number, Snap>; ticks: number } {
+export function evolve(p: SimParams, seed: number): { snaps: Map<number, Snap>; ticks: number; safetyLimitHits: number } {
   const sim = new Sim(p, seed)
-  const snaps = new Map<number, Snap>()
+  const snaps = new Map<number, Snap>([[0, { prey: sim.prey.map(a => a.brain), pred: sim.preds.map(a => a.brain) }]])
   const at = new Set(MONTHS.map((m) => m * 720))
   while (sim.step()) {
     if (at.has(sim.tick)) snaps.set(sim.tick / 720, { prey: sim.prey.map((a) => a.brain), pred: sim.preds.map((a) => a.brain) })
   }
-  return { snaps, ticks: sim.tick }
+  return { snaps, ticks: sim.tick, safetyLimitHits: sim.ceilingHits }
 }
 
 export interface Assay {
@@ -104,14 +104,12 @@ function pool(snaps: Snap[], s: Species, n: number): Genome[] {
 }
 
 export function reference(p: SimParams): Snap {
-  const late: Snap[] = []
-  for (let seed = 900; seed < 940 && late.length < 4; seed++) {
-    const { snaps } = evolve(p, seed)
-    const s = snaps.get(8) ?? snaps.get(4)
-    if (s?.prey?.length && s.pred?.length) late.push(s)
-  }
-  if (late.length === 0) throw new Error('no reference run lived to month 4')
-  return { prey: pool(late, 'prey', ARENA.prey), pred: pool(late, 'pred', ARENA.pred) }
+  // Fixed opponents from independent founder seeds, identical for all conditions.
+  const refs = [900, 901, 902, 903].map(seed => {
+    const s = new Sim(p, seed)
+    return { prey: s.prey.map(a => a.brain), pred: s.preds.map(a => a.brain) }
+  })
+  return { prey: pool(refs, 'prey', ARENA.prey), pred: pool(refs, 'pred', ARENA.pred) }
 }
 
 function mean(xs: number[]): number {
@@ -120,43 +118,38 @@ function mean(xs: number[]): number {
 }
 
 function main(): void {
-  const variant = process.argv[2] ?? 'brain'
+  const variant = process.argv[2] ?? 'linear'
   const nSeeds = Number(process.argv[3] ?? 6)
   const jsonAt = process.argv.indexOf('--json')
   const p = params(variant)
   const frozen = params(variant, { heredity: false })
-  const ref = reference(p)
-  const rows: Record<string, Assay[]> = {}
-  const push = (k: string, a: Assay) => (rows[k] ??= []).push(a)
-  const founders = new Sim(p, 100)
-  push('founders', assay(p, { prey: founders.prey.map((a) => a.brain), pred: founders.preds.map((a) => a.brain) }, ref))
-  let yearEnd = 0
-  for (let seed = 100; seed < 100 + nSeeds; seed++) {
-    const ev = evolve(p, seed)
-    const fr = evolve(frozen, seed)
-    if (ev.ticks >= p.horizon) yearEnd++
-    for (const m of MONTHS) {
-      const e = ev.snaps.get(m)
-      const f = fr.snaps.get(m)
-      if (e) push(`evolving m${m}`, assay(p, e, ref))
-      if (f) push(`frozen m${m}`, assay(p, f, ref))
+  const ref = reference(params('linear'))
+  const rows: { seed: number; condition: string; month: number; ticks: number; assay: Assay | null }[] = []
+  const startSeed = Number(process.argv[process.argv.indexOf('--start') + 1]) || 2000
+  const outcomes = []
+  for (let seed = startSeed; seed < startSeed + nSeeds; seed++) {
+    const conditions = [ ['evolving', p], ['founder-pool', frozen],
+      ['selection-only', { ...p, mutationRate: 0, eco: { ...p.eco, growRate: 0 } }] ] as const
+    for (const [condition, config] of conditions) {
+      const ev = evolve(config, seed)
+      outcomes.push({ seed, condition, ticks: ev.ticks, safetyLimitHits: ev.safetyLimitHits, survived: ev.ticks >= p.horizon })
+      for (const month of MONTHS) {
+        const snapshot = ev.snaps.get(month)
+        rows.push({ seed, condition, month, ticks: ev.ticks, assay: snapshot ? assay(p, snapshot, ref) : null })
+      }
     }
+    console.log(`assayed seed ${seed}`)
   }
-  const table = Object.entries(rows).map(([k, v]) => ({
-    snapshot: k,
-    n: v.length,
-    escape: mean(v.map((a) => a.escape)),
-    forage: mean(v.map((a) => a.forage)),
-    preySurvival: mean(v.map((a) => a.preySurvival)),
-    catchPerFoxDay: mean(v.map((a) => a.catchRate)),
+  const table = ['evolving', 'founder-pool', 'selection-only'].flatMap(condition => MONTHS.map(month => {
+    const entries = rows.filter(r => r.condition === condition && r.month === month)
+    const values = entries.flatMap(r => r.assay ? [r.assay] : [])
+    return { condition, month, available: values.length, total: nSeeds,
+      escape: mean(values.map(a => a.escape)), forage: mean(values.map(a => a.forage)),
+      preySurvival: mean(values.map(a => a.preySurvival)), catchPerFoxDay: mean(values.map(a => a.catchRate)) }
   }))
-  console.log(`variant ${variant}: ${yearEnd}/${nSeeds} evolving runs reached the year`)
-  for (const r of table) {
-    console.log(
-      `  ${r.snapshot.padEnd(12)} n=${r.n}  escape ${(100 * r.escape).toFixed(1)}%  forage ${r.forage.toFixed(3)}/h  rabbits alive ${(100 * r.preySurvival).toFixed(0)}%  fox catches/day ${r.catchPerFoxDay.toFixed(2)}`,
-    )
-  }
-  if (jsonAt > 0) writeFileSync(process.argv[jsonAt + 1], JSON.stringify({ variant, yearEnd, nSeeds, table }, null, 2))
+  const result = { variant, startSeed, nSeeds, parameters: p, note: 'Behavioural assays condition on surviving populations; missing snapshots are reported, not treated as zero. Survival outcomes include every seed. Founder-pool is a no-inherited-selection control, not mutation-off.', outcomes, table, rows }
+  console.table(table)
+  if (jsonAt > 0) writeFileSync(process.argv[jsonAt + 1], JSON.stringify(result, null, 2))
 }
 
 main()

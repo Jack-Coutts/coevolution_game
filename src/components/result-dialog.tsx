@@ -15,7 +15,7 @@ import { cn } from '@/lib/utils'
 const STARS = [
   { tick: 90 * 24, label: '3 months' },
   { tick: 210 * 24, label: '7 months' },
-  { tick: 8000, label: 'Full year' },
+  { tick: 8760, label: 'Full year' },
 ]
 
 interface Props {

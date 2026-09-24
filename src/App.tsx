@@ -1,3 +1,6 @@
+import { EvolutionPanel, type AnimalSelection } from '@/components/evolution-panel'
+import { Button } from '@/components/ui/button'
+import { readSave, type MeadowSave } from '@/game/saves'
 import { useEffect, useRef, useState } from 'react'
 import { Guide } from '@/components/guide'
 import { MeadowSettings } from '@/components/meadow-settings'
@@ -19,7 +22,7 @@ import { useGame } from '@/hooks/use-game'
 import { BUDGET, spent, type LeverValues } from '@/sim/levers'
 import { SCENARIO_BY_ID, SCENARIOS, type ScenarioId } from '@/sim/scenarios'
 
-type Tab = 'levers' | 'run' | 'guide'
+type Tab = 'levers' | 'run' | 'evolution' | 'guide'
 
 function useViewport(): { w: number; h: number } {
   const [v, setV] = useState({ w: window.innerWidth, h: window.innerHeight })
@@ -47,6 +50,10 @@ const initial = initialState()
 export default function App() {
   const [game, snap] = useGame()
   const icons = useAnimalIcons()
+  const [endless, setEndless] = useState(false)
+  const [selected, setSelected] = useState<AnimalSelection | null>(null)
+  const [loadStatus, setLoadStatus] = useState('')
+  const pendingSave = useRef<MeadowSave | null>(null)
   const base = STABLE_PRESET
   const [levers, setLevers] = useState<LeverValues>(STABLE_PRESET)
   const [scenario, setScenario] = useState<ScenarioId>(initial.scenario)
@@ -60,8 +67,9 @@ export default function App() {
   const worldMax = desktop ? Math.max(360, Math.min(860, vp.h - 330)) : vp.w - 24
 
   useEffect(() => {
-    game.configure({ levers, base, scenario, seed })
-  }, [game, levers, base, scenario, seed, resetKey])
+    if (pendingSave.current) { game.restore(pendingSave.current); pendingSave.current = null }
+    else game.configure({ levers, base, scenario, seed, endless })
+  }, [game, levers, base, scenario, seed, endless, resetKey])
 
   useEffect(() => {
     const q = new URLSearchParams()
@@ -80,7 +88,7 @@ export default function App() {
     prevPhase.current = snap.phase
   }, [snap.phase, tab])
 
-  const reset = () => setResetKey((k) => k + 1)
+  const reset = () => { setSelected(null); setResetKey((k) => k + 1) }
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
@@ -129,6 +137,21 @@ export default function App() {
     return () => window.removeEventListener('keydown', onKey)
   }, [game, left])
 
+  const resume = async () => {
+    try {
+      const saved = await readSave()
+      if (!saved) { setLoadStatus('No saved meadow on this device yet.'); return }
+      setSelected(null)
+      pendingSave.current = saved
+      setLevers(saved.config.levers)
+      setScenario(saved.config.scenario)
+      setSeedChoice({ kind: 'custom', seed: saved.config.seed })
+      setEndless(saved.config.endless)
+      setResetKey(k => k + 1)
+      setTab('evolution')
+      setLoadStatus('')
+    } catch { setLoadStatus('Could not load this meadow. Device storage may be unavailable, or the save is incompatible.') }
+  }
   const sc = SCENARIO_BY_ID[scenario]
 
   return (
@@ -142,13 +165,13 @@ export default function App() {
             </div>
             <div className="leading-tight">
               <h1 className="text-lg font-semibold tracking-tight">Coevolution</h1>
-              <p className="hidden text-xs text-muted-foreground sm:block">Meadow Keeper · keep both species alive for a year</p>
+              <p className="hidden text-xs text-muted-foreground sm:block">Meadow Keeper · {endless ? 'a world that keeps evolving' : 'keep both species alive for a year'}</p>
             </div>
           </div>
 
           <div className="ml-auto flex items-center gap-2">
             <Select value={scenario} onValueChange={(v) => setScenario(v as ScenarioId)}>
-              <SelectTrigger className="w-[150px] sm:w-[170px]" aria-label="Scenario">
+              <SelectTrigger disabled={locked} className="w-[150px] sm:w-[170px]" aria-label="Scenario">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent align="end">
@@ -159,7 +182,10 @@ export default function App() {
                 ))}
               </SelectContent>
             </Select>
-            <MeadowSettings choice={seedChoice} onChange={setSeedChoice} />
+            <select aria-label="Run duration" className="rounded-md border bg-background px-2 py-2 text-xs" value={endless ? 'endless' : 'year'} disabled={locked} onChange={e => setEndless(e.target.value === 'endless')}>
+              <option value="year">One year</option><option value="endless">Endless</option>
+            </select>
+            <MeadowSettings onPractice={() => { setSelected(null); setLevers(STABLE_PRESET); setScenario('stable'); setSeedChoice({ kind: 'custom', seed: 5007 }); setEndless(false); reset() }} locked={locked} choice={seedChoice} onChange={setSeedChoice} />
           </div>
         </header>
 
@@ -174,7 +200,12 @@ export default function App() {
                 {seedChoice.kind === 'daily' ? "Today's meadow" : 'Seed'} {seed}
               </span>
             </div>
-            <WorldView maxSize={worldMax} />
+            <WorldView maxSize={worldMax} selected={selected} onSelect={a => { setSelected(a); setTab('evolution') }} />
+            <div className="flex flex-wrap items-center justify-center gap-2 text-xs">
+              <Button size="xs" variant="outline" disabled={snap.phase === 'loading'} onClick={() => { setLoadStatus(''); game.save() }}>Save meadow</Button>
+              <Button size="xs" variant="outline" onClick={() => void resume()}>Resume saved meadow</Button>
+              <span role="status" className="text-muted-foreground">{loadStatus || snap.saveStatus}</span>
+            </div>
             <Card className="gap-2 p-3">
               <Transport onReset={reset} />
               <Timeline />
@@ -197,7 +228,8 @@ export default function App() {
                   <TabsList className="w-full">
                     <TabsTrigger value="levers">Levers</TabsTrigger>
                     <TabsTrigger value="run">Field notes</TabsTrigger>
-                    <TabsTrigger value="guide">How to play</TabsTrigger>
+                    <TabsTrigger value="evolution">Evolution</TabsTrigger>
+                    <TabsTrigger value="guide">Guide</TabsTrigger>
                   </TabsList>
                 </div>
                 <div className="min-h-0 flex-1 overflow-y-auto p-3 lg:max-h-[calc(100vh-7rem)]">
@@ -213,6 +245,9 @@ export default function App() {
                   </TabsContent>
                   <TabsContent value="run" className="mt-0">
                     <RunPanel />
+                  </TabsContent>
+                  <TabsContent value="evolution" className="mt-0">
+                    <EvolutionPanel selected={selected} onSelect={setSelected} />
                   </TabsContent>
                   <TabsContent value="guide" className="mt-0">
                     <Guide />

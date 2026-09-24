@@ -9,7 +9,7 @@ import { Sim } from '../src/sim/sim'
 
 interface Patch {
   name: string
-  levers?: Partial<LeverValues>
+  levers?: LeverValues
   eco?: Partial<EcoParams>
 }
 

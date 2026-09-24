@@ -20,6 +20,7 @@ const FX_MS: Record<Fx['kind'], number> = {
   eaten: 700,
   born: 600,
   starved: 700,
+  illness: 900,
   old: 700,
   arrived: 1400,
   released: 1100,
@@ -271,6 +272,13 @@ export class WorldRenderer {
       ctx.rotate(ang)
       ctx.drawImage(frame, -s / 2, -s / 2, s, s)
       ctx.restore()
+      if (b[i + 21] > 0) {
+        ctx.strokeStyle = '#bd85ff'
+        ctx.lineWidth = 1.5
+        ctx.beginPath()
+        ctx.arc(cx, cy, len * S * scale * 0.75, 0, Math.PI * 2)
+        ctx.stroke()
+      }
       if (b[i + 5] < 0.2) this.drawTired(cx, cy, len * S * scale)
     }
     ctx.globalAlpha = 1
@@ -342,6 +350,7 @@ export class WorldRenderer {
           ctx.stroke()
           break
         }
+        case 'illness':
         case 'starved':
         case 'old': {
           if (layer !== 'under') break

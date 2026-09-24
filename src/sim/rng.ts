@@ -15,6 +15,16 @@ export class Rng {
     this.seed(seed)
   }
 
+  save() {
+    return { mt: [...this.mt], mti: this.mti, gaussNext: this.gaussNext }
+  }
+
+  restore(state: ReturnType<Rng['save']>): void {
+    this.mt.set(state.mt)
+    this.mti = state.mti
+    this.gaussNext = state.gaussNext
+  }
+
   seed(seed: number): void {
     let n = Math.abs(Math.trunc(seed))
     const key: number[] = []

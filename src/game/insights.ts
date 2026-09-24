@@ -22,7 +22,7 @@ const WINDOW = 240
 const AHEAD = 300
 
 function trend(h: RunHistory, key: 'prey' | 'pred', tick: number): number {
-  const from = Math.max(0, tick - WINDOW)
+  const from = Math.max(h.firstTick, tick - WINDOW)
   const n = tick - from
   if (n < 24) return 0
   let sx = 0
@@ -42,7 +42,7 @@ function trend(h: RunHistory, key: 'prey' | 'pred', tick: number): number {
 }
 
 export function forecast(h: RunHistory, tick: number): Forecast | null {
-  if (tick < 48) return null
+  if (tick - h.firstTick < 48) return null
   const ahead = Math.min(AHEAD, h.horizon - tick)
   const project = (key: 'prey' | 'pred') => {
     const now = h.stat(tick, key)
@@ -53,10 +53,10 @@ export function forecast(h: RunHistory, tick: number): Forecast | null {
 
 export function hints(h: RunHistory, tick: number): Hint[] {
   const out: Hint[] = []
-  if (tick < 24) return out
+  if (tick - h.firstTick < 24) return out
   const prey = h.stat(tick, 'prey')
   const pred = h.stat(tick, 'pred')
-  const past = Math.max(0, tick - WINDOW)
+  const past = Math.max(h.firstTick, tick - WINDOW)
   const prey0 = h.stat(past, 'prey')
   const pred0 = h.stat(past, 'pred')
   const stock = h.stat(tick, 'stock')
@@ -173,7 +173,7 @@ function avg(h: RunHistory, key: Parameters<RunHistory['stat']>[1], from: number
 
 function lastBirthTick(h: RunHistory, key: 'preyBorn' | 'predBorn', end: number): number | null {
   const total = h.stat(end, key)
-  for (let t = end; t >= 0; t--) if (h.stat(t, key) < total) return t + 1
+  for (let t = end; t >= h.firstTick; t--) if (h.stat(t, key) < total) return t + 1
   return null
 }
 
@@ -193,9 +193,18 @@ export function explain(h: RunHistory, end: EndInfo, scenario: Scenario): Explan
       suggestions: ['Try a harder scenario, or win with more of the budget unspent for a higher score.'],
     }
   }
-  const from = Math.max(0, T - 300)
-  const context = inSpan(scenario, T)
+  const from = Math.max(h.firstTick, T - 300)
+  const context = inSpan(scenario, h.endless ? T % 8760 : T)
   const ctx = context ? ` This happened during the ${context.toLowerCase()} period.` : ''
+  const species = end.predEnd === 0 ? 'pred' : 'prey'
+  const illness = delta(h, species === 'pred' ? 'predIllness' : 'preyIllness', from, T)
+  const other = delta(h, species === 'pred' ? 'predStarved' : 'preyStarved', from, T) +
+    delta(h, species === 'pred' ? 'predOld' : 'preyOld', from, T) + (species === 'prey' ? delta(h, 'preyEaten', from, T) : 0)
+  if (illness > 0 && illness >= other) return {
+    headline: `${species === 'pred' ? 'Foxes' : 'Rabbits'} died out during illness on ${when}.`,
+    detail: `${illness} animals ran out of energy while ill in the final observation window. Illness adds energy costs and spreads locally.${ctx}`,
+    suggestions: ['Use illness earlier, while the population has a larger reserve', 'Prefer a precise fox cull when numbers are already low', 'Support food supplies while ill animals recover'],
+  }
   if (end.predEnd === 0) {
     const starved = delta(h, 'predStarved', from, T)
     const old = delta(h, 'predOld', from, T)

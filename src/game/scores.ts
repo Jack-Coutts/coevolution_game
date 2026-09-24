@@ -29,10 +29,10 @@ export interface BestScore {
   at: string
 }
 
-const PREFIX = 'coevo-game:best:v2:'
+const PREFIX = 'coevo-game:best:v3:'
 
-function key(c: Pick<RunConfig, 'scenario' | 'seed'>): string {
-  return `${PREFIX}${c.scenario}:${c.seed}`
+function key(c: Pick<RunConfig, 'scenario' | 'seed' | 'endless'>): string {
+  return `${PREFIX}${c.scenario}:${c.seed}:${c.endless ? 'endless' : 'year'}`
 }
 
 function read(k: string): BestScore | null {
@@ -44,7 +44,7 @@ function read(k: string): BestScore | null {
   }
 }
 
-export function scoreFor(c: Pick<RunConfig, 'scenario' | 'seed'>): BestScore | null {
+export function scoreFor(c: Pick<RunConfig, 'scenario' | 'seed' | 'endless'>): BestScore | null {
   return read(key(c))
 }
 

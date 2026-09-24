@@ -1,3 +1,4 @@
+import { ACTIONS } from '@/game/interventions'
 import { AlertTriangle, CheckCircle2, CloudRain, Crosshair, Info, OctagonAlert, TrendingUp, Trophy } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
@@ -19,12 +20,6 @@ const TONE: Record<Tone, { icon: typeof Info; cls: string }> = {
   danger: { icon: OctagonAlert, cls: 'border-red-400/35 bg-red-400/10 text-red-100' },
 }
 
-const ACTIONS: { id: Intervention; label: string; blurb: string }[] = [
-  { id: 'rain', label: 'Rain', blurb: 'Refill every bush to full.' },
-  { id: 'releasePrey', label: 'Release rabbits', blurb: '+8 rabbits near the bushes, bred from living ones.' },
-  { id: 'cullPred', label: 'Cull foxes', blurb: 'Remove a third of the foxes.' },
-  { id: 'releasePred', label: 'Release foxes', blurb: '+3 fed foxes at the meadow edge.' },
-]
 
 export function RunPanel() {
   const [game, snap] = useGame()
@@ -36,12 +31,16 @@ export function RunPanel() {
 
   const actionIcon = (id: Intervention) => {
     switch (id) {
+      case 'plantBushes':
       case 'rain':
         return <CloudRain className="size-4 text-sky-300" />
+      case 'illnessPrey':
       case 'releasePrey':
         return <img src={icons.rabbit} alt="" className="size-5" />
       case 'cullPred':
         return <Crosshair className="size-4 text-red-300" />
+      case 'feedFoxes':
+      case 'illnessPred':
       case 'releasePred':
         return <img src={icons.fox} alt="" className="size-5" />
       default: {
@@ -54,6 +53,14 @@ export function RunPanel() {
   return (
     <div className="flex flex-col gap-4">
       <BestScore />
+      <section className="rounded-lg border p-3">
+        <h3 className="text-sm font-semibold">Deaths by cause</h3>
+        <table className="mt-2 w-full text-left text-xs tabular"><thead><tr><th>Species</th><th>Starved</th><th>Eaten</th><th>Old age</th><th>Illness</th><th>Culled</th></tr></thead>
+          <tbody><tr><td>Rabbits</td><td>{game.history.stat(snap.tick, 'preyStarved')}</td><td>{game.history.stat(snap.tick, 'preyEaten')}</td><td>{game.history.stat(snap.tick, 'preyOld')}</td><td>{game.history.stat(snap.tick, 'preyIllness')}</td><td>—</td></tr>
+          <tr><td>Foxes</td><td>{game.history.stat(snap.tick, 'predStarved')}</td><td>—</td><td>{game.history.stat(snap.tick, 'predOld')}</td><td>{game.history.stat(snap.tick, 'predIllness')}</td><td>{game.history.stat(snap.tick, 'predCulled')}</td></tr></tbody></table>
+        <p className="mt-2 text-[11px] text-muted-foreground">Totals up to the displayed time. Illness deaths are energy exhaustion during illness.</p>
+        {game.history.stat(snap.tick, 'ceilingHits') > 0 && <p className="mt-2 text-xs text-amber-200">The performance safety limit has restricted births. This run is not valid for balance comparisons.</p>}
+      </section>
 
       <section>
         <h3 className="mb-2 text-xs font-semibold tracking-wide text-muted-foreground uppercase">Field notes</h3>
@@ -76,6 +83,10 @@ export function RunPanel() {
         )}
       </section>
 
+      {(game.history.stat(snap.tick, 'preySick') + game.history.stat(snap.tick, 'predSick')) > 0 && <section className="rounded-lg border border-violet-400/30 bg-violet-400/10 p-3 text-xs">
+        <strong>Illness in the meadow</strong>
+        <p className="mt-1">{game.history.stat(snap.tick, 'preySick')} rabbits and {game.history.stat(snap.tick, 'predSick')} foxes are ill. Purple rings mark affected animals. Food can help them survive the added energy cost.</p>
+      </section>}
       {f && (
         <section className="rounded-lg border bg-muted/30 p-3">
           <div className="mb-1 flex items-center gap-1.5 text-xs font-semibold tracking-wide text-muted-foreground uppercase">
@@ -133,9 +144,10 @@ export function RunPanel() {
                   ? `Recharging: ready in ${formatDuration(coolLeft)}.`
                   : `Ready. There is a ${formatDuration(COOLDOWN)} cooldown between interventions.`}
         </p>
+        <p className="mt-2 text-[11px] text-muted-foreground">Illness spreads locally and drains energy; it can overshoot. Planting supports future food. Feeding foxes gives relief but may encourage births.</p>
         {cooling && <Progress value={100 - (coolLeft / COOLDOWN) * 100} className="mt-1 h-1" />}
         <p className="mt-2 text-[11px] text-muted-foreground">
-          A full year with no interventions earns +{CALM_BONUS[0]}, and each one used lowers that bonus by 100.
+          {snap.endless ? 'These four charges last the whole Endless run. Score is hours survived, with no year-end bonus.' : `A full year with no interventions earns +${CALM_BONUS[0]}, and each one used lowers that bonus by 100.`}
         </p>
       </section>
 

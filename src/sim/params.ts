@@ -32,7 +32,7 @@ export interface EcoParams {
   memory: boolean
   /** Births need a nearby adult mate; the child's genes cross over from both parents. */
   sexual: boolean
-  /** false = frozen-genes control: every newborn gets fresh random genes. */
+  /** false = founder-pool control: newborns sample fixed founder genomes independently of parent success. */
   heredity: boolean
   mateR: number
   kinR: number
@@ -52,6 +52,7 @@ export interface EcoParams {
 
 export interface SimParams {
   horizon: number
+  endless?: boolean
   patches: number
   patchStock: number
   regrowEvery: number
@@ -80,10 +81,10 @@ export interface SimParams {
 
 export function defaultEco(): EcoParams {
   return {
-    hidden: 4,
+    hidden: 0,
     maxHidden: 12,
-    growRate: 0.02,
-    memory: true,
+    growRate: 0,
+    memory: false,
     sexual: false,
     heredity: true,
     mateR: 0.1,
@@ -101,16 +102,16 @@ export function defaultEco(): EcoParams {
 /** The world's fixed physics; levers overwrite the tunable parts (see levers.ts). */
 export function defaultParams(): SimParams {
   return {
-    horizon: 8000,
+    horizon: 8760,
     patches: 10,
     patchStock: 30,
     regrowEvery: 15,
     sproutPerDay: 2,
     seedSpread: 0.5,
-    witherHours: 120,
+    witherHours: 240,
     maxBushes: 48,
     patchSpacing: 0.15,
-    eatR: 0.025,
+    eatR: 0.008,
     feedR: 0.02,
     birthR: 0.02,
     foodScent: 0.3,
@@ -149,7 +150,7 @@ export function defaultParams(): SimParams {
       mealEnergy: 90,
       breedEnergy: 0.7,
       childEnergy: 0.4,
-      visionUpkeep: 0.2,
+      visionUpkeep: 0.05,
       step: 0.014,
       baseStep: 0.014,
       view: [0.1, 1.0],

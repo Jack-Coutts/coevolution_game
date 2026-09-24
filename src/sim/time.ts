@@ -40,6 +40,7 @@ export function calendar(tick: number): CalendarTime {
   let dayIdx = Math.floor(hours / HOURS_PER_DAY)
   const hour = hours - dayIdx * HOURS_PER_DAY
   const dayOfRun = Math.floor(tick / HOURS_PER_DAY) + 1
+  dayIdx %= 365
   let month = 0
   while (dayIdx >= MONTH_DAYS[month % 12]) {
     dayIdx -= MONTH_DAYS[month % 12]
@@ -66,19 +67,19 @@ function seasonOf(m: number): Season {
 
 /** Tick at 00:00 on the given day of a month, counting months from September (0). */
 export function tickAt(monthFromSep: number, day = 1, hour = 0): number {
-  let days = 0
-  for (let m = 0; m < monthFromSep; m++) days += MONTH_DAYS[m % 12]
+  let days = Math.floor(monthFromSep / 12) * 365
+  for (let m = 0; m < monthFromSep % 12; m++) days += MONTH_DAYS[m % 12]
   days += day - 1
   return days * HOURS_PER_DAY + hour - START_HOUR
 }
 
 /** Start ticks of each calendar month within [0, horizon]. */
-export function monthStarts(horizon: number): { tick: number; label: string }[] {
+export function monthStarts(horizon: number, from = 0): { tick: number; label: string }[] {
   const out: { tick: number; label: string }[] = []
-  for (let m = 1; m < 13; m++) {
+  for (let m = Math.max(1, Math.floor(from / 8760) * 12); ; m++) {
     const t = tickAt(m)
     if (t > horizon) break
-    out.push({ tick: t, label: MONTHS[m % 12] })
+    if (t >= from) out.push({ tick: t, label: MONTHS[m % 12] })
   }
   return out
 }
@@ -100,6 +101,11 @@ function plural(n: number, word: string): string {
 /** "11 months 3 days", "5 days 4 hours", "7 hours". */
 export function formatDuration(ticks: number): string {
   const t = Math.max(0, Math.round(ticks))
+  if (t >= 8760) {
+    const years = Math.floor(t / 8760)
+    const remainderDays = Math.floor((t % 8760) / 24)
+    return remainderDays ? `${plural(years, 'year')} ${plural(remainderDays, 'day')}` : plural(years, 'year')
+  }
   const days = Math.floor(t / HOURS_PER_DAY)
   const hours = t % HOURS_PER_DAY
   const months = Math.floor(days / DAYS_PER_MONTH)

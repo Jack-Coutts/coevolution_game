@@ -7,7 +7,7 @@ import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group'
 import { dailySeed, type SeedChoice } from '@/game/seed'
 import { cn } from '@/lib/utils'
 
-export function MeadowSettings({ choice, onChange }: { choice: SeedChoice; onChange: (c: SeedChoice) => void }) {
+export function MeadowSettings({ choice, onChange, onPractice, locked = false }: { choice: SeedChoice; onChange: (c: SeedChoice) => void; locked?: boolean; onPractice: () => void }) {
   const [copied, setCopied] = useState(false)
   const custom = choice.kind === 'custom' ? choice.seed : null
   const copy = async () => {
@@ -31,6 +31,7 @@ export function MeadowSettings({ choice, onChange }: { choice: SeedChoice; onCha
           <div>
             <div className="mb-1.5 text-xs font-semibold tracking-wide text-muted-foreground uppercase">Meadow</div>
             <ToggleGroup
+              disabled={locked}
               type="single"
               variant="outline"
               size="sm"
@@ -60,7 +61,7 @@ export function MeadowSettings({ choice, onChange }: { choice: SeedChoice; onCha
               inputMode="numeric"
               aria-label="Seed"
               value={custom ?? dailySeed()}
-              disabled={choice.kind !== 'custom'}
+              disabled={locked || choice.kind !== 'custom'}
               onChange={(e) => {
                 const n = Math.abs(Math.trunc(Number(e.target.value)))
                 if (Number.isFinite(n)) onChange({ kind: 'custom', seed: n })
@@ -70,12 +71,15 @@ export function MeadowSettings({ choice, onChange }: { choice: SeedChoice; onCha
             <Button
               variant="outline"
               size="icon"
+              disabled={locked}
               aria-label="Random seed"
               onClick={() => onChange({ kind: 'custom', seed: randomSeed() })}
             >
               <Dices />
             </Button>
           </div>
+          <Button variant="outline" size="sm" disabled={locked} onClick={onPractice}>Practice meadow · seed 5007</Button>
+          <p className="text-[11px] text-muted-foreground">Practice restores the starting balance on a seed known to survive. Observe it, then compare your changes.</p>
           <Button variant="secondary" size="sm" onClick={copy} className="gap-1.5">
             {copied ? <Check /> : <Link2 />} {copied ? 'Link copied' : 'Copy link to this meadow'}
           </Button>

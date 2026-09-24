@@ -17,7 +17,7 @@ import { Rng } from './rng'
 import { calendar, type Season } from './time'
 
 export type Species = 'prey' | 'pred'
-export type Intervention = 'rain' | 'releasePrey' | 'cullPred' | 'releasePred'
+export type Intervention = 'rain' | 'releasePrey' | 'cullPred' | 'releasePred' | 'plantBushes' | 'feedFoxes' | 'illnessPrey' | 'illnessPred'
 
 export interface Window {
   from: number
@@ -40,10 +40,10 @@ export interface Disturbance {
 
 export const NO_DISTURBANCE: Disturbance = { regrow: [], metabolism: [], arrivals: [] }
 
-export type DeathCause = 'starved' | 'eaten' | 'old'
+export type DeathCause = 'starved' | 'eaten' | 'old' | 'illness'
 
 export interface TickEvent {
-  kind: 'eaten' | 'born' | 'starved' | 'old' | 'arrived' | 'released' | 'culled' | 'sprouted' | 'withered'
+  kind: 'eaten' | 'born' | 'starved' | 'old' | 'arrived' | 'released' | 'culled' | 'sprouted' | 'withered' | 'illness'
   species: Species
   x: number
   y: number
@@ -105,6 +105,9 @@ export interface Counters {
   preyStarved: number
   preyEaten: number
   preyOld: number
+  predCulled: number
+  preyIllness: number
+  predIllness: number
   predStarved: number
   predOld: number
 }
@@ -148,6 +151,8 @@ export class Creature {
   kits = 0
   pace = 0
   mem = 0
+  illUntil = 0
+  immuneUntil = 0
   inCover = false
   /** Tick a predator first came close; -1 when not being chased. */
   threatSince = -1
@@ -247,10 +252,12 @@ export class Sim {
   pops: Record<Species, Creature[]>
   tick = 0
   ended = false
-  counters: Counters = { preyBorn: 0, predBorn: 0, preyStarved: 0, preyEaten: 0, preyOld: 0, predStarved: 0, predOld: 0 }
+  counters: Counters = { preyBorn: 0, predBorn: 0, preyStarved: 0, preyEaten: 0, preyOld: 0, predStarved: 0, predOld: 0, predCulled: 0, preyIllness: 0, predIllness: 0 }
   evo: EvoCounters = { encounters: 0, escapes: 0, caught: 0, preyHours: 0, preyIntake: 0, predHours: 0, predHungryHours: 0 }
   lastBirth = { prey: 0, pred: 0 }
   events: TickEvent[] = []
+  private founders: Record<Species, Genome[]> = { prey: [], pred: [] }
+  ceilingHits = 0
   private rng: Rng
   private evRng: Rng
   private nextId = { prey: 0, pred: 0 }
@@ -289,7 +296,34 @@ export class Sim {
         this.pops[s].push(a)
       }
     }
+    for (const s of SPECIES) this.founders[s] = this.pops[s].map(a => a.brain)
     for (const s of SPECIES) for (const a of this.pops[s]) a.inCover = this.inCover(a.x, a.y)
+  }
+
+  /** Structured-cloneable checkpoint, including every random stream and pending action. */
+  save() {
+    return {
+      version: 2 as const, p: this.p, seed: this.seed, dist: this.dist, opts: this.opts,
+      pops: this.pops, founders: this.founders, bushes: this.bushes,
+      tick: this.tick, ended: this.ended, counters: this.counters, evo: this.evo,
+      lastBirth: this.lastBirth, nextId: this.nextId, nextBush: this.nextBush,
+      regrowAcc: this.regrowAcc, sproutAcc: this.sproutAcc, pending: this.pending,
+      ceilingHits: this.ceilingHits,
+      rng: this.rng.save(), evRng: this.evRng.save(), foodRng: this.foodRng.save(),
+    }
+  }
+
+  static restore(data: ReturnType<Sim['save']>): Sim {
+    if (data.version !== 2) throw new Error('Unsupported meadow save version')
+    const s = new Sim(data.p, data.seed, data.dist, data.opts)
+    for (const key of ['pops', 'founders', 'bushes', 'tick', 'ended', 'counters', 'evo', 'lastBirth',
+      'nextId', 'nextBush', 'regrowAcc', 'sproutAcc', 'pending', 'ceilingHits'] as const) {
+      Object.assign(s, { [key]: structuredClone(data[key]) })
+    }
+    s.rng.restore(data.rng)
+    s.evRng.restore(data.evRng)
+    s.foodRng.restore(data.foodRng)
+    return s
   }
 
   get prey(): Creature[] {
@@ -301,7 +335,7 @@ export class Sim {
   }
 
   get survived(): boolean {
-    return this.tick >= this.p.horizon && this.prey.length > 0 && this.preds.length > 0
+    return !this.p.endless && this.tick >= this.p.horizon && this.prey.length > 0 && this.preds.length > 0
   }
 
   queue(action: Intervention): void {
@@ -315,12 +349,14 @@ export class Sim {
 
   regrowFactor(tick: number): number {
     let f = 1
+    if (this.p.endless) tick %= 8760
     for (const w of this.dist.regrow) if (tick >= w.from && tick < w.to) f *= w.factor
     return f
   }
 
   metabolismFactor(tick: number): number {
     let f = 1
+    if (this.p.endless) tick %= 8760
     for (const w of this.dist.metabolism) if (tick >= w.from && tick < w.to) f *= w.factor
     return f
   }
@@ -376,6 +412,7 @@ export class Sim {
       this.grids[s].build(this.pops[s])
     }
 
+    this.spreadIllness()
     const met = this.metabolismFactor(tick)
     for (const s of SPECIES) for (const a of this.pops[s]) this.move(a, met)
     for (const s of SPECIES) this.grids[s].build(this.pops[s])
@@ -391,7 +428,7 @@ export class Sim {
 
     this.evo.preyHours += this.prey.length
     this.evo.predHours += this.preds.length
-    if (this.prey.length === 0 || this.preds.length === 0 || tick >= p.horizon) {
+    if (this.prey.length === 0 || this.preds.length === 0 || (!p.endless && tick >= p.horizon)) {
       this.ended = true
       return false
     }
@@ -601,7 +638,7 @@ export class Sim {
     a.inCover = this.cover.length > 0 && this.inCover(a.x, a.y)
     const r = step / body.baseStep
     a.energy -=
-      (body.metabolism + body.visionUpkeep * a.view + eco.brainUpkeep * a.brain.nHid) * met + body.speedCost * r * r
+      (body.metabolism + body.visionUpkeep * a.view + eco.brainUpkeep * a.brain.nHid) * met + body.speedCost * r * r + (a.illUntil > this.tick ? 0.65 : 0)
   }
 
   private graze(): void {
@@ -649,6 +686,7 @@ export class Sim {
           let best = eat2
           let hunter: Creature | null = null
           this.grids[s].each(a.x, a.y, this.p.eatR, (q) => {
+            if (q.energy > full) return
             const d2 = (q.x - a.x) ** 2 + (q.y - a.y) ** 2
             if (d2 <= best) {
               best = d2
@@ -688,7 +726,11 @@ export class Sim {
         continue
       }
       if (s === 'prey' && a.threatSince >= 0) a.threatSince = -1
-      if (starved) {
+      if (starved && a.illUntil > this.tick) {
+        if (s === 'prey') c.preyIllness++
+        else c.predIllness++
+        this.emit('illness', s, a)
+      } else if (starved) {
         if (s === 'prey') c.preyStarved += 1
         else c.predStarved += 1
         this.emit('starved', s, a)
@@ -724,7 +766,8 @@ export class Sim {
     const pop = this.pops[s]
     const cap = this.cap(s)
     const since = parent.lastBirth < 0 ? body.birthGap : parent.age - parent.lastBirth
-    if (pop.length >= cap || parent.age < body.adultAge || since < body.birthGap) return
+    if (pop.length >= cap) { this.ceilingHits++; return }
+    if (parent.age < body.adultAge || since < body.birthGap) return
     const childCost = body.childEnergy * body.maxEnergy
     if (parent.energy < body.breedEnergy * body.maxEnergy || parent.energy <= childCost) return
     const mate = p.eco.sexual ? this.findMate(parent) : null
@@ -737,7 +780,7 @@ export class Sim {
       const x = Math.min(1, Math.max(0, parent.x + r * Math.cos(angle)))
       const y = Math.min(1, Math.max(0, parent.y + r * Math.sin(angle)))
       let brain: Genome
-      if (!p.eco.heredity) brain = randomGenome(rng, p.eco.hidden, p.geneInit)
+      if (!p.eco.heredity) brain = this.founders[s][Math.floor(rng.random() * this.founders[s].length)]
       else {
         const base = mate ? crossover(rng, parent.brain, mate.brain) : parent.brain
         brain = mutateGenome(rng, base, p.mutationRate, p.mutationSigma, p.eco.growRate, p.eco.maxHidden)
@@ -762,11 +805,15 @@ export class Sim {
     const ev = this.evRng
     const p = this.p
     const pop = this.pops[s]
-    const brain =
-      pop.length > 0
-        ? mutateGenome(ev, pop[Math.floor(ev.random() * pop.length)].brain, p.mutationRate, p.mutationSigma, 0, p.eco.maxHidden)
+    const ancestor = pop.length ? pop[Math.floor(ev.random() * pop.length)] : null
+    const brain = !p.eco.heredity && this.founders[s].length
+      ? this.founders[s][Math.floor(ev.random() * this.founders[s].length)]
+      : ancestor
+        ? mutateGenome(ev, ancestor.brain, p.mutationRate, p.mutationSigma, 0, p.eco.maxHidden)
         : randomGenome(ev, p.eco.hidden, p.geneInit)
-    const a = this.spawn(s, x, y, brain, this.defs[s].body.maxEnergy, 0, -1)
+    const inherited = p.eco.heredity && ancestor
+    const a = this.spawn(s, x, y, brain, this.defs[s].body.maxEnergy, inherited ? ancestor.gen + 1 : 0, inherited ? ancestor.id : -1)
+    if (inherited) a.lineage = ancestor.lineage
     a.inCover = this.cover.length > 0 && this.inCover(x, y)
     return a
   }
@@ -788,7 +835,9 @@ export class Sim {
 
   private arrive(arr: Arrival): void {
     const [ex, ey] = this.edgePoint()
-    for (let i = 0; i < arr.count; i++) {
+    const room = Math.max(0, this.cap(arr.species) - this.pops[arr.species].length)
+    if (arr.count > room) this.ceilingHits += arr.count - room
+    for (let i = 0; i < Math.min(arr.count, room); i++) {
       const x = Math.min(1, Math.max(0, ex + this.evRng.uniform(-0.05, 0.05)))
       const y = Math.min(1, Math.max(0, ey + this.evRng.uniform(-0.05, 0.05)))
       const a = this.newcomer(arr.species, x, y)
@@ -797,14 +846,56 @@ export class Sim {
     }
   }
 
+  private infect(a: Creature): void {
+    a.illUntil = this.tick + 240
+    a.immuneUntil = this.tick + 720
+  }
+
+  /** Abstract game illness: local spread, extra energy costs, then recovery and temporary immunity. */
+  private spreadIllness(): void {
+    if (this.tick % 6 !== 0) return
+    for (const s of SPECIES) {
+      const sick = this.pops[s].filter(a => a.illUntil > this.tick)
+      const exposed = new Set<Creature>()
+      for (const a of sick) this.grids[s].each(a.x, a.y, 0.045, b => {
+        if (b.immuneUntil > this.tick || (a.x - b.x) ** 2 + (a.y - b.y) ** 2 > 0.045 ** 2) return
+        if (this.evRng.random() < 0.15) exposed.add(b)
+      })
+      for (const a of exposed) this.infect(a)
+    }
+  }
+
   private intervene(action: Intervention): void {
     const ev = this.evRng
     switch (action) {
+      case 'illnessPrey':
+      case 'illnessPred': {
+        const species = action === 'illnessPrey' ? 'prey' : 'pred'
+        const available = this.pops[species].filter(a => a.immuneUntil <= this.tick)
+        const n = Math.min(6, Math.max(1, Math.ceil(available.length * 0.2)))
+        for (let i = 0; i < n && available.length; i++) {
+          const at = Math.floor(ev.random() * available.length)
+          this.infect(available.splice(at, 1)[0])
+        }
+        break
+      }
+      case 'plantBushes':
+        for (let i = 0; i < 4 && this.bushes.length < this.p.maxBushes; i++) {
+          const bush = { id: this.nextBush++, x: ev.uniform(0.05, 0.95), y: ev.uniform(0.05, 0.95),
+            stock: this.p.patchStock / 2, grazedFor: 0, age: 0 }
+          this.bushes.push(bush)
+          this.emit('sprouted', 'prey', bush)
+        }
+        break
+      case 'feedFoxes':
+        for (const a of this.preds) a.energy = this.p.pred.maxEnergy
+        break
       case 'rain':
         for (const b of this.bushes) b.stock = this.p.patchStock
         break
       case 'releasePrey': {
         const room = Math.max(0, this.cap('prey') - this.prey.length)
+        if (room < 8) this.ceilingHits += 8 - room
         for (let i = 0; i < Math.min(8, room); i++) {
           const spot = this.bushes.length ? this.bushes[Math.floor(ev.random() * this.bushes.length)] : { x: 0.5, y: 0.5 }
           const [px, py] = [spot.x, spot.y]
@@ -818,6 +909,7 @@ export class Sim {
       }
       case 'releasePred': {
         const room = Math.max(0, this.cap('pred') - this.preds.length)
+        if (room < 3) this.ceilingHits += 3 - room
         const [ex, ey] = this.edgePoint()
         for (let i = 0; i < Math.min(3, room); i++) {
           const a = this.newcomer('pred', ex, ey)
@@ -830,6 +922,7 @@ export class Sim {
         const n = Math.floor(this.preds.length / 3)
         for (let i = 0; i < n && this.preds.length > 1; i++) {
           const k = Math.floor(ev.random() * this.preds.length)
+          this.counters.predCulled++
           this.emit('culled', 'pred', this.preds[k])
           this.preds.splice(k, 1)
         }

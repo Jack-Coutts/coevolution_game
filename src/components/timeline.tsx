@@ -1,8 +1,9 @@
+import { visibleSpans } from '@/sim/scenarios'
 import { useEffect, useRef, useState } from 'react'
 import { forecast } from '@/game/insights'
 import { useGame } from '@/hooks/use-game'
 import { dateLabel, monthStarts } from '@/sim/time'
-import { STAT, STAT_STRIDE } from '@/worker/protocol'
+import { STAT } from '@/worker/protocol'
 
 const H = 132
 const PAD_L = 30
@@ -26,7 +27,7 @@ export function Timeline() {
     if (!el) return 0
     const r = el.getBoundingClientRect()
     const f = (clientX - r.left - PAD_L) / (r.width - PAD_L - PAD_R)
-    return Math.round(Math.max(0, Math.min(1, f)) * game.history.horizon)
+    return game.history.firstTick + Math.round(Math.max(0, Math.min(1, f)) * (game.history.horizon - game.history.firstTick))
   }
 
   useEffect(() => {
@@ -50,34 +51,36 @@ export function Timeline() {
       ctx.clearRect(0, 0, W, H)
       const h = game.history
       const horizon = h.horizon
+      const start = h.firstTick
       const iw = W - PAD_L - PAD_R
       const ih = H - PAD_T - PAD_B
-      const xOf = (t: number) => PAD_L + (t / horizon) * iw
+      const xOf = (t: number) => PAD_L + ((t - start) / (horizon - start)) * iw
       let preyMax = 10
       let predMax = 4
-      for (let t = 0; t <= h.head; t += 12) {
+      for (let t = start; t <= h.head; t += 12) {
         preyMax = Math.max(preyMax, h.stat(t, 'prey'))
         predMax = Math.max(predMax, h.stat(t, 'pred'))
       }
-      preyMax *= 1.15
-      predMax *= 1.15
+      preyMax = Math.ceil(preyMax * 1.15)
+      predMax = Math.ceil(predMax * 1.15)
       const yPrey = (v: number) => PAD_T + ih - (v / preyMax) * ih
       const yPred = (v: number) => PAD_T + ih - (v / predMax) * ih
 
       ctx.fillStyle = 'rgba(255,255,255,0.025)'
       ctx.fillRect(PAD_L, PAD_T, iw, ih)
 
-      for (const s of game.scenario.spans) {
+      for (const s of visibleSpans(game.scenario, start, horizon, h.endless)) {
+        if (s.to < start || s.from > horizon) continue
         ctx.fillStyle = s.tone === 'winter' ? 'rgba(186, 220, 255, 0.10)' : 'rgba(240, 190, 90, 0.10)'
-        ctx.fillRect(xOf(s.from), PAD_T, xOf(Math.min(horizon, s.to)) - xOf(s.from), ih)
+        ctx.fillRect(xOf(Math.max(start, s.from)), PAD_T, xOf(Math.min(horizon, s.to)) - xOf(Math.max(start, s.from)), ih)
         ctx.fillStyle = s.tone === 'winter' ? 'rgba(186, 220, 255, 0.7)' : 'rgba(240, 190, 90, 0.8)'
         ctx.font = '500 10px Geist Variable, sans-serif'
-        ctx.fillText(s.label, xOf(s.from) + 4, PAD_T + 10)
+        ctx.fillText(s.label, xOf(Math.max(start, s.from)) + 4, PAD_T + 10)
       }
 
       ctx.font = '10px Geist Variable, sans-serif'
       ctx.textAlign = 'center'
-      for (const m of monthStarts(horizon)) {
+      for (const m of monthStarts(horizon, start)) {
         const x = xOf(m.tick)
         ctx.strokeStyle = 'rgba(255,255,255,0.06)'
         ctx.beginPath()
@@ -85,7 +88,7 @@ export function Timeline() {
         ctx.lineTo(x, PAD_T + ih)
         ctx.stroke()
       }
-      const labels = [{ tick: 0, label: 'Sep' }, ...monthStarts(horizon)]
+      const labels = [{ tick: start, label: dateLabel(start) }, ...monthStarts(horizon, start)]
       labels.forEach((m, i) => {
         const next = labels[i + 1]?.tick ?? horizon
         ctx.fillStyle = 'rgba(255,255,255,0.45)'
@@ -94,33 +97,32 @@ export function Timeline() {
       ctx.textAlign = 'left'
 
       const head = h.head
-      const step = Math.max(1, Math.floor(horizon / iw / 1.5))
-      const st = h.stats
+      const step = Math.max(1, Math.floor((horizon - start) / iw / 1.5))
       if (head > 0) {
         ctx.beginPath()
-        ctx.moveTo(xOf(0), PAD_T + ih)
-        for (let t = 0; t <= head; t += step) ctx.lineTo(xOf(t), PAD_T + ih - Math.min(1, st[t * STAT_STRIDE + STAT.stock]) * ih)
-        ctx.lineTo(xOf(head), PAD_T + ih - Math.min(1, st[head * STAT_STRIDE + STAT.stock]) * ih)
+        ctx.moveTo(xOf(start), PAD_T + ih)
+        for (let t = start; t <= head; t += step) ctx.lineTo(xOf(t), PAD_T + ih - Math.min(1, h.stat(t, 'stock')) * ih)
+        ctx.lineTo(xOf(head), PAD_T + ih - Math.min(1, h.stat(head, 'stock')) * ih)
         ctx.lineTo(xOf(head), PAD_T + ih)
         ctx.closePath()
         ctx.fillStyle = BERRY
         ctx.fill()
 
-        const line = (key: number, y: (v: number) => number, color: string, width: number) => {
+        const line = (key: keyof typeof STAT, y: (v: number) => number, color: string, width: number) => {
           ctx.beginPath()
-          for (let t = 0; t <= head; t += step) {
-            const v = st[t * STAT_STRIDE + key]
-            if (t === 0) ctx.moveTo(xOf(t), y(v))
+          for (let t = start; t <= head; t += step) {
+            const v = h.stat(t, key)
+            if (t === start) ctx.moveTo(xOf(t), y(v))
             else ctx.lineTo(xOf(t), y(v))
           }
-          ctx.lineTo(xOf(head), y(st[head * STAT_STRIDE + key]))
+          ctx.lineTo(xOf(head), y(h.stat(head, key)))
           ctx.strokeStyle = color
           ctx.lineWidth = width
           ctx.lineJoin = 'round'
           ctx.stroke()
         }
-        line(STAT.prey, yPrey, RABBIT, 1.8)
-        line(STAT.pred, yPred, FOX, 1.8)
+        line('prey', yPrey, RABBIT, 1.8)
+        line('pred', yPred, FOX, 1.8)
 
         const f = !game.getSnapshot().end ? forecast(h, head) : null
         if (f && f.ahead > 0) {
@@ -128,12 +130,12 @@ export function Timeline() {
           ctx.lineWidth = 1.3
           ctx.strokeStyle = 'rgba(220, 199, 163, 0.7)'
           ctx.beginPath()
-          ctx.moveTo(xOf(head), yPrey(st[head * STAT_STRIDE + STAT.prey]))
+          ctx.moveTo(xOf(head), yPrey(h.stat(head, 'prey')))
           ctx.lineTo(xOf(head + f.ahead), yPrey(Math.min(preyMax, f.prey)))
           ctx.stroke()
           ctx.strokeStyle = 'rgba(236, 138, 69, 0.75)'
           ctx.beginPath()
-          ctx.moveTo(xOf(head), yPred(st[head * STAT_STRIDE + STAT.pred]))
+          ctx.moveTo(xOf(head), yPred(h.stat(head, 'pred')))
           ctx.lineTo(xOf(head + f.ahead), yPred(Math.min(predMax, f.pred)))
           ctx.stroke()
           ctx.setLineDash([])
@@ -146,6 +148,7 @@ export function Timeline() {
       }
 
       for (const m of game.scenario.markers) {
+        if (m.tick < start) continue
         const x = xOf(m.tick)
         ctx.strokeStyle = 'rgba(236, 138, 69, 0.8)'
         ctx.setLineDash([3, 3])
@@ -159,6 +162,7 @@ export function Timeline() {
         ctx.fillText(m.label, x + 4, PAD_T + 10)
       }
       for (const iv of h.interventions) {
+        if (iv.tick < start) continue
         const x = xOf(iv.tick)
         ctx.fillStyle = '#f5d67b'
         ctx.beginPath()
@@ -225,7 +229,7 @@ export function Timeline() {
         onPointerLeave={() => setHover(null)}
         role="slider"
         aria-label="Population timeline. Click or drag to replay an earlier moment."
-        aria-valuemin={0}
+        aria-valuemin={game.history.firstTick}
         aria-valuemax={snap.horizon}
         aria-valuenow={snap.tick}
         aria-valuetext={dateLabel(snap.tick)}

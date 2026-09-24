@@ -50,7 +50,7 @@ if (mode === 'trace') {
     )
   }
 } else {
-  const patches: { name: string; levers?: Partial<LeverValues>; eco?: Partial<EcoParams>; wither?: number; vision?: number }[] = [
+  const patches: { name: string; levers?: LeverValues; eco?: Partial<EcoParams>; wither?: number; vision?: number }[] = [
     { name: 'rabbits-120', vision: 0.05, levers: { ...SLOW, 'prey.initial': 120 } },
     { name: 'slower', vision: 0.05, levers: { ...SLOW, 'pred.speed': 0.75 } },
     { name: 'sprint-cost', vision: 0.05, levers: { ...SLOW, 'pred.speedCost': 1.3 } },

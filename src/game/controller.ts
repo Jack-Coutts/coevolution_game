@@ -1,7 +1,8 @@
+import { writeSave, type MeadowSave } from './saves'
 import { BUDGET, deriveParams, spent, type LeverValues } from '@/sim/levers'
 import type { SimParams } from '@/sim/params'
 import { SCENARIO_BY_ID, type Scenario, type ScenarioId } from '@/sim/scenarios'
-import type { Intervention } from '@/sim/sim'
+import type { Intervention, Sim } from '@/sim/sim'
 import { tickAt } from '@/sim/time'
 import { WorldRenderer, type Weather } from '@/render/renderer'
 import { STAT_STRIDE, type EndInfo, type FrameData, type FromWorker, type ToWorker } from '@/worker/protocol'
@@ -17,6 +18,7 @@ export interface RunConfig {
   base: LeverValues
   scenario: ScenarioId
   seed: number
+  endless: boolean
 }
 
 export const SPEEDS = [
@@ -27,7 +29,7 @@ export const SPEEDS = [
   { label: '2 wk/s', tps: 336 },
   { label: '1 mo/s', tps: 720 },
 ]
-export const DEFAULT_SPEED = 3
+export const DEFAULT_SPEED = 1
 
 export const CHARGES = 4
 export const COOLDOWN = 400
@@ -38,6 +40,8 @@ export interface Snapshot {
   tick: number
   head: number
   horizon: number
+  endless: boolean
+  saveStatus: string
   speed: number
   prey: number
   pred: number
@@ -70,11 +74,13 @@ function span(t: number, from: number, to: number): number {
 }
 
 export class GameController {
-  history: RunHistory = new RunHistory(8000)
+  history: RunHistory = new RunHistory(8760)
   params: SimParams | null = null
   scenario: Scenario = SCENARIO_BY_ID.stable
   config: RunConfig | null = null
   cover: [number, number][] = []
+  private saveStatus = ''
+  private saving = false
   private worker: Worker
   private renderer: WorldRenderer | null = null
   private runId = 0
@@ -83,6 +89,7 @@ export class GameController {
   private speed = DEFAULT_SPEED
   private phase: Phase = 'loading'
   private end: EndInfo | null = null
+  private stepTarget: number | null = null
   private inflight = false
   private raf = 0
   private last = 0
@@ -156,6 +163,8 @@ export class GameController {
       tick: t,
       head: h.head,
       horizon: h.horizon,
+      endless: this.config?.endless ?? false,
+      saveStatus: this.saveStatus,
       speed: this.speed,
       prey: h.stat(t, 'prey'),
       pred: h.stat(t, 'pred'),
@@ -183,16 +192,21 @@ export class GameController {
   }
 
   /** Start a fresh run at tick 0 (planning phase). */
-  configure(config: RunConfig): void {
+  configure(config: RunConfig, state?: ReturnType<Sim['save']>): void {
     this.config = config
     this.params = deriveParams(config.levers)
+    this.params.endless = config.endless
     this.scenario = SCENARIO_BY_ID[config.scenario]
     this.runId += 1
-    this.history = new RunHistory(this.params.horizon)
+    this.history = new RunHistory(this.params.horizon, config.endless)
+    this.saveStatus = ''
+    this.saving = false
+    this.hintCache = { tick: -1, hints: [] }
     this.displayTick = 0
     this.lastFxTick = 0
     this.playing = false
     this.phase = 'loading'
+    this.stepTarget = null
     this.end = null
     this.inflight = false
     this.finalized = false
@@ -203,7 +217,7 @@ export class GameController {
     this.cooldownUntil = 0
     this.best = scoreFor(config)
     this.renderer?.clearFx()
-    this.send({
+    this.send(state ? { type: 'restore', runId: this.runId, state } : {
       type: 'init',
       runId: this.runId,
       params: this.params,
@@ -223,7 +237,9 @@ export class GameController {
       case 'ready':
         this.cover = msg.cover
         this.history.add(msg.frame, msg.stats, 0)
-        this.phase = 'planning'
+        this.history.addEvolution(msg.evolution)
+        this.phase = msg.restored ? 'running' : 'planning'
+        if (msg.restored) { this.displayTick = msg.frame.tick; this.end = msg.end ?? null; if (this.end) this.finalize() }
         if (this.renderer && this.params && this.config) {
           this.renderer.setWorld(msg.cover, this.params.eco.coverR, this.config.seed, this.params.patchStock)
         }
@@ -232,10 +248,42 @@ export class GameController {
       case 'frames':
         this.inflight = false
         msg.frames.forEach((f: FrameData, i: number) => this.history.add(f, msg.stats, i * STAT_STRIDE))
+        msg.evolution.forEach(e => this.history.addEvolution(e))
         if (msg.end) this.end = msg.end
+        if (this.stepTarget !== null) {
+          this.displayTick = Math.min(this.history.head, this.stepTarget)
+          if (this.history.head < this.stepTarget && !this.end) {
+            this.inflight = true
+            this.send({ type: 'advance', runId: this.runId, target: this.stepTarget })
+          } else {
+            this.stepTarget = null
+            if (this.end) this.finalize()
+          }
+        }
         this.notify()
         break
+      case 'saved': {
+        if (!this.config) break
+        this.displayTick = msg.state.tick
+        const save: MeadowSave = { version: 2, savedAt: new Date().toISOString(), config: this.config,
+          state: msg.state, history: this.history.save(), charges: this.charges, cooldownUntil: this.cooldownUntil,
+          interventions: this.history.interventions, evolution: this.history.evolution, journal: this.history.journal }
+        const id = this.runId
+        void writeSave(save).then(() => {
+          if (id !== this.runId) return
+          this.saving = false
+          this.saveStatus = 'Meadow saved on this device.'
+          this.notify(true)
+        }).catch(() => {
+          if (id !== this.runId) return
+          this.saving = false
+          this.saveStatus = 'Could not save: device storage is unavailable or full.'
+          this.notify(true)
+        })
+        break
+      }
       case 'intervened':
+        this.cooldownUntil = msg.tick - 1 + COOLDOWN
         this.history.interventions = [...this.history.interventions, { tick: msg.tick, action: msg.action }]
         this.notify(true)
         break
@@ -247,9 +295,9 @@ export class GameController {
   }
 
   play(): void {
-    if (this.phase === 'loading') return
+    if (this.phase === 'loading' || this.saving) return
     if (this.phase === 'planning' && this.budgetLeft() < 0) return
-    if (this.phase === 'ended' && this.displayTick >= this.history.head) this.displayTick = 0
+    if (this.phase === 'ended' && this.displayTick >= this.history.head) this.displayTick = this.history.firstTick
     if (this.phase === 'planning') this.phase = 'running'
     this.playing = true
     this.last = performance.now()
@@ -257,6 +305,7 @@ export class GameController {
   }
 
   pause(): void {
+    this.stepTarget = null
     this.playing = false
     this.notify(true)
   }
@@ -273,7 +322,8 @@ export class GameController {
 
   /** Jump the view to a tick already simulated (scrub). */
   seek(tick: number): void {
-    this.displayTick = Math.max(0, Math.min(this.history.head, tick))
+    this.stepTarget = null
+    this.displayTick = Math.max(this.history.firstTick, Math.min(this.history.head, tick))
     this.lastFxTick = Math.floor(this.displayTick)
     this.renderer?.clearFx()
     this.notify(true)
@@ -282,19 +332,43 @@ export class GameController {
   /** Step forward or back by `n` ticks; stepping past the head simulates when running. */
   stepBy(n: number): void {
     this.pause()
-    const target = this.displayTick + n
-    if (target > this.history.head && !this.end && this.phase !== 'loading') {
+    const target = Math.round(this.displayTick + n)
+    if (target > this.history.head && !this.end && this.phase !== 'loading' && !this.saving) {
+      if (this.phase === 'planning' && this.budgetLeft() < 0) return
       if (this.phase === 'planning') this.phase = 'running'
-      this.send({ type: 'advance', runId: this.runId, target: Math.ceil(target) })
-      this.inflight = true
-    }
-    this.seek(Math.round(target))
+      this.stepTarget = target
+      if (!this.inflight) {
+        this.send({ type: 'advance', runId: this.runId, target })
+        this.inflight = true
+      }
+    } else this.seek(target)
+  }
+
+  save(): void {
+    if (this.phase === 'loading' || this.saving) return
+    this.pause()
+    this.saving = true
+    this.saveStatus = 'Saving meadow…'
+    this.send({ type: 'save', runId: this.runId })
+    this.notify(true)
+  }
+
+  restore(save: MeadowSave): void {
+    this.configure(save.config, save.state)
+    this.history.restore(save.history)
+    this.charges = save.charges
+    this.cooldownUntil = save.cooldownUntil
+    this.history.interventions = save.interventions
+    this.history.evolution = save.evolution
+    this.history.journal = save.journal
+    this.saveStatus = 'Meadow restored and paused. Recent replay and the evolution journal are preserved.'
   }
 
   canIntervene(): boolean {
     return (
       this.phase === 'running' &&
       !this.end &&
+      !this.saving &&
       this.charges > 0 &&
       this.history.head >= this.cooldownUntil &&
       this.atLive()
@@ -315,6 +389,7 @@ export class GameController {
   }
 
   weather(tick: number): Weather {
+    if (this.config?.endless) tick %= 8760
     const harsh = this.scenario.spans.some((s) => s.tone === 'winter')
     let dry = 0.35 * span(tick, SUMMER, Infinity)
     for (const s of this.scenario.spans) if (s.tone === 'drought') dry = Math.max(dry, span(tick, s.from, s.to))

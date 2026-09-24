@@ -1,4 +1,5 @@
 /// <reference lib="webworker" />
+import { inheritedTraits, summarizeEvolution, type EvolutionSample } from '@/sim/evolution'
 import { Sim } from '@/sim/sim'
 import {
   ANIMAL_STRIDE,
@@ -37,6 +38,19 @@ function packAnimals(s: Sim, species: 'prey' | 'pred'): Float32Array {
     out[o + 7] = a.pace
     out[o + 8] = a.inCover ? 1 : 0
     out[o + 9] = a.gen
+    out[o + 10] = a.age
+    out[o + 11] = a.parent
+    out[o + 12] = a.lineage
+    out[o + 13] = a.kits
+    out[o + 14] = a.view
+    out[o + 15] = a.maxTurn
+    out[o + 16] = a.brain.nHid
+    const t = inheritedTraits(a.brain, species)
+    out[o + 17] = t.forage
+    out[o + 18] = t.flee
+    out[o + 19] = t.cruise
+    out[o + 20] = t.hide
+    out[o + 21] = Math.max(0, a.illUntil - s.tick)
   }
   return out
 }
@@ -81,7 +95,7 @@ function writeStats(s: Sim, out: Float64Array, row: number): void {
     arr.length ? arr.reduce((t, a) => t + a[key], 0) / arr.length / max : 0
   out[o + STAT.prey] = s.prey.length
   out[o + STAT.pred] = s.preds.length
-  out[o + STAT.stock] = s.bushes.reduce((t, b) => t + b.stock, 0) / (s.p.patchStock * s.p.patches)
+  out[o + STAT.stock] = s.bushes.reduce((t, b) => t + b.stock, 0) / (s.p.patchStock * Math.max(1, s.bushes.length))
   out[o + STAT.bushes] = s.bushes.length
   out[o + STAT.preyEnergy] = mean(s.prey, 'energy', s.p.prey.maxEnergy)
   out[o + STAT.predEnergy] = mean(s.preds, 'energy', s.p.pred.maxEnergy)
@@ -95,6 +109,12 @@ function writeStats(s: Sim, out: Float64Array, row: number): void {
   out[o + STAT.preyOld] = c.preyOld
   out[o + STAT.predStarved] = c.predStarved
   out[o + STAT.predOld] = c.predOld
+  out[o + STAT.predCulled] = c.predCulled
+  out[o + STAT.ceilingHits] = s.ceilingHits
+  out[o + STAT.preySick] = s.prey.filter(a => a.illUntil > s.tick).length
+  out[o + STAT.predSick] = s.preds.filter(a => a.illUntil > s.tick).length
+  out[o + STAT.preyIllness] = c.preyIllness
+  out[o + STAT.predIllness] = c.predIllness
   // mean distance of rabbits from their nearest bush: how spread out the prey are
   let spread = 0
   for (const a of s.prey) {
@@ -124,7 +144,20 @@ ctx.onmessage = (ev: MessageEvent<ToWorker>) => {
       const stats = new Float64Array(STAT_STRIDE)
       writeStats(sim, stats, 0)
       const f = frame(sim)
-      post({ type: 'ready', runId, cover: sim.cover, frame: f, stats }, [stats.buffer])
+      post({ type: 'ready', evolution: summarizeEvolution(sim), runId, cover: sim.cover, frame: f, stats }, [stats.buffer])
+      break
+    }
+    case 'save': {
+      if (sim && msg.runId === runId) post({ type: 'saved', runId, state: sim.save() }, [])
+      break
+    }
+    case 'restore': {
+      runId = msg.runId
+      sim = Sim.restore(msg.state)
+      const stats = new Float64Array(STAT_STRIDE)
+      writeStats(sim, stats, 0)
+      post({ type: 'ready', restored: true, end: endInfo(sim), evolution: summarizeEvolution(sim), runId,
+        cover: sim.cover, frame: frame(sim), stats }, [stats.buffer])
       break
     }
     case 'advance': {
@@ -132,9 +165,11 @@ ctx.onmessage = (ev: MessageEvent<ToWorker>) => {
       const s = sim
       const frames: FrameData[] = []
       const rows: Float64Array[] = []
+      const evolution: EvolutionSample[] = []
       const t0 = performance.now()
       while (!s.ended && s.tick < msg.target && performance.now() - t0 < CHUNK_MS && frames.length < 4000) {
         s.step()
+        if (s.tick % 24 === 0 || s.ended) evolution.push(summarizeEvolution(s))
         frames.push(frame(s))
         const row = new Float64Array(STAT_STRIDE)
         writeStats(s, row, 0)
@@ -142,7 +177,7 @@ ctx.onmessage = (ev: MessageEvent<ToWorker>) => {
       }
       const stats = new Float64Array(rows.length * STAT_STRIDE)
       rows.forEach((row, i) => stats.set(row, i * STAT_STRIDE))
-      post({ type: 'frames', runId, frames, stats, head: s.tick, end: endInfo(s) }, [stats.buffer])
+      post({ type: 'frames', evolution, runId, frames, stats, head: s.tick, end: endInfo(s) }, [stats.buffer])
       break
     }
     case 'intervene': {

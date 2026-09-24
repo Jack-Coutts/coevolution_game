@@ -9,8 +9,10 @@ import { runHeadless, Sim } from '@/sim/sim'
 import { calendar, formatDuration, formatHours, tickAt } from '@/sim/time'
 
 describe('natural time labels', () => {
-  it('maps the 8,000-tick horizon to 11 months 3 days', () => {
+  it('formats durations through and beyond the 365-day challenge', () => {
     expect(formatDuration(8000)).toBe('11 months 3 days')
+    expect(formatDuration(8760)).toBe('1 year')
+    expect(formatDuration(8784)).toBe('1 year 1 day')
     expect(formatDuration(100)).toBe('4 days 4 hours')
     expect(formatHours(150)).toBe('6 d 6 h')
     expect(formatHours(15)).toBe('15 h')
@@ -19,7 +21,7 @@ describe('natural time labels', () => {
     expect(calendar(0)).toMatchObject({ day: 1, monthName: 'Sep', hour: 8, season: 'autumn' })
     expect(calendar(tickAt(3))).toMatchObject({ day: 1, monthName: 'Dec', hour: 0, season: 'winter' })
     expect(calendar(tickAt(6) - 1).monthName).toBe('Feb')
-    expect(calendar(8000)).toMatchObject({ monthName: 'Jul', day: 31, hour: 16 })
+    expect(calendar(8760)).toMatchObject({ monthName: 'Sep', day: 1, hour: 8 })
   })
 })
 
@@ -77,8 +79,11 @@ describe('simulation', () => {
     }
   })
 
-  it('catches a rabbit that shares the fox’s position', () => {
-    const s = new Sim(p, 4)
+  it('catches a rabbit in physical reach after movement', () => {
+    const params = structuredClone(p)
+    params.prey.step = 0
+    params.pred.step = 0
+    const s = new Sim(params, 4)
     const fox = s.preds[0]
     const rabbit = s.prey[0]
     fox.x = 0.4
@@ -119,7 +124,7 @@ describe('simulation', () => {
     const born = s.counters.preyBorn - before
     expect(born).toBeGreaterThanOrEqual(1)
     const child = s.prey.find((a) => a.age === 0 && Math.hypot(a.x - parent.x, a.y - parent.y) <= p.birthR + p.prey.step)
-    expect(child?.energy).toBe(81)
+    expect(child?.energy).toBe(p.prey.childEnergy * p.prey.maxEnergy)
     expect(parent.lastBirth).toBe(parent.age)
   })
 
@@ -138,10 +143,10 @@ describe('simulation', () => {
 describe('score', () => {
   it('pays bonuses only for a full year, capped so weakening levers cannot inflate them', () => {
     expect(scoreRun(5000, false, 0, 0)).toEqual({ hours: 5000, budgetBonus: 0, calmBonus: 0, total: 5000 })
-    expect(scoreRun(8000, true, 0, 0)).toEqual({ hours: 8000, budgetBonus: 300, calmBonus: 400, total: 8700 })
-    expect(scoreRun(8000, true, -12, 0).total).toBe(8700)
-    expect(scoreRun(8000, true, 20, 2)).toEqual({ hours: 8000, budgetBonus: 100, calmBonus: 200, total: 8300 })
-    expect(scoreRun(8000, true, 35, 4).total).toBe(8000)
+    expect(scoreRun(8760, true, 0, 0)).toEqual({ hours: 8760, budgetBonus: 300, calmBonus: 400, total: 9460 })
+    expect(scoreRun(8760, true, -12, 0).total).toBe(9460)
+    expect(scoreRun(8760, true, 20, 2)).toEqual({ hours: 8760, budgetBonus: 100, calmBonus: 200, total: 9060 })
+    expect(scoreRun(8760, true, 35, 4).total).toBe(8760)
   })
 })
 
@@ -162,20 +167,24 @@ describe('brains', () => {
 })
 
 describe('hunting', () => {
-  it('catches a rabbit whenever a fox is within the catch radius, however full the fox is', () => {
+  it('lets a satiated fox leave a rabbit alive until it needs energy', () => {
     const p = deriveParams(STABLE_PRESET)
     p.prey.step = 0
     p.pred.step = 0
     const s = new Sim(p, 4)
     const fox = s.preds[0]
+    s.pops.pred = [fox]
     fox.energy = p.pred.maxEnergy
     const rabbit = s.prey[0]
     rabbit.x = fox.x + p.eatR * 0.9
     rabbit.y = fox.y
     const eaten = s.counters.preyEaten
     s.step()
+    expect(s.prey.includes(rabbit)).toBe(true)
+    expect(s.counters.preyEaten - eaten).toBe(0)
+    fox.energy = p.pred.maxEnergy / 2
+    s.step()
     expect(s.prey.includes(rabbit)).toBe(false)
-    expect(s.counters.preyEaten - eaten).toBeGreaterThanOrEqual(1)
   })
 })
 
