@@ -106,6 +106,38 @@ Score is hours survived. A successful challenge also awards up to 300 unspent-bu
 and 400 calm points, reduced by 100 per intervention. Endless scores are survival time only.
 Scores have a new version and are separated by mode to avoid mixing old balance results.
 
+## The Vole meadow
+
+The fifth scenario (after the Open meadow, Drought, Fox invasion and Harsh winter) adds field
+voles to the Open meadow preset, with no weather. The Open meadow stays the default and the
+practice meadow (seed 5007) is unchanged. Design record: `third-species.md`.
+
+- **Food web.** Voles eat grass seed in the tall grass and nibble berries when seed runs short.
+  Foxes eat voles and rabbits; a vole is 40% of a fox meal. Tall grass hides voles as it hides
+  rabbits and does not slow them. The planning panel shows a "Who eats whom" card.
+- **Rule.** All three species must be alive at the end of the year; the run ends at the first
+  extinction of any of them, in the challenge and in Endless.
+- **Choices.** One extra lever, Starting voles (20 to 150, default 60), only in this meadow. The
+  Tall grass lever now also sets vole food. Ten interventions share the same four uses and
+  cooldown: the eight above plus Release voles (twelve voles into tall grass) and Vole illness.
+  No action removes voles directly.
+- **Identity.** A small, rounded slate-grey sprite with tiny ears and a thin tail, two thirds of
+  a rabbit. The UI colour is `--color-vole`, a slate blue (light `oklch(0.5 0.09 250)`, 5.8:1 on
+  the card; dark `oklch(0.78 0.08 250)`, 9.0:1). Voles appear in the HUD, status strip,
+  timeline (on the rabbits' left scale), forecast, deaths table, illness note, inspector and
+  picker, the Evolution page tiles and trait charts, the journal and the guide. Vole births and
+  starvation have no map effect (there are thousands); deaths to foxes use the eaten effect.
+- **Field notes.** Grass seed nearly gone (voles move to the bushes), vole boom, vole crash with
+  many foxes ("the foxes that lived on them will turn to rabbits"), few voles left, and a
+  forecast of vole extinction. With 100 or more voles, the overhunting warning adds that a fox
+  cull can set off a vole boom that strips the bushes.
+- **Explanations.** A vole extinction is explained by its main cause (starved on bare seed,
+  eaten out, illness, old age); fox starvation names voles when voles were most of the foxes'
+  recent catch.
+- **The decision it creates.** Culling foxes during overhunting also frees the voles. On paired
+  seeds the same cull at the same warning had a different best alternative on 8 of 20 seeds
+  with voles present, in both directions, and turned a surviving meadow into a loss on three (see `validation.md`).
+
 ## Validation
 
 Keep adaptation and ecological resilience separate. The common-garden assay compares

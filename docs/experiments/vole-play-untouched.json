@@ -1,0 +1,890 @@
+[
+ {
+  "seed": 9300,
+  "survived": true,
+  "tick": 8760,
+  "end": {
+   "prey": 115,
+   "pred": 85,
+   "vole": 153
+  },
+  "firstExtinct": [],
+  "ceilingHits": 0,
+  "peaks": {
+   "prey": 396,
+   "pred": 86,
+   "vole": 312
+  },
+  "deaths": {
+   "prey": {
+    "born": 7816,
+    "starved": 6672,
+    "eaten": 1153,
+    "old": 36,
+    "illness": 0,
+    "culled": 0
+   },
+   "pred": {
+    "born": 422,
+    "starved": 106,
+    "eaten": 0,
+    "old": 237,
+    "illness": 0,
+    "culled": 0
+   },
+   "vole": {
+    "born": 10773,
+    "starved": 9009,
+    "eaten": 1464,
+    "old": 207,
+    "illness": 0,
+    "culled": 0
+   }
+  }
+ },
+ {
+  "seed": 9301,
+  "survived": false,
+  "tick": 1917,
+  "end": {
+   "prey": 0,
+   "pred": 114,
+   "vole": 54
+  },
+  "firstExtinct": [
+   "prey"
+  ],
+  "ceilingHits": 0,
+  "peaks": {
+   "prey": 259,
+   "pred": 123,
+   "vole": 298
+  },
+  "deaths": {
+   "prey": {
+    "born": 1586,
+    "starved": 997,
+    "eaten": 745,
+    "old": 4,
+    "illness": 0,
+    "culled": 0
+   },
+   "pred": {
+    "born": 177,
+    "starved": 43,
+    "eaten": 0,
+    "old": 26,
+    "illness": 0,
+    "culled": 0
+   },
+   "vole": {
+    "born": 3708,
+    "starved": 3188,
+    "eaten": 448,
+    "old": 78,
+    "illness": 0,
+    "culled": 0
+   }
+  }
+ },
+ {
+  "seed": 9302,
+  "survived": false,
+  "tick": 3112,
+  "end": {
+   "prey": 271,
+   "pred": 47,
+   "vole": 0
+  },
+  "firstExtinct": [
+   "vole"
+  ],
+  "ceilingHits": 0,
+  "peaks": {
+   "prey": 356,
+   "pred": 69,
+   "vole": 236
+  },
+  "deaths": {
+   "prey": {
+    "born": 2459,
+    "starved": 1815,
+    "eaten": 523,
+    "old": 10,
+    "illness": 0,
+    "culled": 0
+   },
+   "pred": {
+    "born": 171,
+    "starved": 43,
+    "eaten": 0,
+    "old": 87,
+    "illness": 0,
+    "culled": 0
+   },
+   "vole": {
+    "born": 2856,
+    "starved": 2293,
+    "eaten": 571,
+    "old": 52,
+    "illness": 0,
+    "culled": 0
+   }
+  }
+ },
+ {
+  "seed": 9303,
+  "survived": false,
+  "tick": 5823,
+  "end": {
+   "prey": 0,
+   "pred": 105,
+   "vole": 37
+  },
+  "firstExtinct": [
+   "prey"
+  ],
+  "ceilingHits": 0,
+  "peaks": {
+   "prey": 302,
+   "pred": 157,
+   "vole": 272
+  },
+  "deaths": {
+   "prey": {
+    "born": 4022,
+    "starved": 2508,
+    "eaten": 1665,
+    "old": 9,
+    "illness": 0,
+    "culled": 0
+   },
+   "pred": {
+    "born": 434,
+    "starved": 105,
+    "eaten": 0,
+    "old": 230,
+    "illness": 0,
+    "culled": 0
+   },
+   "vole": {
+    "born": 6486,
+    "starved": 5941,
+    "eaten": 308,
+    "old": 260,
+    "illness": 0,
+    "culled": 0
+   }
+  }
+ },
+ {
+  "seed": 9304,
+  "survived": true,
+  "tick": 8760,
+  "end": {
+   "prey": 99,
+   "pred": 75,
+   "vole": 36
+  },
+  "firstExtinct": [],
+  "ceilingHits": 0,
+  "peaks": {
+   "prey": 306,
+   "pred": 94,
+   "vole": 303
+  },
+  "deaths": {
+   "prey": {
+    "born": 6171,
+    "starved": 4676,
+    "eaten": 1517,
+    "old": 39,
+    "illness": 0,
+    "culled": 0
+   },
+   "pred": {
+    "born": 452,
+    "starved": 166,
+    "eaten": 0,
+    "old": 217,
+    "illness": 0,
+    "culled": 0
+   },
+   "vole": {
+    "born": 11295,
+    "starved": 9377,
+    "eaten": 1802,
+    "old": 140,
+    "illness": 0,
+    "culled": 0
+   }
+  }
+ },
+ {
+  "seed": 9305,
+  "survived": false,
+  "tick": 1966,
+  "end": {
+   "prey": 0,
+   "pred": 82,
+   "vole": 12
+  },
+  "firstExtinct": [
+   "prey"
+  ],
+  "ceilingHits": 0,
+  "peaks": {
+   "prey": 274,
+   "pred": 90,
+   "vole": 289
+  },
+  "deaths": {
+   "prey": {
+    "born": 1410,
+    "starved": 1072,
+    "eaten": 492,
+    "old": 6,
+    "illness": 0,
+    "culled": 0
+   },
+   "pred": {
+    "born": 124,
+    "starved": 21,
+    "eaten": 0,
+    "old": 27,
+    "illness": 0,
+    "culled": 0
+   },
+   "vole": {
+    "born": 3132,
+    "starved": 2524,
+    "eaten": 595,
+    "old": 61,
+    "illness": 0,
+    "culled": 0
+   }
+  }
+ },
+ {
+  "seed": 9306,
+  "survived": false,
+  "tick": 4180,
+  "end": {
+   "prey": 0,
+   "pred": 146,
+   "vole": 43
+  },
+  "firstExtinct": [
+   "prey"
+  ],
+  "ceilingHits": 0,
+  "peaks": {
+   "prey": 298,
+   "pred": 186,
+   "vole": 252
+  },
+  "deaths": {
+   "prey": {
+    "born": 3405,
+    "starved": 1714,
+    "eaten": 1845,
+    "old": 6,
+    "illness": 0,
+    "culled": 0
+   },
+   "pred": {
+    "born": 380,
+    "starved": 108,
+    "eaten": 0,
+    "old": 132,
+    "illness": 0,
+    "culled": 0
+   },
+   "vole": {
+    "born": 5820,
+    "starved": 5017,
+    "eaten": 686,
+    "old": 134,
+    "illness": 0,
+    "culled": 0
+   }
+  }
+ },
+ {
+  "seed": 9307,
+  "survived": false,
+  "tick": 1966,
+  "end": {
+   "prey": 0,
+   "pred": 26,
+   "vole": 124
+  },
+  "firstExtinct": [
+   "prey"
+  ],
+  "ceilingHits": 0,
+  "peaks": {
+   "prey": 282,
+   "pred": 49,
+   "vole": 325
+  },
+  "deaths": {
+   "prey": {
+    "born": 1309,
+    "starved": 1041,
+    "eaten": 419,
+    "old": 9,
+    "illness": 0,
+    "culled": 0
+   },
+   "pred": {
+    "born": 83,
+    "starved": 45,
+    "eaten": 0,
+    "old": 18,
+    "illness": 0,
+    "culled": 0
+   },
+   "vole": {
+    "born": 3486,
+    "starved": 3067,
+    "eaten": 244,
+    "old": 111,
+    "illness": 0,
+    "culled": 0
+   }
+  }
+ },
+ {
+  "seed": 9308,
+  "survived": true,
+  "tick": 8760,
+  "end": {
+   "prey": 126,
+   "pred": 67,
+   "vole": 115
+  },
+  "firstExtinct": [],
+  "ceilingHits": 0,
+  "peaks": {
+   "prey": 380,
+   "pred": 67,
+   "vole": 285
+  },
+  "deaths": {
+   "prey": {
+    "born": 5884,
+    "starved": 5207,
+    "eaten": 637,
+    "old": 74,
+    "illness": 0,
+    "culled": 0
+   },
+   "pred": {
+    "born": 204,
+    "starved": 35,
+    "eaten": 0,
+    "old": 108,
+    "illness": 0,
+    "culled": 0
+   },
+   "vole": {
+    "born": 16713,
+    "starved": 15456,
+    "eaten": 629,
+    "old": 573,
+    "illness": 0,
+    "culled": 0
+   }
+  }
+ },
+ {
+  "seed": 9309,
+  "survived": false,
+  "tick": 3515,
+  "end": {
+   "prey": 6,
+   "pred": 85,
+   "vole": 0
+  },
+  "firstExtinct": [
+   "vole"
+  ],
+  "ceilingHits": 0,
+  "peaks": {
+   "prey": 249,
+   "pred": 137,
+   "vole": 266
+  },
+  "deaths": {
+   "prey": {
+    "born": 2066,
+    "starved": 1411,
+    "eaten": 802,
+    "old": 7,
+    "illness": 0,
+    "culled": 0
+   },
+   "pred": {
+    "born": 262,
+    "starved": 70,
+    "eaten": 0,
+    "old": 113,
+    "illness": 0,
+    "culled": 0
+   },
+   "vole": {
+    "born": 3603,
+    "starved": 2908,
+    "eaten": 702,
+    "old": 53,
+    "illness": 0,
+    "culled": 0
+   }
+  }
+ },
+ {
+  "seed": 9310,
+  "survived": false,
+  "tick": 1612,
+  "end": {
+   "prey": 0,
+   "pred": 30,
+   "vole": 139
+  },
+  "firstExtinct": [
+   "prey"
+  ],
+  "ceilingHits": 0,
+  "peaks": {
+   "prey": 294,
+   "pred": 43,
+   "vole": 223
+  },
+  "deaths": {
+   "prey": {
+    "born": 963,
+    "starved": 826,
+    "eaten": 295,
+    "old": 2,
+    "illness": 0,
+    "culled": 0
+   },
+   "pred": {
+    "born": 59,
+    "starved": 25,
+    "eaten": 0,
+    "old": 10,
+    "illness": 0,
+    "culled": 0
+   },
+   "vole": {
+    "born": 2703,
+    "starved": 2446,
+    "eaten": 97,
+    "old": 81,
+    "illness": 0,
+    "culled": 0
+   }
+  }
+ },
+ {
+  "seed": 9311,
+  "survived": true,
+  "tick": 8760,
+  "end": {
+   "prey": 172,
+   "pred": 4,
+   "vole": 31
+  },
+  "firstExtinct": [],
+  "ceilingHits": 0,
+  "peaks": {
+   "prey": 465,
+   "pred": 46,
+   "vole": 271
+  },
+  "deaths": {
+   "prey": {
+    "born": 6782,
+    "starved": 6230,
+    "eaten": 484,
+    "old": 56,
+    "illness": 0,
+    "culled": 0
+   },
+   "pred": {
+    "born": 155,
+    "starved": 48,
+    "eaten": 0,
+    "old": 109,
+    "illness": 0,
+    "culled": 0
+   },
+   "vole": {
+    "born": 8748,
+    "starved": 8012,
+    "eaten": 481,
+    "old": 284,
+    "illness": 0,
+    "culled": 0
+   }
+  }
+ },
+ {
+  "seed": 9312,
+  "survived": true,
+  "tick": 8760,
+  "end": {
+   "prey": 141,
+   "pred": 59,
+   "vole": 46
+  },
+  "firstExtinct": [],
+  "ceilingHits": 0,
+  "peaks": {
+   "prey": 378,
+   "pred": 99,
+   "vole": 241
+  },
+  "deaths": {
+   "prey": {
+    "born": 7756,
+    "starved": 5910,
+    "eaten": 1827,
+    "old": 38,
+    "illness": 0,
+    "culled": 0
+   },
+   "pred": {
+    "born": 457,
+    "starved": 126,
+    "eaten": 0,
+    "old": 278,
+    "illness": 0,
+    "culled": 0
+   },
+   "vole": {
+    "born": 9165,
+    "starved": 8589,
+    "eaten": 148,
+    "old": 442,
+    "illness": 0,
+    "culled": 0
+   }
+  }
+ },
+ {
+  "seed": 9313,
+  "survived": false,
+  "tick": 4877,
+  "end": {
+   "prey": 0,
+   "pred": 73,
+   "vole": 39
+  },
+  "firstExtinct": [
+   "prey"
+  ],
+  "ceilingHits": 0,
+  "peaks": {
+   "prey": 319,
+   "pred": 130,
+   "vole": 273
+  },
+  "deaths": {
+   "prey": {
+    "born": 2792,
+    "starved": 1834,
+    "eaten": 1110,
+    "old": 8,
+    "illness": 0,
+    "culled": 0
+   },
+   "pred": {
+    "born": 392,
+    "starved": 80,
+    "eaten": 0,
+    "old": 245,
+    "illness": 0,
+    "culled": 0
+   },
+   "vole": {
+    "born": 7035,
+    "starved": 5548,
+    "eaten": 1427,
+    "old": 81,
+    "illness": 0,
+    "culled": 0
+   }
+  }
+ },
+ {
+  "seed": 9314,
+  "survived": false,
+  "tick": 4122,
+  "end": {
+   "prey": 0,
+   "pred": 130,
+   "vole": 17
+  },
+  "firstExtinct": [
+   "prey"
+  ],
+  "ceilingHits": 0,
+  "peaks": {
+   "prey": 245,
+   "pred": 139,
+   "vole": 313
+  },
+  "deaths": {
+   "prey": {
+    "born": 1900,
+    "starved": 1322,
+    "eaten": 736,
+    "old": 2,
+    "illness": 0,
+    "culled": 0
+   },
+   "pred": {
+    "born": 302,
+    "starved": 29,
+    "eaten": 0,
+    "old": 149,
+    "illness": 0,
+    "culled": 0
+   },
+   "vole": {
+    "born": 7881,
+    "starved": 5925,
+    "eaten": 1914,
+    "old": 85,
+    "illness": 0,
+    "culled": 0
+   }
+  }
+ },
+ {
+  "seed": 9315,
+  "survived": false,
+  "tick": 1853,
+  "end": {
+   "prey": 0,
+   "pred": 91,
+   "vole": 19
+  },
+  "firstExtinct": [
+   "prey"
+  ],
+  "ceilingHits": 0,
+  "peaks": {
+   "prey": 253,
+   "pred": 99,
+   "vole": 353
+  },
+  "deaths": {
+   "prey": {
+    "born": 1390,
+    "starved": 983,
+    "eaten": 564,
+    "old": 3,
+    "illness": 0,
+    "culled": 0
+   },
+   "pred": {
+    "born": 139,
+    "starved": 18,
+    "eaten": 0,
+    "old": 36,
+    "illness": 0,
+    "culled": 0
+   },
+   "vole": {
+    "born": 2637,
+    "starved": 2256,
+    "eaten": 373,
+    "old": 49,
+    "illness": 0,
+    "culled": 0
+   }
+  }
+ },
+ {
+  "seed": 9316,
+  "survived": false,
+  "tick": 1716,
+  "end": {
+   "prey": 0,
+   "pred": 62,
+   "vole": 39
+  },
+  "firstExtinct": [
+   "prey"
+  ],
+  "ceilingHits": 0,
+  "peaks": {
+   "prey": 295,
+   "pred": 81,
+   "vole": 333
+  },
+  "deaths": {
+   "prey": {
+    "born": 1267,
+    "starved": 952,
+    "eaten": 473,
+    "old": 2,
+    "illness": 0,
+    "culled": 0
+   },
+   "pred": {
+    "born": 109,
+    "starved": 33,
+    "eaten": 0,
+    "old": 20,
+    "illness": 0,
+    "culled": 0
+   },
+   "vole": {
+    "born": 2901,
+    "starved": 2587,
+    "eaten": 281,
+    "old": 54,
+    "illness": 0,
+    "culled": 0
+   }
+  }
+ },
+ {
+  "seed": 9317,
+  "survived": true,
+  "tick": 8760,
+  "end": {
+   "prey": 90,
+   "pred": 80,
+   "vole": 119
+  },
+  "firstExtinct": [],
+  "ceilingHits": 0,
+  "peaks": {
+   "prey": 279,
+   "pred": 137,
+   "vole": 310
+  },
+  "deaths": {
+   "prey": {
+    "born": 5290,
+    "starved": 1982,
+    "eaten": 3371,
+    "old": 7,
+    "illness": 0,
+    "culled": 0
+   },
+   "pred": {
+    "born": 906,
+    "starved": 384,
+    "eaten": 0,
+    "old": 448,
+    "illness": 0,
+    "culled": 0
+   },
+   "vole": {
+    "born": 16521,
+    "starved": 12140,
+    "eaten": 4021,
+    "old": 301,
+    "illness": 0,
+    "culled": 0
+   }
+  }
+ },
+ {
+  "seed": 9318,
+  "survived": false,
+  "tick": 2872,
+  "end": {
+   "prey": 219,
+   "pred": 0,
+   "vole": 54
+  },
+  "firstExtinct": [
+   "pred"
+  ],
+  "ceilingHits": 0,
+  "peaks": {
+   "prey": 300,
+   "pred": 24,
+   "vole": 334
+  },
+  "deaths": {
+   "prey": {
+    "born": 2472,
+    "starved": 2307,
+    "eaten": 91,
+    "old": 15,
+    "illness": 0,
+    "culled": 0
+   },
+   "pred": {
+    "born": 30,
+    "starved": 13,
+    "eaten": 0,
+    "old": 23,
+    "illness": 0,
+    "culled": 0
+   },
+   "vole": {
+    "born": 4440,
+    "starved": 4196,
+    "eaten": 98,
+    "old": 152,
+    "illness": 0,
+    "culled": 0
+   }
+  }
+ },
+ {
+  "seed": 9319,
+  "survived": false,
+  "tick": 2622,
+  "end": {
+   "prey": 0,
+   "pred": 51,
+   "vole": 28
+  },
+  "firstExtinct": [
+   "prey"
+  ],
+  "ceilingHits": 0,
+  "peaks": {
+   "prey": 351,
+   "pred": 91,
+   "vole": 301
+  },
+  "deaths": {
+   "prey": {
+    "born": 2004,
+    "starved": 1260,
+    "eaten": 902,
+    "old": 2,
+    "illness": 0,
+    "culled": 0
+   },
+   "pred": {
+    "born": 185,
+    "starved": 85,
+    "eaten": 0,
+    "old": 55,
+    "illness": 0,
+    "culled": 0
+   },
+   "vole": {
+    "born": 2793,
+    "starved": 2290,
+    "eaten": 488,
+    "old": 47,
+    "illness": 0,
+    "culled": 0
+   }
+  }
+ }
+]

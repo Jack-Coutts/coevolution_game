@@ -253,3 +253,55 @@ Implementation notes and deviations from the design record:
 - Deferred to #9: vole levers (only an optional `vole.initial` value is read), hints and
   forecasts, full vole explanations (a plain cause summary stands in), rendering, the run
   panel's vole actions (`VOLE_ACTIONS` exists but is not shown) and picker visibility.
+
+## Playable Vole meadow (#9)
+
+Measured with Node 22.22.2 on Linux x64 (shared container), `scripts/vole-play.ts`, raw rows in
+`experiments/vole-play-untouched.json` and `experiments/vole-play-decision.json`. Engine and
+parameters are the #8 ones: no tuning pass was made, because the #8 batch (5/10) was already
+inside the 30 to 50% guide.
+
+**Untouched, fresh seeds 9300 to 9319**, default settings (60 starting voles), game rules:
+
+| Measure | Result |
+| --- | ---: |
+| All three alive at a year | **6/20 (30%)**, Wilson 95% interval 15 to 52% |
+| First species lost (rabbit / vole / fox) | 11 / 2 / 1 |
+| Safety-ceiling hits | 0 in every run |
+| Peak voles (range) | 223 to 353 (ceiling 800) |
+
+Survival sits at the lower edge of the band. Rabbits are 79% of first losses, above the
+design's 70% guide for "no single fragile species": a flag for a later calibration on a larger
+batch, not tuned here.
+
+**Decision 1: cull foxes when they overhunt, with voles present.** Each run was branched at the
+first overhunting warning (10 or more foxes, under 5 rabbits per fox, rabbits down 15% in ten
+days; in the Vole meadow there were 82 to 147 voles at that moment) into cull foxes, release
+rabbits, or wait. Same seeds in both meadows.
+
+| | Open meadow | Vole meadow |
+| --- | ---: | ---: |
+| Year survival: cull / release rabbits / wait | 9 / 7 / 10 | 6 / 3 / 6 |
+| Cull lasted longer / shorter than waiting | 7 / 6 | 11 / 5 |
+| Cull lasted longer / shorter than releasing | 12 / 4 | 12 / 5 |
+| 30 days on, after a cull vs after waiting: voles | | 95 vs 84 |
+| 30 days on: highest vole count, cull vs wait | | 149 vs 136 |
+| 30 days on: barest bushes (mean fullness), cull vs wait | 9.1% vs 11.1% | 6.4% vs 8.2% |
+
+Whether the cull or the release lasted longer differed between the meadows on **8 of 20 seeds**
+: with voles the cull compared better on 9302, 9303, 9307 and 9311, and worse on 9300, 9312,
+9316 and 9318. On three seeds a cull that kept the Open meadow alive for the year lost the Vole
+meadow: 9300 (Vole: cull ends at hour 4289, waiting survives), 9311 (cull ends at 5899, waiting
+survives) and 9318 (cull ends at 2865 with 3 foxes left a month on; releasing rabbits lasts to
+5619). So the vole link makes
+the familiar fix a real trade-off: the cull still helps more often than it hurts, but it frees
+the voles and strips berries, and it can backfire. The new overhunting note says so.
+
+Not measured here (left for a later pass): decision 2 (culling when voles crash), mistimed
+actions, the browser worker batch and playback speed, the 50-seed batch the design asks for,
+and Starting voles values other than the default.
+
+**Browser check.** A production build (`vite build`, `vite preview`) was driven with Playwright
+in light and dark themes through planning, running, inspecting a vole, the Evolution page, the
+Guide and the result dialog, in the Vole meadow (seed 9302) and the Open meadow (seed 9305).
+The Open meadow shows no vole lever, action, count, row or legend entry.

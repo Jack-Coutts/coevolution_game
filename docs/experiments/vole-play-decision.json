@@ -1,0 +1,3020 @@
+[
+ {
+  "scenario": "stable",
+  "seed": 9300,
+  "trigger": {
+   "tick": 804,
+   "prey": 164,
+   "pred": 33
+  },
+  "branches": [
+   {
+    "action": "cullPred",
+    "volePeak30": 0,
+    "stockMin30": 0.006,
+    "preyStarved30": 454,
+    "preyEaten30": 68,
+    "day30": {
+     "prey": 67,
+     "pred": 18
+    },
+    "survived": true,
+    "tick": 8760,
+    "end": {
+     "prey": 109,
+     "pred": 68
+    },
+    "firstExtinct": [],
+    "ceilingHits": 0
+   },
+   {
+    "action": "releasePrey",
+    "volePeak30": 0,
+    "stockMin30": 0.029,
+    "preyStarved30": 434,
+    "preyEaten30": 71,
+    "day30": {
+     "prey": 68,
+     "pred": 22
+    },
+    "survived": false,
+    "tick": 5130,
+    "end": {
+     "prey": 0,
+     "pred": 76
+    },
+    "firstExtinct": [
+     "prey"
+    ],
+    "ceilingHits": 0
+   },
+   {
+    "action": "wait",
+    "volePeak30": 0,
+    "stockMin30": 0.042,
+    "preyStarved30": 441,
+    "preyEaten30": 97,
+    "day30": {
+     "prey": 183,
+     "pred": 30
+    },
+    "survived": false,
+    "tick": 7417,
+    "end": {
+     "prey": 0,
+     "pred": 100
+    },
+    "firstExtinct": [
+     "prey"
+    ],
+    "ceilingHits": 0
+   }
+  ]
+ },
+ {
+  "scenario": "voles",
+  "seed": 9300,
+  "trigger": {
+   "tick": 709,
+   "prey": 154,
+   "pred": 31,
+   "vole": 104
+  },
+  "branches": [
+   {
+    "action": "cullPred",
+    "volePeak30": 147,
+    "stockMin30": 0.068,
+    "preyStarved30": 458,
+    "preyEaten30": 150,
+    "day30": {
+     "prey": 208,
+     "pred": 39,
+     "vole": 99
+    },
+    "survived": false,
+    "tick": 4289,
+    "end": {
+     "prey": 0,
+     "pred": 58,
+     "vole": 25
+    },
+    "firstExtinct": [
+     "prey"
+    ],
+    "ceilingHits": 0
+   },
+   {
+    "action": "releasePrey",
+    "volePeak30": 142,
+    "stockMin30": 0.045,
+    "preyStarved30": 434,
+    "preyEaten30": 198,
+    "day30": {
+     "prey": 116,
+     "pred": 61,
+     "vole": 122
+    },
+    "survived": false,
+    "tick": 6632,
+    "end": {
+     "prey": 0,
+     "pred": 237,
+     "vole": 13
+    },
+    "firstExtinct": [
+     "prey"
+    ],
+    "ceilingHits": 0
+   },
+   {
+    "action": "wait",
+    "volePeak30": 142,
+    "stockMin30": 0.125,
+    "preyStarved30": 466,
+    "preyEaten30": 137,
+    "day30": {
+     "prey": 180,
+     "pred": 38,
+     "vole": 110
+    },
+    "survived": true,
+    "tick": 8760,
+    "end": {
+     "prey": 115,
+     "pred": 85,
+     "vole": 153
+    },
+    "firstExtinct": [],
+    "ceilingHits": 0
+   }
+  ]
+ },
+ {
+  "scenario": "stable",
+  "seed": 9301,
+  "trigger": {
+   "tick": 1129,
+   "prey": 228,
+   "pred": 46
+  },
+  "branches": [
+   {
+    "action": "cullPred",
+    "volePeak30": 0,
+    "stockMin30": 0.062,
+    "preyStarved30": 408,
+    "preyEaten30": 287,
+    "day30": {
+     "prey": 48,
+     "pred": 73
+    },
+    "survived": false,
+    "tick": 4400,
+    "end": {
+     "prey": 0,
+     "pred": 45
+    },
+    "firstExtinct": [
+     "prey"
+    ],
+    "ceilingHits": 0
+   },
+   {
+    "action": "releasePrey",
+    "volePeak30": 0,
+    "stockMin30": 0.121,
+    "preyStarved30": 290,
+    "preyEaten30": 372,
+    "day30": {
+     "prey": 17,
+     "pred": 95
+    },
+    "survived": false,
+    "tick": 2112,
+    "end": {
+     "prey": 0,
+     "pred": 37
+    },
+    "firstExtinct": [
+     "prey"
+    ],
+    "ceilingHits": 0
+   },
+   {
+    "action": "wait",
+    "volePeak30": 0,
+    "stockMin30": 0.085,
+    "preyStarved30": 284,
+    "preyEaten30": 362,
+    "day30": {
+     "prey": 4,
+     "pred": 93
+    },
+    "survived": false,
+    "tick": 1995,
+    "end": {
+     "prey": 0,
+     "pred": 70
+    },
+    "firstExtinct": [
+     "prey"
+    ],
+    "ceilingHits": 0
+   }
+  ]
+ },
+ {
+  "scenario": "voles",
+  "seed": 9301,
+  "trigger": {
+   "tick": 1141,
+   "prey": 205,
+   "pred": 56,
+   "vole": 147
+  },
+  "branches": [
+   {
+    "action": "cullPred",
+    "volePeak30": 165,
+    "stockMin30": 0.045,
+    "preyStarved30": 328,
+    "preyEaten30": 414,
+    "day30": {
+     "prey": 42,
+     "pred": 96,
+     "vole": 93
+    },
+    "survived": false,
+    "tick": 2143,
+    "end": {
+     "prey": 0,
+     "pred": 82,
+     "vole": 69
+    },
+    "firstExtinct": [
+     "prey"
+    ],
+    "ceilingHits": 0
+   },
+   {
+    "action": "releasePrey",
+    "volePeak30": 157,
+    "stockMin30": 0.114,
+    "preyStarved30": 246,
+    "preyEaten30": 411,
+    "day30": {
+     "prey": 29,
+     "pred": 101,
+     "vole": 48
+    },
+    "survived": false,
+    "tick": 1957,
+    "end": {
+     "prey": 0,
+     "pred": 99,
+     "vole": 35
+    },
+    "firstExtinct": [
+     "prey"
+    ],
+    "ceilingHits": 0
+   },
+   {
+    "action": "wait",
+    "volePeak30": 164,
+    "stockMin30": 0.182,
+    "preyStarved30": 233,
+    "preyEaten30": 450,
+    "day30": {
+     "prey": 9,
+     "pred": 115,
+     "vole": 55
+    },
+    "survived": false,
+    "tick": 1917,
+    "end": {
+     "prey": 0,
+     "pred": 114,
+     "vole": 54
+    },
+    "firstExtinct": [
+     "prey"
+    ],
+    "ceilingHits": 0
+   }
+  ]
+ },
+ {
+  "scenario": "stable",
+  "seed": 9302,
+  "trigger": {
+   "tick": 1249,
+   "prey": 207,
+   "pred": 48
+  },
+  "branches": [
+   {
+    "action": "cullPred",
+    "volePeak30": 0,
+    "stockMin30": 0.059,
+    "preyStarved30": 465,
+    "preyEaten30": 220,
+    "day30": {
+     "prey": 171,
+     "pred": 55
+    },
+    "survived": false,
+    "tick": 2841,
+    "end": {
+     "prey": 0,
+     "pred": 48
+    },
+    "firstExtinct": [
+     "prey"
+    ],
+    "ceilingHits": 0
+   },
+   {
+    "action": "releasePrey",
+    "volePeak30": 0,
+    "stockMin30": 0.103,
+    "preyStarved30": 429,
+    "preyEaten30": 219,
+    "day30": {
+     "prey": 161,
+     "pred": 56
+    },
+    "survived": false,
+    "tick": 3202,
+    "end": {
+     "prey": 0,
+     "pred": 40
+    },
+    "firstExtinct": [
+     "prey"
+    ],
+    "ceilingHits": 0
+   },
+   {
+    "action": "wait",
+    "volePeak30": 0,
+    "stockMin30": 0.03,
+    "preyStarved30": 415,
+    "preyEaten30": 260,
+    "day30": {
+     "prey": 148,
+     "pred": 66
+    },
+    "survived": false,
+    "tick": 2766,
+    "end": {
+     "prey": 0,
+     "pred": 60
+    },
+    "firstExtinct": [
+     "prey"
+    ],
+    "ceilingHits": 0
+   }
+  ]
+ },
+ {
+  "scenario": "voles",
+  "seed": 9302,
+  "trigger": {
+   "tick": 1199,
+   "prey": 229,
+   "pred": 53,
+   "vole": 82
+  },
+  "branches": [
+   {
+    "action": "cullPred",
+    "volePeak30": 104,
+    "stockMin30": 0.018,
+    "preyStarved30": 412,
+    "preyEaten30": 122,
+    "day30": {
+     "prey": 108,
+     "pred": 59,
+     "vole": 60
+    },
+    "survived": false,
+    "tick": 4740,
+    "end": {
+     "prey": 315,
+     "pred": 96,
+     "vole": 0
+    },
+    "firstExtinct": [
+     "vole"
+    ],
+    "ceilingHits": 0
+   },
+   {
+    "action": "releasePrey",
+    "volePeak30": 108,
+    "stockMin30": 0.007,
+    "preyStarved30": 448,
+    "preyEaten30": 120,
+    "day30": {
+     "prey": 69,
+     "pred": 59,
+     "vole": 83
+    },
+    "survived": false,
+    "tick": 4090,
+    "end": {
+     "prey": 42,
+     "pred": 60,
+     "vole": 0
+    },
+    "firstExtinct": [
+     "vole"
+    ],
+    "ceilingHits": 0
+   },
+   {
+    "action": "wait",
+    "volePeak30": 92,
+    "stockMin30": 0.024,
+    "preyStarved30": 424,
+    "preyEaten30": 125,
+    "day30": {
+     "prey": 57,
+     "pred": 65,
+     "vole": 25
+    },
+    "survived": false,
+    "tick": 3112,
+    "end": {
+     "prey": 271,
+     "pred": 47,
+     "vole": 0
+    },
+    "firstExtinct": [
+     "vole"
+    ],
+    "ceilingHits": 0
+   }
+  ]
+ },
+ {
+  "scenario": "stable",
+  "seed": 9303,
+  "trigger": {
+   "tick": 1116,
+   "prey": 113,
+   "pred": 23
+  },
+  "branches": [
+   {
+    "action": "cullPred",
+    "volePeak30": 0,
+    "stockMin30": 0.047,
+    "preyStarved30": 458,
+    "preyEaten30": 88,
+    "day30": {
+     "prey": 213,
+     "pred": 28
+    },
+    "survived": true,
+    "tick": 8760,
+    "end": {
+     "prey": 227,
+     "pred": 57
+    },
+    "firstExtinct": [],
+    "ceilingHits": 0
+   },
+   {
+    "action": "releasePrey",
+    "volePeak30": 0,
+    "stockMin30": 0.152,
+    "preyStarved30": 493,
+    "preyEaten30": 112,
+    "day30": {
+     "prey": 153,
+     "pred": 37
+    },
+    "survived": true,
+    "tick": 8760,
+    "end": {
+     "prey": 94,
+     "pred": 133
+    },
+    "firstExtinct": [],
+    "ceilingHits": 0
+   },
+   {
+    "action": "wait",
+    "volePeak30": 0,
+    "stockMin30": 0.183,
+    "preyStarved30": 449,
+    "preyEaten30": 129,
+    "day30": {
+     "prey": 124,
+     "pred": 44
+    },
+    "survived": true,
+    "tick": 8760,
+    "end": {
+     "prey": 184,
+     "pred": 173
+    },
+    "firstExtinct": [],
+    "ceilingHits": 0
+   }
+  ]
+ },
+ {
+  "scenario": "voles",
+  "seed": 9303,
+  "trigger": {
+   "tick": 1621,
+   "prey": 152,
+   "pred": 57,
+   "vole": 116
+  },
+  "branches": [
+   {
+    "action": "cullPred",
+    "volePeak30": 124,
+    "stockMin30": 0.035,
+    "preyStarved30": 287,
+    "preyEaten30": 234,
+    "day30": {
+     "prey": 64,
+     "pred": 64,
+     "vole": 80
+    },
+    "survived": false,
+    "tick": 8470,
+    "end": {
+     "prey": 0,
+     "pred": 28,
+     "vole": 74
+    },
+    "firstExtinct": [
+     "prey"
+    ],
+    "ceilingHits": 0
+   },
+   {
+    "action": "releasePrey",
+    "volePeak30": 127,
+    "stockMin30": 0.153,
+    "preyStarved30": 307,
+    "preyEaten30": 230,
+    "day30": {
+     "prey": 134,
+     "pred": 68,
+     "vole": 95
+    },
+    "survived": false,
+    "tick": 5425,
+    "end": {
+     "prey": 85,
+     "pred": 232,
+     "vole": 0
+    },
+    "firstExtinct": [
+     "vole"
+    ],
+    "ceilingHits": 0
+   },
+   {
+    "action": "wait",
+    "volePeak30": 136,
+    "stockMin30": 0.164,
+    "preyStarved30": 250,
+    "preyEaten30": 285,
+    "day30": {
+     "prey": 57,
+     "pred": 88,
+     "vole": 83
+    },
+    "survived": false,
+    "tick": 5823,
+    "end": {
+     "prey": 0,
+     "pred": 105,
+     "vole": 37
+    },
+    "firstExtinct": [
+     "prey"
+    ],
+    "ceilingHits": 0
+   }
+  ]
+ },
+ {
+  "scenario": "stable",
+  "seed": 9304,
+  "trigger": {
+   "tick": 899,
+   "prey": 134,
+   "pred": 27
+  },
+  "branches": [
+   {
+    "action": "cullPred",
+    "volePeak30": 0,
+    "stockMin30": 0.009,
+    "preyStarved30": 327,
+    "preyEaten30": 54,
+    "day30": {
+     "prey": 135,
+     "pred": 15
+    },
+    "survived": true,
+    "tick": 8760,
+    "end": {
+     "prey": 122,
+     "pred": 60
+    },
+    "firstExtinct": [],
+    "ceilingHits": 0
+   },
+   {
+    "action": "releasePrey",
+    "volePeak30": 0,
+    "stockMin30": 0.008,
+    "preyStarved30": 327,
+    "preyEaten30": 44,
+    "day30": {
+     "prey": 45,
+     "pred": 12
+    },
+    "survived": true,
+    "tick": 8760,
+    "end": {
+     "prey": 29,
+     "pred": 50
+    },
+    "firstExtinct": [],
+    "ceilingHits": 0
+   },
+   {
+    "action": "wait",
+    "volePeak30": 0,
+    "stockMin30": 0.01,
+    "preyStarved30": 336,
+    "preyEaten30": 50,
+    "day30": {
+     "prey": 101,
+     "pred": 9
+    },
+    "survived": true,
+    "tick": 8760,
+    "end": {
+     "prey": 105,
+     "pred": 8
+    },
+    "firstExtinct": [],
+    "ceilingHits": 0
+   }
+  ]
+ },
+ {
+  "scenario": "voles",
+  "seed": 9304,
+  "trigger": {
+   "tick": 2115,
+   "prey": 119,
+   "pred": 24,
+   "vole": 96
+  },
+  "branches": [
+   {
+    "action": "cullPred",
+    "volePeak30": 145,
+    "stockMin30": 0.104,
+    "preyStarved30": 314,
+    "preyEaten30": 35,
+    "day30": {
+     "prey": 91,
+     "pred": 25,
+     "vole": 83
+    },
+    "survived": true,
+    "tick": 8760,
+    "end": {
+     "prey": 86,
+     "pred": 93,
+     "vole": 71
+    },
+    "firstExtinct": [],
+    "ceilingHits": 0
+   },
+   {
+    "action": "releasePrey",
+    "volePeak30": 114,
+    "stockMin30": 0.101,
+    "preyStarved30": 349,
+    "preyEaten30": 34,
+    "day30": {
+     "prey": 86,
+     "pred": 19,
+     "vole": 78
+    },
+    "survived": true,
+    "tick": 8760,
+    "end": {
+     "prey": 70,
+     "pred": 89,
+     "vole": 34
+    },
+    "firstExtinct": [],
+    "ceilingHits": 0
+   },
+   {
+    "action": "wait",
+    "volePeak30": 133,
+    "stockMin30": 0.09,
+    "preyStarved30": 330,
+    "preyEaten30": 53,
+    "day30": {
+     "prey": 95,
+     "pred": 27,
+     "vole": 92
+    },
+    "survived": true,
+    "tick": 8760,
+    "end": {
+     "prey": 99,
+     "pred": 75,
+     "vole": 36
+    },
+    "firstExtinct": [],
+    "ceilingHits": 0
+   }
+  ]
+ },
+ {
+  "scenario": "stable",
+  "seed": 9305,
+  "trigger": {
+   "tick": 1151,
+   "prey": 218,
+   "pred": 45
+  },
+  "branches": [
+   {
+    "action": "cullPred",
+    "volePeak30": 0,
+    "stockMin30": 0.041,
+    "preyStarved30": 201,
+    "preyEaten30": 238,
+    "day30": {
+     "prey": 0,
+     "pred": 57
+    },
+    "survived": false,
+    "tick": 1626,
+    "end": {
+     "prey": 0,
+     "pred": 57
+    },
+    "firstExtinct": [
+     "prey"
+    ],
+    "ceilingHits": 0
+   },
+   {
+    "action": "releasePrey",
+    "volePeak30": 0,
+    "stockMin30": 0.046,
+    "preyStarved30": 167,
+    "preyEaten30": 281,
+    "day30": {
+     "prey": 0,
+     "pred": 74
+    },
+    "survived": false,
+    "tick": 1576,
+    "end": {
+     "prey": 0,
+     "pred": 74
+    },
+    "firstExtinct": [
+     "prey"
+    ],
+    "ceilingHits": 0
+   },
+   {
+    "action": "wait",
+    "volePeak30": 0,
+    "stockMin30": 0.048,
+    "preyStarved30": 164,
+    "preyEaten30": 251,
+    "day30": {
+     "prey": 0,
+     "pred": 67
+    },
+    "survived": false,
+    "tick": 1649,
+    "end": {
+     "prey": 0,
+     "pred": 67
+    },
+    "firstExtinct": [
+     "prey"
+    ],
+    "ceilingHits": 0
+   }
+  ]
+ },
+ {
+  "scenario": "voles",
+  "seed": 9305,
+  "trigger": {
+   "tick": 1097,
+   "prey": 167,
+   "pred": 36,
+   "vole": 89
+  },
+  "branches": [
+   {
+    "action": "cullPred",
+    "volePeak30": 157,
+    "stockMin30": 0.105,
+    "preyStarved30": 295,
+    "preyEaten30": 262,
+    "day30": {
+     "prey": 68,
+     "pred": 71,
+     "vole": 75
+    },
+    "survived": false,
+    "tick": 2164,
+    "end": {
+     "prey": 0,
+     "pred": 90,
+     "vole": 59
+    },
+    "firstExtinct": [
+     "prey"
+    ],
+    "ceilingHits": 0
+   },
+   {
+    "action": "releasePrey",
+    "volePeak30": 145,
+    "stockMin30": 0.099,
+    "preyStarved30": 272,
+    "preyEaten30": 297,
+    "day30": {
+     "prey": 4,
+     "pred": 92,
+     "vole": 58
+    },
+    "survived": false,
+    "tick": 1936,
+    "end": {
+     "prey": 0,
+     "pred": 82,
+     "vole": 35
+    },
+    "firstExtinct": [
+     "prey"
+    ],
+    "ceilingHits": 0
+   },
+   {
+    "action": "wait",
+    "volePeak30": 145,
+    "stockMin30": 0.096,
+    "preyStarved30": 265,
+    "preyEaten30": 287,
+    "day30": {
+     "prey": 24,
+     "pred": 88,
+     "vole": 40
+    },
+    "survived": false,
+    "tick": 1966,
+    "end": {
+     "prey": 0,
+     "pred": 82,
+     "vole": 12
+    },
+    "firstExtinct": [
+     "prey"
+    ],
+    "ceilingHits": 0
+   }
+  ]
+ },
+ {
+  "scenario": "stable",
+  "seed": 9306,
+  "trigger": {
+   "tick": 881,
+   "prey": 204,
+   "pred": 41
+  },
+  "branches": [
+   {
+    "action": "cullPred",
+    "volePeak30": 0,
+    "stockMin30": 0.196,
+    "preyStarved30": 413,
+    "preyEaten30": 266,
+    "day30": {
+     "prey": 200,
+     "pred": 65
+    },
+    "survived": false,
+    "tick": 8403,
+    "end": {
+     "prey": 0,
+     "pred": 37
+    },
+    "firstExtinct": [
+     "prey"
+    ],
+    "ceilingHits": 0
+   },
+   {
+    "action": "releasePrey",
+    "volePeak30": 0,
+    "stockMin30": 0.176,
+    "preyStarved30": 409,
+    "preyEaten30": 270,
+    "day30": {
+     "prey": 166,
+     "pred": 64
+    },
+    "survived": false,
+    "tick": 6293,
+    "end": {
+     "prey": 0,
+     "pred": 22
+    },
+    "firstExtinct": [
+     "prey"
+    ],
+    "ceilingHits": 0
+   },
+   {
+    "action": "wait",
+    "volePeak30": 0,
+    "stockMin30": 0.175,
+    "preyStarved30": 373,
+    "preyEaten30": 277,
+    "day30": {
+     "prey": 181,
+     "pred": 63
+    },
+    "survived": true,
+    "tick": 8760,
+    "end": {
+     "prey": 328,
+     "pred": 37
+    },
+    "firstExtinct": [],
+    "ceilingHits": 0
+   }
+  ]
+ },
+ {
+  "scenario": "voles",
+  "seed": 9306,
+  "trigger": {
+   "tick": 991,
+   "prey": 188,
+   "pred": 38,
+   "vole": 94
+  },
+  "branches": [
+   {
+    "action": "cullPred",
+    "volePeak30": 150,
+    "stockMin30": 0.119,
+    "preyStarved30": 442,
+    "preyEaten30": 169,
+    "day30": {
+     "prey": 199,
+     "pred": 45,
+     "vole": 68
+    },
+    "survived": false,
+    "tick": 5632,
+    "end": {
+     "prey": 0,
+     "pred": 31,
+     "vole": 54
+    },
+    "firstExtinct": [
+     "prey"
+    ],
+    "ceilingHits": 0
+   },
+   {
+    "action": "releasePrey",
+    "volePeak30": 125,
+    "stockMin30": 0.115,
+    "preyStarved30": 426,
+    "preyEaten30": 237,
+    "day30": {
+     "prey": 96,
+     "pred": 55,
+     "vole": 81
+    },
+    "survived": false,
+    "tick": 2750,
+    "end": {
+     "prey": 0,
+     "pred": 57,
+     "vole": 69
+    },
+    "firstExtinct": [
+     "prey"
+    ],
+    "ceilingHits": 0
+   },
+   {
+    "action": "wait",
+    "volePeak30": 132,
+    "stockMin30": 0.113,
+    "preyStarved30": 377,
+    "preyEaten30": 244,
+    "day30": {
+     "prey": 105,
+     "pred": 57,
+     "vole": 108
+    },
+    "survived": false,
+    "tick": 4180,
+    "end": {
+     "prey": 0,
+     "pred": 146,
+     "vole": 43
+    },
+    "firstExtinct": [
+     "prey"
+    ],
+    "ceilingHits": 0
+   }
+  ]
+ },
+ {
+  "scenario": "stable",
+  "seed": 9307,
+  "trigger": {
+   "tick": 828,
+   "prey": 140,
+   "pred": 29
+  },
+  "branches": [
+   {
+    "action": "cullPred",
+    "volePeak30": 0,
+    "stockMin30": 0.206,
+    "preyStarved30": 357,
+    "preyEaten30": 141,
+    "day30": {
+     "prey": 130,
+     "pred": 22
+    },
+    "survived": false,
+    "tick": 3137,
+    "end": {
+     "prey": 0,
+     "pred": 13
+    },
+    "firstExtinct": [
+     "prey"
+    ],
+    "ceilingHits": 0
+   },
+   {
+    "action": "releasePrey",
+    "volePeak30": 0,
+    "stockMin30": 0.197,
+    "preyStarved30": 350,
+    "preyEaten30": 226,
+    "day30": {
+     "prey": 163,
+     "pred": 39
+    },
+    "survived": true,
+    "tick": 8760,
+    "end": {
+     "prey": 110,
+     "pred": 88
+    },
+    "firstExtinct": [],
+    "ceilingHits": 0
+   },
+   {
+    "action": "wait",
+    "volePeak30": 0,
+    "stockMin30": 0.198,
+    "preyStarved30": 329,
+    "preyEaten30": 256,
+    "day30": {
+     "prey": 147,
+     "pred": 48
+    },
+    "survived": false,
+    "tick": 3133,
+    "end": {
+     "prey": 0,
+     "pred": 36
+    },
+    "firstExtinct": [
+     "prey"
+    ],
+    "ceilingHits": 0
+   }
+  ]
+ },
+ {
+  "scenario": "voles",
+  "seed": 9307,
+  "trigger": {
+   "tick": 869,
+   "prey": 153,
+   "pred": 31,
+   "vole": 128
+  },
+  "branches": [
+   {
+    "action": "cullPred",
+    "volePeak30": 147,
+    "stockMin30": 0.022,
+    "preyStarved30": 333,
+    "preyEaten30": 198,
+    "day30": {
+     "prey": 69,
+     "pred": 41,
+     "vole": 100
+    },
+    "survived": true,
+    "tick": 8760,
+    "end": {
+     "prey": 141,
+     "pred": 22,
+     "vole": 201
+    },
+    "firstExtinct": [],
+    "ceilingHits": 0
+   },
+   {
+    "action": "releasePrey",
+    "volePeak30": 141,
+    "stockMin30": 0.029,
+    "preyStarved30": 244,
+    "preyEaten30": 230,
+    "day30": {
+     "prey": 23,
+     "pred": 50,
+     "vole": 90
+    },
+    "survived": false,
+    "tick": 1889,
+    "end": {
+     "prey": 0,
+     "pred": 35,
+     "vole": 70
+    },
+    "firstExtinct": [
+     "prey"
+    ],
+    "ceilingHits": 0
+   },
+   {
+    "action": "wait",
+    "volePeak30": 137,
+    "stockMin30": 0.016,
+    "preyStarved30": 272,
+    "preyEaten30": 222,
+    "day30": {
+     "prey": 19,
+     "pred": 44,
+     "vole": 117
+    },
+    "survived": false,
+    "tick": 1966,
+    "end": {
+     "prey": 0,
+     "pred": 26,
+     "vole": 124
+    },
+    "firstExtinct": [
+     "prey"
+    ],
+    "ceilingHits": 0
+   }
+  ]
+ },
+ {
+  "scenario": "stable",
+  "seed": 9308,
+  "trigger": {
+   "tick": 1395,
+   "prey": 153,
+   "pred": 31
+  },
+  "branches": [
+   {
+    "action": "cullPred",
+    "volePeak30": 0,
+    "stockMin30": 0.089,
+    "preyStarved30": 573,
+    "preyEaten30": 55,
+    "day30": {
+     "prey": 274,
+     "pred": 17
+    },
+    "survived": true,
+    "tick": 8760,
+    "end": {
+     "prey": 254,
+     "pred": 127
+    },
+    "firstExtinct": [],
+    "ceilingHits": 0
+   },
+   {
+    "action": "releasePrey",
+    "volePeak30": 0,
+    "stockMin30": 0.143,
+    "preyStarved30": 501,
+    "preyEaten30": 129,
+    "day30": {
+     "prey": 285,
+     "pred": 37
+    },
+    "survived": true,
+    "tick": 8760,
+    "end": {
+     "prey": 170,
+     "pred": 130
+    },
+    "firstExtinct": [],
+    "ceilingHits": 0
+   },
+   {
+    "action": "wait",
+    "volePeak30": 0,
+    "stockMin30": 0.115,
+    "preyStarved30": 357,
+    "preyEaten30": 144,
+    "day30": {
+     "prey": 311,
+     "pred": 46
+    },
+    "survived": true,
+    "tick": 8760,
+    "end": {
+     "prey": 176,
+     "pred": 100
+    },
+    "firstExtinct": [],
+    "ceilingHits": 0
+   }
+  ]
+ },
+ {
+  "scenario": "voles",
+  "seed": 9308,
+  "trigger": {
+   "tick": 1324,
+   "prey": 69,
+   "pred": 14,
+   "vole": 136
+  },
+  "branches": [
+   {
+    "action": "cullPred",
+    "volePeak30": 202,
+    "stockMin30": 0.073,
+    "preyStarved30": 247,
+    "preyEaten30": 25,
+    "day30": {
+     "prey": 71,
+     "pred": 12,
+     "vole": 123
+    },
+    "survived": true,
+    "tick": 8760,
+    "end": {
+     "prey": 193,
+     "pred": 49,
+     "vole": 109
+    },
+    "firstExtinct": [],
+    "ceilingHits": 0
+   },
+   {
+    "action": "releasePrey",
+    "volePeak30": 179,
+    "stockMin30": 0.062,
+    "preyStarved30": 267,
+    "preyEaten30": 49,
+    "day30": {
+     "prey": 104,
+     "pred": 22,
+     "vole": 134
+    },
+    "survived": true,
+    "tick": 8760,
+    "end": {
+     "prey": 119,
+     "pred": 41,
+     "vole": 134
+    },
+    "firstExtinct": [],
+    "ceilingHits": 0
+   },
+   {
+    "action": "wait",
+    "volePeak30": 178,
+    "stockMin30": 0.084,
+    "preyStarved30": 166,
+    "preyEaten30": 39,
+    "day30": {
+     "prey": 106,
+     "pred": 15,
+     "vole": 120
+    },
+    "survived": true,
+    "tick": 8760,
+    "end": {
+     "prey": 126,
+     "pred": 67,
+     "vole": 115
+    },
+    "firstExtinct": [],
+    "ceilingHits": 0
+   }
+  ]
+ },
+ {
+  "scenario": "stable",
+  "seed": 9309,
+  "trigger": {
+   "tick": 935,
+   "prey": 231,
+   "pred": 47
+  },
+  "branches": [
+   {
+    "action": "cullPred",
+    "volePeak30": 0,
+    "stockMin30": 0.05,
+    "preyStarved30": 414,
+    "preyEaten30": 238,
+    "day30": {
+     "prey": 67,
+     "pred": 53
+    },
+    "survived": false,
+    "tick": 3339,
+    "end": {
+     "prey": 0,
+     "pred": 41
+    },
+    "firstExtinct": [
+     "prey"
+    ],
+    "ceilingHits": 0
+   },
+   {
+    "action": "releasePrey",
+    "volePeak30": 0,
+    "stockMin30": 0.051,
+    "preyStarved30": 392,
+    "preyEaten30": 248,
+    "day30": {
+     "prey": 167,
+     "pred": 48
+    },
+    "survived": true,
+    "tick": 8760,
+    "end": {
+     "prey": 5,
+     "pred": 63
+    },
+    "firstExtinct": [],
+    "ceilingHits": 0
+   },
+   {
+    "action": "wait",
+    "volePeak30": 0,
+    "stockMin30": 0.089,
+    "preyStarved30": 388,
+    "preyEaten30": 218,
+    "day30": {
+     "prey": 138,
+     "pred": 47
+    },
+    "survived": true,
+    "tick": 8760,
+    "end": {
+     "prey": 82,
+     "pred": 50
+    },
+    "firstExtinct": [],
+    "ceilingHits": 0
+   }
+  ]
+ },
+ {
+  "scenario": "voles",
+  "seed": 9309,
+  "trigger": {
+   "tick": 852,
+   "prey": 164,
+   "pred": 33,
+   "vole": 94
+  },
+  "branches": [
+   {
+    "action": "cullPred",
+    "volePeak30": 144,
+    "stockMin30": 0.006,
+    "preyStarved30": 361,
+    "preyEaten30": 56,
+    "day30": {
+     "prey": 76,
+     "pred": 28,
+     "vole": 61
+    },
+    "survived": false,
+    "tick": 2553,
+    "end": {
+     "prey": 88,
+     "pred": 46,
+     "vole": 0
+    },
+    "firstExtinct": [
+     "vole"
+    ],
+    "ceilingHits": 0
+   },
+   {
+    "action": "releasePrey",
+    "volePeak30": 122,
+    "stockMin30": 0.002,
+    "preyStarved30": 306,
+    "preyEaten30": 75,
+    "day30": {
+     "prey": 56,
+     "pred": 38,
+     "vole": 60
+    },
+    "survived": false,
+    "tick": 4491,
+    "end": {
+     "prey": 31,
+     "pred": 84,
+     "vole": 0
+    },
+    "firstExtinct": [
+     "vole"
+    ],
+    "ceilingHits": 0
+   },
+   {
+    "action": "wait",
+    "volePeak30": 116,
+    "stockMin30": 0.011,
+    "preyStarved30": 302,
+    "preyEaten30": 81,
+    "day30": {
+     "prey": 44,
+     "pred": 30,
+     "vole": 46
+    },
+    "survived": false,
+    "tick": 3515,
+    "end": {
+     "prey": 6,
+     "pred": 85,
+     "vole": 0
+    },
+    "firstExtinct": [
+     "vole"
+    ],
+    "ceilingHits": 0
+   }
+  ]
+ },
+ {
+  "scenario": "stable",
+  "seed": 9310,
+  "trigger": {
+   "tick": 895,
+   "prey": 160,
+   "pred": 33
+  },
+  "branches": [
+   {
+    "action": "cullPred",
+    "volePeak30": 0,
+    "stockMin30": 0.163,
+    "preyStarved30": 313,
+    "preyEaten30": 226,
+    "day30": {
+     "prey": 121,
+     "pred": 44
+    },
+    "survived": false,
+    "tick": 3207,
+    "end": {
+     "prey": 0,
+     "pred": 39
+    },
+    "firstExtinct": [
+     "prey"
+    ],
+    "ceilingHits": 0
+   },
+   {
+    "action": "releasePrey",
+    "volePeak30": 0,
+    "stockMin30": 0.217,
+    "preyStarved30": 175,
+    "preyEaten30": 254,
+    "day30": {
+     "prey": 0,
+     "pred": 50
+    },
+    "survived": false,
+    "tick": 1601,
+    "end": {
+     "prey": 0,
+     "pred": 50
+    },
+    "firstExtinct": [
+     "prey"
+    ],
+    "ceilingHits": 0
+   },
+   {
+    "action": "wait",
+    "volePeak30": 0,
+    "stockMin30": 0.22,
+    "preyStarved30": 253,
+    "preyEaten30": 251,
+    "day30": {
+     "prey": 58,
+     "pred": 38
+    },
+    "survived": false,
+    "tick": 4094,
+    "end": {
+     "prey": 0,
+     "pred": 22
+    },
+    "firstExtinct": [
+     "prey"
+    ],
+    "ceilingHits": 0
+   }
+  ]
+ },
+ {
+  "scenario": "voles",
+  "seed": 9310,
+  "trigger": {
+   "tick": 817,
+   "prey": 122,
+   "pred": 25,
+   "vole": 108
+  },
+  "branches": [
+   {
+    "action": "cullPred",
+    "volePeak30": 183,
+    "stockMin30": 0.053,
+    "preyStarved30": 270,
+    "preyEaten30": 182,
+    "day30": {
+     "prey": 90,
+     "pred": 47,
+     "vole": 123
+    },
+    "survived": false,
+    "tick": 2704,
+    "end": {
+     "prey": 0,
+     "pred": 48,
+     "vole": 158
+    },
+    "firstExtinct": [
+     "prey"
+    ],
+    "ceilingHits": 0
+   },
+   {
+    "action": "releasePrey",
+    "volePeak30": 196,
+    "stockMin30": 0.053,
+    "preyStarved30": 174,
+    "preyEaten30": 152,
+    "day30": {
+     "prey": 0,
+     "pred": 43,
+     "vole": 118
+    },
+    "survived": false,
+    "tick": 1393,
+    "end": {
+     "prey": 0,
+     "pred": 43,
+     "vole": 118
+    },
+    "firstExtinct": [
+     "prey"
+    ],
+    "ceilingHits": 0
+   },
+   {
+    "action": "wait",
+    "volePeak30": 159,
+    "stockMin30": 0.05,
+    "preyStarved30": 196,
+    "preyEaten30": 156,
+    "day30": {
+     "prey": 6,
+     "pred": 33,
+     "vole": 105
+    },
+    "survived": false,
+    "tick": 1612,
+    "end": {
+     "prey": 0,
+     "pred": 30,
+     "vole": 139
+    },
+    "firstExtinct": [
+     "prey"
+    ],
+    "ceilingHits": 0
+   }
+  ]
+ },
+ {
+  "scenario": "stable",
+  "seed": 9311,
+  "trigger": {
+   "tick": 1479,
+   "prey": 238,
+   "pred": 50
+  },
+  "branches": [
+   {
+    "action": "cullPred",
+    "volePeak30": 0,
+    "stockMin30": 0.008,
+    "preyStarved30": 487,
+    "preyEaten30": 94,
+    "day30": {
+     "prey": 144,
+     "pred": 26
+    },
+    "survived": true,
+    "tick": 8760,
+    "end": {
+     "prey": 216,
+     "pred": 59
+    },
+    "firstExtinct": [],
+    "ceilingHits": 0
+   },
+   {
+    "action": "releasePrey",
+    "volePeak30": 0,
+    "stockMin30": 0.033,
+    "preyStarved30": 458,
+    "preyEaten30": 108,
+    "day30": {
+     "prey": 94,
+     "pred": 33
+    },
+    "survived": true,
+    "tick": 8760,
+    "end": {
+     "prey": 207,
+     "pred": 111
+    },
+    "firstExtinct": [],
+    "ceilingHits": 0
+   },
+   {
+    "action": "wait",
+    "volePeak30": 0,
+    "stockMin30": 0.039,
+    "preyStarved30": 450,
+    "preyEaten30": 148,
+    "day30": {
+     "prey": 126,
+     "pred": 46
+    },
+    "survived": true,
+    "tick": 8760,
+    "end": {
+     "prey": 203,
+     "pred": 99
+    },
+    "firstExtinct": [],
+    "ceilingHits": 0
+   }
+  ]
+ },
+ {
+  "scenario": "voles",
+  "seed": 9311,
+  "trigger": {
+   "tick": 778,
+   "prey": 138,
+   "pred": 28,
+   "vole": 97
+  },
+  "branches": [
+   {
+    "action": "cullPred",
+    "volePeak30": 134,
+    "stockMin30": 0.031,
+    "preyStarved30": 412,
+    "preyEaten30": 55,
+    "day30": {
+     "prey": 179,
+     "pred": 31,
+     "vole": 95
+    },
+    "survived": false,
+    "tick": 5899,
+    "end": {
+     "prey": 235,
+     "pred": 37,
+     "vole": 0
+    },
+    "firstExtinct": [
+     "vole"
+    ],
+    "ceilingHits": 0
+   },
+   {
+    "action": "releasePrey",
+    "volePeak30": 131,
+    "stockMin30": 0.03,
+    "preyStarved30": 401,
+    "preyEaten30": 106,
+    "day30": {
+     "prey": 199,
+     "pred": 48,
+     "vole": 81
+    },
+    "survived": false,
+    "tick": 3829,
+    "end": {
+     "prey": 74,
+     "pred": 5,
+     "vole": 0
+    },
+    "firstExtinct": [
+     "vole"
+    ],
+    "ceilingHits": 0
+   },
+   {
+    "action": "wait",
+    "volePeak30": 128,
+    "stockMin30": 0.031,
+    "preyStarved30": 375,
+    "preyEaten30": 85,
+    "day30": {
+     "prey": 164,
+     "pred": 38,
+     "vole": 119
+    },
+    "survived": true,
+    "tick": 8760,
+    "end": {
+     "prey": 172,
+     "pred": 4,
+     "vole": 31
+    },
+    "firstExtinct": [],
+    "ceilingHits": 0
+   }
+  ]
+ },
+ {
+  "scenario": "stable",
+  "seed": 9312,
+  "trigger": {
+   "tick": 1189,
+   "prey": 149,
+   "pred": 30
+  },
+  "branches": [
+   {
+    "action": "cullPred",
+    "volePeak30": 0,
+    "stockMin30": 0.077,
+    "preyStarved30": 486,
+    "preyEaten30": 34,
+    "day30": {
+     "prey": 112,
+     "pred": 13
+    },
+    "survived": true,
+    "tick": 8760,
+    "end": {
+     "prey": 202,
+     "pred": 43
+    },
+    "firstExtinct": [],
+    "ceilingHits": 0
+   },
+   {
+    "action": "releasePrey",
+    "volePeak30": 0,
+    "stockMin30": 0.063,
+    "preyStarved30": 478,
+    "preyEaten30": 55,
+    "day30": {
+     "prey": 111,
+     "pred": 22
+    },
+    "survived": false,
+    "tick": 5831,
+    "end": {
+     "prey": 136,
+     "pred": 0
+    },
+    "firstExtinct": [
+     "pred"
+    ],
+    "ceilingHits": 0
+   },
+   {
+    "action": "wait",
+    "volePeak30": 0,
+    "stockMin30": 0.088,
+    "preyStarved30": 451,
+    "preyEaten30": 51,
+    "day30": {
+     "prey": 136,
+     "pred": 21
+    },
+    "survived": true,
+    "tick": 8760,
+    "end": {
+     "prey": 156,
+     "pred": 4
+    },
+    "firstExtinct": [],
+    "ceilingHits": 0
+   }
+  ]
+ },
+ {
+  "scenario": "voles",
+  "seed": 9312,
+  "trigger": {
+   "tick": 788,
+   "prey": 141,
+   "pred": 29,
+   "vole": 84
+  },
+  "branches": [
+   {
+    "action": "cullPred",
+    "volePeak30": 142,
+    "stockMin30": 0.189,
+    "preyStarved30": 388,
+    "preyEaten30": 156,
+    "day30": {
+     "prey": 176,
+     "pred": 41,
+     "vole": 111
+    },
+    "survived": true,
+    "tick": 8760,
+    "end": {
+     "prey": 246,
+     "pred": 72,
+     "vole": 79
+    },
+    "firstExtinct": [],
+    "ceilingHits": 0
+   },
+   {
+    "action": "releasePrey",
+    "volePeak30": 110,
+    "stockMin30": 0.042,
+    "preyStarved30": 385,
+    "preyEaten30": 233,
+    "day30": {
+     "prey": 212,
+     "pred": 53,
+     "vole": 63
+    },
+    "survived": true,
+    "tick": 8760,
+    "end": {
+     "prey": 144,
+     "pred": 46,
+     "vole": 49
+    },
+    "firstExtinct": [],
+    "ceilingHits": 0
+   },
+   {
+    "action": "wait",
+    "volePeak30": 98,
+    "stockMin30": 0.05,
+    "preyStarved30": 390,
+    "preyEaten30": 136,
+    "day30": {
+     "prey": 341,
+     "pred": 37,
+     "vole": 55
+    },
+    "survived": true,
+    "tick": 8760,
+    "end": {
+     "prey": 141,
+     "pred": 59,
+     "vole": 46
+    },
+    "firstExtinct": [],
+    "ceilingHits": 0
+   }
+  ]
+ },
+ {
+  "scenario": "stable",
+  "seed": 9313,
+  "trigger": {
+   "tick": 1089,
+   "prey": 212,
+   "pred": 43
+  },
+  "branches": [
+   {
+    "action": "cullPred",
+    "volePeak30": 0,
+    "stockMin30": 0.127,
+    "preyStarved30": 478,
+    "preyEaten30": 214,
+    "day30": {
+     "prey": 98,
+     "pred": 58
+    },
+    "survived": false,
+    "tick": 2860,
+    "end": {
+     "prey": 0,
+     "pred": 44
+    },
+    "firstExtinct": [
+     "prey"
+    ],
+    "ceilingHits": 0
+   },
+   {
+    "action": "releasePrey",
+    "volePeak30": 0,
+    "stockMin30": 0.116,
+    "preyStarved30": 473,
+    "preyEaten30": 264,
+    "day30": {
+     "prey": 112,
+     "pred": 72
+    },
+    "survived": true,
+    "tick": 8760,
+    "end": {
+     "prey": 66,
+     "pred": 102
+    },
+    "firstExtinct": [],
+    "ceilingHits": 0
+   },
+   {
+    "action": "wait",
+    "volePeak30": 0,
+    "stockMin30": 0.197,
+    "preyStarved30": 421,
+    "preyEaten30": 251,
+    "day30": {
+     "prey": 87,
+     "pred": 68
+    },
+    "survived": true,
+    "tick": 8760,
+    "end": {
+     "prey": 122,
+     "pred": 116
+    },
+    "firstExtinct": [],
+    "ceilingHits": 0
+   }
+  ]
+ },
+ {
+  "scenario": "voles",
+  "seed": 9313,
+  "trigger": {
+   "tick": 1088,
+   "prey": 144,
+   "pred": 29,
+   "vole": 95
+  },
+  "branches": [
+   {
+    "action": "cullPred",
+    "volePeak30": 143,
+    "stockMin30": 0.111,
+    "preyStarved30": 292,
+    "preyEaten30": 106,
+    "day30": {
+     "prey": 146,
+     "pred": 36,
+     "vole": 94
+    },
+    "survived": false,
+    "tick": 6449,
+    "end": {
+     "prey": 139,
+     "pred": 145,
+     "vole": 0
+    },
+    "firstExtinct": [
+     "vole"
+    ],
+    "ceilingHits": 0
+   },
+   {
+    "action": "releasePrey",
+    "volePeak30": 145,
+    "stockMin30": 0.125,
+    "preyStarved30": 265,
+    "preyEaten30": 120,
+    "day30": {
+     "prey": 142,
+     "pred": 51,
+     "vole": 118
+    },
+    "survived": false,
+    "tick": 6886,
+    "end": {
+     "prey": 35,
+     "pred": 84,
+     "vole": 0
+    },
+    "firstExtinct": [
+     "vole"
+    ],
+    "ceilingHits": 0
+   },
+   {
+    "action": "wait",
+    "volePeak30": 134,
+    "stockMin30": 0.124,
+    "preyStarved30": 299,
+    "preyEaten30": 134,
+    "day30": {
+     "prey": 99,
+     "pred": 61,
+     "vole": 115
+    },
+    "survived": false,
+    "tick": 4877,
+    "end": {
+     "prey": 0,
+     "pred": 73,
+     "vole": 39
+    },
+    "firstExtinct": [
+     "prey"
+    ],
+    "ceilingHits": 0
+   }
+  ]
+ },
+ {
+  "scenario": "stable",
+  "seed": 9314,
+  "trigger": {
+   "tick": 848,
+   "prey": 163,
+   "pred": 33
+  },
+  "branches": [
+   {
+    "action": "cullPred",
+    "volePeak30": 0,
+    "stockMin30": 0.125,
+    "preyStarved30": 380,
+    "preyEaten30": 186,
+    "day30": {
+     "prey": 114,
+     "pred": 45
+    },
+    "survived": false,
+    "tick": 3184,
+    "end": {
+     "prey": 0,
+     "pred": 45
+    },
+    "firstExtinct": [
+     "prey"
+    ],
+    "ceilingHits": 0
+   },
+   {
+    "action": "releasePrey",
+    "volePeak30": 0,
+    "stockMin30": 0.119,
+    "preyStarved30": 333,
+    "preyEaten30": 234,
+    "day30": {
+     "prey": 96,
+     "pred": 63
+    },
+    "survived": false,
+    "tick": 3130,
+    "end": {
+     "prey": 0,
+     "pred": 38
+    },
+    "firstExtinct": [
+     "prey"
+    ],
+    "ceilingHits": 0
+   },
+   {
+    "action": "wait",
+    "volePeak30": 0,
+    "stockMin30": 0.13,
+    "preyStarved30": 296,
+    "preyEaten30": 239,
+    "day30": {
+     "prey": 131,
+     "pred": 64
+    },
+    "survived": false,
+    "tick": 6429,
+    "end": {
+     "prey": 0,
+     "pred": 102
+    },
+    "firstExtinct": [
+     "prey"
+    ],
+    "ceilingHits": 0
+   }
+  ]
+ },
+ {
+  "scenario": "voles",
+  "seed": 9314,
+  "trigger": {
+   "tick": 793,
+   "prey": 109,
+   "pred": 22,
+   "vole": 127
+  },
+  "branches": [
+   {
+    "action": "cullPred",
+    "volePeak30": 185,
+    "stockMin30": 0.006,
+    "preyStarved30": 214,
+    "preyEaten30": 50,
+    "day30": {
+     "prey": 90,
+     "pred": 20,
+     "vole": 150
+    },
+    "survived": false,
+    "tick": 4797,
+    "end": {
+     "prey": 0,
+     "pred": 105,
+     "vole": 33
+    },
+    "firstExtinct": [
+     "prey"
+    ],
+    "ceilingHits": 0
+   },
+   {
+    "action": "releasePrey",
+    "volePeak30": 152,
+    "stockMin30": 0.024,
+    "preyStarved30": 249,
+    "preyEaten30": 71,
+    "day30": {
+     "prey": 44,
+     "pred": 35,
+     "vole": 145
+    },
+    "survived": false,
+    "tick": 4511,
+    "end": {
+     "prey": 0,
+     "pred": 42,
+     "vole": 8
+    },
+    "firstExtinct": [
+     "prey"
+    ],
+    "ceilingHits": 0
+   },
+   {
+    "action": "wait",
+    "volePeak30": 166,
+    "stockMin30": 0.03,
+    "preyStarved30": 212,
+    "preyEaten30": 87,
+    "day30": {
+     "prey": 36,
+     "pred": 34,
+     "vole": 147
+    },
+    "survived": false,
+    "tick": 4122,
+    "end": {
+     "prey": 0,
+     "pred": 130,
+     "vole": 17
+    },
+    "firstExtinct": [
+     "prey"
+    ],
+    "ceilingHits": 0
+   }
+  ]
+ },
+ {
+  "scenario": "stable",
+  "seed": 9315,
+  "trigger": {
+   "tick": 866,
+   "prey": 178,
+   "pred": 36
+  },
+  "branches": [
+   {
+    "action": "cullPred",
+    "volePeak30": 0,
+    "stockMin30": 0.16,
+    "preyStarved30": 234,
+    "preyEaten30": 196,
+    "day30": {
+     "prey": 19,
+     "pred": 42
+    },
+    "survived": false,
+    "tick": 2112,
+    "end": {
+     "prey": 0,
+     "pred": 9
+    },
+    "firstExtinct": [
+     "prey"
+    ],
+    "ceilingHits": 0
+   },
+   {
+    "action": "releasePrey",
+    "volePeak30": 0,
+    "stockMin30": 0.16,
+    "preyStarved30": 199,
+    "preyEaten30": 183,
+    "day30": {
+     "prey": 0,
+     "pred": 36
+    },
+    "survived": false,
+    "tick": 1541,
+    "end": {
+     "prey": 0,
+     "pred": 36
+    },
+    "firstExtinct": [
+     "prey"
+    ],
+    "ceilingHits": 0
+   },
+   {
+    "action": "wait",
+    "volePeak30": 0,
+    "stockMin30": 0.16,
+    "preyStarved30": 184,
+    "preyEaten30": 130,
+    "day30": {
+     "prey": 0,
+     "pred": 33
+    },
+    "survived": false,
+    "tick": 1431,
+    "end": {
+     "prey": 0,
+     "pred": 33
+    },
+    "firstExtinct": [
+     "prey"
+    ],
+    "ceilingHits": 0
+   }
+  ]
+ },
+ {
+  "scenario": "voles",
+  "seed": 9315,
+  "trigger": {
+   "tick": 813,
+   "prey": 199,
+   "pred": 40,
+   "vole": 96
+  },
+  "branches": [
+   {
+    "action": "cullPred",
+    "volePeak30": 145,
+    "stockMin30": 0.103,
+    "preyStarved30": 480,
+    "preyEaten30": 204,
+    "day30": {
+     "prey": 143,
+     "pred": 61,
+     "vole": 88
+    },
+    "survived": false,
+    "tick": 3284,
+    "end": {
+     "prey": 4,
+     "pred": 143,
+     "vole": 0
+    },
+    "firstExtinct": [
+     "vole"
+    ],
+    "ceilingHits": 0
+   },
+   {
+    "action": "releasePrey",
+    "volePeak30": 110,
+    "stockMin30": 0.098,
+    "preyStarved30": 356,
+    "preyEaten30": 260,
+    "day30": {
+     "prey": 26,
+     "pred": 77,
+     "vole": 68
+    },
+    "survived": false,
+    "tick": 1797,
+    "end": {
+     "prey": 0,
+     "pred": 65,
+     "vole": 44
+    },
+    "firstExtinct": [
+     "prey"
+    ],
+    "ceilingHits": 0
+   },
+   {
+    "action": "wait",
+    "volePeak30": 124,
+    "stockMin30": 0.11,
+    "preyStarved30": 359,
+    "preyEaten30": 323,
+    "day30": {
+     "prey": 86,
+     "pred": 86,
+     "vole": 87
+    },
+    "survived": false,
+    "tick": 1853,
+    "end": {
+     "prey": 0,
+     "pred": 91,
+     "vole": 19
+    },
+    "firstExtinct": [
+     "prey"
+    ],
+    "ceilingHits": 0
+   }
+  ]
+ },
+ {
+  "scenario": "stable",
+  "seed": 9316,
+  "trigger": {
+   "tick": 1048,
+   "prey": 164,
+   "pred": 34
+  },
+  "branches": [
+   {
+    "action": "cullPred",
+    "volePeak30": 0,
+    "stockMin30": 0.156,
+    "preyStarved30": 367,
+    "preyEaten30": 339,
+    "day30": {
+     "prey": 96,
+     "pred": 63
+    },
+    "survived": false,
+    "tick": 2390,
+    "end": {
+     "prey": 0,
+     "pred": 6
+    },
+    "firstExtinct": [
+     "prey"
+    ],
+    "ceilingHits": 0
+   },
+   {
+    "action": "releasePrey",
+    "volePeak30": 0,
+    "stockMin30": 0.174,
+    "preyStarved30": 206,
+    "preyEaten30": 357,
+    "day30": {
+     "prey": 0,
+     "pred": 71
+    },
+    "survived": false,
+    "tick": 1669,
+    "end": {
+     "prey": 0,
+     "pred": 71
+    },
+    "firstExtinct": [
+     "prey"
+    ],
+    "ceilingHits": 0
+   },
+   {
+    "action": "wait",
+    "volePeak30": 0,
+    "stockMin30": 0.174,
+    "preyStarved30": 150,
+    "preyEaten30": 227,
+    "day30": {
+     "prey": 0,
+     "pred": 43
+    },
+    "survived": false,
+    "tick": 1665,
+    "end": {
+     "prey": 0,
+     "pred": 43
+    },
+    "firstExtinct": [
+     "prey"
+    ],
+    "ceilingHits": 0
+   }
+  ]
+ },
+ {
+  "scenario": "voles",
+  "seed": 9316,
+  "trigger": {
+   "tick": 868,
+   "prey": 164,
+   "pred": 37,
+   "vole": 113
+  },
+  "branches": [
+   {
+    "action": "cullPred",
+    "volePeak30": 158,
+    "stockMin30": 0.057,
+    "preyStarved30": 277,
+    "preyEaten30": 141,
+    "day30": {
+     "prey": 0,
+     "pred": 40,
+     "vole": 138
+    },
+    "survived": false,
+    "tick": 1487,
+    "end": {
+     "prey": 0,
+     "pred": 40,
+     "vole": 138
+    },
+    "firstExtinct": [
+     "prey"
+    ],
+    "ceilingHits": 0
+   },
+   {
+    "action": "releasePrey",
+    "volePeak30": 154,
+    "stockMin30": 0.029,
+    "preyStarved30": 268,
+    "preyEaten30": 351,
+    "day30": {
+     "prey": 37,
+     "pred": 84,
+     "vole": 95
+    },
+    "survived": false,
+    "tick": 1726,
+    "end": {
+     "prey": 0,
+     "pred": 90,
+     "vole": 94
+    },
+    "firstExtinct": [
+     "prey"
+    ],
+    "ceilingHits": 0
+   },
+   {
+    "action": "wait",
+    "volePeak30": 149,
+    "stockMin30": 0.065,
+    "preyStarved30": 229,
+    "preyEaten30": 319,
+    "day30": {
+     "prey": 3,
+     "pred": 77,
+     "vole": 51
+    },
+    "survived": false,
+    "tick": 1716,
+    "end": {
+     "prey": 0,
+     "pred": 62,
+     "vole": 39
+    },
+    "firstExtinct": [
+     "prey"
+    ],
+    "ceilingHits": 0
+   }
+  ]
+ },
+ {
+  "scenario": "stable",
+  "seed": 9317,
+  "trigger": {
+   "tick": 870,
+   "prey": 149,
+   "pred": 30
+  },
+  "branches": [
+   {
+    "action": "cullPred",
+    "volePeak30": 0,
+    "stockMin30": 0.095,
+    "preyStarved30": 466,
+    "preyEaten30": 198,
+    "day30": {
+     "prey": 207,
+     "pred": 37
+    },
+    "survived": true,
+    "tick": 8760,
+    "end": {
+     "prey": 150,
+     "pred": 47
+    },
+    "firstExtinct": [],
+    "ceilingHits": 0
+   },
+   {
+    "action": "releasePrey",
+    "volePeak30": 0,
+    "stockMin30": 0.119,
+    "preyStarved30": 410,
+    "preyEaten30": 276,
+    "day30": {
+     "prey": 202,
+     "pred": 54
+    },
+    "survived": false,
+    "tick": 4476,
+    "end": {
+     "prey": 0,
+     "pred": 133
+    },
+    "firstExtinct": [
+     "prey"
+    ],
+    "ceilingHits": 0
+   },
+   {
+    "action": "wait",
+    "volePeak30": 0,
+    "stockMin30": 0.076,
+    "preyStarved30": 420,
+    "preyEaten30": 266,
+    "day30": {
+     "prey": 182,
+     "pred": 50
+    },
+    "survived": false,
+    "tick": 4085,
+    "end": {
+     "prey": 0,
+     "pred": 121
+    },
+    "firstExtinct": [
+     "prey"
+    ],
+    "ceilingHits": 0
+   }
+  ]
+ },
+ {
+  "scenario": "voles",
+  "seed": 9317,
+  "trigger": {
+   "tick": 908,
+   "prey": 150,
+   "pred": 32,
+   "vole": 95
+  },
+  "branches": [
+   {
+    "action": "cullPred",
+    "volePeak30": 133,
+    "stockMin30": 0.031,
+    "preyStarved30": 330,
+    "preyEaten30": 149,
+    "day30": {
+     "prey": 122,
+     "pred": 43,
+     "vole": 79
+    },
+    "survived": true,
+    "tick": 8760,
+    "end": {
+     "prey": 17,
+     "pred": 118,
+     "vole": 61
+    },
+    "firstExtinct": [],
+    "ceilingHits": 0
+   },
+   {
+    "action": "releasePrey",
+    "volePeak30": 134,
+    "stockMin30": 0.025,
+    "preyStarved30": 298,
+    "preyEaten30": 160,
+    "day30": {
+     "prey": 102,
+     "pred": 46,
+     "vole": 96
+    },
+    "survived": false,
+    "tick": 4010,
+    "end": {
+     "prey": 0,
+     "pred": 36,
+     "vole": 117
+    },
+    "firstExtinct": [
+     "prey"
+    ],
+    "ceilingHits": 0
+   },
+   {
+    "action": "wait",
+    "volePeak30": 131,
+    "stockMin30": 0.038,
+    "preyStarved30": 301,
+    "preyEaten30": 150,
+    "day30": {
+     "prey": 104,
+     "pred": 48,
+     "vole": 101
+    },
+    "survived": true,
+    "tick": 8760,
+    "end": {
+     "prey": 90,
+     "pred": 80,
+     "vole": 119
+    },
+    "firstExtinct": [],
+    "ceilingHits": 0
+   }
+  ]
+ },
+ {
+  "scenario": "stable",
+  "seed": 9318,
+  "trigger": {
+   "tick": 954,
+   "prey": 134,
+   "pred": 27
+  },
+  "branches": [
+   {
+    "action": "cullPred",
+    "volePeak30": 0,
+    "stockMin30": 0.108,
+    "preyStarved30": 441,
+    "preyEaten30": 47,
+    "day30": {
+     "prey": 202,
+     "pred": 18
+    },
+    "survived": true,
+    "tick": 8760,
+    "end": {
+     "prey": 129,
+     "pred": 73
+    },
+    "firstExtinct": [],
+    "ceilingHits": 0
+   },
+   {
+    "action": "releasePrey",
+    "volePeak30": 0,
+    "stockMin30": 0.074,
+    "preyStarved30": 459,
+    "preyEaten30": 55,
+    "day30": {
+     "prey": 179,
+     "pred": 18
+    },
+    "survived": false,
+    "tick": 3993,
+    "end": {
+     "prey": 163,
+     "pred": 0
+    },
+    "firstExtinct": [
+     "pred"
+    ],
+    "ceilingHits": 0
+   },
+   {
+    "action": "wait",
+    "volePeak30": 0,
+    "stockMin30": 0.096,
+    "preyStarved30": 441,
+    "preyEaten30": 48,
+    "day30": {
+     "prey": 124,
+     "pred": 19
+    },
+    "survived": true,
+    "tick": 8760,
+    "end": {
+     "prey": 144,
+     "pred": 12
+    },
+    "firstExtinct": [],
+    "ceilingHits": 0
+   }
+  ]
+ },
+ {
+  "scenario": "voles",
+  "seed": 9318,
+  "trigger": {
+   "tick": 1234,
+   "prey": 109,
+   "pred": 22,
+   "vole": 138
+  },
+  "branches": [
+   {
+    "action": "cullPred",
+    "volePeak30": 148,
+    "stockMin30": 0.104,
+    "preyStarved30": 490,
+    "preyEaten30": 3,
+    "day30": {
+     "prey": 235,
+     "pred": 3,
+     "vole": 87
+    },
+    "survived": false,
+    "tick": 2865,
+    "end": {
+     "prey": 102,
+     "pred": 0,
+     "vole": 86
+    },
+    "firstExtinct": [
+     "pred"
+    ],
+    "ceilingHits": 0
+   },
+   {
+    "action": "releasePrey",
+    "volePeak30": 154,
+    "stockMin30": 0.016,
+    "preyStarved30": 531,
+    "preyEaten30": 23,
+    "day30": {
+     "prey": 154,
+     "pred": 12,
+     "vole": 138
+    },
+    "survived": false,
+    "tick": 5619,
+    "end": {
+     "prey": 264,
+     "pred": 0,
+     "vole": 84
+    },
+    "firstExtinct": [
+     "pred"
+    ],
+    "ceilingHits": 0
+   },
+   {
+    "action": "wait",
+    "volePeak30": 147,
+    "stockMin30": 0.218,
+    "preyStarved30": 422,
+    "preyEaten30": 9,
+    "day30": {
+     "prey": 214,
+     "pred": 6,
+     "vole": 78
+    },
+    "survived": false,
+    "tick": 2872,
+    "end": {
+     "prey": 219,
+     "pred": 0,
+     "vole": 54
+    },
+    "firstExtinct": [
+     "pred"
+    ],
+    "ceilingHits": 0
+   }
+  ]
+ },
+ {
+  "scenario": "stable",
+  "seed": 9319,
+  "trigger": {
+   "tick": 828,
+   "prey": 139,
+   "pred": 29
+  },
+  "branches": [
+   {
+    "action": "cullPred",
+    "volePeak30": 0,
+    "stockMin30": 0.043,
+    "preyStarved30": 368,
+    "preyEaten30": 124,
+    "day30": {
+     "prey": 87,
+     "pred": 21
+    },
+    "survived": true,
+    "tick": 8760,
+    "end": {
+     "prey": 80,
+     "pred": 15
+    },
+    "firstExtinct": [],
+    "ceilingHits": 0
+   },
+   {
+    "action": "releasePrey",
+    "volePeak30": 0,
+    "stockMin30": 0.021,
+    "preyStarved30": 272,
+    "preyEaten30": 189,
+    "day30": {
+     "prey": 60,
+     "pred": 35
+    },
+    "survived": false,
+    "tick": 3863,
+    "end": {
+     "prey": 0,
+     "pred": 16
+    },
+    "firstExtinct": [
+     "prey"
+    ],
+    "ceilingHits": 0
+   },
+   {
+    "action": "wait",
+    "volePeak30": 0,
+    "stockMin30": 0.057,
+    "preyStarved30": 239,
+    "preyEaten30": 300,
+    "day30": {
+     "prey": 138,
+     "pred": 57
+    },
+    "survived": true,
+    "tick": 8760,
+    "end": {
+     "prey": 416,
+     "pred": 21
+    },
+    "firstExtinct": [],
+    "ceilingHits": 0
+   }
+  ]
+ },
+ {
+  "scenario": "voles",
+  "seed": 9319,
+  "trigger": {
+   "tick": 762,
+   "prey": 207,
+   "pred": 42,
+   "vole": 98
+  },
+  "branches": [
+   {
+    "action": "cullPred",
+    "volePeak30": 121,
+    "stockMin30": 0.007,
+    "preyStarved30": 281,
+    "preyEaten30": 174,
+    "day30": {
+     "prey": 201,
+     "pred": 43,
+     "vole": 96
+    },
+    "survived": true,
+    "tick": 8760,
+    "end": {
+     "prey": 126,
+     "pred": 100,
+     "vole": 78
+    },
+    "firstExtinct": [],
+    "ceilingHits": 0
+   },
+   {
+    "action": "releasePrey",
+    "volePeak30": 111,
+    "stockMin30": 0.011,
+    "preyStarved30": 237,
+    "preyEaten30": 212,
+    "day30": {
+     "prey": 56,
+     "pred": 45,
+     "vole": 52
+    },
+    "survived": false,
+    "tick": 3348,
+    "end": {
+     "prey": 0,
+     "pred": 33,
+     "vole": 45
+    },
+    "firstExtinct": [
+     "prey"
+    ],
+    "ceilingHits": 0
+   },
+   {
+    "action": "wait",
+    "volePeak30": 117,
+    "stockMin30": 0.009,
+    "preyStarved30": 250,
+    "preyEaten30": 188,
+    "day30": {
+     "prey": 118,
+     "pred": 49,
+     "vole": 30
+    },
+    "survived": false,
+    "tick": 2622,
+    "end": {
+     "prey": 0,
+     "pred": 51,
+     "vole": 28
+    },
+    "firstExtinct": [
+     "prey"
+    ],
+    "ceilingHits": 0
+   }
+  ]
+ }
+]
