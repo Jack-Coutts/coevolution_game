@@ -28,6 +28,8 @@ interface Props {
   base: LeverValues
   onChange: (id: string, value: number) => void
   onResetLevers: () => void
+  /** In Endless the score is hours survived, so unspent points earn nothing. */
+  endless?: boolean
 }
 
 /** Budget points still unspent, to one decimal. */
@@ -35,7 +37,7 @@ function pointsLeft(levers: LeverValues, base: LeverValues): number {
   return Math.round((BUDGET - spent(levers, base)) * 10) / 10
 }
 
-export function LeverPanel({ levers, base, onChange, onResetLevers }: Props) {
+export function LeverPanel({ levers, base, onChange, onResetLevers, endless = false }: Props) {
   const left = pointsLeft(levers, base)
   const over = left < 0
   const changed = LEVERS.filter((d) => Math.abs(levers[d.id] - base[d.id]) > 1e-9).length
@@ -59,7 +61,9 @@ export function LeverPanel({ levers, base, onChange, onResetLevers }: Props) {
         <p className="mt-2 text-xs text-muted-foreground">
           {over
             ? 'Over budget. Weaken something to earn points back before you can play.'
-            : 'Making animals stronger or food richer costs points. Weakening refunds half. Unspent points add to your score if both species survive.'}
+            : endless
+              ? 'Making animals stronger or food richer costs points. Weakening refunds half. In Endless the score is hours survived, so unspent points add nothing.'
+              : 'Making animals stronger or food richer costs points. Weakening refunds half. Unspent points add 10 each to your score if both species last the year.'}
         </p>
         <div className="mt-2 flex items-center justify-between">
           <span className="text-xs text-muted-foreground">

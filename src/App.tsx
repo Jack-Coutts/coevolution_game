@@ -312,6 +312,7 @@ export default function App() {
                       <BestScore />
                       {inspector}
                       <LeverPanel
+                        endless={endless}
                         levers={levers}
                         base={base}
                         onChange={(id, v) => setLevers((prev) => ({ ...prev, [id]: v }))}
