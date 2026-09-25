@@ -122,7 +122,7 @@ No entry claims why something happened, and trait trends are never presented as 
 | Trait shift | Daily trait mean and middle-80% band | Mean at least 0.25 from the first measurement (founders, or first sample with 10+ animals) for 20 daily samples in a row, each with 10+ animals; once per trait and direction until the mean returns within 0.125 |
 | Extinction | Living count, daily samples | Above 0, then 0 |
 | Year | Both counts at a new year's first sample | Both above 0 |
-| Variety | Reserved for ecological varieties (issue #11) | Supplied by the detector; one entry per key until released |
+| Variety | Daily 2-means split of a species' inherited traits: shares, centroid distance, separation, days, generations | Named after the rules in "Observed ecological varieties"; one entry when a pair is named (or returns) and one when it ends |
 
 Samples with fewer than 10 animals neither extend a trait run nor count as a return, so an
 extinction does not read as a trait change. The journal keeps its latest 80 entries and says how
@@ -131,6 +131,34 @@ of the living animals, generations, largest size, first and last count). Daily c
 about a year; older days survive only as each family's first count and largest size, and at most
 40 extinct families per species are kept, which the Endless page states. Journal state, trait
 latches and family counts are saved with the meadow; journals from older saves load as notes.
+
+### Observed ecological varieties (issue #11)
+
+Averages can hide two strategies inside one species. Once a day, each species with at least 20
+animals is split into two groups (`src/game/varieties.ts`, deterministic 2-means, k = 2 only) on
+five inherited dimensions: the four behaviour traits and body size as its gene (log size / log
+1.25, so ×0.8 to ×1.25 spans -1 to 1 like the behaviour traits). Traits are clustered on these
+fixed scales, not standardized by the day's spread, which would shrink the trait that separates
+two groups and inflate traits that barely vary. At most 400 animals are clustered per sample.
+
+| Rule | Threshold |
+| --- | --- |
+| A day's split counts | Clear gap: along the line between the two centres, the middle third holds under half as many animals as the same width around the smaller group's centre (separation > 0.5); smaller group at least 15%; centres at least 0.2 apart |
+| Named (persistent) | 20 consecutive daily samples of matching splits, while the mean generation rose by at least 2 |
+| Same groups next day | Each new centre within half the previous centre-to-centre distance of its match (nearest pairing); otherwise it is a different split and starts its own run |
+| Ends | 10 daily samples in a row without a matching split, or at once on extinction; samples with fewer than 20 animals neither extend nor end a pair |
+| Returns | A later named split matching the ended pair's last centres keeps its names |
+
+Each named pair gets new numbers per species (Rabbit variety 1, 2, 3...), never a new name each
+day. They are presented as "observed ecological varieties", never subspecies, and kept apart from
+founder families: a variety can mix animals from several founders. The Evolution page's
+Observed ecological varieties card shows each species' shares, group centres and the day's
+evidence (or the progress of a possible split); the inspector names an animal's variety (the
+nearer centre). Limits: a third group, or a variety splitting again, is not detected; a smooth
+cline without a gap is never a split; a single day can pass by chance, which is why a run of 20
+is needed; observed ecological role (what animals
+actually do) is not a dimension yet. State is a few numbers per species plus about a year of
+daily records (about 70 KB per species-year), saved with the meadow.
 
 ## Time, persistence and scoring
 
