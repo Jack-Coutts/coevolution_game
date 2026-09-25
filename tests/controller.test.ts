@@ -25,10 +25,10 @@ beforeEach(() => {
 })
 afterEach(() => vi.unstubAllGlobals())
 
-function ready() {
+function ready(endless = false) {
   const game = new GameController()
   const sim = new Sim(deriveParams(STABLE_PRESET), 7)
-  game.configure({ levers: STABLE_PRESET, base: STABLE_PRESET, scenario: 'stable', seed: 7, endless: false })
+  game.configure({ levers: STABLE_PRESET, base: STABLE_PRESET, scenario: 'stable', seed: 7, endless })
   const runId = game.getSnapshot().runId
   const frame = { tick: 0, prey: new Float32Array(), preds: new Float32Array(), bushes: new Float32Array(), events: new Float32Array() }
   mock.receive({ type: 'ready', runId, cover: [], frame, stats: new Float64Array(STAT_STRIDE), evolution: summarizeEvolution(sim) })
@@ -176,4 +176,130 @@ it('asks the worker to save the displayed hour, not the hours it ran ahead', () 
   game.save()
   expect(mock.messages.at(-1)).toMatchObject({ type: 'save', at: 5 })
   game.dispose()
+})
+
+// Endless intervention budget: 1 Dec is hour 2176 and the next 1 Sep is hour 8752.
+type Game = ReturnType<typeof ready>['game']
+type Frame = ReturnType<typeof ready>['frame']
+function advanceTo(game: Game, runId: number, frame: Frame, to: number) {
+  const from = game.history.head
+  game.stepBy(to - game.displayTickValue)
+  const frames = Array.from({ length: to - from }, (_, i) => ({ ...frame, tick: from + i + 1 }))
+  mock.receive({ type: 'frames', runId, frames, stats: new Float64Array(frames.length * STAT_STRIDE), head: to, end: null, evolution: [] })
+  expect(game.displayTickValue).toBe(to)
+  game.pause() // refresh the snapshot, which frames only update every 100 ms
+}
+function act(game: Game, runId: number, frame: Frame) {
+  const at = Math.floor(game.displayTickValue)
+  expect(game.canIntervene()).toBe(true)
+  game.intervene('rain')
+  mock.receive({ type: 'intervened', runId, action: 'rain', from: at, tick: at + 1, frame: { ...frame, tick: at + 1 }, stats: row(), evolution: [], end: null })
+}
+function spendFour(game: Game, runId: number, frame: Frame) {
+  for (const at of [100, 500, 900, 1300]) { advanceTo(game, runId, frame, at); act(game, runId, frame) }
+}
+
+it('Endless spends uses, waits out the cooldown, and renews one at each season start', () => {
+  const { game, runId, frame } = ready(true)
+  game.setAutoPause(false)
+  spendFour(game, runId, frame)
+  expect([game.getSnapshot().charges, game.getSnapshot().cooldownUntil, game.getSnapshot().nextRenewal]).toEqual([0, 1700, 2176])
+  advanceTo(game, runId, frame, 2175)
+  expect(game.canIntervene()).toBe(false)
+  advanceTo(game, runId, frame, 2176)
+  expect([game.getSnapshot().charges, game.getSnapshot().nextRenewal]).toEqual([1, 4336])
+  act(game, runId, frame)
+  expect(game.getSnapshot().charges).toBe(0)
+  advanceTo(game, runId, frame, 4336)
+  // A renewal while the cooldown runs is kept, but cannot be used until the cooldown ends.
+  expect([game.getSnapshot().charges, game.canIntervene()]).toEqual([1, true])
+  advanceTo(game, runId, frame, 8752)
+  expect([game.getSnapshot().charges, game.getSnapshot().nextRenewal]).toEqual([3, 10936])
+  advanceTo(game, runId, frame, 10936)
+  expect(game.getSnapshot().charges).toBe(4)
+  advanceTo(game, runId, frame, 13096)
+  expect(game.getSnapshot().charges).toBe(4)
+  game.dispose()
+})
+
+it('Endless cannot act again inside the cooldown even after a renewal', () => {
+  const { game, runId, frame } = ready(true)
+  game.setAutoPause(false)
+  advanceTo(game, runId, frame, 2000)
+  act(game, runId, frame)
+  advanceTo(game, runId, frame, 2176)
+  expect([game.getSnapshot().charges, game.canIntervene()]).toEqual([4, false])
+  advanceTo(game, runId, frame, 2400)
+  expect(game.canIntervene()).toBe(true)
+  game.dispose()
+})
+
+it('the one-year challenge keeps four uses for the year with no renewal', () => {
+  const { game, runId, frame } = ready(false)
+  game.setAutoPause(false)
+  spendFour(game, runId, frame)
+  advanceTo(game, runId, frame, 8700)
+  const snap = game.getSnapshot()
+  expect([snap.charges, snap.nextRenewal, game.canIntervene()]).toEqual([0, null, false])
+  game.dispose()
+})
+
+it('replaying the past neither adds nor loses uses', () => {
+  const { game, runId, frame } = ready(true)
+  game.setAutoPause(false)
+  spendFour(game, runId, frame)
+  advanceTo(game, runId, frame, 2300)
+  expect(game.getSnapshot().charges).toBe(1)
+  for (let i = 0; i < 3; i++) {
+    game.seek(1000)
+    expect(game.getSnapshot().charges).toBe(1)
+    game.seek(2300)
+    expect(game.getSnapshot().charges).toBe(1)
+  }
+  game.dispose()
+})
+
+it('gives back a use the worker could not apply', () => {
+  const { game, runId, frame } = ready(true)
+  game.setAutoPause(false)
+  advanceTo(game, runId, frame, 50)
+  game.intervene('rain')
+  expect(game.getSnapshot().charges).toBe(3)
+  mock.receive({ type: 'intervened', runId, action: 'rain', from: 50, tick: 50, frame: { ...frame, tick: 50 }, stats: row(), evolution: [], end: null })
+  expect([game.getSnapshot().charges, game.getSnapshot().cooldownUntil]).toEqual([4, 0])
+  game.dispose()
+})
+
+it('saving and resuming keeps the uses, cooldown and next renewal, and old saves load', async () => {
+  const { game, sim, runId, frame } = ready(true)
+  game.setAutoPause(false)
+  spendFour(game, runId, frame)
+  advanceTo(game, runId, frame, 2200)
+  act(game, runId, frame)
+  advanceTo(game, runId, frame, 2300)
+  game.save()
+  mock.receive({ type: 'saved', runId, state: { ...sim.save(), tick: 2300 } })
+  await Promise.resolve()
+  const save = mock.save.mock.calls.at(-1)?.[0]
+  expect([save.charges, save.cooldownUntil, save.interventions.length]).toEqual([0, 2600, 5])
+  game.dispose()
+
+  const resume = (data: typeof save) => {
+    const g = new GameController()
+    g.restore(data)
+    mock.receive({ type: 'ready', restored: true, runId: g.getSnapshot().runId, cover: [], frame: { ...frame, tick: 2300 }, stats: row(), evolution: summarizeEvolution(sim) })
+    return g
+  }
+  const g = resume(save)
+  let snap = g.getSnapshot()
+  expect([snap.tick, snap.charges, snap.cooldownUntil, snap.nextRenewal]).toEqual([2300, 0, 2600, 4336])
+  // A saved `charges` that disagrees with the recorded interventions cannot duplicate a use.
+  const g2 = resume({ ...save, charges: 4 })
+  expect(g2.getSnapshot().charges).toBe(0)
+  // An early save without the budget fields resumes with a full allowance and no cooldown.
+  const { charges: _c, cooldownUntil: _u, interventions: _i, ...old } = save
+  const g3 = resume(old)
+  snap = g3.getSnapshot()
+  expect([snap.charges, snap.cooldownUntil, snap.interventions]).toEqual([4, 0, []])
+  for (const x of [g, g2, g3]) x.dispose()
 })
