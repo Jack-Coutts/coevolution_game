@@ -220,7 +220,8 @@ export class WorldRenderer {
     for (let i = 0; i < bushes.length; i += BUSH_STRIDE) {
       const id = bushes[i]
       live.add(id)
-      const fullness = bushes[i + 3]
+      // A vole-bitten bush can briefly regrow a little above its stock (docs/validation.md, #8); draw it as full.
+      const fullness = Math.min(1, bushes[i + 3])
       const grown = bushes[i + 4]
       const wither = Math.min(1, bushes[i + 5])
       const sprite = this.bushSprite(id)
