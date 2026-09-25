@@ -1,5 +1,7 @@
 # Meadow Keeper roadmap
 
+Current delivery plan and progress: [progress.md](progress.md).
+
 The player’s job is to recognise developing trouble and intervene. A meadow that always
 balances itself is not the goal. Untouched survival around 30–50% is a calibration target;
 readable warning signs, enough time to respond, and useful choices are the gameplay gates.
