@@ -12,7 +12,7 @@ const PAD_R = 30
 const PAD_T = 14
 const PAD_B = 20
 
-const TOKENS = ['rabbit', 'fox', 'berry', 'gold', 'primary', 'border', 'muted', 'muted-foreground', 'background', 'tone-info-foreground', 'tone-warn-foreground'] as const
+const TOKENS = ['rabbit', 'fox', 'berry', 'gold', 'primary', 'border', 'card', 'muted', 'muted-foreground', 'background', 'tone-info-foreground', 'tone-warn-foreground'] as const
 type Palette = Record<(typeof TOKENS)[number], string>
 
 function readPalette(): Palette {
@@ -182,12 +182,17 @@ export function Timeline() {
       for (const iv of h.interventions) {
         if (iv.tick < start) continue
         const x = xOf(iv.tick)
-        ctx.fillStyle = c.gold
         ctx.beginPath()
         ctx.moveTo(x, PAD_T + 1)
         ctx.lineTo(x + 4, PAD_T + 7)
         ctx.lineTo(x - 4, PAD_T + 7)
         ctx.closePath()
+        // A card-coloured halo keeps the marker at 3:1 over the berry fill as well as the plain plot.
+        ctx.strokeStyle = c.card
+        ctx.lineWidth = 2
+        ctx.lineJoin = 'round'
+        ctx.stroke()
+        ctx.fillStyle = c.gold
         ctx.fill()
       }
 
