@@ -52,8 +52,8 @@ describe('scenario disturbances in Endless', () => {
     expect(d.regrowFactor(8760 + MAY_1)).toBe(0.35)
     expect(d.regrowFactor(8760 + 100)).toBe(1)
     const w = new Sim(endless(), 1, winter.disturbance)
-    expect(w.regrowFactor(2 * 8760 + DEC_1)).toBe(0.3)
-    expect(w.metabolismFactor(2 * 8760 + DEC_1)).toBe(1.35)
+    expect(w.regrowFactor(2 * 8760 + DEC_1)).toBe(0.6)
+    expect(w.metabolismFactor(2 * 8760 + DEC_1)).toBe(1.15)
     expect(visibleSpans(drought, 8760, 2 * 8760, true).map(s => s.from)).toEqual([8760 + MAY_1])
   })
   it('brings the fox pack only once', () => {
