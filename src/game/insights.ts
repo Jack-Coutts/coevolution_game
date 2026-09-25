@@ -63,7 +63,9 @@ export const DANGER_HOLD = 48
  */
 export function hints(h: RunHistory, tick: number): Hint[] {
   const out = notesAt(h, tick)
-  for (let lag = 1; lag <= DANGER_HOLD && tick - lag - h.firstTick >= 24; lag++) {
+  // Once a species is gone there is nothing left to warn about, so old danger notes are not carried.
+  const alive = h.stat(tick, 'prey') > 0 && h.stat(tick, 'pred') > 0
+  for (let lag = 1; alive && lag <= DANGER_HOLD && tick - lag - h.firstTick >= 24; lag++) {
     for (const n of notesAt(h, tick - lag)) {
       if (n.tone !== 'danger' || out.some(o => o.id === n.id)) continue
       out.push({ ...n, text: `${n.text} (${lag} h ago)` })
@@ -100,7 +102,7 @@ function notesAt(h: RunHistory, tick: number): Hint[] {
       text: `Rabbits are up ${Math.round(preyGrowth * 100)}% in 10 days while bushes are only ${Math.round(stock * 100)}% full. A food crash is likely.`,
     })
   }
-  if (pred > 0 && prey / pred < 5 && preyGrowth < -0.15) {
+  if (pred > 0 && prey > 0 && prey / pred < 5 && preyGrowth < -0.15) {
     out.push({
       id: 'overhunt',
       tone: 'danger',
@@ -125,7 +127,7 @@ function notesAt(h: RunHistory, tick: number): Hint[] {
     out.push({ id: 'fewfox', tone: 'danger', text: `Only ${pred} fox${pred === 1 ? '' : 'es'} left. One bad week ends the run.` })
   }
   if (prey > 0 && prey <= 12) {
-    out.push({ id: 'fewprey', tone: 'danger', text: `Only ${prey} rabbits left.` })
+    out.push({ id: 'fewprey', tone: 'danger', text: `Only ${prey} rabbit${prey === 1 ? '' : 's'} left.` })
   }
   if (prey > 0 && stock < 0.12 && preyE >= 0.3) {
     out.push({

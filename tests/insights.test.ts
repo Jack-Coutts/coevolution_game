@@ -48,4 +48,11 @@ describe('field notes', () => {
     const h = history(500, (t) => ({ prey: Math.round(5 + 5 * Math.min(1, Math.max(0, (t - 260) / 240))), pred: 2, stock: 0.2 }))
     expect(hints(h, 500).map(n => `${n.tone} ${n.id}`)).toEqual(['danger fewfox', 'danger fewprey', 'warn boom'])
   })
+
+  it('stops warning about a species once it has died out', () => {
+    const h = history(500, (t) => ({ prey: t < 499 ? Math.max(1, Math.round(10 - (t - 400) / 10)) : 0, pred: 8 }))
+    expect(hints(h, 500).map(n => n.id)).not.toContain('fewprey')
+    expect(hints(h, 500).map(n => n.id)).not.toContain('overhunt')
+    expect(hints(h, 498).find(n => n.id === 'fewprey')?.text).toBe('Only 1 rabbit left.')
+  })
 })
