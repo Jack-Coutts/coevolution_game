@@ -15,8 +15,8 @@ export function AnimalInspector({ selected, onSelect, picker = false }: { select
   const [game, snap] = useGame()
   const [species, setSpecies] = useState<Species>(selected?.species ?? 'prey')
   const frame = game.history.frameAt(snap.tick)?.a
-  const animals = species === 'prey' ? frame?.prey : frame?.preds
   const options: number[] = []
+  const animals = picker ? (species === 'prey' ? frame?.prey : frame?.preds) : undefined
   if (animals) for (let i = 0; i < animals.length; i += ANIMAL_STRIDE) options.push(animals[i])
   const inspected = selected && frame ? (selected.species === 'prey' ? frame.prey : frame.preds) : null
   let animal: Float32Array | null = null

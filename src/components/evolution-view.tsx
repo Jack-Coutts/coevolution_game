@@ -1,10 +1,19 @@
+import { useMemo } from 'react'
 import { AnimalInspector, type AnimalSelection } from '@/components/animal-inspector'
-import { TraitChart } from '@/components/trait-chart'
+import { TraitChart, type TraitSeries } from '@/components/trait-chart'
 import { Card } from '@/components/ui/card'
 import { useAnimalIcons } from '@/hooks/use-animal-icons'
 import { useGame } from '@/hooks/use-game'
-import { TRAITS } from '@/sim/evolution'
+import { TRAITS, type EvolutionSample } from '@/sim/evolution'
 import type { Species } from '@/sim/sim'
+
+function traitSeries(samples: EvolutionSample[]): TraitSeries {
+  // Once history is trimmed, samples[0] is the founders sample far behind the rest; keep it only for the dashed line.
+  const trimmed = samples.length > 1 && samples[1].tick - samples[0].tick > 24
+  const plotted = trimmed ? samples.slice(1) : samples
+  const from = plotted[0]?.tick ?? 0
+  return { plotted, founders: samples[0], from, end: Math.max(from + 24, samples.at(-1)?.tick ?? 24) }
+}
 
 const SPECIES: { id: Species; name: string; tone: string }[] = [
   { id: 'prey', name: 'Rabbits', tone: 'text-rabbit' },
@@ -14,8 +23,15 @@ const SPECIES: { id: Species; name: string; tone: string }[] = [
 export function EvolutionView({ selected, onSelect }: { selected: AnimalSelection | null; onSelect: (a: AnimalSelection | null) => void }) {
   const [game, snap] = useGame()
   const icons = useAnimalIcons()
-  const samples = game.history.evolution.filter(s => s.tick <= snap.tick)
-  const latest = samples.at(-1)
+  const evolution = game.history.evolution
+  let last = evolution.length - 1
+  while (last >= 0 && evolution[last].tick > snap.tick) last--
+  const lastTick = evolution[last]?.tick
+  // The controller notifies ~10 times a second even when paused; rebuild the charts only when the visible samples change.
+  // History mutates the array in place (push, then trim to a fixed length), so its length and last tick are part of the key.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const series = useMemo(() => traitSeries(evolution.slice(0, last + 1)), [evolution, evolution.length, last, lastTick])
+  const latest = series.plotted.at(-1)
   const journal = game.history.journal.filter(e => e.tick <= snap.tick).reverse()
   return <div className="flex flex-col gap-3">
     <Card className="gap-3 p-4">
@@ -46,7 +62,7 @@ export function EvolutionView({ selected, onSelect }: { selected: AnimalSelectio
       {SPECIES.map(s => <section key={s.id} aria-label={`${s.name} traits`}>
         <h4 className={`mb-2 text-xs font-semibold tracking-wide uppercase ${s.tone}`}>{s.name}</h4>
         <div className="grid gap-2 sm:grid-cols-2 xl:grid-cols-4">
-          {TRAITS.map(t => <TraitChart key={t} samples={samples} species={s.id} trait={t} />)}
+          {TRAITS.map(t => <TraitChart key={t} series={series} species={s.id} trait={t} />)}
         </div>
       </section>)}
     </Card>
