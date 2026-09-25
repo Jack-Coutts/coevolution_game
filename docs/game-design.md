@@ -63,8 +63,9 @@ start of each season, holding at most four (below).
 
 The one-year challenge keeps four uses for the year. Endless used to share the same four across
 an unlimited run, so after them the player could only watch: in playtest session 3 the Endless
-player had used three by day 94 (4 Dec) and could not answer the winter crash on day 110, and
-said every use "feels like a mistake unless it's in winter". We compared four rules with a greedy
+player had used three of four by 4 Dec (day 95), with one left for an unlimited run, and
+the rabbits died out on day 110. The player said every use "feels like a mistake unless it's in
+winter". Renewal does not shorten the cooldown, so a crash inside it still goes unanswered. We compared four rules with a greedy
 threshold keeper (`scripts/endless-budget.ts`, seeds 7300–7304, stable and harsh-winter, up to
 three years; `docs/experiments/endless-budget.json`):
 
