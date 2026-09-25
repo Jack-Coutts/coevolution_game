@@ -60,6 +60,8 @@ export const OUTPUT_LABELS = ['Turn', 'Pace', 'Memory']
 export interface Genome {
   nHid: number
   w: Float64Array
+  /** Inherited body-size gene in [-1, 1] (src/sim/body.ts). Absent = neutral; ignored while body evolution is off. */
+  sizeGene?: number
 }
 
 export function genomeSize(nHid: number): number {
