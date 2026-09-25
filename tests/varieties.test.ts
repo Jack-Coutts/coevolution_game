@@ -3,26 +3,29 @@ import { RunHistory } from '@/game/history'
 import { detectSplit, VARIETY } from '@/game/varieties'
 import type { EvolutionSample } from '@/sim/evolution'
 import { Rng } from '@/sim/rng'
-import { ANIMAL_STRIDE, STAT_STRIDE, type FrameData } from '@/worker/protocol'
+import { ANIMAL_SIZE, ANIMAL_STRIDE, STAT_STRIDE, type FrameData } from '@/worker/protocol'
 
 const D = 24
 /** A group of animals: its share, mean traits [forage, flee, cruise, hide] and spread. */
-interface Group { share: number; mean: number[]; sd?: number }
+interface Group { share: number; mean: number[]; sd?: number; size?: number }
 const ONE: Group[] = [{ share: 1, mean: [0.3, 0.2, 0.5, 0] }]
 /** Two groups 0.6 apart in cover seeking (six spreads). */
 const TWO: Group[] = [{ share: 0.7, mean: [0.3, 0.2, 0.5, -0.3] }, { share: 0.3, mean: [0.3, 0.2, 0.5, 0.3] }]
 const shift = (groups: Group[], by: number): Group[] => groups.map(g => ({ ...g, mean: g.mean.map((v, j) => (j === 0 ? v + by : v)) }))
 
+/** Animals as [forage, flee, cruise, hide, body size multiplier]. */
 function points(groups: Group[], n: number, rng: Rng): number[][] {
   const out: number[][] = []
-  for (const g of groups) for (let i = 0; i < Math.round(g.share * n); i++) out.push(g.mean.map(m => rng.gauss(m, g.sd ?? 0.1)))
+  for (const g of groups) for (let i = 0; i < Math.round(g.share * n); i++) out.push([...g.mean.map(m => rng.gauss(m, g.sd ?? 0.1)), g.size ?? 1])
   return out
 }
+/** Points as the detector reads them (body size as its gene). */
+const genes = (pts: number[][]) => pts.map(p => [...p.slice(0, 4), Math.log(p[4]) / Math.log(1.25)])
 
 function frame(tick: number, groups: Group[], rng: Rng, gen: number, n = 120): FrameData {
   const pts = points(groups, n, rng)
   const rows = new Float32Array(pts.length * ANIMAL_STRIDE)
-  pts.forEach((p, i) => { const o = i * ANIMAL_STRIDE; rows[o] = i + 1; rows[o + 9] = gen; p.forEach((v, j) => (rows[o + 17 + j] = v)) })
+  pts.forEach((p, i) => { const o = i * ANIMAL_STRIDE; rows[o] = i + 1; rows[o + 9] = gen; p.slice(0, 4).forEach((v, j) => (rows[o + 17 + j] = v)); rows[o + ANIMAL_SIZE] = p[4] })
   return { tick, prey: rows, preds: new Float32Array(), bushes: new Float32Array(), events: new Float32Array() }
 }
 
@@ -48,17 +51,17 @@ describe('split detection (one daily sample)', () => {
   it('does not split a single group, even with correlated traits, in 200 random samples', () => {
     const rng = new Rng(3)
     let found = 0
-    for (let k = 0; k < 100; k++) if (detectSplit(points(ONE, 120, rng))?.ok) found++
+    for (let k = 0; k < 100; k++) if (detectSplit(genes(points(ONE, 120, rng)))?.ok) found++
     // One latent factor drives all four traits: a stretched, still single-peaked cloud.
     for (let k = 0; k < 100; k++) {
       const pts = Array.from({ length: 120 }, () => { const f = rng.gauss(0, 0.3); return [f, 0.8 * f, -f, 0.5 * f].map(v => v + rng.gauss(0, 0.03)) })
-      if (detectSplit(pts)?.ok) found++
+      if (detectSplit(pts.map(p => [...p, 0]))?.ok) found++
     }
     expect(found).toBe(0)
   })
 
   it('finds two clearly separate groups with their shares and centroids', () => {
-    const s = detectSplit(points(TWO, 120, new Rng(4)))!
+    const s = detectSplit(genes(points(TWO, 120, new Rng(4))))!
     expect(s.ok).toBe(true)
     expect(s.share[0]).toBeCloseTo(0.7, 1)
     expect(s.c[0][3]).toBeCloseTo(-0.3, 1)
@@ -66,12 +69,18 @@ describe('split detection (one daily sample)', () => {
     expect(s.sep).toBeGreaterThan(VARIETY.minSeparation)
   })
 
+  it('finds groups that differ only in body size', () => {
+    const sized: Group[] = [{ share: 0.6, mean: [0.3, 0.2, 0.5, 0], size: 0.85 }, { share: 0.4, mean: [0.3, 0.2, 0.5, 0], size: 1.2 }]
+    const h = run(repeat(25, sized))
+    expect(entries(h)[0].text).toMatch(/mostly in body size \(×0\.85 vs ×1\.20\)\.$/)
+  })
+
   it('limits: misses overlapping groups (2 spreads apart) and a group under 15%', () => {
     const rng = new Rng(5)
     const close: Group[] = [{ share: 0.5, mean: [0, 0, 0, -0.1] }, { share: 0.5, mean: [0, 0, 0, 0.1] }]
     const rare: Group[] = [{ share: 0.9, mean: [0, 0, 0, -0.3] }, { share: 0.1, mean: [0, 0, 0, 0.3] }]
-    expect(detectSplit(points(close, 200, rng))?.ok).toBe(false)
-    const r = detectSplit(points(rare, 200, rng))!
+    expect(detectSplit(genes(points(close, 200, rng)))?.ok).toBe(false)
+    const r = detectSplit(genes(points(rare, 200, rng)))!
     expect(r.ok).toBe(false)
     expect(r.share[1]).toBeCloseTo(0.1, 2)
   })

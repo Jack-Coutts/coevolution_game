@@ -1,6 +1,7 @@
 import { TRAITS, type TraitKey } from '@/sim/evolution'
 import { TWO_SPECIES, type Species } from '@/sim/species'
-import { ANIMAL_STRIDE, type FrameData } from '@/worker/protocol'
+import { SIZE_BASE } from '@/sim/body'
+import { ANIMAL_SIZE, ANIMAL_STRIDE, type FrameData } from '@/worker/protocol'
 import type { Journal } from './journal'
 import { framePop } from './species-ui'
 
@@ -10,8 +11,9 @@ import { framePop } from './species-ui'
  * behaviour, not subspecies, and are separate from founder families (ancestry).
  *
  * Method, per species and daily sample with at least `minCount` animals:
- * 1. Each animal is a point of its inherited traits (DIMS), each divided by a fixed scale. The four behaviour traits
- *    share one response scale (scale 1). They are deliberately not standardized by the day's spread: that would shrink
+ * 1. Each animal is a point of its inherited traits (DIMS): the four behaviour traits, which share one response scale,
+ *    and body size as its gene (log size / log 1.25, from -1 to 1), so a full-range size difference weighs like a
+ *    full-range behaviour difference. They are deliberately not standardized by the day's spread: that would shrink
  *    the trait that separates two groups and inflate traits that barely vary, hiding clear groups in noise.
  * 2. Deterministic 2-means (k = 2 only): start from the animal farthest from the mean and the animal farthest from it.
  * 3. The split counts when the gap between the two groups is clear: projected onto the line between the centroids,
@@ -26,7 +28,8 @@ import { framePop } from './species-ui'
  *    one group was lost, or the difference changed), or at once if the species dies out. Samples with too few animals
  *    neither extend nor end a pair, and break a candidate run.
  * Limits: k = 2 only (a third group, or a variety splitting again, is not detected); a gradual cline without a gap is
- * not a split; only inherited behaviour is used, not what animals actually do.
+ * not a split; only inherited traits are used, not what animals actually do (an observed ecological role, such as
+ * where an animal feeds, would be another dimension).
  */
 export const VARIETY = {
   minCount: 20, minShare: 0.15, minSeparation: 0.5, minDistance: 0.2,
@@ -38,12 +41,17 @@ export const VARIETY = {
 } as const
 
 /**
- * The inherited traits clustered: frame column and the scale that makes one unit comparable to the behaviour traits'
- * response scale. Another inherited dimension is one more entry; stored centroids then gain a column, so a save from
- * before the change has its varieties reset.
+ * The inherited dimensions clustered, each read from an animal's frame floats (at offset `o`) on a scale comparable to
+ * the behaviour traits' response scale. Another dimension is one more entry; stored centroids then gain a column, so a
+ * save from before the change has its varieties reset.
  */
-export type DimKey = TraitKey
-export const DIMS: readonly { key: DimKey; col: number; scale: number }[] = TRAITS.map((key, i) => ({ key, col: 17 + i, scale: 1 }))
+export type DimKey = TraitKey | 'size'
+export const DIMS: readonly { key: DimKey; value: (rows: Float32Array, o: number) => number }[] = [
+  ...TRAITS.map((key, i) => ({ key, value: (rows: Float32Array, o: number) => rows[o + 17 + i] })),
+  { key: 'size', value: (rows, o) => (rows[o + ANIMAL_SIZE] > 0 ? Math.log(rows[o + ANIMAL_SIZE]) / Math.log(SIZE_BASE) : 0) },
+]
+/** A dimension's value as players read it: trait values as they are, body size as its multiplier (×1 = base body). */
+export const dimText = (key: DimKey, v: number) => (key === 'size' ? `×${(SIZE_BASE ** v).toFixed(2)}` : v.toFixed(2))
 
 export interface Split {
   /** Whether the split met the thresholds on this day. */
@@ -153,22 +161,22 @@ export interface VarietyDay {
 export type VarietyDays = { tick: number } & Partial<Record<Species, VarietyDay>>
 
 const NAME: Record<Species, [string, string]> = { prey: ['Rabbit', 'rabbits'], pred: ['Fox', 'foxes'], vole: ['Vole', 'voles'] }
-const LABEL: Record<TraitKey, string> = { forage: 'food seeking', flee: 'threat avoidance', cruise: 'cruising pace', hide: 'cover seeking' }
+const LABEL: Record<DimKey, string> = { forage: 'food seeking', flee: 'threat avoidance', cruise: 'cruising pace', hide: 'cover seeking', size: 'body size' }
 const day = (tick: number) => Math.floor(tick / 24) + 1
 const pct = (v: number) => `${Math.round(v * 100)}%`
 const r3 = (v: number) => Math.round(v * 1000) / 1000
 const round = (s: Split): Split => ({ ...s, share: [r3(s.share[0]), r3(s.share[1])], c: [s.c[0].map(r3), s.c[1].map(r3)], dist: r3(s.dist), sep: r3(s.sep) })
 
-export const VARIETY_CAVEAT = 'Observed ecological varieties: groups found by clustering the four inherited behaviour traits once a day. '
+export const VARIETY_CAVEAT = 'Observed ecological varieties: groups found by clustering inherited traits (four behaviour traits and body size) once a day. '
   + 'They are not subspecies and are separate from founder families; they can merge back or vanish, and this does not show why they differ.'
 
 /** The trait whose centroids differ most in units of its spread, described for a sentence. */
 export function mainDifference(s: Pick<Split, 'c'>): { trait: DimKey; a: number; b: number } {
   let best = 0
   DIMS.forEach((_, j) => { if (Math.abs(s.c[0][j] - s.c[1][j]) > Math.abs(s.c[0][best] - s.c[1][best])) best = j })
-  return { trait: DIMS[best].key, a: s.c[0][best] * DIMS[best].scale, b: s.c[1][best] * DIMS[best].scale }
+  return { trait: DIMS[best].key, a: s.c[0][best], b: s.c[1][best] }
 }
-export const traitLabel = (t: TraitKey) => LABEL[t]
+export const dimLabel = (t: DimKey) => LABEL[t]
 
 /** Bounded daily variety tracking. State is a few numbers per species; `days` keeps about a year for display. */
 export class VarietyTracker {
@@ -201,7 +209,7 @@ export class VarietyTracker {
     const points: number[][] = []
     for (let k = 0; k < n && points.length < VARIETY.maxAnimals; k += step) {
       const o = Math.floor(k) * ANIMAL_STRIDE
-      points.push(DIMS.map(dim => rows[o + dim.col] / dim.scale))
+      points.push(DIMS.map(dim => dim.value(rows, o)))
     }
     const split = detectSplit(points)
     if (!split) { st.candidate = null; return this.finish(st, out, gen) }
@@ -230,10 +238,10 @@ export class VarietyTracker {
       const [one, many] = NAME[s]
       log.record({ kind: 'variety', species: s, key: `${s}:${ids[0]}`, tick,
         text: `Two observed ecological varieties of ${many}: ${one} variety ${ids[0]} (${pct(split.share[0])}) and variety ${ids[1]} (${pct(split.share[1])}) `
-          + `have differed in inherited behaviour for ${cand.samples} daily samples in a row (since day ${day(cand.since)}), mostly in ${LABEL[diff.trait]} `
-          + `(${diff.a.toFixed(2)} vs ${diff.b.toFixed(2)}).`,
+          + `have differed in inherited traits for ${cand.samples} daily samples in a row (since day ${day(cand.since)}), mostly in ${LABEL[diff.trait]} `
+          + `(${dimText(diff.trait, diff.a)} vs ${dimText(diff.trait, diff.b)}).`,
         caveat: VARIETY_CAVEAT,
-        evidence: { measure: 'Deterministic 2-means on the inherited traits (food seeking, threat avoidance, cruising pace, cover seeking), each on its fixed scale.',
+        evidence: { measure: 'Deterministic 2-means on the inherited traits (food seeking, threat avoidance, cruising pace, cover seeking, body size), each on its fixed scale.',
           threshold: `A clear gap (separation above ${VARIETY.minSeparation}), the smaller group at least ${pct(VARIETY.minShare)}, centroids at least ${VARIETY.minDistance} apart, `
             + `in ${VARIETY.persistDays} consecutive daily samples while the mean generation rose by at least ${VARIETY.persistGenerations}.`,
           since: cand.since, samples: cand.samples,
@@ -277,7 +285,7 @@ export class VarietyTracker {
     const d = this.at(tick)?.[species]
     const split = d?.split
     if (!d?.ids || !split?.ok) return null
-    const dist = (c: number[]) => DIMS.reduce((a, dim, j) => a + (row[dim.col] / dim.scale - c[j]) ** 2, 0)
+    const dist = (c: number[]) => DIMS.reduce((a, dim, j) => a + (dim.value(row, 0) - c[j]) ** 2, 0)
     return { id: d.ids[dist(split.c[1]) < dist(split.c[0]) ? 1 : 0], day: d }
   }
 
