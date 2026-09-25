@@ -2,7 +2,7 @@ import { writeSave, type MeadowSave } from './saves'
 import { BUDGET, deriveParams, spent, type LeverValues } from '@/sim/levers'
 import type { SimParams } from '@/sim/params'
 import { SCENARIO_BY_ID, type Scenario, type ScenarioId } from '@/sim/scenarios'
-import type { Intervention, Sim } from '@/sim/sim'
+import type { Intervention, MeadowState } from '@/sim/sim'
 import { tickAt } from '@/sim/time'
 import { WorldRenderer, type Weather } from '@/render/renderer'
 import { STAT_STRIDE, type EndInfo, type FrameData, type FromWorker, type ToWorker } from '@/worker/protocol'
@@ -45,6 +45,8 @@ export interface Snapshot {
   speed: number
   prey: number
   pred: number
+  /** 0 outside the Vole meadow. */
+  vole: number
   stock: number
   bushes: number
   preyEnergy: number
@@ -168,6 +170,7 @@ export class GameController {
       speed: this.speed,
       prey: h.stat(t, 'prey'),
       pred: h.stat(t, 'pred'),
+      vole: h.stat(t, 'vole'),
       stock: h.stat(t, 'stock'),
       bushes: h.stat(t, 'bushes'),
       preyEnergy: h.stat(t, 'preyEnergy'),
@@ -192,13 +195,13 @@ export class GameController {
   }
 
   /** Start a fresh run at tick 0 (planning phase). */
-  configure(config: RunConfig, state?: ReturnType<Sim['save']>): void {
+  configure(config: RunConfig, state?: MeadowState): void {
     this.config = config
-    this.params = deriveParams(config.levers)
-    this.params.endless = config.endless
     this.scenario = SCENARIO_BY_ID[config.scenario]
+    this.params = deriveParams(config.levers, this.scenario.species)
+    this.params.endless = config.endless
     this.runId += 1
-    this.history = new RunHistory(this.params.horizon, config.endless)
+    this.history = new RunHistory(this.params.horizon, config.endless, this.scenario.species)
     this.saveStatus = ''
     this.saving = false
     this.hintCache = { tick: -1, hints: [] }
@@ -265,7 +268,7 @@ export class GameController {
       case 'saved': {
         if (!this.config) break
         this.displayTick = msg.state.tick
-        const save: MeadowSave = { version: 2, savedAt: new Date().toISOString(), config: this.config,
+        const save: MeadowSave = { version: 3, savedAt: new Date().toISOString(), config: this.config,
           state: msg.state, history: this.history.save(), charges: this.charges, cooldownUntil: this.cooldownUntil,
           interventions: this.history.interventions, evolution: this.history.evolution, journal: this.history.journal }
         const id = this.runId
