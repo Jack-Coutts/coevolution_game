@@ -32,16 +32,16 @@ export function Guide() {
             Rabbits graze the berry bushes. Bushes shrink as they are eaten.
           </span>
         </div>
-        <div className="flex items-center gap-2 rounded-lg border p-2">
-          <img src={icons.fox} alt="" className="size-8" />
-          <span className="text-xs text-muted-foreground">{voles ? 'Foxes hunt rabbits and voles. A full fox stops hunting.' : 'Foxes hunt rabbits. A full fox stops hunting.'}</span>
-        </div>
         {voles && (
           <div className="flex items-center gap-2 rounded-lg border p-2">
             <img src={icons.vole} alt="" className="size-8" />
             <span className="text-xs text-muted-foreground">Voles eat grass seed, and berries when seed runs short. A vole is a small meal for a fox.</span>
           </div>
         )}
+        <div className="flex items-center gap-2 rounded-lg border p-2">
+          <img src={icons.fox} alt="" className="size-8" />
+          <span className="text-xs text-muted-foreground">{voles ? 'Foxes hunt rabbits and voles. A full fox stops hunting.' : 'Foxes hunt rabbits. A full fox stops hunting.'}</span>
+        </div>
       </section>
       <section>
         <h3 className="mb-1 font-semibold">The Vole meadow</h3>

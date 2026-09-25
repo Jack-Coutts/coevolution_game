@@ -20,12 +20,12 @@ export function FoodWeb({ compact = false }: { compact?: boolean }) {
       </p>
       <table className="mt-2 w-full text-left">
         <thead className="text-muted-foreground">
-          <tr><th className="font-medium">Species</th><th className="font-medium">Eats</th><th className="font-medium">Eaten by</th></tr>
+          <tr><th className="pr-3 font-medium">Species</th><th className="pr-2 font-medium">Eats</th><th className="font-medium">Eaten by</th></tr>
         </thead>
         <tbody>
           {ROWS.map(r => (
             <tr key={r.s} className="align-top">
-              <td className="py-0.5 pr-2">
+              <td className="py-0.5 pr-3 whitespace-nowrap">
                 <span className="flex items-center gap-1">
                   <img src={iconFor(icons, r.s)} alt="" className="size-5" />
                   <span className={`font-semibold ${SPECIES_UI[r.s].text}`}>{SPECIES_UI[r.s].Plural}</span>
