@@ -60,6 +60,34 @@ export interface Bush {
   age: number
 }
 
+/**
+ * Intervention and illness constants, exported so experiments can record them.
+ * Illness is an abstract game mechanic, not a model of any real disease.
+ */
+export const EFFECTS = {
+  illness: {
+    /** Cases seeded by the action: a share of susceptible animals, at least one, at most `seedMax`. */
+    seedMax: 6,
+    seedShare: 0.2,
+    /** Every `every` hours each case can infect each susceptible same-species animal within `radius`. */
+    every: 6,
+    radius: 0.045,
+    chance: 0.15,
+    /** Extra energy per hour while ill. */
+    drain: 0.65,
+    /** Step multiplier while ill. 1 = no slowdown (the game); 0.6 was explored for tuning and not adopted. */
+    slow: 1,
+    hours: 240,
+    /** Immunity lasts this long from infection, so it outlasts the illness itself. */
+    immunity: 720,
+  },
+  plant: { count: 4, stockShare: 0.5 },
+  releasePrey: 8,
+  releasePred: 3,
+  /** A cull removes floor(foxes / cullDivisor), always leaving one. */
+  cullDivisor: 3,
+}
+
 const WITHER_LEVEL = 0.15
 const SPROUT_STOCK = 3
 const SPROUT_GAP = 0.05
@@ -631,14 +659,14 @@ export class Sim {
     const n = Math.sqrt(hx * hx + hy * hy)
     a.hx = hx / n
     a.hy = hy / n
-    const step = body.step * pace * (a.inCover ? eco.coverSlow : 1)
+    const step = body.step * pace * (a.inCover ? eco.coverSlow : 1) * (a.illUntil > this.tick ? EFFECTS.illness.slow : 1)
     a.x = Math.min(1, Math.max(0, a.x + a.hx * step))
     a.y = Math.min(1, Math.max(0, a.y + a.hy * step))
     a.pace = step / body.step
     a.inCover = this.cover.length > 0 && this.inCover(a.x, a.y)
     const r = step / body.baseStep
     a.energy -=
-      (body.metabolism + body.visionUpkeep * a.view + eco.brainUpkeep * a.brain.nHid) * met + body.speedCost * r * r + (a.illUntil > this.tick ? 0.65 : 0)
+      (body.metabolism + body.visionUpkeep * a.view + eco.brainUpkeep * a.brain.nHid) * met + body.speedCost * r * r + (a.illUntil > this.tick ? EFFECTS.illness.drain : 0)
   }
 
   private graze(): void {
@@ -847,19 +875,20 @@ export class Sim {
   }
 
   private infect(a: Creature): void {
-    a.illUntil = this.tick + 240
-    a.immuneUntil = this.tick + 720
+    a.illUntil = this.tick + EFFECTS.illness.hours
+    a.immuneUntil = this.tick + EFFECTS.illness.immunity
   }
 
   /** Abstract game illness: local spread, extra energy costs, then recovery and temporary immunity. */
   private spreadIllness(): void {
-    if (this.tick % 6 !== 0) return
+    const { every, radius, chance } = EFFECTS.illness
+    if (this.tick % every !== 0) return
     for (const s of SPECIES) {
       const sick = this.pops[s].filter(a => a.illUntil > this.tick)
       const exposed = new Set<Creature>()
-      for (const a of sick) this.grids[s].each(a.x, a.y, 0.045, b => {
-        if (b.immuneUntil > this.tick || (a.x - b.x) ** 2 + (a.y - b.y) ** 2 > 0.045 ** 2) return
-        if (this.evRng.random() < 0.15) exposed.add(b)
+      for (const a of sick) this.grids[s].each(a.x, a.y, radius, b => {
+        if (b.immuneUntil > this.tick || (a.x - b.x) ** 2 + (a.y - b.y) ** 2 > radius ** 2) return
+        if (this.evRng.random() < chance) exposed.add(b)
       })
       for (const a of exposed) this.infect(a)
     }
@@ -872,7 +901,7 @@ export class Sim {
       case 'illnessPred': {
         const species = action === 'illnessPrey' ? 'prey' : 'pred'
         const available = this.pops[species].filter(a => a.immuneUntil <= this.tick)
-        const n = Math.min(6, Math.max(1, Math.ceil(available.length * 0.2)))
+        const n = Math.min(EFFECTS.illness.seedMax, Math.max(1, Math.ceil(available.length * EFFECTS.illness.seedShare)))
         for (let i = 0; i < n && available.length; i++) {
           const at = Math.floor(ev.random() * available.length)
           this.infect(available.splice(at, 1)[0])
@@ -880,9 +909,9 @@ export class Sim {
         break
       }
       case 'plantBushes':
-        for (let i = 0; i < 4 && this.bushes.length < this.p.maxBushes; i++) {
+        for (let i = 0; i < EFFECTS.plant.count && this.bushes.length < this.p.maxBushes; i++) {
           const bush = { id: this.nextBush++, x: ev.uniform(0.05, 0.95), y: ev.uniform(0.05, 0.95),
-            stock: this.p.patchStock / 2, grazedFor: 0, age: 0 }
+            stock: this.p.patchStock * EFFECTS.plant.stockShare, grazedFor: 0, age: 0 }
           this.bushes.push(bush)
           this.emit('sprouted', 'prey', bush)
         }
@@ -894,9 +923,10 @@ export class Sim {
         for (const b of this.bushes) b.stock = this.p.patchStock
         break
       case 'releasePrey': {
+        const want = EFFECTS.releasePrey
         const room = Math.max(0, this.cap('prey') - this.prey.length)
-        if (room < 8) this.ceilingHits += 8 - room
-        for (let i = 0; i < Math.min(8, room); i++) {
+        if (room < want) this.ceilingHits += want - room
+        for (let i = 0; i < Math.min(want, room); i++) {
           const spot = this.bushes.length ? this.bushes[Math.floor(ev.random() * this.bushes.length)] : { x: 0.5, y: 0.5 }
           const [px, py] = [spot.x, spot.y]
           const x = Math.min(1, Math.max(0, px + ev.uniform(-0.04, 0.04)))
@@ -908,10 +938,11 @@ export class Sim {
         break
       }
       case 'releasePred': {
+        const want = EFFECTS.releasePred
         const room = Math.max(0, this.cap('pred') - this.preds.length)
-        if (room < 3) this.ceilingHits += 3 - room
+        if (room < want) this.ceilingHits += want - room
         const [ex, ey] = this.edgePoint()
-        for (let i = 0; i < Math.min(3, room); i++) {
+        for (let i = 0; i < Math.min(want, room); i++) {
           const a = this.newcomer('pred', ex, ey)
           this.preds.push(a)
           this.emit('released', 'pred', a)
@@ -919,7 +950,7 @@ export class Sim {
         break
       }
       case 'cullPred': {
-        const n = Math.floor(this.preds.length / 3)
+        const n = Math.floor(this.preds.length / EFFECTS.cullDivisor)
         for (let i = 0; i < n && this.preds.length > 1; i++) {
           const k = Math.floor(ev.random() * this.preds.length)
           this.counters.predCulled++

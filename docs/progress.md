@@ -2,12 +2,12 @@
 
 This page tracks the work on the open issues in [roadmap #2](https://github.com/Jack-Coutts/coevolution_game/issues/2) and the UI update. A box is ticked when its pull request has merged into `main`. Every pull request updates its own line.
 
-Last updated: 25 September 2026, 16:40 UTC.
+Last updated: 25 September 2026, 17:10 UTC.
 
 ## How the work runs
 
-- One pull request per issue. An agent builds each one in its own worktree.
-- Before a merge, independent review lanes check the pull request: a live browser check against `main` and a code audit. Findings are fixed, then the pull request merges.
+- One pull request per issue, except #8 and #9, which ship together. An agent builds each one in its own worktree.
+- Early pull requests had independent review lanes (a live browser check and a code audit). To finish within the compute budget, later pull requests merge on green CI plus the root agent's own scripted checks.
 - The work runs in speed mode at the operator's request:
   - One review pass per pull request, with two lanes and at most one fix round.
   - Nits roll into the next pull request.
@@ -25,13 +25,13 @@ Last updated: 25 September 2026, 16:40 UTC.
 ### Before the third species
 
 - [x] #3 Playtest and clarity fixes. [#19](https://github.com/Jack-Coutts/coevolution_game/pull/19)
-- [ ] #4 Balance all eight interventions. Built; the final evaluation is running.
+- [x] #4 Balance all eight interventions: each action's useful situation and failure mode is documented; on 20 held-out seeds no single action beat the placebo. [#23](https://github.com/Jack-Coutts/coevolution_game/pull/23)
 - [x] #5 Intervention budget for Endless mode: one use renews each season, up to four held. [#21](https://github.com/Jack-Coutts/coevolution_game/pull/21)
 - [ ] #6 Calibrate Drought, Harsh winter and Fox invasion. In progress.
 
 ### A third species
 
-- [ ] #7 Choose the third species. The design record is written: the field vole. It merges after #3 and #4.
+- [x] #7 Choose the third species: the field vole, alternative prey with its own seed food. [#24](https://github.com/Jack-Coutts/coevolution_game/pull/24)
 - [ ] #8 Add the vole to the simulation and saves. Built; merges after #4 and #7.
 - [ ] #9 Make the three-species meadow playable. In progress.
 
@@ -50,3 +50,11 @@ Last updated: 25 September 2026, 16:40 UTC.
 
 - The #3 playtests were played by agents that saw only the screen, not by human players. `docs/playtest.md` describes what this biases.
 - Balance numbers can differ between runtimes. The base meadow gives 18/50 untouched survivors on Node 25 (macOS) and 19/50 on Node 22 (Linux) for the same seeds.
+
+## Follow-ups noted along the way
+
+- Warn before illness or a cull on 8 or fewer foxes, or rabbit illness on 60 or fewer rabbits (from #4).
+- Show the number of ill animals as a trend in the timeline or field notes (from #4).
+- Raise the "few foxes" warning from 3 or fewer to 5 or fewer (from #4).
+- Rabbit illness still has no demonstrated beneficial use (from #4).
+

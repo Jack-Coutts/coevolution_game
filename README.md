@@ -63,7 +63,8 @@ changing the preset changes the experiment, so retain the parameters with the re
 
 ```bash
 node --import tsx scripts/validate-balance.ts 5000 50 /tmp/balance.json
-node --import tsx scripts/intervention-assay.ts 5000 50 /tmp/interventions.json
+node --import tsx scripts/action-assay.ts 8100 100 /tmp/actions.json   # all eight actions, ~1 h on 4 cores
+node --import tsx scripts/action-summary.ts /tmp/actions.json --markdown
 node --import tsx scripts/evo-assay.ts linear 20 --start 6000 --json /tmp/evolution.json
 ```
 
