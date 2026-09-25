@@ -11,7 +11,7 @@ import { CALM_BONUS } from '@/game/scores'
 import { forecast, type Tone } from '@/game/insights'
 import { useGame } from '@/hooks/use-game'
 import type { Intervention } from '@/sim/sim'
-import { dateLabel, formatDuration } from '@/sim/time'
+import { clockLabel, dateLabel, formatDuration } from '@/sim/time'
 import { cn } from '@/lib/utils'
 
 const TONE: Record<Tone, { icon: typeof Info; cls: string }> = {
@@ -112,8 +112,8 @@ export function BestScore() {
 /** With `preview`, a read-only list shown during setup so the options are known before the run. */
 export function Interventions({ preview = false }: { preview?: boolean }) {
   const [game, snap] = useGame()
-  const cooling = snap.head < snap.cooldownUntil
-  const coolLeft = Math.max(0, snap.cooldownUntil - snap.head)
+  const cooling = snap.tick < snap.cooldownUntil
+  const coolLeft = Math.max(0, snap.cooldownUntil - snap.tick)
   const canAct = game.canIntervene()
   return (
     <section aria-labelledby="interventions-heading">
@@ -228,7 +228,7 @@ export function Almanac() {
               </Badge>
               {ACTIONS.find((a) => a.id === iv.action)?.label}
             </span>
-            <span className="text-muted-foreground tabular">{dateLabel(iv.tick)}</span>
+            <span className="text-muted-foreground tabular">{dateLabel(iv.tick)} · {clockLabel(iv.tick)}</span>
           </li>
         ))}
       </ul>

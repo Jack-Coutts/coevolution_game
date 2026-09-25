@@ -54,6 +54,16 @@ export class RunHistory {
     if (this.evolution.length > 367) this.evolution.splice(1, this.evolution.length - 367)
   }
 
+  /** Forget everything after `tick`: the worker recomputed those hours (an intervention at `tick`). */
+  truncate(tick: number): void {
+    if (tick >= this.head) return
+    for (const t of [...this.frames.keys()]) if (t > tick) this.frames.delete(t)
+    this.head = Math.max(this.start, tick)
+    while (this.evolution.length > 1 && (this.evolution.at(-1)?.tick ?? 0) > tick) this.evolution.pop()
+    this.journal = this.journal.filter(e => e.tick <= tick)
+    for (const s of ['prey', 'pred'] as const) this.highestGeneration[s] = Math.max(0, ...this.evolution.map(e => e[s].generation))
+  }
+
   save() {
     return { stats: this.stats, highestGeneration: this.highestGeneration, head: this.head, start: Math.max(this.firstTick, this.head - RECENT),
       frames: [...this.frames.entries()].filter(([t]) => t >= this.head - RECENT) }

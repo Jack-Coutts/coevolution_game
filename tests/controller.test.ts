@@ -1,6 +1,6 @@
 import { afterEach, beforeEach, expect, it, vi } from 'vitest'
 import type { FromWorker, ToWorker } from '@/worker/protocol'
-import { STAT_STRIDE } from '@/worker/protocol'
+import { STAT, STAT_STRIDE } from '@/worker/protocol'
 import { summarizeEvolution } from '@/sim/evolution'
 import { Sim } from '@/sim/sim'
 import { deriveParams } from '@/sim/levers'
@@ -50,12 +50,46 @@ it('saving during a chunked step cancels further advance requests', async () => 
   game.dispose()
 })
 
-it('starts the full cooldown at the actual worker intervention time', () => {
-  const { game, runId } = ready()
+const row = () => new Float64Array(STAT_STRIDE)
+
+it('starts the full cooldown at the hour the intervention was made', () => {
+  const { game, runId, frame } = ready()
   game.play()
   game.intervene('rain')
-  mock.receive({ type: 'intervened', runId, action: 'rain', tick: 25 })
-  expect(game.getSnapshot().cooldownUntil).toBe(424)
+  expect(mock.messages.at(-1)).toMatchObject({ type: 'intervene', action: 'rain', at: 0 })
+  mock.receive({ type: 'intervened', runId, action: 'rain', from: 0, tick: 1, frame: { ...frame, tick: 1 }, stats: row(), evolution: [], end: null })
+  expect(game.getSnapshot().cooldownUntil).toBe(400)
   expect(game.getSnapshot().charges).toBe(3)
+  game.dispose()
+})
+
+it('intervenes at the displayed hour while paused and shows the result at once', () => {
+  const { game, runId, frame } = ready()
+  game.stepBy(5)
+  // The worker overshoots the step target, as it does when it runs ahead of the display.
+  const frames = Array.from({ length: 12 }, (_, i) => ({ ...frame, tick: i + 1 }))
+  mock.receive({ type: 'frames', runId, frames, stats: new Float64Array(12 * STAT_STRIDE), head: 12, end: null, evolution: [] })
+  expect([game.displayTickValue, game.history.head]).toEqual([5, 12])
+  game.intervene('cullPred')
+  expect(mock.messages.at(-1)).toMatchObject({ type: 'intervene', action: 'cullPred', at: 5 })
+  expect(game.canIntervene()).toBe(false)
+  const stats = row()
+  stats[STAT.pred] = 4
+  mock.receive({ type: 'intervened', runId, action: 'cullPred', from: 5, tick: 6, frame: { ...frame, tick: 6 }, stats, evolution: [], end: null })
+  const snap = game.getSnapshot()
+  expect([snap.tick, snap.head, snap.pred, snap.charges, snap.cooldownUntil]).toEqual([6, 6, 4, 3, 405])
+  expect(snap.interventions).toEqual([{ tick: 6, action: 'cullPred' }])
+  game.dispose()
+})
+
+it('allows an intervention while the worker has already reached an end the player has not seen', () => {
+  const { game, runId, frame } = ready()
+  game.stepBy(5)
+  const frames = Array.from({ length: 12 }, (_, i) => ({ ...frame, tick: i + 1 }))
+  mock.receive({ type: 'frames', runId, frames, stats: new Float64Array(12 * STAT_STRIDE), head: 12, end: { tick: 12, survived: false, preyEnd: 0, predEnd: 3 }, evolution: [] })
+  expect(game.canIntervene()).toBe(true)
+  game.intervene('releasePrey')
+  mock.receive({ type: 'intervened', runId, action: 'releasePrey', from: 5, tick: 6, frame: { ...frame, tick: 6 }, stats: row(), evolution: [], end: null })
+  expect(game.getSnapshot().end).toBeNull()
   game.dispose()
 })

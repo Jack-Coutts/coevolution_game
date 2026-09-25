@@ -92,6 +92,9 @@ export class GameController {
   private end: EndInfo | null = null
   private stepTarget: number | null = null
   private inflight = false
+  /** An intervention is on its way to the worker; hold the display and advance requests until it lands. */
+  private intervening = false
+  private refund: number | null = null
   private raf = 0
   private last = 0
   private lastFxTick = 0
@@ -217,6 +220,8 @@ export class GameController {
     this.stepTarget = null
     this.end = null
     this.inflight = false
+    this.intervening = false
+    this.refund = null
     this.finalized = false
     this.explanation = null
     this.score = null
@@ -265,7 +270,7 @@ export class GameController {
             this.send({ type: 'advance', runId: this.runId, target: this.stepTarget })
           } else {
             this.stepTarget = null
-            if (this.end) this.finalize()
+            if (this.end && this.displayTick >= this.end.tick) this.finalize()
           }
         }
         this.notify()
@@ -290,11 +295,32 @@ export class GameController {
         })
         break
       }
-      case 'intervened':
-        this.cooldownUntil = msg.tick - 1 + COOLDOWN
+      case 'intervened': {
+        this.intervening = false
+        // Any advance sent before the intervention has already answered, and none was sent after it.
+        this.inflight = false
+        if (msg.tick === msg.from) {
+          // The run had already ended at that hour: nothing was applied, so give the charge back.
+          this.charges += 1
+          this.cooldownUntil = this.refund ?? 0
+          this.refund = null
+          this.notify(true)
+          break
+        }
+        this.refund = null
+        this.history.truncate(msg.from)
+        this.history.add(msg.frame, msg.stats, 0)
+        msg.evolution.forEach(e => this.history.addEvolution(e))
+        this.end = msg.end
+        this.displayTick = msg.tick
+        this.lastFxTick = msg.tick
+        if (this.renderer && this.rendererAttached) this.renderer.addEvents(msg.frame, performance.now(), false)
+        this.cooldownUntil = msg.from + COOLDOWN
         this.history.interventions = [...this.history.interventions, { tick: msg.tick, action: msg.action }]
+        if (this.end && this.displayTick >= this.end.tick) this.finalize()
         this.notify(true)
         break
+      }
       default: {
         const never: never = msg
         throw new Error(`unknown message ${String(never)}`)
@@ -334,11 +360,13 @@ export class GameController {
     this.displayTick = Math.max(this.history.firstTick, Math.min(this.history.head, tick))
     this.lastFxTick = Math.floor(this.displayTick)
     this.renderer?.clearFx()
+    if (this.end && this.displayTick >= this.end.tick) this.finalize()
     this.notify(true)
   }
 
   /** Step forward or back by `n` ticks; stepping past the head simulates when running. */
   stepBy(n: number): void {
+    if (this.intervening) return
     this.pause()
     const target = Math.round(this.displayTick + n)
     if (target > this.history.head && !this.end && this.phase !== 'loading' && !this.saving) {
@@ -372,22 +400,30 @@ export class GameController {
     this.saveStatus = 'Meadow restored and paused. Recent replay and the evolution journal are preserved.'
   }
 
+  /** The worker may already have simulated past the displayed hour (even to the end); what counts is what the player sees. */
   canIntervene(): boolean {
+    const t = Math.floor(this.displayTick)
     return (
       this.phase === 'running' &&
-      !this.end &&
+      (!this.end || t < this.end.tick) &&
       !this.saving &&
+      !this.intervening &&
       this.charges > 0 &&
-      this.history.head >= this.cooldownUntil &&
+      t >= this.cooldownUntil &&
       this.atLive()
     )
   }
 
+  /** Act at the displayed hour. The effect shows one hour later, straight away even while paused. */
   intervene(action: Intervention): void {
     if (!this.canIntervene()) return
+    const at = Math.floor(this.displayTick)
     this.charges -= 1
-    this.cooldownUntil = this.history.head + COOLDOWN
-    this.send({ type: 'intervene', runId: this.runId, action })
+    this.refund = this.cooldownUntil
+    this.cooldownUntil = at + COOLDOWN
+    this.stepTarget = null
+    this.intervening = true
+    this.send({ type: 'intervene', runId: this.runId, action, at })
     this.notify(true)
   }
 
@@ -427,14 +463,14 @@ export class GameController {
     this.last = now
     const h = this.history
     const tps = SPEEDS[this.speed].tps
-    if (this.playing) {
+    if (this.playing && !this.intervening) {
       this.displayTick += (dt / 1000) * tps
       if (this.displayTick >= h.head) {
         this.displayTick = h.head
         if (this.end && h.head >= this.end.tick) this.finalize()
       }
     }
-    if (!this.end && this.phase === 'running' && this.playing && !this.inflight) {
+    if (!this.end && this.phase === 'running' && this.playing && !this.inflight && !this.intervening) {
       const lead = Math.max(6, tps * 0.25)
       if (h.head < this.displayTick + lead) {
         this.inflight = true
