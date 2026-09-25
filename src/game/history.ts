@@ -57,6 +57,8 @@ export class RunHistory {
   /** Forget everything after `tick`: the worker recomputed those hours (an intervention at `tick`). */
   truncate(tick: number): void {
     if (tick >= this.head) return
+    // The stats ring still holds the discarded hours' values in its oldest slots, so keep the window from moving back.
+    this.start = Math.max(this.start, this.head - HISTORY_HOURS)
     for (const t of [...this.frames.keys()]) if (t > tick) this.frames.delete(t)
     this.head = Math.max(this.start, tick)
     while (this.evolution.length > 1 && (this.evolution.at(-1)?.tick ?? 0) > tick) this.evolution.pop()
@@ -64,13 +66,24 @@ export class RunHistory {
     this.families.truncate(tick)
   }
 
-  save() {
-    const replayFrom = Math.max(this.replayStart, this.head - RECENT)
-    return { stats: this.stats, head: this.head, start: this.firstTick, replayFrom,
-      journal: this.log.save() as ReturnType<Journal['save']> | undefined, families: this.families.save() as ReturnType<FamilyHistory['save']> | undefined,
+  /** Everything up to `upTo`: a save holds the world at that hour, so later hours would be replayed twice. */
+  save(upTo = this.head) {
+    const head = Math.min(this.head, upTo)
+    const replayFrom = Math.max(this.replayStart, head - RECENT)
+    const log = new Journal(this.endless)
+    log.restore(this.log.save())
+    const families = new FamilyHistory()
+    families.restore(this.families.save())
+    if (head < this.head) {
+      log.truncate(head, this.evolution.filter(e => e.tick <= head))
+      families.truncate(head)
+    }
+    const journal = log.save()
+    return { stats: this.stats, head, start: this.firstTick, replayFrom,
+      journal: journal as ReturnType<Journal['save']> | undefined, families: families.save() as ReturnType<FamilyHistory['save']> | undefined,
       /** For older builds; this build reads `journal.highest`. */
-      highestGeneration: this.log.save().highest as { prey: number; pred: number } | undefined,
-      frames: [...this.frames.entries()].filter(([t]) => t >= replayFrom) }
+      highestGeneration: journal.highest as { prey: number; pred: number } | undefined,
+      frames: [...this.frames.entries()].filter(([t]) => t >= replayFrom && t <= head) }
   }
 
   /** `entries` are the journal entries stored beside the history by saves made before the journal state moved here. */

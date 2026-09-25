@@ -162,7 +162,7 @@ export class SimCore {
       }
       case 'save': {
         // Save the hour the player is looking at, not the hours the worker has run ahead (a copy, so the lead stays valid).
-        if (this.sim && msg.runId === this.runId) this.post({ type: 'saved', runId: this.runId, state: this.rewound(msg.at ?? this.sim.tick).save() }, [])
+        if (this.sim && msg.runId === this.runId) this.post({ type: 'saved', runId: this.runId, state: (this.rewound(msg.at ?? this.sim.tick) ?? this.sim).save() }, [])
         break
       }
       case 'restore': {
@@ -214,6 +214,13 @@ export class SimCore {
    */
   private intervene(action: Intervention, at: number): void {
     const s = this.rewound(at)
+    if (!s) {
+      // No checkpoint reaches back that far (e.g. just after a resume): refuse rather than act at a later hour.
+      const live = this.sim as Sim
+      const stats = statsRow(live)
+      this.post({ type: 'intervened', runId: this.runId, action, tick: live.tick, from: live.tick, frame: frame(live), stats, evolution: [], end: endInfo(live) }, [stats.buffer])
+      return
+    }
     if (s !== this.sim) {
       this.sim = s
       this.checkpoints = this.checkpoints.filter(c => c.tick <= at)
@@ -222,17 +229,23 @@ export class SimCore {
     if (!s.ended) {
       s.queue(action)
       s.step()
+      // A later rewind must never restore a state from before this action.
+      this.checkpoint()
     }
     const evolution = s.tick % 24 === 0 || s.ended ? [summarizeEvolution(s)] : []
     const stats = statsRow(s)
     this.post({ type: 'intervened', runId: this.runId, action, tick: s.tick, from, frame: frame(s), stats, evolution, end: endInfo(s) }, [stats.buffer])
   }
 
-  /** The simulation at hour `at`, re-stepped from the newest checkpoint at or before it; the live one when `at` is not behind it. */
-  private rewound(at: number): Sim {
+  /**
+   * The simulation at hour `at`, re-stepped from the newest checkpoint at or before it; the live one when `at` is not
+   * behind it; null when no checkpoint reaches back that far.
+   */
+  private rewound(at: number): Sim | null {
     const live = this.sim as Sim
-    const cp = at < live.tick ? this.checkpoints.findLast(c => c.tick <= at) : undefined
-    if (!cp) return live
+    if (at >= live.tick) return live
+    const cp = this.checkpoints.findLast(c => c.tick <= at)
+    if (!cp) return null
     const s = Sim.restore(structuredClone(cp))
     while (s.tick < at && s.step()) { /* replay the hours the display has already shown */ }
     return s

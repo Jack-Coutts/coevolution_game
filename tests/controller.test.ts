@@ -178,6 +178,22 @@ it('asks the worker to save the displayed hour, not the hours it ran ahead', () 
   game.dispose()
 })
 
+it('saves the latest hour seen, not a replayed one, and keeps no history after it', async () => {
+  const { game, sim, runId, frame } = ready()
+  game.stepBy(12)
+  const frames = Array.from({ length: 20 }, (_, i) => ({ ...frame, tick: i + 1 }))
+  mock.receive({ type: 'frames', runId, frames, stats: new Float64Array(20 * STAT_STRIDE), head: 20, end: null, evolution: [] })
+  game.seek(5)
+  game.save()
+  expect(mock.messages.at(-1)).toMatchObject({ type: 'save', at: 12 })
+  for (let i = 0; i < 12; i++) sim.step()
+  mock.receive({ type: 'saved', runId, state: sim.save() })
+  await Promise.resolve()
+  const saved = mock.save.mock.calls.at(-1)?.[0]
+  expect([saved.state.tick, saved.history.head, Math.max(...saved.history.frames.map(([t]: [number]) => t))]).toEqual([12, 12, 12])
+  game.dispose()
+})
+
 // Endless intervention budget: 1 Dec is hour 2176 and the next 1 Sep is hour 8752.
 type Game = ReturnType<typeof ready>['game']
 type Frame = ReturnType<typeof ready>['frame']
@@ -302,4 +318,30 @@ it('saving and resuming keeps the uses, cooldown and next renewal, and old saves
   snap = g3.getSnapshot()
   expect([snap.charges, snap.cooldownUntil, snap.interventions]).toEqual([4, 0, []])
   for (const x of [g, g2, g3]) x.dispose()
+})
+
+it('ignores a seek while an intervention is in flight, so the run is not ended early', () => {
+  const { game, runId, frame } = ready()
+  game.stepBy(5)
+  const frames = Array.from({ length: 12 }, (_, i) => ({ ...frame, tick: i + 1 }))
+  mock.receive({ type: 'frames', runId, frames, stats: new Float64Array(12 * STAT_STRIDE), head: 12, end: { tick: 12, survived: false, preyEnd: 0, predEnd: 3 }, evolution: [] })
+  game.intervene('releasePrey')
+  game.seek(12)
+  mock.receive({ type: 'intervened', runId, action: 'releasePrey', from: 5, tick: 6, frame: { ...frame, tick: 6 }, stats: row(), evolution: [], end: null })
+  const s = game.getSnapshot()
+  expect([s.phase, s.end, s.tick, s.head, s.score]).toEqual(['running', null, 6, 6, null])
+  game.dispose()
+})
+
+it('does not intervene at an hour the player has already watched, only at the latest hour seen', () => {
+  const { game, runId, frame } = ready()
+  game.stepBy(12)
+  const frames = Array.from({ length: 12 }, (_, i) => ({ ...frame, tick: i + 1 }))
+  mock.receive({ type: 'frames', runId, frames, stats: new Float64Array(12 * STAT_STRIDE), head: 12, end: null, evolution: [] })
+  expect([game.displayTickValue, game.canIntervene()]).toEqual([12, true])
+  game.seek(5)
+  expect([game.displayTickValue, game.canIntervene()]).toEqual([5, false])
+  game.seek(12)
+  expect(game.canIntervene()).toBe(true)
+  game.dispose()
 })
