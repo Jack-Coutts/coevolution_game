@@ -2,6 +2,7 @@ import type { Scenario } from '@/sim/scenarios'
 import { dateLabel, formatDuration } from '@/sim/time'
 import type { EndInfo } from '@/worker/protocol'
 import type { RunHistory } from './history'
+import { BUDGET_POINT_BONUS, CALM_BONUS, type ScoreBreakdown } from './scores'
 
 export type Tone = 'good' | 'info' | 'warn' | 'danger'
 
@@ -277,4 +278,18 @@ export function explain(h: RunHistory, end: EndInfo, scenario: Scenario): Explan
 export function usesLeft(charges: number, total: number, planning: boolean): string {
   if (planning) return `${total} uses per run`
   return charges === 0 ? `none of ${total} uses left` : `${charges} of ${total} uses left`
+}
+
+const n = (v: number) => v.toLocaleString('en-US')
+
+/** The score as a sum in words, so a player can see what earned each part. */
+export function scoreWords(score: ScoreBreakdown, survived: boolean, endless: boolean, interventions: number): string {
+  const hours = `${n(score.hours)} hours survived (one point per hour)`
+  if (!survived) {
+    return endless
+      ? `Score ${n(score.total)} = ${hours}. In Endless the score is hours survived only.`
+      : `Score ${n(score.total)} = ${hours}. The budget and calm bonuses count only when both species last the full year.`
+  }
+  const used = `${interventions} intervention${interventions === 1 ? '' : 's'} used`
+  return `Score ${n(score.total)} = ${hours} + ${n(score.budgetBonus)} budget bonus (${BUDGET_POINT_BONUS} per unspent point) + ${n(score.calmBonus)} calm bonus (${CALM_BONUS[0]} with no interventions, 100 less for each; ${used}).`
 }

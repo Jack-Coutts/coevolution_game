@@ -1,4 +1,4 @@
-import { ChevronLeft, ChevronRight, Pause, Play, RotateCcw, Radio } from 'lucide-react'
+import { ChevronLeft, ChevronRight, Pause, Play, RotateCcw, Radio, Trophy } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
@@ -6,7 +6,7 @@ import { SPEEDS } from '@/game/controller'
 import { useGame } from '@/hooks/use-game'
 import { formatDuration } from '@/sim/time'
 
-export function Transport({ onReset }: { onReset: () => void }) {
+export function Transport({ onReset, onShowResult }: { onReset: () => void; onShowResult: () => void }) {
   const [game, snap] = useGame()
   const behind = !snap.atLive && snap.phase !== 'loading'
   return (
@@ -54,6 +54,11 @@ export function Transport({ onReset }: { onReset: () => void }) {
       </ToggleGroup>
 
       <div className="ml-auto flex items-center gap-3 text-xs text-muted-foreground tabular">
+        {snap.phase === 'ended' && (
+          <Button variant="outline" size="xs" onClick={onShowResult} className="gap-1">
+            <Trophy className="size-3" /> Show result
+          </Button>
+        )}
         {behind && (
           <Button variant="outline" size="xs" onClick={() => game.seek(snap.head)} className="gap-1">
             <Radio className="size-3" /> Back to live

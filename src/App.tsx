@@ -280,7 +280,7 @@ export default function App() {
               </div>
               <WorldView maxSize={worldMax} selected={selected} onSelect={(a) => { reveal.current = true; setSelected(a) }} />
               <Card className="gap-2 p-3">
-                <Transport onReset={reset} />
+                <Transport onReset={reset} onShowResult={() => setDismissed(-1)} />
                 <Timeline />
                 <div className="flex flex-wrap items-center gap-x-4 gap-y-1 px-1 text-[11px] text-muted-foreground">
                   <Legend color="bg-rabbit" label="Rabbits (left scale)" />
@@ -298,7 +298,7 @@ export default function App() {
               <Card className="gap-0 p-0 lg:sticky lg:top-4 lg:max-h-[calc(100vh-2rem)]">
                 <div className="min-h-0 flex-1 p-3 lg:overflow-y-auto">
                   {locked ? (
-                    <RunPanel inspector={inspector} setup={<LockedSetup levers={levers} base={base} onUnlock={reset} />} />
+                    <RunPanel inspector={inspector} onShowResult={() => setDismissed(-1)} setup={<LockedSetup levers={levers} base={base} onUnlock={reset} />} />
                   ) : (
                     <div className="flex flex-col gap-4">
                       <BestScore />

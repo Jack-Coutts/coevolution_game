@@ -23,13 +23,25 @@ const TONE: Record<Tone, { icon: typeof Info; cls: string }> = {
 
 
 /** The side panel while the meadow runs. Interventions come first so they stay in view without scrolling. */
-export function RunPanel({ inspector, setup }: { inspector: ReactNode; setup: ReactNode }) {
+export function RunPanel({ inspector, setup, onShowResult }: { inspector: ReactNode; setup: ReactNode; onShowResult: () => void }) {
   const [game, snap] = useGame()
   const icons = useAnimalIcons()
   const f = snap.tick > 48 && !snap.end && snap.atLive ? forecast(game.history, snap.tick) : null
 
   return (
     <div className="flex flex-col gap-4">
+      {snap.end && snap.score && snap.phase === 'ended' && (
+        <section className="flex items-center gap-2 rounded-lg border border-primary/40 bg-primary/10 px-3 py-2 text-sm">
+          <Trophy className="size-4 shrink-0 text-gold" />
+          <span className="min-w-0 flex-1">
+            {snap.end.survived ? 'Year complete' : `Run ended ${dateLabel(snap.end.tick)}`}
+            <span className="text-muted-foreground"> · score </span>
+            <span className="font-semibold tabular">{snap.score.total.toLocaleString()}</span>
+          </span>
+          <Button size="xs" variant="outline" onClick={onShowResult}>Show result</Button>
+        </section>
+      )}
+
       <Interventions />
 
       {inspector}
