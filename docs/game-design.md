@@ -56,9 +56,11 @@ makes adaptation show in appearance. It is written here before it was implemente
 - **Nothing is free.** Large: more reserves, faster refuelling, longer reach and bigger meals
   for hunters; but slower, dearer to run and to breed, easier to catch and a richer meal.
   Small: faster, cheaper, harder to catch; but lower reserves, slower refuelling, shorter reach.
-- **Off switch.** `eco.body` absent means body evolution is off: every animal is exactly
-  ×1.00, no random numbers are drawn for it, and a meadow runs identically to one without
-  the feature. Genes in a genome are ignored while it is off.
+- **Default and off switch.** On by default (`defaultEco().body`) after the population check
+  in `validation.md`. Deleting `eco.body` switches it off: every animal is then exactly
+  ×1.00, no random numbers are drawn for it, and a meadow runs identically to one from before
+  the feature. Genes in a genome are ignored while it is off. Saved meadows keep the setting
+  they started with.
 - **Display.** The sprite is drawn at `m` times its size (on top of the juvenile scale).
   Hunger keeps its dashed ring and illness its purple ring, so a thin or sick animal is never
   drawn smaller. The inspector reports the inherited size; Evolution charts its mean and
@@ -94,7 +96,8 @@ standardised situations and plots mean and middle-80% variation; founders are a 
 reference. Probed inherited tendencies are distinct from current animal movement.
 
 Click an animal or choose it from the inspector to pause and read its age, energy, health,
-generation, parent, lineage, offspring and inherited responses. The journal records observed
+generation, parent, lineage, offspring, inherited body size and inherited responses. Body
+size is also charted in the Evolution tab. The journal records observed
 generation and lineage milestones, without inventing causal evolutionary explanations.
 
 ## Time, persistence and scoring

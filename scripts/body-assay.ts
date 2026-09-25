@@ -9,7 +9,7 @@
  *       - predation arena (240 h): rabbits' survival, deaths, intake, distance; foxes' catches;
  *       - famine arena: no food and no hunting (eatR 0); hours from full to starvation, with
  *         the other species fed every hour so the arena does not end.
- *   node --import tsx scripts/body-assay.ts population off|on [start] [count] [--json out.json]
+ *   node --import tsx scripts/body-assay.ts population off|on [start] [count] [--voles] [--json out.json]
  *     Untouched Open meadows on fresh seeds (default 9400–9419), with body evolution off or on:
  *     survival, deaths, peaks, ceiling hits, and mean body size by month.
  */
@@ -20,6 +20,7 @@ import type { Genome } from '../src/sim/brain'
 import { deriveParams } from '../src/sim/levers'
 import type { SimParams } from '../src/sim/params'
 import { Sim, type Creature, type Species } from '../src/sim/sim'
+import { THREE_SPECIES } from '../src/sim/species'
 
 const WORLDS = Array.from({ length: 16 }, (_, i) => 4242 + i)
 const ARENA_TICKS = 240
@@ -27,8 +28,8 @@ const ARENA = { prey: 60, pred: 10 }
 const LINES = { small: -1, neutral: 0, large: 1 } as const
 type Line = keyof typeof LINES
 
-function params(body: boolean): SimParams {
-  const p = deriveParams(STABLE_PRESET)
+function params(body: boolean, voles = false): SimParams {
+  const p = deriveParams(STABLE_PRESET, voles ? THREE_SPECIES : undefined)
   if (body) p.eco.body = defaultBody()
   else delete p.eco.body
   return p
@@ -186,17 +187,18 @@ function assayMain(json?: string) {
   if (json) writeFileSync(json, JSON.stringify({ worlds: WORLDS, arenaTicks: ARENA_TICKS, arena: ARENA, controllers: 'body-off STABLE_PRESET, seeds 900–903, living genomes at day 90, pooled', table, breeding: young }, null, 2))
 }
 
-function populationMain(mode: 'off' | 'on', start: number, count: number, json?: string) {
-  const p = params(mode === 'on')
+function populationMain(mode: 'off' | 'on', start: number, count: number, voles: boolean, json?: string) {
+  const p = params(mode === 'on', voles)
   const rows: { seed: number; survived: boolean; tick: number; prey: number; foxes: number; maxPrey: number; maxFox: number
-    safetyLimitHits: number; deaths: Sim['counters']; sizeByQuarter: { month: number; rabbit: number; fox: number }[]
-    endSize: { rabbit: number; fox: number } }[] = []
+    safetyLimitHits: number; deaths: Sim['counters']; sizeByQuarter: { month: number; rabbit: number; fox: number; vole: number }[]
+    endSize: { rabbit: number; fox: number; vole: number }; voles: number }[] = []
   for (let seed = start; seed < start + count; seed++) {
     const s = new Sim(p, seed)
     let maxPrey = s.prey.length
     let maxFox = s.preds.length
-    const bySize: { month: number; rabbit: number; fox: number }[] = []
-    const sample = () => bySize.push({ month: s.tick / 720, rabbit: round(mean(s.prey.map(a => a.size))), fox: round(mean(s.preds.map(a => a.size))) })
+    const sizes = () => ({ rabbit: round(mean(s.prey.map(a => a.size))), fox: round(mean(s.preds.map(a => a.size))), vole: round(mean(s.voles.map(a => a.size))) })
+    const bySize: { month: number; rabbit: number; fox: number; vole: number }[] = []
+    const sample = () => bySize.push({ month: s.tick / 720, ...sizes() })
     sample()
     while (s.step()) {
       maxPrey = Math.max(maxPrey, s.prey.length)
@@ -205,14 +207,14 @@ function populationMain(mode: 'off' | 'on', start: number, count: number, json?:
     }
     rows.push({ seed, survived: s.survived, tick: s.tick, prey: s.prey.length, foxes: s.preds.length, maxPrey, maxFox,
       safetyLimitHits: s.ceilingHits, deaths: s.counters, sizeByQuarter: bySize,
-      endSize: { rabbit: round(mean(s.prey.map(a => a.size))), fox: round(mean(s.preds.map(a => a.size))) } })
+      endSize: sizes(), voles: s.voles.length })
     console.log(seed, s.survived, s.tick, s.prey.length, s.preds.length, JSON.stringify(rows.at(-1)!.endSize))
   }
   const survived = rows.filter(r => r.survived).length
   const deaths = (k: keyof (typeof rows)[number]['deaths']) => rows.reduce((t, r) => t + r.deaths[k], 0)
-  const summary = { mode, start, count, survived, survivalRate: survived / count, ceilingHitRuns: rows.filter(r => r.safetyLimitHits > 0).length,
+  const summary = { mode, meadow: voles ? 'voles' : 'open', start, count, survived, survivalRate: survived / count, ceilingHitRuns: rows.filter(r => r.safetyLimitHits > 0).length,
     medianTick: [...rows.map(r => r.tick)].sort((a, b) => a - b)[Math.floor(count / 2)],
-    extinctFirst: { rabbits: rows.filter(r => !r.survived && r.prey === 0).length, foxes: rows.filter(r => !r.survived && r.foxes === 0).length },
+    extinctFirst: { rabbits: rows.filter(r => !r.survived && r.prey === 0).length, foxes: rows.filter(r => !r.survived && r.foxes === 0).length, voles: voles ? rows.filter(r => !r.survived && r.voles === 0).length : 0 },
     deaths: { preyEaten: deaths('preyEaten'), preyStarved: deaths('preyStarved'), preyOld: deaths('preyOld'), predStarved: deaths('predStarved'), predOld: deaths('predOld') } }
   console.log(JSON.stringify(summary))
   if (json) writeFileSync(json, JSON.stringify({ summary, parameters: p, rows }, null, 2))
@@ -222,5 +224,5 @@ const [mode, ...rest] = process.argv.slice(2)
 const jsonAt = process.argv.indexOf('--json')
 const json = jsonAt > 0 ? process.argv[jsonAt + 1] : undefined
 if (mode === 'assay') assayMain(json)
-else if (mode === 'population') populationMain(rest[0] === 'on' ? 'on' : 'off', Number(rest[1] ?? 9400), Number(rest[2] ?? 20), json)
+else if (mode === 'population') populationMain(rest[0] === 'on' ? 'on' : 'off', Number(rest[1] ?? 9400), Number(rest[2] ?? 20), process.argv.includes('--voles'), json)
 else console.log('usage: body-assay.ts assay | population off|on [start] [count] [--json out.json]')

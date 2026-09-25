@@ -1,0 +1,3157 @@
+{
+ "issue": 10,
+ "generatedBy": "scripts/body-assay.ts (assay; population off|on [--voles]) and scripts/validate-balance.ts",
+ "note": "Runtime: Node 22, this branch. Common-garden lines share controllers and arenas and differ only in the size gene. Population runs are untouched (no interventions). Size means by quarter are over populations still alive at that time.",
+ "commonGarden": {
+  "worlds": [
+   4242,
+   4243,
+   4244,
+   4245,
+   4246,
+   4247,
+   4248,
+   4249,
+   4250,
+   4251,
+   4252,
+   4253,
+   4254,
+   4255,
+   4256,
+   4257
+  ],
+  "arenaTicks": 240,
+  "arena": {
+   "prey": 60,
+   "pred": 10
+  },
+  "controllers": "body-off STABLE_PRESET, seeds 900–903, living genomes at day 90, pooled",
+  "table": [
+   {
+    "line": "small",
+    "size": 0.8,
+    "rabbits": {
+     "rabbitSurvival": 0.801,
+     "rabbitEatenShare": 0.149,
+     "rabbitStarvedShare": 0.05,
+     "rabbitEscapeShare": 0.9042,
+     "rabbitIntakePerHour": 0.5094,
+     "rabbitDistancePerHour": 0.005635,
+     "rabbitEnergyEnd": 0.6786,
+     "foxCatchesPerFoxDay": 0.0894,
+     "foxStarvedShare": 0,
+     "foxEnergyEnd": 0.6982
+    },
+    "foxes": {
+     "rabbitSurvival": 0.8458,
+     "rabbitEatenShare": 0.125,
+     "rabbitStarvedShare": 0.0292,
+     "rabbitEscapeShare": 0.9194,
+     "rabbitIntakePerHour": 0.5425,
+     "rabbitDistancePerHour": 0.005026,
+     "rabbitEnergyEnd": 0.6584,
+     "foxCatchesPerFoxDay": 0.075,
+     "foxStarvedShare": 0.0125,
+     "foxEnergyEnd": 0.6624
+    },
+    "rabbitFamine": {
+     "reserve": 144,
+     "hoursToStarve": 337.1,
+     "burnPerHour": 0.427,
+     "starvedCount": 960
+    },
+    "foxFamine": {
+     "reserve": 192,
+     "hoursToStarve": 827.7,
+     "burnPerHour": 0.232,
+     "starvedCount": 160
+    },
+    "rabbitBreeding": {
+     "birthsPerAnimalDay": 0.1289,
+     "endPerFounder": 3.598,
+     "eatenPerFounder": 2.252,
+     "starvedPerFounder": 12.218
+    },
+    "foxBreeding": {
+     "birthsPerAnimalDay": 0.0444,
+     "endPerFounder": 3.444,
+     "eatenPerFounder": 0,
+     "starvedPerFounder": 0.131
+    }
+   },
+   {
+    "line": "neutral",
+    "size": 1,
+    "rabbits": {
+     "rabbitSurvival": 0.8208,
+     "rabbitEatenShare": 0.1552,
+     "rabbitStarvedShare": 0.024,
+     "rabbitEscapeShare": 0.9022,
+     "rabbitIntakePerHour": 0.5414,
+     "rabbitDistancePerHour": 0.00501,
+     "rabbitEnergyEnd": 0.6564,
+     "foxCatchesPerFoxDay": 0.0931,
+     "foxStarvedShare": 0,
+     "foxEnergyEnd": 0.7229
+    },
+    "foxes": {
+     "rabbitSurvival": 0.8208,
+     "rabbitEatenShare": 0.1552,
+     "rabbitStarvedShare": 0.024,
+     "rabbitEscapeShare": 0.9022,
+     "rabbitIntakePerHour": 0.5414,
+     "rabbitDistancePerHour": 0.00501,
+     "rabbitEnergyEnd": 0.6564,
+     "foxCatchesPerFoxDay": 0.0931,
+     "foxStarvedShare": 0,
+     "foxEnergyEnd": 0.7229
+    },
+    "rabbitFamine": {
+     "reserve": 180,
+     "hoursToStarve": 372.4,
+     "burnPerHour": 0.483,
+     "starvedCount": 960
+    },
+    "foxFamine": {
+     "reserve": 240,
+     "hoursToStarve": 930.8,
+     "burnPerHour": 0.258,
+     "starvedCount": 160
+    },
+    "rabbitBreeding": {
+     "birthsPerAnimalDay": 0.1193,
+     "endPerFounder": 3.546,
+     "eatenPerFounder": 2.074,
+     "starvedPerFounder": 9.672
+    },
+    "foxBreeding": {
+     "birthsPerAnimalDay": 0.0468,
+     "endPerFounder": 3.788,
+     "eatenPerFounder": 0,
+     "starvedPerFounder": 0.056
+    }
+   },
+   {
+    "line": "large",
+    "size": 1.25,
+    "rabbits": {
+     "rabbitSurvival": 0.8323,
+     "rabbitEatenShare": 0.15,
+     "rabbitStarvedShare": 0.0177,
+     "rabbitEscapeShare": 0.8957,
+     "rabbitIntakePerHour": 0.6164,
+     "rabbitDistancePerHour": 0.004565,
+     "rabbitEnergyEnd": 0.6807,
+     "foxCatchesPerFoxDay": 0.09,
+     "foxStarvedShare": 0,
+     "foxEnergyEnd": 0.7233
+    },
+    "foxes": {
+     "rabbitSurvival": 0.8229,
+     "rabbitEatenShare": 0.1573,
+     "rabbitStarvedShare": 0.0198,
+     "rabbitEscapeShare": 0.8939,
+     "rabbitIntakePerHour": 0.5573,
+     "rabbitDistancePerHour": 0.005032,
+     "rabbitEnergyEnd": 0.6725,
+     "foxCatchesPerFoxDay": 0.0944,
+     "foxStarvedShare": 0,
+     "foxEnergyEnd": 0.7324
+    },
+    "rabbitFamine": {
+     "reserve": 225,
+     "hoursToStarve": 408.4,
+     "burnPerHour": 0.551,
+     "starvedCount": 960
+    },
+    "foxFamine": {
+     "reserve": 300,
+     "hoursToStarve": 1018.1,
+     "burnPerHour": 0.295,
+     "starvedCount": 160
+    },
+    "rabbitBreeding": {
+     "birthsPerAnimalDay": 0.1134,
+     "endPerFounder": 3.216,
+     "eatenPerFounder": 1.948,
+     "starvedPerFounder": 8.198
+    },
+    "foxBreeding": {
+     "birthsPerAnimalDay": 0.0467,
+     "endPerFounder": 3.856,
+     "eatenPerFounder": 0,
+     "starvedPerFounder": 0.094
+    }
+   }
+  ],
+  "breeding": [
+   {
+    "line": "small",
+    "rabbitBreedAt": 93.6,
+    "rabbitYoungCost": 64.8,
+    "foxBreedAt": 182.4,
+    "foxYoungCost": 115.2
+   },
+   {
+    "line": "neutral",
+    "rabbitBreedAt": 117,
+    "rabbitYoungCost": 81,
+    "foxBreedAt": 228,
+    "foxYoungCost": 144
+   },
+   {
+    "line": "large",
+    "rabbitBreedAt": 146.3,
+    "rabbitYoungCost": 101.3,
+    "foxBreedAt": 285,
+    "foxYoungCost": 180
+   }
+  ]
+ },
+ "openMeadow9400": {
+  "off": {
+   "summary": {
+    "mode": "off",
+    "start": 9400,
+    "count": 20,
+    "survived": 9,
+    "survivalRate": 0.45,
+    "ceilingHitRuns": 0,
+    "medianTick": 6856,
+    "extinctFirst": {
+     "rabbits": 7,
+     "foxes": 4
+    },
+    "deaths": {
+     "preyEaten": 32625,
+     "preyStarved": 78289,
+     "preyOld": 399,
+     "predStarved": 2934,
+     "predOld": 2575
+    }
+   },
+   "rows": [
+    {
+     "seed": 9400,
+     "survived": false,
+     "tick": 2518,
+     "prey": 0,
+     "foxes": 51,
+     "maxPrey": 320,
+     "maxFox": 68,
+     "safetyLimitHits": 0,
+     "deaths": {
+      "preyBorn": 1973,
+      "predBorn": 114,
+      "preyStarved": 1644,
+      "preyEaten": 486,
+      "preyOld": 3,
+      "predStarved": 28,
+      "predOld": 41,
+      "predCulled": 0,
+      "preyIllness": 0,
+      "predIllness": 0
+     },
+     "sizeByQuarter": [
+      {
+       "month": 0,
+       "rabbit": 1,
+       "fox": 1
+      },
+      {
+       "month": 3,
+       "rabbit": 1,
+       "fox": 1
+      }
+     ],
+     "endSize": {
+      "rabbit": null,
+      "fox": 1
+     }
+    },
+    {
+     "seed": 9401,
+     "survived": false,
+     "tick": 6841,
+     "prey": 0,
+     "foxes": 67,
+     "maxPrey": 543,
+     "maxFox": 138,
+     "safetyLimitHits": 0,
+     "deaths": {
+      "preyBorn": 6774,
+      "predBorn": 530,
+      "preyStarved": 3875,
+      "preyEaten": 3032,
+      "preyOld": 27,
+      "predStarved": 360,
+      "predOld": 109,
+      "predCulled": 0,
+      "preyIllness": 0,
+      "predIllness": 0
+     },
+     "sizeByQuarter": [
+      {
+       "month": 0,
+       "rabbit": 1,
+       "fox": 1
+      },
+      {
+       "month": 3,
+       "rabbit": 1,
+       "fox": 1
+      },
+      {
+       "month": 6,
+       "rabbit": 1,
+       "fox": 1
+      },
+      {
+       "month": 9,
+       "rabbit": 1,
+       "fox": 1
+      }
+     ],
+     "endSize": {
+      "rabbit": null,
+      "fox": 1
+     }
+    },
+    {
+     "seed": 9402,
+     "survived": false,
+     "tick": 2389,
+     "prey": 0,
+     "foxes": 22,
+     "maxPrey": 356,
+     "maxFox": 63,
+     "safetyLimitHits": 0,
+     "deaths": {
+      "preyBorn": 1929,
+      "predBorn": 113,
+      "preyStarved": 1489,
+      "preyEaten": 595,
+      "preyOld": 5,
+      "predStarved": 63,
+      "predOld": 34,
+      "predCulled": 0,
+      "preyIllness": 0,
+      "predIllness": 0
+     },
+     "sizeByQuarter": [
+      {
+       "month": 0,
+       "rabbit": 1,
+       "fox": 1
+      },
+      {
+       "month": 3,
+       "rabbit": 1,
+       "fox": 1
+      }
+     ],
+     "endSize": {
+      "rabbit": null,
+      "fox": 1
+     }
+    },
+    {
+     "seed": 9403,
+     "survived": true,
+     "tick": 8760,
+     "prey": 194,
+     "foxes": 66,
+     "maxPrey": 354,
+     "maxFox": 71,
+     "safetyLimitHits": 0,
+     "deaths": {
+      "preyBorn": 7931,
+      "predBorn": 242,
+      "preyStarved": 6863,
+      "preyEaten": 974,
+      "preyOld": 60,
+      "predStarved": 36,
+      "predOld": 146,
+      "predCulled": 0,
+      "preyIllness": 0,
+      "predIllness": 0
+     },
+     "sizeByQuarter": [
+      {
+       "month": 0,
+       "rabbit": 1,
+       "fox": 1
+      },
+      {
+       "month": 3,
+       "rabbit": 1,
+       "fox": 1
+      },
+      {
+       "month": 6,
+       "rabbit": 1,
+       "fox": 1
+      },
+      {
+       "month": 9,
+       "rabbit": 1,
+       "fox": 1
+      },
+      {
+       "month": 12,
+       "rabbit": 1,
+       "fox": 1
+      }
+     ],
+     "endSize": {
+      "rabbit": 1,
+      "fox": 1
+     }
+    },
+    {
+     "seed": 9404,
+     "survived": false,
+     "tick": 2366,
+     "prey": 0,
+     "foxes": 65,
+     "maxPrey": 352,
+     "maxFox": 69,
+     "safetyLimitHits": 0,
+     "deaths": {
+      "preyBorn": 1862,
+      "predBorn": 139,
+      "preyStarved": 1277,
+      "preyEaten": 738,
+      "preyOld": 7,
+      "predStarved": 42,
+      "predOld": 38,
+      "predCulled": 0,
+      "preyIllness": 0,
+      "predIllness": 0
+     },
+     "sizeByQuarter": [
+      {
+       "month": 0,
+       "rabbit": 1,
+       "fox": 1
+      },
+      {
+       "month": 3,
+       "rabbit": 1,
+       "fox": 1
+      }
+     ],
+     "endSize": {
+      "rabbit": null,
+      "fox": 1
+     }
+    },
+    {
+     "seed": 9405,
+     "survived": true,
+     "tick": 8760,
+     "prey": 151,
+     "foxes": 173,
+     "maxPrey": 414,
+     "maxFox": 218,
+     "safetyLimitHits": 0,
+     "deaths": {
+      "preyBorn": 8207,
+      "predBorn": 910,
+      "preyStarved": 4621,
+      "preyEaten": 3575,
+      "preyOld": 20,
+      "predStarved": 156,
+      "predOld": 587,
+      "predCulled": 0,
+      "preyIllness": 0,
+      "predIllness": 0
+     },
+     "sizeByQuarter": [
+      {
+       "month": 0,
+       "rabbit": 1,
+       "fox": 1
+      },
+      {
+       "month": 3,
+       "rabbit": 1,
+       "fox": 1
+      },
+      {
+       "month": 6,
+       "rabbit": 1,
+       "fox": 1
+      },
+      {
+       "month": 9,
+       "rabbit": 1,
+       "fox": 1
+      },
+      {
+       "month": 12,
+       "rabbit": 1,
+       "fox": 1
+      }
+     ],
+     "endSize": {
+      "rabbit": 1,
+      "fox": 1
+     }
+    },
+    {
+     "seed": 9406,
+     "survived": false,
+     "tick": 6856,
+     "prey": 0,
+     "foxes": 122,
+     "maxPrey": 427,
+     "maxFox": 128,
+     "safetyLimitHits": 0,
+     "deaths": {
+      "preyBorn": 5284,
+      "predBorn": 334,
+      "preyStarved": 3961,
+      "preyEaten": 1461,
+      "preyOld": 22,
+      "predStarved": 67,
+      "predOld": 151,
+      "predCulled": 0,
+      "preyIllness": 0,
+      "predIllness": 0
+     },
+     "sizeByQuarter": [
+      {
+       "month": 0,
+       "rabbit": 1,
+       "fox": 1
+      },
+      {
+       "month": 3,
+       "rabbit": 1,
+       "fox": 1
+      },
+      {
+       "month": 6,
+       "rabbit": 1,
+       "fox": 1
+      },
+      {
+       "month": 9,
+       "rabbit": 1,
+       "fox": 1
+      }
+     ],
+     "endSize": {
+      "rabbit": null,
+      "fox": 1
+     }
+    },
+    {
+     "seed": 9407,
+     "survived": false,
+     "tick": 5531,
+     "prey": 149,
+     "foxes": 0,
+     "maxPrey": 375,
+     "maxFox": 64,
+     "safetyLimitHits": 0,
+     "deaths": {
+      "preyBorn": 4658,
+      "predBorn": 216,
+      "preyStarved": 3718,
+      "preyEaten": 940,
+      "preyOld": 11,
+      "predStarved": 111,
+      "predOld": 111,
+      "predCulled": 0,
+      "preyIllness": 0,
+      "predIllness": 0
+     },
+     "sizeByQuarter": [
+      {
+       "month": 0,
+       "rabbit": 1,
+       "fox": 1
+      },
+      {
+       "month": 3,
+       "rabbit": 1,
+       "fox": 1
+      },
+      {
+       "month": 6,
+       "rabbit": 1,
+       "fox": 1
+      }
+     ],
+     "endSize": {
+      "rabbit": 1,
+      "fox": null
+     }
+    },
+    {
+     "seed": 9408,
+     "survived": true,
+     "tick": 8760,
+     "prey": 112,
+     "foxes": 84,
+     "maxPrey": 320,
+     "maxFox": 86,
+     "safetyLimitHits": 0,
+     "deaths": {
+      "preyBorn": 6717,
+      "predBorn": 267,
+      "preyStarved": 5650,
+      "preyEaten": 1073,
+      "preyOld": 42,
+      "predStarved": 51,
+      "predOld": 138,
+      "predCulled": 0,
+      "preyIllness": 0,
+      "predIllness": 0
+     },
+     "sizeByQuarter": [
+      {
+       "month": 0,
+       "rabbit": 1,
+       "fox": 1
+      },
+      {
+       "month": 3,
+       "rabbit": 1,
+       "fox": 1
+      },
+      {
+       "month": 6,
+       "rabbit": 1,
+       "fox": 1
+      },
+      {
+       "month": 9,
+       "rabbit": 1,
+       "fox": 1
+      },
+      {
+       "month": 12,
+       "rabbit": 1,
+       "fox": 1
+      }
+     ],
+     "endSize": {
+      "rabbit": 1,
+      "fox": 1
+     }
+    },
+    {
+     "seed": 9409,
+     "survived": true,
+     "tick": 8760,
+     "prey": 134,
+     "foxes": 11,
+     "maxPrey": 469,
+     "maxFox": 128,
+     "safetyLimitHits": 0,
+     "deaths": {
+      "preyBorn": 6894,
+      "predBorn": 633,
+      "preyStarved": 3877,
+      "preyEaten": 3028,
+      "preyOld": 15,
+      "predStarved": 364,
+      "predOld": 264,
+      "predCulled": 0,
+      "preyIllness": 0,
+      "predIllness": 0
+     },
+     "sizeByQuarter": [
+      {
+       "month": 0,
+       "rabbit": 1,
+       "fox": 1
+      },
+      {
+       "month": 3,
+       "rabbit": 1,
+       "fox": 1
+      },
+      {
+       "month": 6,
+       "rabbit": 1,
+       "fox": 1
+      },
+      {
+       "month": 9,
+       "rabbit": 1,
+       "fox": 1
+      },
+      {
+       "month": 12,
+       "rabbit": 1,
+       "fox": 1
+      }
+     ],
+     "endSize": {
+      "rabbit": 1,
+      "fox": 1
+     }
+    },
+    {
+     "seed": 9410,
+     "survived": false,
+     "tick": 5798,
+     "prey": 150,
+     "foxes": 0,
+     "maxPrey": 410,
+     "maxFox": 25,
+     "safetyLimitHits": 0,
+     "deaths": {
+      "preyBorn": 5128,
+      "predBorn": 61,
+      "preyStarved": 4831,
+      "preyEaten": 286,
+      "preyOld": 21,
+      "predStarved": 39,
+      "predOld": 28,
+      "predCulled": 0,
+      "preyIllness": 0,
+      "predIllness": 0
+     },
+     "sizeByQuarter": [
+      {
+       "month": 0,
+       "rabbit": 1,
+       "fox": 1
+      },
+      {
+       "month": 3,
+       "rabbit": 1,
+       "fox": 1
+      },
+      {
+       "month": 6,
+       "rabbit": 1,
+       "fox": 1
+      }
+     ],
+     "endSize": {
+      "rabbit": 1,
+      "fox": null
+     }
+    },
+    {
+     "seed": 9411,
+     "survived": true,
+     "tick": 8760,
+     "prey": 411,
+     "foxes": 78,
+     "maxPrey": 411,
+     "maxFox": 118,
+     "safetyLimitHits": 0,
+     "deaths": {
+      "preyBorn": 10284,
+      "predBorn": 526,
+      "preyStarved": 7468,
+      "preyEaten": 2548,
+      "preyOld": 17,
+      "predStarved": 261,
+      "predOld": 193,
+      "predCulled": 0,
+      "preyIllness": 0,
+      "predIllness": 0
+     },
+     "sizeByQuarter": [
+      {
+       "month": 0,
+       "rabbit": 1,
+       "fox": 1
+      },
+      {
+       "month": 3,
+       "rabbit": 1,
+       "fox": 1
+      },
+      {
+       "month": 6,
+       "rabbit": 1,
+       "fox": 1
+      },
+      {
+       "month": 9,
+       "rabbit": 1,
+       "fox": 1
+      },
+      {
+       "month": 12,
+       "rabbit": 1,
+       "fox": 1
+      }
+     ],
+     "endSize": {
+      "rabbit": 1,
+      "fox": 1
+     }
+    },
+    {
+     "seed": 9412,
+     "survived": false,
+     "tick": 4513,
+     "prey": 0,
+     "foxes": 86,
+     "maxPrey": 545,
+     "maxFox": 108,
+     "safetyLimitHits": 0,
+     "deaths": {
+      "preyBorn": 3593,
+      "predBorn": 317,
+      "preyStarved": 2415,
+      "preyEaten": 1327,
+      "preyOld": 11,
+      "predStarved": 132,
+      "predOld": 105,
+      "predCulled": 0,
+      "preyIllness": 0,
+      "predIllness": 0
+     },
+     "sizeByQuarter": [
+      {
+       "month": 0,
+       "rabbit": 1,
+       "fox": 1
+      },
+      {
+       "month": 3,
+       "rabbit": 1,
+       "fox": 1
+      },
+      {
+       "month": 6,
+       "rabbit": 1,
+       "fox": 1
+      }
+     ],
+     "endSize": {
+      "rabbit": null,
+      "fox": 1
+     }
+    },
+    {
+     "seed": 9413,
+     "survived": true,
+     "tick": 8760,
+     "prey": 3,
+     "foxes": 84,
+     "maxPrey": 420,
+     "maxFox": 112,
+     "safetyLimitHits": 0,
+     "deaths": {
+      "preyBorn": 7739,
+      "predBorn": 606,
+      "preyStarved": 4272,
+      "preyEaten": 3608,
+      "preyOld": 16,
+      "predStarved": 302,
+      "predOld": 226,
+      "predCulled": 0,
+      "preyIllness": 0,
+      "predIllness": 0
+     },
+     "sizeByQuarter": [
+      {
+       "month": 0,
+       "rabbit": 1,
+       "fox": 1
+      },
+      {
+       "month": 3,
+       "rabbit": 1,
+       "fox": 1
+      },
+      {
+       "month": 6,
+       "rabbit": 1,
+       "fox": 1
+      },
+      {
+       "month": 9,
+       "rabbit": 1,
+       "fox": 1
+      },
+      {
+       "month": 12,
+       "rabbit": 1,
+       "fox": 1
+      }
+     ],
+     "endSize": {
+      "rabbit": 1,
+      "fox": 1
+     }
+    },
+    {
+     "seed": 9414,
+     "survived": true,
+     "tick": 8760,
+     "prey": 187,
+     "foxes": 40,
+     "maxPrey": 459,
+     "maxFox": 65,
+     "safetyLimitHits": 0,
+     "deaths": {
+      "preyBorn": 7932,
+      "predBorn": 376,
+      "preyStarved": 5419,
+      "preyEaten": 2453,
+      "preyOld": 33,
+      "predStarved": 255,
+      "predOld": 87,
+      "predCulled": 0,
+      "preyIllness": 0,
+      "predIllness": 0
+     },
+     "sizeByQuarter": [
+      {
+       "month": 0,
+       "rabbit": 1,
+       "fox": 1
+      },
+      {
+       "month": 3,
+       "rabbit": 1,
+       "fox": 1
+      },
+      {
+       "month": 6,
+       "rabbit": 1,
+       "fox": 1
+      },
+      {
+       "month": 9,
+       "rabbit": 1,
+       "fox": 1
+      },
+      {
+       "month": 12,
+       "rabbit": 1,
+       "fox": 1
+      }
+     ],
+     "endSize": {
+      "rabbit": 1,
+      "fox": 1
+     }
+    },
+    {
+     "seed": 9415,
+     "survived": true,
+     "tick": 8760,
+     "prey": 134,
+     "foxes": 57,
+     "maxPrey": 551,
+     "maxFox": 119,
+     "safetyLimitHits": 0,
+     "deaths": {
+      "preyBorn": 8305,
+      "predBorn": 550,
+      "preyStarved": 4941,
+      "preyEaten": 3375,
+      "preyOld": 15,
+      "predStarved": 363,
+      "predOld": 136,
+      "predCulled": 0,
+      "preyIllness": 0,
+      "predIllness": 0
+     },
+     "sizeByQuarter": [
+      {
+       "month": 0,
+       "rabbit": 1,
+       "fox": 1
+      },
+      {
+       "month": 3,
+       "rabbit": 1,
+       "fox": 1
+      },
+      {
+       "month": 6,
+       "rabbit": 1,
+       "fox": 1
+      },
+      {
+       "month": 9,
+       "rabbit": 1,
+       "fox": 1
+      },
+      {
+       "month": 12,
+       "rabbit": 1,
+       "fox": 1
+      }
+     ],
+     "endSize": {
+      "rabbit": 1,
+      "fox": 1
+     }
+    },
+    {
+     "seed": 9416,
+     "survived": true,
+     "tick": 8760,
+     "prey": 111,
+     "foxes": 24,
+     "maxPrey": 389,
+     "maxFox": 49,
+     "safetyLimitHits": 0,
+     "deaths": {
+      "preyBorn": 8741,
+      "predBorn": 307,
+      "preyStarved": 6941,
+      "preyEaten": 1791,
+      "preyOld": 58,
+      "predStarved": 202,
+      "predOld": 87,
+      "predCulled": 0,
+      "preyIllness": 0,
+      "predIllness": 0
+     },
+     "sizeByQuarter": [
+      {
+       "month": 0,
+       "rabbit": 1,
+       "fox": 1
+      },
+      {
+       "month": 3,
+       "rabbit": 1,
+       "fox": 1
+      },
+      {
+       "month": 6,
+       "rabbit": 1,
+       "fox": 1
+      },
+      {
+       "month": 9,
+       "rabbit": 1,
+       "fox": 1
+      },
+      {
+       "month": 12,
+       "rabbit": 1,
+       "fox": 1
+      }
+     ],
+     "endSize": {
+      "rabbit": 1,
+      "fox": 1
+     }
+    },
+    {
+     "seed": 9417,
+     "survived": false,
+     "tick": 1737,
+     "prey": 147,
+     "foxes": 0,
+     "maxPrey": 365,
+     "maxFox": 21,
+     "safetyLimitHits": 0,
+     "deaths": {
+      "preyBorn": 1569,
+      "predBorn": 20,
+      "preyStarved": 1475,
+      "preyEaten": 100,
+      "preyOld": 7,
+      "predStarved": 23,
+      "predOld": 3,
+      "predCulled": 0,
+      "preyIllness": 0,
+      "predIllness": 0
+     },
+     "sizeByQuarter": [
+      {
+       "month": 0,
+       "rabbit": 1,
+       "fox": 1
+      }
+     ],
+     "endSize": {
+      "rabbit": 1,
+      "fox": null
+     }
+    },
+    {
+     "seed": 9418,
+     "survived": false,
+     "tick": 3523,
+     "prey": 94,
+     "foxes": 0,
+     "maxPrey": 347,
+     "maxFox": 41,
+     "safetyLimitHits": 0,
+     "deaths": {
+      "preyBorn": 2645,
+      "predBorn": 63,
+      "preyStarved": 2407,
+      "preyEaten": 297,
+      "preyOld": 7,
+      "predStarved": 36,
+      "predOld": 33,
+      "predCulled": 0,
+      "preyIllness": 0,
+      "predIllness": 0
+     },
+     "sizeByQuarter": [
+      {
+       "month": 0,
+       "rabbit": 1,
+       "fox": 1
+      },
+      {
+       "month": 3,
+       "rabbit": 1,
+       "fox": 1
+      }
+     ],
+     "endSize": {
+      "rabbit": 1,
+      "fox": null
+     }
+    },
+    {
+     "seed": 9419,
+     "survived": false,
+     "tick": 2549,
+     "prey": 0,
+     "foxes": 95,
+     "maxPrey": 359,
+     "maxFox": 106,
+     "safetyLimitHits": 0,
+     "deaths": {
+      "preyBorn": 1925,
+      "predBorn": 190,
+      "preyStarved": 1145,
+      "preyEaten": 938,
+      "preyOld": 2,
+      "predStarved": 43,
+      "predOld": 58,
+      "predCulled": 0,
+      "preyIllness": 0,
+      "predIllness": 0
+     },
+     "sizeByQuarter": [
+      {
+       "month": 0,
+       "rabbit": 1,
+       "fox": 1
+      },
+      {
+       "month": 3,
+       "rabbit": 1,
+       "fox": 1
+      }
+     ],
+     "endSize": {
+      "rabbit": null,
+      "fox": 1
+     }
+    }
+   ]
+  },
+  "on": {
+   "summary": {
+    "mode": "on",
+    "start": 9400,
+    "count": 20,
+    "survived": 9,
+    "survivalRate": 0.45,
+    "ceilingHitRuns": 0,
+    "medianTick": 7125,
+    "extinctFirst": {
+     "rabbits": 7,
+     "foxes": 4
+    },
+    "deaths": {
+     "preyEaten": 35299,
+     "preyStarved": 79559,
+     "preyOld": 424,
+     "predStarved": 3046,
+     "predOld": 3459
+    }
+   },
+   "rows": [
+    {
+     "seed": 9400,
+     "survived": false,
+     "tick": 2179,
+     "prey": 0,
+     "foxes": 71,
+     "maxPrey": 355,
+     "maxFox": 109,
+     "safetyLimitHits": 0,
+     "deaths": {
+      "preyBorn": 2254,
+      "predBorn": 162,
+      "preyStarved": 1676,
+      "preyEaten": 727,
+      "preyOld": 11,
+      "predStarved": 59,
+      "predOld": 38,
+      "predCulled": 0,
+      "preyIllness": 0,
+      "predIllness": 0
+     },
+     "sizeByQuarter": [
+      {
+       "month": 0,
+       "rabbit": 1.0059,
+       "fox": 0.9961
+      },
+      {
+       "month": 3,
+       "rabbit": 0.918,
+       "fox": 0.947
+      }
+     ],
+     "endSize": {
+      "rabbit": null,
+      "fox": 0.95
+     }
+    },
+    {
+     "seed": 9401,
+     "survived": false,
+     "tick": 4573,
+     "prey": 0,
+     "foxes": 24,
+     "maxPrey": 394,
+     "maxFox": 205,
+     "safetyLimitHits": 0,
+     "deaths": {
+      "preyBorn": 4191,
+      "predBorn": 444,
+      "preyStarved": 2326,
+      "preyEaten": 2016,
+      "preyOld": 9,
+      "predStarved": 229,
+      "predOld": 197,
+      "predCulled": 0,
+      "preyIllness": 0,
+      "predIllness": 0
+     },
+     "sizeByQuarter": [
+      {
+       "month": 0,
+       "rabbit": 0.9959,
+       "fox": 1.0376
+      },
+      {
+       "month": 3,
+       "rabbit": 1.0016,
+       "fox": 0.9729
+      },
+      {
+       "month": 6,
+       "rabbit": 1.0193,
+       "fox": 1.0988
+      }
+     ],
+     "endSize": {
+      "rabbit": null,
+      "fox": 1.0909
+     }
+    },
+    {
+     "seed": 9402,
+     "survived": false,
+     "tick": 3527,
+     "prey": 76,
+     "foxes": 0,
+     "maxPrey": 343,
+     "maxFox": 135,
+     "safetyLimitHits": 0,
+     "deaths": {
+      "preyBorn": 2665,
+      "predBorn": 218,
+      "preyStarved": 1736,
+      "preyEaten": 1008,
+      "preyOld": 5,
+      "predStarved": 123,
+      "predOld": 101,
+      "predCulled": 0,
+      "preyIllness": 0,
+      "predIllness": 0
+     },
+     "sizeByQuarter": [
+      {
+       "month": 0,
+       "rabbit": 1.0193,
+       "fox": 1.1189
+      },
+      {
+       "month": 3,
+       "rabbit": 1.1058,
+       "fox": 1.0808
+      }
+     ],
+     "endSize": {
+      "rabbit": 1.1105,
+      "fox": null
+     }
+    },
+    {
+     "seed": 9403,
+     "survived": false,
+     "tick": 5829,
+     "prey": 0,
+     "foxes": 4,
+     "maxPrey": 462,
+     "maxFox": 95,
+     "safetyLimitHits": 0,
+     "deaths": {
+      "preyBorn": 5600,
+      "predBorn": 390,
+      "preyStarved": 3087,
+      "preyEaten": 2656,
+      "preyOld": 17,
+      "predStarved": 302,
+      "predOld": 90,
+      "predCulled": 0,
+      "preyIllness": 0,
+      "predIllness": 0
+     },
+     "sizeByQuarter": [
+      {
+       "month": 0,
+       "rabbit": 1.0125,
+       "fox": 1.0196
+      },
+      {
+       "month": 3,
+       "rabbit": 0.9986,
+       "fox": 1.1098
+      },
+      {
+       "month": 6,
+       "rabbit": 0.9827,
+       "fox": 1.1169
+      }
+     ],
+     "endSize": {
+      "rabbit": null,
+      "fox": 1.1164
+     }
+    },
+    {
+     "seed": 9404,
+     "survived": true,
+     "tick": 8760,
+     "prey": 291,
+     "foxes": 70,
+     "maxPrey": 347,
+     "maxFox": 171,
+     "safetyLimitHits": 0,
+     "deaths": {
+      "preyBorn": 6966,
+      "predBorn": 719,
+      "preyStarved": 3338,
+      "preyEaten": 3493,
+      "preyOld": 4,
+      "predStarved": 160,
+      "predOld": 495,
+      "predCulled": 0,
+      "preyIllness": 0,
+      "predIllness": 0
+     },
+     "sizeByQuarter": [
+      {
+       "month": 0,
+       "rabbit": 1.0071,
+       "fox": 0.9642
+      },
+      {
+       "month": 3,
+       "rabbit": 1.0366,
+       "fox": 1.1494
+      },
+      {
+       "month": 6,
+       "rabbit": 1.0255,
+       "fox": 1.2319
+      },
+      {
+       "month": 9,
+       "rabbit": 1.0247,
+       "fox": 1.2326
+      },
+      {
+       "month": 12,
+       "rabbit": 1.0022,
+       "fox": 1.2319
+      }
+     ],
+     "endSize": {
+      "rabbit": 1.0009,
+      "fox": 1.2309
+     }
+    },
+    {
+     "seed": 9405,
+     "survived": true,
+     "tick": 8760,
+     "prey": 190,
+     "foxes": 46,
+     "maxPrey": 409,
+     "maxFox": 55,
+     "safetyLimitHits": 0,
+     "deaths": {
+      "preyBorn": 9122,
+      "predBorn": 240,
+      "preyStarved": 7931,
+      "preyEaten": 1104,
+      "preyOld": 57,
+      "predStarved": 50,
+      "predOld": 150,
+      "predCulled": 0,
+      "preyIllness": 0,
+      "predIllness": 0
+     },
+     "sizeByQuarter": [
+      {
+       "month": 0,
+       "rabbit": 0.9966,
+       "fox": 0.9779
+      },
+      {
+       "month": 3,
+       "rabbit": 0.8908,
+       "fox": 1.0622
+      },
+      {
+       "month": 6,
+       "rabbit": 0.8896,
+       "fox": 1.116
+      },
+      {
+       "month": 9,
+       "rabbit": 0.8618,
+       "fox": 1.0572
+      },
+      {
+       "month": 12,
+       "rabbit": 0.8591,
+       "fox": 1.0098
+      }
+     ],
+     "endSize": {
+      "rabbit": 0.8614,
+      "fox": 1.0097
+     }
+    },
+    {
+     "seed": 9406,
+     "survived": true,
+     "tick": 8760,
+     "prey": 174,
+     "foxes": 99,
+     "maxPrey": 333,
+     "maxFox": 191,
+     "safetyLimitHits": 0,
+     "deaths": {
+      "preyBorn": 6847,
+      "predBorn": 784,
+      "preyStarved": 3754,
+      "preyEaten": 3061,
+      "preyOld": 18,
+      "predStarved": 145,
+      "predOld": 546,
+      "predCulled": 0,
+      "preyIllness": 0,
+      "predIllness": 0
+     },
+     "sizeByQuarter": [
+      {
+       "month": 0,
+       "rabbit": 1.0145,
+       "fox": 1.0274
+      },
+      {
+       "month": 3,
+       "rabbit": 0.907,
+       "fox": 0.9663
+      },
+      {
+       "month": 6,
+       "rabbit": 1.0239,
+       "fox": 0.9674
+      },
+      {
+       "month": 9,
+       "rabbit": 1.0906,
+       "fox": 0.9676
+      },
+      {
+       "month": 12,
+       "rabbit": 1.0886,
+       "fox": 0.9675
+      }
+     ],
+     "endSize": {
+      "rabbit": 1.0891,
+      "fox": 0.9672
+     }
+    },
+    {
+     "seed": 9407,
+     "survived": false,
+     "tick": 2669,
+     "prey": 186,
+     "foxes": 0,
+     "maxPrey": 327,
+     "maxFox": 81,
+     "safetyLimitHits": 0,
+     "deaths": {
+      "preyBorn": 2218,
+      "predBorn": 123,
+      "preyStarved": 1552,
+      "preyEaten": 637,
+      "preyOld": 3,
+      "predStarved": 85,
+      "predOld": 44,
+      "predCulled": 0,
+      "preyIllness": 0,
+      "predIllness": 0
+     },
+     "sizeByQuarter": [
+      {
+       "month": 0,
+       "rabbit": 0.9942,
+       "fox": 0.9752
+      },
+      {
+       "month": 3,
+       "rabbit": 1.1313,
+       "fox": 1.1736
+      }
+     ],
+     "endSize": {
+      "rabbit": 1.1306,
+      "fox": null
+     }
+    },
+    {
+     "seed": 9408,
+     "survived": false,
+     "tick": 5654,
+     "prey": 0,
+     "foxes": 25,
+     "maxPrey": 373,
+     "maxFox": 90,
+     "safetyLimitHits": 0,
+     "deaths": {
+      "preyBorn": 6213,
+      "predBorn": 407,
+      "preyStarved": 4394,
+      "preyEaten": 1976,
+      "preyOld": 3,
+      "predStarved": 279,
+      "predOld": 109,
+      "predCulled": 0,
+      "preyIllness": 0,
+      "predIllness": 0
+     },
+     "sizeByQuarter": [
+      {
+       "month": 0,
+       "rabbit": 1.0062,
+       "fox": 0.9437
+      },
+      {
+       "month": 3,
+       "rabbit": 0.8474,
+       "fox": 0.835
+      },
+      {
+       "month": 6,
+       "rabbit": 0.8507,
+       "fox": 0.8272
+      }
+     ],
+     "endSize": {
+      "rabbit": null,
+      "fox": 0.8239
+     }
+    },
+    {
+     "seed": 9409,
+     "survived": false,
+     "tick": 3806,
+     "prey": 0,
+     "foxes": 50,
+     "maxPrey": 408,
+     "maxFox": 107,
+     "safetyLimitHits": 0,
+     "deaths": {
+      "preyBorn": 3620,
+      "predBorn": 283,
+      "preyStarved": 2085,
+      "preyEaten": 1690,
+      "preyOld": 5,
+      "predStarved": 86,
+      "predOld": 153,
+      "predCulled": 0,
+      "preyIllness": 0,
+      "predIllness": 0
+     },
+     "sizeByQuarter": [
+      {
+       "month": 0,
+       "rabbit": 0.9937,
+       "fox": 1.0498
+      },
+      {
+       "month": 3,
+       "rabbit": 0.8185,
+       "fox": 0.9121
+      }
+     ],
+     "endSize": {
+      "rabbit": null,
+      "fox": 0.8512
+     }
+    },
+    {
+     "seed": 9410,
+     "survived": true,
+     "tick": 8760,
+     "prey": 173,
+     "foxes": 109,
+     "maxPrey": 356,
+     "maxFox": 159,
+     "safetyLimitHits": 0,
+     "deaths": {
+      "preyBorn": 9492,
+      "predBorn": 873,
+      "preyStarved": 4751,
+      "preyEaten": 4720,
+      "preyOld": 8,
+      "predStarved": 327,
+      "predOld": 443,
+      "predCulled": 0,
+      "preyIllness": 0,
+      "predIllness": 0
+     },
+     "sizeByQuarter": [
+      {
+       "month": 0,
+       "rabbit": 1.014,
+       "fox": 1.0089
+      },
+      {
+       "month": 3,
+       "rabbit": 0.9273,
+       "fox": 1.0183
+      },
+      {
+       "month": 6,
+       "rabbit": 0.87,
+       "fox": 0.9909
+      },
+      {
+       "month": 9,
+       "rabbit": 0.8665,
+       "fox": 1.0045
+      },
+      {
+       "month": 12,
+       "rabbit": 0.8644,
+       "fox": 0.9908
+      }
+     ],
+     "endSize": {
+      "rabbit": 0.8645,
+      "fox": 0.9964
+     }
+    },
+    {
+     "seed": 9411,
+     "survived": false,
+     "tick": 3921,
+     "prey": 48,
+     "foxes": 0,
+     "maxPrey": 323,
+     "maxFox": 30,
+     "safetyLimitHits": 0,
+     "deaths": {
+      "preyBorn": 2815,
+      "predBorn": 64,
+      "preyStarved": 2602,
+      "preyEaten": 307,
+      "preyOld": 18,
+      "predStarved": 43,
+      "predOld": 27,
+      "predCulled": 0,
+      "preyIllness": 0,
+      "predIllness": 0
+     },
+     "sizeByQuarter": [
+      {
+       "month": 0,
+       "rabbit": 1.0117,
+       "fox": 1.0378
+      },
+      {
+       "month": 3,
+       "rabbit": 0.8602,
+       "fox": 1.1806
+      }
+     ],
+     "endSize": {
+      "rabbit": 0.8279,
+      "fox": null
+     }
+    },
+    {
+     "seed": 9412,
+     "survived": true,
+     "tick": 8760,
+     "prey": 125,
+     "foxes": 21,
+     "maxPrey": 403,
+     "maxFox": 77,
+     "safetyLimitHits": 0,
+     "deaths": {
+      "preyBorn": 9515,
+      "predBorn": 445,
+      "preyStarved": 7064,
+      "preyEaten": 2470,
+      "preyOld": 16,
+      "predStarved": 287,
+      "predOld": 143,
+      "predCulled": 0,
+      "preyIllness": 0,
+      "predIllness": 0
+     },
+     "sizeByQuarter": [
+      {
+       "month": 0,
+       "rabbit": 1.0231,
+       "fox": 0.9994
+      },
+      {
+       "month": 3,
+       "rabbit": 1.022,
+       "fox": 0.9726
+      },
+      {
+       "month": 6,
+       "rabbit": 0.9927,
+       "fox": 0.992
+      },
+      {
+       "month": 9,
+       "rabbit": 0.9911,
+       "fox": 1.0557
+      },
+      {
+       "month": 12,
+       "rabbit": 0.9657,
+       "fox": 1.0681
+      }
+     ],
+     "endSize": {
+      "rabbit": 0.9664,
+      "fox": 1.0586
+     }
+    },
+    {
+     "seed": 9413,
+     "survived": false,
+     "tick": 2123,
+     "prey": 0,
+     "foxes": 33,
+     "maxPrey": 343,
+     "maxFox": 58,
+     "safetyLimitHits": 0,
+     "deaths": {
+      "preyBorn": 1706,
+      "predBorn": 80,
+      "preyStarved": 1510,
+      "preyEaten": 344,
+      "preyOld": 12,
+      "predStarved": 26,
+      "predOld": 27,
+      "predCulled": 0,
+      "preyIllness": 0,
+      "predIllness": 0
+     },
+     "sizeByQuarter": [
+      {
+       "month": 0,
+       "rabbit": 1.0135,
+       "fox": 0.9843
+      }
+     ],
+     "endSize": {
+      "rabbit": null,
+      "fox": 0.8923
+     }
+    },
+    {
+     "seed": 9414,
+     "survived": false,
+     "tick": 3866,
+     "prey": 0,
+     "foxes": 59,
+     "maxPrey": 324,
+     "maxFox": 96,
+     "safetyLimitHits": 0,
+     "deaths": {
+      "preyBorn": 2897,
+      "predBorn": 259,
+      "preyStarved": 1410,
+      "preyEaten": 1643,
+      "preyOld": 4,
+      "predStarved": 110,
+      "predOld": 96,
+      "predCulled": 0,
+      "preyIllness": 0,
+      "predIllness": 0
+     },
+     "sizeByQuarter": [
+      {
+       "month": 0,
+       "rabbit": 1.014,
+       "fox": 1.0483
+      },
+      {
+       "month": 3,
+       "rabbit": 0.9118,
+       "fox": 1.1
+      }
+     ],
+     "endSize": {
+      "rabbit": null,
+      "fox": 1.0802
+     }
+    },
+    {
+     "seed": 9415,
+     "survived": false,
+     "tick": 7125,
+     "prey": 207,
+     "foxes": 0,
+     "maxPrey": 499,
+     "maxFox": 42,
+     "safetyLimitHits": 0,
+     "deaths": {
+      "preyBorn": 7139,
+      "predBorn": 155,
+      "preyStarved": 6162,
+      "preyEaten": 878,
+      "preyOld": 52,
+      "predStarved": 94,
+      "predOld": 67,
+      "predCulled": 0,
+      "preyIllness": 0,
+      "predIllness": 0
+     },
+     "sizeByQuarter": [
+      {
+       "month": 0,
+       "rabbit": 1.0193,
+       "fox": 1.0142
+      },
+      {
+       "month": 3,
+       "rabbit": 0.9629,
+       "fox": 1.027
+      },
+      {
+       "month": 6,
+       "rabbit": 0.9361,
+       "fox": 1.1219
+      },
+      {
+       "month": 9,
+       "rabbit": 0.9257,
+       "fox": 1.1599
+      }
+     ],
+     "endSize": {
+      "rabbit": 0.9199,
+      "fox": null
+     }
+    },
+    {
+     "seed": 9416,
+     "survived": true,
+     "tick": 8760,
+     "prey": 196,
+     "foxes": 58,
+     "maxPrey": 512,
+     "maxFox": 58,
+     "safetyLimitHits": 0,
+     "deaths": {
+      "preyBorn": 7969,
+      "predBorn": 226,
+      "preyStarved": 7073,
+      "preyEaten": 805,
+      "preyOld": 55,
+      "predStarved": 38,
+      "predOld": 136,
+      "predCulled": 0,
+      "preyIllness": 0,
+      "predIllness": 0
+     },
+     "sizeByQuarter": [
+      {
+       "month": 0,
+       "rabbit": 1.0021,
+       "fox": 0.9845
+      },
+      {
+       "month": 3,
+       "rabbit": 0.9648,
+       "fox": 0.9188
+      },
+      {
+       "month": 6,
+       "rabbit": 0.9584,
+       "fox": 0.9326
+      },
+      {
+       "month": 9,
+       "rabbit": 0.887,
+       "fox": 0.9326
+      },
+      {
+       "month": 12,
+       "rabbit": 0.9035,
+       "fox": 0.9313
+      }
+     ],
+     "endSize": {
+      "rabbit": 0.8927,
+      "fox": 0.9311
+     }
+    },
+    {
+     "seed": 9417,
+     "survived": true,
+     "tick": 8760,
+     "prey": 265,
+     "foxes": 30,
+     "maxPrey": 450,
+     "maxFox": 50,
+     "safetyLimitHits": 0,
+     "deaths": {
+      "preyBorn": 9300,
+      "predBorn": 343,
+      "preyStarved": 7106,
+      "preyEaten": 2041,
+      "preyOld": 48,
+      "predStarved": 202,
+      "predOld": 117,
+      "predCulled": 0,
+      "preyIllness": 0,
+      "predIllness": 0
+     },
+     "sizeByQuarter": [
+      {
+       "month": 0,
+       "rabbit": 1.0154,
+       "fox": 0.9723
+      },
+      {
+       "month": 3,
+       "rabbit": 1.0583,
+       "fox": 1.0896
+      },
+      {
+       "month": 6,
+       "rabbit": 1.0366,
+       "fox": 1.2249
+      },
+      {
+       "month": 9,
+       "rabbit": 1.0357,
+       "fox": 1.2276
+      },
+      {
+       "month": 12,
+       "rabbit": 1.043,
+       "fox": 1.2273
+      }
+     ],
+     "endSize": {
+      "rabbit": 1.0434,
+      "fox": 1.2237
+     }
+    },
+    {
+     "seed": 9418,
+     "survived": true,
+     "tick": 8760,
+     "prey": 378,
+     "foxes": 7,
+     "maxPrey": 766,
+     "maxFox": 265,
+     "safetyLimitHits": 0,
+     "deaths": {
+      "preyBorn": 8744,
+      "predBorn": 595,
+      "preyStarved": 6064,
+      "preyEaten": 2407,
+      "preyOld": 55,
+      "predStarved": 244,
+      "predOld": 350,
+      "predCulled": 0,
+      "preyIllness": 0,
+      "predIllness": 0
+     },
+     "sizeByQuarter": [
+      {
+       "month": 0,
+       "rabbit": 1.0117,
+       "fox": 0.9441
+      },
+      {
+       "month": 3,
+       "rabbit": 1.0387,
+       "fox": 1.154
+      },
+      {
+       "month": 6,
+       "rabbit": 1.0205,
+       "fox": 1.1741
+      },
+      {
+       "month": 9,
+       "rabbit": 1.0039,
+       "fox": 1.1749
+      },
+      {
+       "month": 12,
+       "rabbit": 1.0063,
+       "fox": 1.1755
+      }
+     ],
+     "endSize": {
+      "rabbit": 1.0067,
+      "fox": 1.1755
+     }
+    },
+    {
+     "seed": 9419,
+     "survived": true,
+     "tick": 8760,
+     "prey": 519,
+     "foxes": 14,
+     "maxPrey": 591,
+     "maxFox": 82,
+     "safetyLimitHits": 0,
+     "deaths": {
+      "preyBorn": 5637,
+      "predBorn": 295,
+      "preyStarved": 3938,
+      "preyEaten": 1316,
+      "preyOld": 24,
+      "predStarved": 157,
+      "predOld": 130,
+      "predCulled": 0,
+      "preyIllness": 0,
+      "predIllness": 0
+     },
+     "sizeByQuarter": [
+      {
+       "month": 0,
+       "rabbit": 1.0056,
+       "fox": 1.0435
+      },
+      {
+       "month": 3,
+       "rabbit": 1.0034,
+       "fox": 1.0524
+      },
+      {
+       "month": 6,
+       "rabbit": 1.0742,
+       "fox": 0.995
+      },
+      {
+       "month": 9,
+       "rabbit": 1.0693,
+       "fox": 0.9925
+      },
+      {
+       "month": 12,
+       "rabbit": 1.0363,
+       "fox": 0.995
+      }
+     ],
+     "endSize": {
+      "rabbit": 1.0354,
+      "fox": 0.995
+     }
+    }
+   ]
+  }
+ },
+ "voleMeadow9400": {
+  "off": {
+   "summary": {
+    "mode": "off",
+    "meadow": "voles",
+    "start": 9400,
+    "count": 10,
+    "survived": 3,
+    "survivalRate": 0.3,
+    "ceilingHitRuns": 0,
+    "medianTick": 4038,
+    "extinctFirst": {
+     "rabbits": 4,
+     "foxes": 1,
+     "voles": 2
+    },
+    "deaths": {
+     "preyEaten": 11880,
+     "preyStarved": 22448,
+     "preyOld": 104,
+     "predStarved": 987,
+     "predOld": 1999
+    }
+   },
+   "rows": [
+    {
+     "seed": 9400,
+     "survived": false,
+     "tick": 2218,
+     "prey": 0,
+     "foxes": 88,
+     "voles": 9,
+     "maxPrey": 246,
+     "maxFox": 98,
+     "safetyLimitHits": 0,
+     "deaths": {
+      "preyBorn": 1362,
+      "predBorn": 141,
+      "preyStarved": 1151,
+      "preyEaten": 367,
+      "preyOld": 4,
+      "predStarved": 23,
+      "predOld": 36,
+      "predCulled": 0,
+      "preyIllness": 0,
+      "predIllness": 0
+     },
+     "sizeByQuarter": [
+      {
+       "month": 0,
+       "rabbit": 1,
+       "fox": 1,
+       "vole": 1
+      },
+      {
+       "month": 3,
+       "rabbit": 1,
+       "fox": 1,
+       "vole": 1
+      }
+     ],
+     "endSize": {
+      "rabbit": null,
+      "fox": 1,
+      "vole": 1
+     }
+    },
+    {
+     "seed": 9401,
+     "survived": false,
+     "tick": 2344,
+     "prey": 0,
+     "foxes": 53,
+     "voles": 71,
+     "maxPrey": 267,
+     "maxFox": 65,
+     "safetyLimitHits": 0,
+     "deaths": {
+      "preyBorn": 1444,
+      "predBorn": 118,
+      "preyStarved": 1174,
+      "preyEaten": 426,
+      "preyOld": 4,
+      "predStarved": 34,
+      "predOld": 37,
+      "predCulled": 0,
+      "preyIllness": 0,
+      "predIllness": 0
+     },
+     "sizeByQuarter": [
+      {
+       "month": 0,
+       "rabbit": 1,
+       "fox": 1,
+       "vole": 1
+      },
+      {
+       "month": 3,
+       "rabbit": 1,
+       "fox": 1,
+       "vole": 1
+      }
+     ],
+     "endSize": {
+      "rabbit": null,
+      "fox": 1,
+      "vole": 1
+     }
+    },
+    {
+     "seed": 9402,
+     "survived": false,
+     "tick": 2953,
+     "prey": 0,
+     "foxes": 44,
+     "voles": 58,
+     "maxPrey": 277,
+     "maxFox": 77,
+     "safetyLimitHits": 0,
+     "deaths": {
+      "preyBorn": 1271,
+      "predBorn": 174,
+      "preyStarved": 1057,
+      "preyEaten": 371,
+      "preyOld": 3,
+      "predStarved": 62,
+      "predOld": 74,
+      "predCulled": 0,
+      "preyIllness": 0,
+      "predIllness": 0
+     },
+     "sizeByQuarter": [
+      {
+       "month": 0,
+       "rabbit": 1,
+       "fox": 1,
+       "vole": 1
+      },
+      {
+       "month": 3,
+       "rabbit": 1,
+       "fox": 1,
+       "vole": 1
+      }
+     ],
+     "endSize": {
+      "rabbit": null,
+      "fox": 1,
+      "vole": 1
+     }
+    },
+    {
+     "seed": 9403,
+     "survived": false,
+     "tick": 7606,
+     "prey": 9,
+     "foxes": 202,
+     "voles": 0,
+     "maxPrey": 269,
+     "maxFox": 222,
+     "safetyLimitHits": 0,
+     "deaths": {
+      "preyBorn": 5945,
+      "predBorn": 722,
+      "preyStarved": 3465,
+      "preyEaten": 2618,
+      "preyOld": 13,
+      "predStarved": 96,
+      "predOld": 430,
+      "predCulled": 0,
+      "preyIllness": 0,
+      "predIllness": 0
+     },
+     "sizeByQuarter": [
+      {
+       "month": 0,
+       "rabbit": 1,
+       "fox": 1,
+       "vole": 1
+      },
+      {
+       "month": 3,
+       "rabbit": 1,
+       "fox": 1,
+       "vole": 1
+      },
+      {
+       "month": 6,
+       "rabbit": 1,
+       "fox": 1,
+       "vole": 1
+      },
+      {
+       "month": 9,
+       "rabbit": 1,
+       "fox": 1,
+       "vole": 1
+      }
+     ],
+     "endSize": {
+      "rabbit": 1,
+      "fox": 1,
+      "vole": null
+     }
+    },
+    {
+     "seed": 9404,
+     "survived": false,
+     "tick": 2366,
+     "prey": 16,
+     "foxes": 75,
+     "voles": 0,
+     "maxPrey": 263,
+     "maxFox": 78,
+     "safetyLimitHits": 0,
+     "deaths": {
+      "preyBorn": 1648,
+      "predBorn": 150,
+      "preyStarved": 1197,
+      "preyEaten": 589,
+      "preyOld": 6,
+      "predStarved": 50,
+      "predOld": 31,
+      "predCulled": 0,
+      "preyIllness": 0,
+      "predIllness": 0
+     },
+     "sizeByQuarter": [
+      {
+       "month": 0,
+       "rabbit": 1,
+       "fox": 1,
+       "vole": 1
+      },
+      {
+       "month": 3,
+       "rabbit": 1,
+       "fox": 1,
+       "vole": 1
+      }
+     ],
+     "endSize": {
+      "rabbit": 1,
+      "fox": 1,
+      "vole": null
+     }
+    },
+    {
+     "seed": 9405,
+     "survived": true,
+     "tick": 8760,
+     "prey": 229,
+     "foxes": 83,
+     "voles": 57,
+     "maxPrey": 346,
+     "maxFox": 130,
+     "safetyLimitHits": 0,
+     "deaths": {
+      "preyBorn": 7258,
+      "predBorn": 584,
+      "preyStarved": 4819,
+      "preyEaten": 2330,
+      "preyOld": 40,
+      "predStarved": 143,
+      "predOld": 364,
+      "predCulled": 0,
+      "preyIllness": 0,
+      "predIllness": 0
+     },
+     "sizeByQuarter": [
+      {
+       "month": 0,
+       "rabbit": 1,
+       "fox": 1,
+       "vole": 1
+      },
+      {
+       "month": 3,
+       "rabbit": 1,
+       "fox": 1,
+       "vole": 1
+      },
+      {
+       "month": 6,
+       "rabbit": 1,
+       "fox": 1,
+       "vole": 1
+      },
+      {
+       "month": 9,
+       "rabbit": 1,
+       "fox": 1,
+       "vole": 1
+      },
+      {
+       "month": 12,
+       "rabbit": 1,
+       "fox": 1,
+       "vole": 1
+      }
+     ],
+     "endSize": {
+      "rabbit": 1,
+      "fox": 1,
+      "vole": 1
+     }
+    },
+    {
+     "seed": 9406,
+     "survived": true,
+     "tick": 8760,
+     "prey": 24,
+     "foxes": 111,
+     "voles": 94,
+     "maxPrey": 331,
+     "maxFox": 144,
+     "safetyLimitHits": 0,
+     "deaths": {
+      "preyBorn": 6639,
+      "predBorn": 778,
+      "preyStarved": 3867,
+      "preyEaten": 2899,
+      "preyOld": 9,
+      "predStarved": 235,
+      "predOld": 438,
+      "predCulled": 0,
+      "preyIllness": 0,
+      "predIllness": 0
+     },
+     "sizeByQuarter": [
+      {
+       "month": 0,
+       "rabbit": 1,
+       "fox": 1,
+       "vole": 1
+      },
+      {
+       "month": 3,
+       "rabbit": 1,
+       "fox": 1,
+       "vole": 1
+      },
+      {
+       "month": 6,
+       "rabbit": 1,
+       "fox": 1,
+       "vole": 1
+      },
+      {
+       "month": 9,
+       "rabbit": 1,
+       "fox": 1,
+       "vole": 1
+      },
+      {
+       "month": 12,
+       "rabbit": 1,
+       "fox": 1,
+       "vole": 1
+      }
+     ],
+     "endSize": {
+      "rabbit": 1,
+      "fox": 1,
+      "vole": 1
+     }
+    },
+    {
+     "seed": 9407,
+     "survived": false,
+     "tick": 4038,
+     "prey": 0,
+     "foxes": 50,
+     "voles": 39,
+     "maxPrey": 285,
+     "maxFox": 64,
+     "safetyLimitHits": 0,
+     "deaths": {
+      "preyBorn": 2568,
+      "predBorn": 226,
+      "preyStarved": 2099,
+      "preyEaten": 620,
+      "preyOld": 9,
+      "predStarved": 81,
+      "predOld": 101,
+      "predCulled": 0,
+      "preyIllness": 0,
+      "predIllness": 0
+     },
+     "sizeByQuarter": [
+      {
+       "month": 0,
+       "rabbit": 1,
+       "fox": 1,
+       "vole": 1
+      },
+      {
+       "month": 3,
+       "rabbit": 1,
+       "fox": 1,
+       "vole": 1
+      }
+     ],
+     "endSize": {
+      "rabbit": null,
+      "fox": 1,
+      "vole": 1
+     }
+    },
+    {
+     "seed": 9408,
+     "survived": false,
+     "tick": 3204,
+     "prey": 150,
+     "foxes": 0,
+     "voles": 109,
+     "maxPrey": 303,
+     "maxFox": 22,
+     "safetyLimitHits": 0,
+     "deaths": {
+      "preyBorn": 2091,
+      "predBorn": 31,
+      "preyStarved": 2007,
+      "preyEaten": 80,
+      "preyOld": 14,
+      "predStarved": 18,
+      "predOld": 19,
+      "predCulled": 0,
+      "preyIllness": 0,
+      "predIllness": 0
+     },
+     "sizeByQuarter": [
+      {
+       "month": 0,
+       "rabbit": 1,
+       "fox": 1,
+       "vole": 1
+      },
+      {
+       "month": 3,
+       "rabbit": 1,
+       "fox": 1,
+       "vole": 1
+      }
+     ],
+     "endSize": {
+      "rabbit": 1,
+      "fox": null,
+      "vole": 1
+     }
+    },
+    {
+     "seed": 9409,
+     "survived": true,
+     "tick": 8760,
+     "prey": 73,
+     "foxes": 70,
+     "voles": 129,
+     "maxPrey": 280,
+     "maxFox": 138,
+     "safetyLimitHits": 0,
+     "deaths": {
+      "preyBorn": 3107,
+      "predBorn": 778,
+      "preyStarved": 1612,
+      "preyEaten": 1580,
+      "preyOld": 2,
+      "predStarved": 245,
+      "predOld": 469,
+      "predCulled": 0,
+      "preyIllness": 0,
+      "predIllness": 0
+     },
+     "sizeByQuarter": [
+      {
+       "month": 0,
+       "rabbit": 1,
+       "fox": 1,
+       "vole": 1
+      },
+      {
+       "month": 3,
+       "rabbit": 1,
+       "fox": 1,
+       "vole": 1
+      },
+      {
+       "month": 6,
+       "rabbit": 1,
+       "fox": 1,
+       "vole": 1
+      },
+      {
+       "month": 9,
+       "rabbit": 1,
+       "fox": 1,
+       "vole": 1
+      },
+      {
+       "month": 12,
+       "rabbit": 1,
+       "fox": 1,
+       "vole": 1
+      }
+     ],
+     "endSize": {
+      "rabbit": 1,
+      "fox": 1,
+      "vole": 1
+     }
+    }
+   ]
+  },
+  "on": {
+   "summary": {
+    "mode": "on",
+    "meadow": "voles",
+    "start": 9400,
+    "count": 10,
+    "survived": 3,
+    "survivalRate": 0.3,
+    "ceilingHitRuns": 0,
+    "medianTick": 5649,
+    "extinctFirst": {
+     "rabbits": 3,
+     "foxes": 1,
+     "voles": 3
+    },
+    "deaths": {
+     "preyEaten": 16008,
+     "preyStarved": 33178,
+     "preyOld": 210,
+     "predStarved": 1419,
+     "predOld": 1795
+    }
+   },
+   "rows": [
+    {
+     "seed": 9400,
+     "survived": false,
+     "tick": 5649,
+     "prey": 0,
+     "foxes": 46,
+     "voles": 21,
+     "maxPrey": 477,
+     "maxFox": 120,
+     "safetyLimitHits": 0,
+     "deaths": {
+      "preyBorn": 4583,
+      "predBorn": 378,
+      "preyStarved": 3045,
+      "preyEaten": 1688,
+      "preyOld": 10,
+      "predStarved": 202,
+      "predOld": 136,
+      "predCulled": 0,
+      "preyIllness": 0,
+      "predIllness": 0
+     },
+     "sizeByQuarter": [
+      {
+       "month": 0,
+       "rabbit": 1.0059,
+       "fox": 0.9961,
+       "vole": 1.0012
+      },
+      {
+       "month": 3,
+       "rabbit": 1.017,
+       "fox": 0.972,
+       "vole": 0.9533
+      },
+      {
+       "month": 6,
+       "rabbit": 1.022,
+       "fox": 0.8823,
+       "vole": 0.9672
+      }
+     ],
+     "endSize": {
+      "rabbit": null,
+      "fox": 0.8974,
+      "vole": 0.9526
+     }
+    },
+    {
+     "seed": 9401,
+     "survived": false,
+     "tick": 4652,
+     "prey": 0,
+     "foxes": 81,
+     "voles": 111,
+     "maxPrey": 335,
+     "maxFox": 89,
+     "safetyLimitHits": 0,
+     "deaths": {
+      "preyBorn": 3034,
+      "predBorn": 220,
+      "preyStarved": 2497,
+      "preyEaten": 683,
+      "preyOld": 14,
+      "predStarved": 26,
+      "predOld": 119,
+      "predCulled": 0,
+      "preyIllness": 0,
+      "predIllness": 0
+     },
+     "sizeByQuarter": [
+      {
+       "month": 0,
+       "rabbit": 0.9959,
+       "fox": 1.0376,
+       "vole": 0.9882
+      },
+      {
+       "month": 3,
+       "rabbit": 0.9166,
+       "fox": 1.1101,
+       "vole": 0.9224
+      },
+      {
+       "month": 6,
+       "rabbit": 0.9972,
+       "fox": 1.1197,
+       "vole": 0.8799
+      }
+     ],
+     "endSize": {
+      "rabbit": null,
+      "fox": 1.1182,
+      "vole": 0.8732
+     }
+    },
+    {
+     "seed": 9402,
+     "survived": false,
+     "tick": 3642,
+     "prey": 0,
+     "foxes": 69,
+     "voles": 4,
+     "maxPrey": 260,
+     "maxFox": 112,
+     "safetyLimitHits": 0,
+     "deaths": {
+      "preyBorn": 1835,
+      "predBorn": 243,
+      "preyStarved": 1398,
+      "preyEaten": 591,
+      "preyOld": 6,
+      "predStarved": 53,
+      "predOld": 127,
+      "predCulled": 0,
+      "preyIllness": 0,
+      "predIllness": 0
+     },
+     "sizeByQuarter": [
+      {
+       "month": 0,
+       "rabbit": 1.0193,
+       "fox": 1.1189,
+       "vole": 1.0075
+      },
+      {
+       "month": 3,
+       "rabbit": 1.1108,
+       "fox": 0.9613,
+       "vole": 0.9481
+      }
+     ],
+     "endSize": {
+      "rabbit": null,
+      "fox": 0.9793,
+      "vole": 0.8897
+     }
+    },
+    {
+     "seed": 9403,
+     "survived": false,
+     "tick": 2619,
+     "prey": 34,
+     "foxes": 75,
+     "voles": 0,
+     "maxPrey": 255,
+     "maxFox": 81,
+     "safetyLimitHits": 0,
+     "deaths": {
+      "preyBorn": 2184,
+      "predBorn": 150,
+      "preyStarved": 1525,
+      "preyEaten": 773,
+      "preyOld": 12,
+      "predStarved": 44,
+      "predOld": 37,
+      "predCulled": 0,
+      "preyIllness": 0,
+      "predIllness": 0
+     },
+     "sizeByQuarter": [
+      {
+       "month": 0,
+       "rabbit": 1.0125,
+       "fox": 1.0196,
+       "vole": 1.0205
+      },
+      {
+       "month": 3,
+       "rabbit": 0.998,
+       "fox": 1.1164,
+       "vole": 0.9444
+      }
+     ],
+     "endSize": {
+      "rabbit": 0.9722,
+      "fox": 1.1171,
+      "vole": null
+     }
+    },
+    {
+     "seed": 9404,
+     "survived": true,
+     "tick": 8760,
+     "prey": 146,
+     "foxes": 82,
+     "voles": 66,
+     "maxPrey": 377,
+     "maxFox": 85,
+     "safetyLimitHits": 0,
+     "deaths": {
+      "preyBorn": 7596,
+      "predBorn": 519,
+      "preyStarved": 5255,
+      "preyEaten": 2311,
+      "preyOld": 44,
+      "predStarved": 229,
+      "predOld": 214,
+      "predCulled": 0,
+      "preyIllness": 0,
+      "predIllness": 0
+     },
+     "sizeByQuarter": [
+      {
+       "month": 0,
+       "rabbit": 1.0071,
+       "fox": 0.9642,
+       "vole": 1.0065
+      },
+      {
+       "month": 3,
+       "rabbit": 0.9281,
+       "fox": 1.0294,
+       "vole": 1.003
+      },
+      {
+       "month": 6,
+       "rabbit": 0.9303,
+       "fox": 1.0635,
+       "vole": 0.9741
+      },
+      {
+       "month": 9,
+       "rabbit": 0.9757,
+       "fox": 0.9519,
+       "vole": 0.9809
+      },
+      {
+       "month": 12,
+       "rabbit": 0.9733,
+       "fox": 1.0607,
+       "vole": 0.9813
+      }
+     ],
+     "endSize": {
+      "rabbit": 0.9695,
+      "fox": 1.0692,
+      "vole": 0.9791
+     }
+    },
+    {
+     "seed": 9405,
+     "survived": false,
+     "tick": 3636,
+     "prey": 231,
+     "foxes": 0,
+     "voles": 136,
+     "maxPrey": 468,
+     "maxFox": 25,
+     "safetyLimitHits": 0,
+     "deaths": {
+      "preyBorn": 3872,
+      "predBorn": 26,
+      "preyStarved": 3665,
+      "preyEaten": 109,
+      "preyOld": 27,
+      "predStarved": 13,
+      "predOld": 19,
+      "predCulled": 0,
+      "preyIllness": 0,
+      "predIllness": 0
+     },
+     "sizeByQuarter": [
+      {
+       "month": 0,
+       "rabbit": 0.9966,
+       "fox": 0.9779,
+       "vole": 1.0241
+      },
+      {
+       "month": 3,
+       "rabbit": 0.9206,
+       "fox": 1.1686,
+       "vole": 0.9343
+      }
+     ],
+     "endSize": {
+      "rabbit": 0.8445,
+      "fox": null,
+      "vole": 0.9333
+     }
+    },
+    {
+     "seed": 9406,
+     "survived": true,
+     "tick": 8760,
+     "prey": 252,
+     "foxes": 53,
+     "voles": 102,
+     "maxPrey": 402,
+     "maxFox": 149,
+     "safetyLimitHits": 0,
+     "deaths": {
+      "preyBorn": 8208,
+      "predBorn": 634,
+      "preyStarved": 5766,
+      "preyEaten": 2292,
+      "preyOld": 58,
+      "predStarved": 120,
+      "predOld": 467,
+      "predCulled": 0,
+      "preyIllness": 0,
+      "predIllness": 0
+     },
+     "sizeByQuarter": [
+      {
+       "month": 0,
+       "rabbit": 1.0145,
+       "fox": 1.0274,
+       "vole": 1.0337
+      },
+      {
+       "month": 3,
+       "rabbit": 0.9481,
+       "fox": 0.9979,
+       "vole": 0.9231
+      },
+      {
+       "month": 6,
+       "rabbit": 1.119,
+       "fox": 0.9741,
+       "vole": 0.891
+      },
+      {
+       "month": 9,
+       "rabbit": 1.1024,
+       "fox": 0.9831,
+       "vole": 0.882
+      },
+      {
+       "month": 12,
+       "rabbit": 1.0791,
+       "fox": 0.982,
+       "vole": 0.8699
+      }
+     ],
+     "endSize": {
+      "rabbit": 1.0759,
+      "fox": 0.9828,
+      "vole": 0.8698
+     }
+    },
+    {
+     "seed": 9407,
+     "survived": false,
+     "tick": 1898,
+     "prey": 57,
+     "foxes": 93,
+     "voles": 0,
+     "maxPrey": 246,
+     "maxFox": 93,
+     "safetyLimitHits": 0,
+     "deaths": {
+      "preyBorn": 1812,
+      "predBorn": 133,
+      "preyStarved": 1258,
+      "preyEaten": 653,
+      "preyOld": 4,
+      "predStarved": 24,
+      "predOld": 22,
+      "predCulled": 0,
+      "preyIllness": 0,
+      "predIllness": 0
+     },
+     "sizeByQuarter": [
+      {
+       "month": 0,
+       "rabbit": 0.9942,
+       "fox": 0.9752,
+       "vole": 1.0306
+      }
+     ],
+     "endSize": {
+      "rabbit": 0.8922,
+      "fox": 1.1731,
+      "vole": null
+     }
+    },
+    {
+     "seed": 9408,
+     "survived": false,
+     "tick": 6885,
+     "prey": 70,
+     "foxes": 102,
+     "voles": 0,
+     "maxPrey": 324,
+     "maxFox": 154,
+     "safetyLimitHits": 0,
+     "deaths": {
+      "preyBorn": 6547,
+      "predBorn": 710,
+      "preyStarved": 3405,
+      "preyEaten": 3230,
+      "preyOld": 2,
+      "predStarved": 403,
+      "predOld": 211,
+      "predCulled": 0,
+      "preyIllness": 0,
+      "predIllness": 0
+     },
+     "sizeByQuarter": [
+      {
+       "month": 0,
+       "rabbit": 1.0062,
+       "fox": 0.9437,
+       "vole": 0.9988
+      },
+      {
+       "month": 3,
+       "rabbit": 0.8292,
+       "fox": 0.8463,
+       "vole": 0.9525
+      },
+      {
+       "month": 6,
+       "rabbit": 0.8073,
+       "fox": 0.8076,
+       "vole": 0.9477
+      },
+      {
+       "month": 9,
+       "rabbit": 0.8193,
+       "fox": 0.8053,
+       "vole": 0.9449
+      }
+     ],
+     "endSize": {
+      "rabbit": 0.8188,
+      "fox": 0.8046,
+      "vole": null
+     }
+    },
+    {
+     "seed": 9409,
+     "survived": true,
+     "tick": 8760,
+     "prey": 50,
+     "foxes": 61,
+     "voles": 34,
+     "maxPrey": 371,
+     "maxFox": 228,
+     "safetyLimitHits": 0,
+     "deaths": {
+      "preyBorn": 8965,
+      "predBorn": 803,
+      "preyStarved": 5364,
+      "preyEaten": 3678,
+      "preyOld": 33,
+      "predStarved": 305,
+      "predOld": 443,
+      "predCulled": 0,
+      "preyIllness": 0,
+      "predIllness": 0
+     },
+     "sizeByQuarter": [
+      {
+       "month": 0,
+       "rabbit": 0.9937,
+       "fox": 1.0498,
+       "vole": 0.9835
+      },
+      {
+       "month": 3,
+       "rabbit": 0.9609,
+       "fox": 0.9892,
+       "vole": 0.883
+      },
+      {
+       "month": 6,
+       "rabbit": 0.8016,
+       "fox": 1.0478,
+       "vole": 0.9043
+      },
+      {
+       "month": 9,
+       "rabbit": 0.8057,
+       "fox": 1.0822,
+       "vole": 0.8993
+      },
+      {
+       "month": 12,
+       "rabbit": 0.8072,
+       "fox": 1.0225,
+       "vole": 0.8569
+      }
+     ],
+     "endSize": {
+      "rabbit": 0.8055,
+      "fox": 1.0011,
+      "vole": 0.8566
+     }
+    }
+   ]
+  }
+ },
+ "validateBalance5000x50": {
+  "baseBeforeBodySize": {
+   "survived": 19,
+   "count": 50,
+   "survivalRate": 0.38,
+   "ceilingHitRuns": 1
+  },
+  "bodyOff": {
+   "survived": 19,
+   "count": 50,
+   "survivalRate": 0.38,
+   "ceilingHitRuns": 1,
+   "command": "BODY=off node --import tsx scripts/validate-balance.ts 5000 50",
+   "rowsIdenticalToBase": true,
+   "rows": 50
+  },
+  "bodyOnDefault": {
+   "survived": 23,
+   "count": 50,
+   "survivalRate": 0.46,
+   "ceilingHitRuns": 0
+  }
+ }
+}
