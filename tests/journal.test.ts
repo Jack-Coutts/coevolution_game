@@ -182,3 +182,24 @@ describe('last seen', () => {
     expect(resumed.lastSeen('prey', 5, 1000)).toBeNull()
   })
 })
+
+describe('audit: rewinds and save cuts after a re-recorded shift', () => {
+  // Recorded day 20, released day 25 (0.1), recorded again day 45.
+  const means = [0, ...repeat(24, 0.3), 0.1, ...repeat(20, 0.3)]
+  it('keeps the earlier latch after a rewind past the second recording', () => {
+    const h = run(means)
+    expect(shifts(h).map(e => e.tick / D)).toEqual([20, 45])
+    h.truncate(22 * D)
+    run(repeat(8, 0.3), h, 23)
+    expect(shifts(h).map(e => e.tick / D)).toEqual([20])
+  })
+  it('keeps the earlier latch in a save cut before the second recording', () => {
+    const h = run(means)
+    const saved = structuredClone({ history: h.save(22 * D), evolution: h.evolution.filter(e => e.tick <= 22 * D) })
+    const resumed = new RunHistory(8760, true)
+    resumed.restore(saved.history)
+    resumed.evolution = saved.evolution
+    run(repeat(8, 0.3), resumed, 23)
+    expect(shifts(resumed).map(e => e.tick / D)).toEqual([20])
+  })
+})

@@ -90,7 +90,13 @@ const f2 = (v: number) => v.toFixed(2)
 export const TRAIT_CAVEAT = 'Inherited tendency, measured in the same test situations for every animal. This records a change; it does not show why it happened or whether it helps.'
 const UNUSED_CAVEAT = ' Nothing hunts foxes here, so they never use this response.'
 
-interface Latch { tick: number; released?: number }
+/** A recorded event and when it was released; `prev` is the latch it replaced, so a rewind can restore it. */
+interface Latch { tick: number; released?: number; prev?: Latch }
+
+/** Record again: keep the replaced latch (one level is enough; rewinds and save cuts go back hours, a re-record needs weeks). */
+function relatch(latch: Latch | undefined, tick: number): Latch {
+  return latch ? { tick, prev: { tick: latch.tick, released: latch.released } } : { tick }
+}
 interface Baseline { tick: number; traits: Record<TraitKey, Distribution> }
 
 export interface JournalState {
@@ -143,7 +149,7 @@ export class Journal {
   record(entry: Extract<JournalEntry, { kind: 'variety' }>): boolean {
     const key = `variety:${entry.key}`
     if (this.latches[key] && this.latches[key].released === undefined) return false
-    this.latches[key] = { tick: entry.tick }
+    this.latches[key] = relatch(this.latches[key], entry.tick)
     this.push(entry)
     return true
   }
@@ -216,7 +222,7 @@ export class Journal {
         const now = sample[s].traits[trait]
         const [one] = NAME[s]
         const label = TRAIT_LABEL[trait]
-        this.latches[key] = { tick: sample.tick }
+        this.latches[key] = relatch(latch, sample.tick)
         this.push({ kind: 'traitShift', species: s, tick: sample.tick,
           text: `${one} ${label} has ${direction > 0 ? 'risen' : 'fallen'} from ${f2(b.mean)} ${base.tick === 0 ? 'among the founders' : `on day ${day(base.tick)}`} to ${f2(now.mean)}, `
             + `staying at least ${threshold} ${direction > 0 ? 'higher' : 'lower'} for ${run} daily samples in a row (since day ${day(since)}).`,
@@ -229,9 +235,12 @@ export class Journal {
   /** Forget what was observed after `tick` (an intervention rewound the worker). */
   truncate(tick: number, samples: readonly EvolutionSample[]): void {
     this.entries = this.entries.filter(e => e.tick <= tick)
-    for (const [key, latch] of Object.entries(this.latches)) {
-      if (latch.tick > tick) delete this.latches[key]
-      else if (latch.released !== undefined && latch.released > tick) latch.released = undefined
+    for (const [key, latest] of Object.entries(this.latches)) {
+      // Walk back to the latch that was in force at `tick`, and undo a release made after it.
+      let latch: Latch | undefined = latest
+      while (latch && latch.tick > tick) latch = latch.prev
+      if (!latch) { delete this.latches[key]; continue }
+      this.latches[key] = latch.released !== undefined && latch.released > tick ? { ...latch, released: undefined } : latch
     }
     for (const s of ['prey', 'pred'] as const) {
       if ((this.baselines[s]?.tick ?? -1) > tick) delete this.baselines[s]
