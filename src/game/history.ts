@@ -4,6 +4,8 @@ import { FamilyHistory } from './families'
 import { Journal, type JournalEntry } from './journal'
 import { ANIMAL_STRIDE, STAT, STAT_STRIDE, type FrameData } from '@/worker/protocol'
 
+export interface Sighting { tick: number; row: Float32Array }
+
 export const HISTORY_HOURS = 8760
 const CAPACITY = HISTORY_HOURS + 1
 const RECENT = 360
@@ -23,6 +25,8 @@ export class RunHistory {
   readonly log: Journal
   readonly families = new FamilyHistory()
   private frames = new Map<number, FrameData>()
+  /** lastSeen answers by animal, valid until a rewind or restore. */
+  private seen = new Map<string, { before: number; result: Sighting | null }>()
 
   constructor(horizon: number, endless = false) { this.limit = horizon; this.endless = endless; this.log = new Journal(endless) }
   get journal(): JournalEntry[] { return this.log.entries }
@@ -66,6 +70,7 @@ export class RunHistory {
     // The stats ring still holds the discarded hours' values in its oldest slots, so keep the window from moving back.
     this.start = Math.max(this.start, this.head - HISTORY_HOURS)
     for (const t of [...this.frames.keys()]) if (t > tick) this.frames.delete(t)
+    this.seen.clear()
     this.head = Math.max(this.start, tick)
     while (this.evolution.length > 1 && (this.evolution.at(-1)?.tick ?? 0) > tick) this.evolution.pop()
     this.log.truncate(tick, this.evolution)
@@ -102,6 +107,7 @@ export class RunHistory {
     // Saves made before replayFrom existed stored the replay start as `start`.
     this.replayFrom = data.replayFrom ?? data.start
     this.frames = new Map(data.frames)
+    this.seen.clear()
   }
 
   stat(tick: number, key: keyof typeof STAT): number {
@@ -129,8 +135,11 @@ export class RunHistory {
   }
   frame(tick: number): FrameData | undefined { return this.frames.get(tick) }
 
-  /** The last kept hour at or before `before` when an animal was alive, with its frame row; null if the kept replay never shows it. */
-  lastSeen(species: 'prey' | 'pred', id: number, before: number): { tick: number; row: Float32Array } | null {
+  /**
+   * The last kept hour at or before `before` when an animal was alive, with its frame row; null if the kept replay never
+   * shows it. Answers are cached per animal: asked again for a later hour, only the hours since are read.
+   */
+  lastSeen(species: 'prey' | 'pred', id: number, before: number): Sighting | null {
     const find = (tick: number) => {
       const f = this.frames.get(tick)
       const rows = species === 'prey' ? f?.prey : f?.preds
@@ -138,6 +147,23 @@ export class RunHistory {
       return f ? null : undefined
     }
     const end = Math.min(this.head, Math.floor(before))
+    const key = `${species}:${id}`
+    const cached = this.seen.get(key)
+    let result: Sighting | null
+    if (cached && cached.before <= end) {
+      result = cached.result
+      for (let t = end; t > cached.before; t--) {
+        const row = find(t)
+        if (row) { result = { tick: t, row }; break }
+      }
+    } else result = this.scan(find, end)
+    this.seen.delete(key)
+    this.seen.set(key, { before: end, result })
+    if (this.seen.size > 64) this.seen.delete(this.seen.keys().next().value!)
+    return result
+  }
+
+  private scan(find: (tick: number) => Float32Array | null | undefined, end: number): Sighting | null {
     // Every third hour is always kept; scan those back (from the end hour itself), then refine forward hour by hour.
     for (let k = end; k >= this.replayStart - KEY_EVERY; k = k === end ? Math.ceil(end / KEY_EVERY) * KEY_EVERY - KEY_EVERY : k - KEY_EVERY) {
       const at = Math.max(k, this.replayStart)

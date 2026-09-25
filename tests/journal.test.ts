@@ -204,6 +204,27 @@ describe('audit: rewinds and save cuts after a re-recorded shift', () => {
   })
 })
 
+describe('audit: last-seen cost while playing', () => {
+  it('looks only at the new hours when asked again later, and forgets after a rewind', () => {
+    const h = new RunHistory(8760)
+    for (let t = 0; t <= 5000; t++) h.add(frame(t, t <= 30 ? [[5, 2, 1, 1]] : []), new Float64Array(STAT_STRIDE), 0)
+    const frames = (h as unknown as { frames: Map<number, FrameData> }).frames
+    let reads = 0
+    const get = frames.get.bind(frames)
+    frames.get = (t: number) => { reads++; return get(t) }
+    expect(h.lastSeen('prey', 5, 4990)?.tick).toBe(30)
+    reads = 0
+    expect(h.lastSeen('prey', 5, 5000)?.tick).toBe(30)
+    expect(reads).toBe(10)
+    h.truncate(4000)
+    expect(h.lastSeen('prey', 5, 4000)?.tick).toBe(30)
+    for (let t = 4001; t <= 4002; t++) h.add(frame(t, [[5, 2, 1, 1]]), new Float64Array(STAT_STRIDE), 0)
+    expect(h.lastSeen('prey', 5, 4002)?.tick).toBe(4002)
+    // Asking about an earlier hour than the cached one scans again.
+    expect(h.lastSeen('prey', 5, 21)?.tick).toBe(21)
+  })
+})
+
 describe('audit: a resume at a non-daily hour', () => {
   it('records on the same day as an uninterrupted run and adds no off-day family count', () => {
     const h = run([0, ...repeat(10, 0.3)])
