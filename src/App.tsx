@@ -58,6 +58,9 @@ function initialState(): { scenario: ScenarioId; seed: SeedChoice } {
 
 const initial = initialState()
 
+/** Controls that keep focus after a click and would otherwise take the Space key. */
+const CONTROL = 'button, a, [role="radio"], [role="slider"]'
+
 export default function App() {
   const [game, snap] = useGame()
   const icons = useAnimalIcons()
@@ -112,15 +115,21 @@ export default function App() {
   }, [selected])
 
   useEffect(() => {
+    // A control focused by a mouse click keeps focus, and Space would then press it again (a speed button, Save).
+    // Remember which control the pointer focused, so Space stays play/pause until the keyboard moves focus.
+    let pointerFocus: Element | null = null
+    const onPointer = (e: PointerEvent) => { pointerFocus = (e.target as Element).closest?.(CONTROL) ?? null }
+    const onFocus = (e: FocusEvent) => { if (e.target !== pointerFocus) pointerFocus = null }
     const onKey = (e: KeyboardEvent) => {
       if (e.defaultPrevented) return
       const t = e.target as HTMLElement
-      if (t.closest('input, textarea, select, [role="slider"], [role="combobox"], [role="listbox"], [role="radiogroup"], [role="radio"]')) return
       if (e.metaKey || e.ctrlKey || e.altKey) return
+      const clicked = e.key === ' ' && pointerFocus !== null && t.closest(CONTROL) === pointerFocus && !t.closest('input, textarea, select, [role="dialog"]')
+      if (!clicked && t.closest('input, textarea, select, [role="slider"], [role="combobox"], [role="listbox"], [role="radiogroup"], [role="radio"]')) return
       const s = game.getSnapshot()
       switch (e.key) {
         case ' ':
-          if (t.closest('button, a')) return
+          if (!clicked && t.closest('button, a')) return
           e.preventDefault()
           if (s.phase === 'planning' && left < 0) return
           game.toggle()
@@ -155,8 +164,14 @@ export default function App() {
           break
       }
     }
+    window.addEventListener('pointerdown', onPointer, true)
+    window.addEventListener('focusin', onFocus, true)
     window.addEventListener('keydown', onKey)
-    return () => window.removeEventListener('keydown', onKey)
+    return () => {
+      window.removeEventListener('pointerdown', onPointer, true)
+      window.removeEventListener('focusin', onFocus, true)
+      window.removeEventListener('keydown', onKey)
+    }
   }, [game, left])
 
   const resume = async () => {
