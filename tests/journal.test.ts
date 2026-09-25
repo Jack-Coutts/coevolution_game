@@ -167,3 +167,18 @@ describe('family history', () => {
     expect(h.families.summaries('prey', 1e9).map(l => [l.founder, l.firstSeen, l.lastSeen, l.living, l.peak])).toEqual([[1, 0, (FAMILY_DAYS + 49) * D, 1, 1], [2, 0, 9 * D, 0, 1]])
   })
 })
+
+describe('last seen', () => {
+  it('finds the last kept hour an animal was alive, or null when the kept replay never shows it', () => {
+    const h = new RunHistory(8760)
+    for (let t = 0; t <= 1000; t++) h.add(frame(t, t <= 30 || (t >= 700 && t <= 710) ? [[t <= 30 ? 5 : 6, 2, 1, 1]] : []), new Float64Array(STAT_STRIDE), 0)
+    expect(h.lastSeen('prey', 5, 1000)?.tick).toBe(30)
+    expect(h.lastSeen('prey', 5, 12)?.tick).toBe(12)
+    expect(h.lastSeen('prey', 9, 1000)).toBeNull()
+    // A resume keeps only the last 15 days of replay (from hour 640): animal 6 is still there, animal 5 is not.
+    const resumed = new RunHistory(8760)
+    resumed.restore(structuredClone(h.save()))
+    expect(resumed.lastSeen('prey', 6, 1000)?.tick).toBe(710)
+    expect(resumed.lastSeen('prey', 5, 1000)).toBeNull()
+  })
+})

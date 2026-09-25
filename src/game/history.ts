@@ -119,13 +119,13 @@ export class RunHistory {
       return f ? null : undefined
     }
     const end = Math.min(this.head, Math.floor(before))
-    // Daily frames are always kept; scan them back, then refine forward hour by hour within the day found.
-    for (let d = Math.floor(end / 24) * 24; d >= this.replayStart - 24; d -= 24) {
-      const day = Math.max(d, this.replayStart)
-      const row = find(day)
+    // Every third hour is always kept; scan those back (from the end hour itself), then refine forward hour by hour.
+    for (let k = end; k >= this.replayStart - KEY_EVERY; k = k === end ? Math.ceil(end / KEY_EVERY) * KEY_EVERY - KEY_EVERY : k - KEY_EVERY) {
+      const at = Math.max(k, this.replayStart)
+      const row = find(at)
       if (!row) continue
-      let best = { tick: day, row }
-      for (let t = day + 1; t <= Math.min(end, day + 23); t++) {
+      let best = { tick: at, row }
+      for (let t = at + 1; t <= Math.min(end, at + KEY_EVERY - 1); t++) {
         const r = find(t)
         if (r === null) break
         if (r) best = { tick: t, row: r }
