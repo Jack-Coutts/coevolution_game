@@ -26,16 +26,22 @@ not player levers: any ceiling-hit run is flagged and excluded from balance clai
 Before release, change parameters within 30 points. During the run, four intervention uses
 are shared by eight options, with 400 hours between uses:
 
-| Intervention | Effect and trade-off |
-| --- | --- |
-| Rain | Restocks existing bushes; can fuel a population boom. |
-| Plant bushes | Adds up to four half-stocked bushes; they can still wither. |
-| Release rabbits | Eight descendants of living rabbits near food. |
-| Release foxes | Three fed foxes at the edge. |
-| Cull foxes | Immediately removes a third, leaving at least one. |
-| Feed foxes | Refills energy, reducing immediate hunting but potentially enabling births. |
-| Rabbit illness | Infects up to six rabbits; spreads within the species and raises energy costs. |
-| Fox illness | The same process in foxes; slower and less predictable than an immediate cull. |
+| Intervention | Effect | Useful situation | Failure mode | Evidence (60-day prevented / caused, tuning seeds) |
+| --- | --- | --- | --- | --- |
+| Rain | Refills every bush; a refilled bush stops withering | Few bushes (20 or fewer) under 20% full | A rabbit boom with 20+ foxes: feeds the next fox boom | 3 / 1 vs 1 / 11 |
+| Plant bushes | Up to four half-stocked bushes; they can still wither | 20 or fewer bushes | 40+ bushes: little room (limit 48) and little effect | 8 / 3 vs 3 / 3 |
+| Release rabbits | Eight descendants of living rabbits near food | 60 or fewer rabbits | 250+ rabbits with 20+ foxes: mostly feeds foxes | 12 / 1 vs 1 / 5 |
+| Release foxes | Three fed foxes at the edge | 5 or fewer foxes | 20+ foxes with under 8 rabbits each: more hunting pressure | 7 / 0 vs 9 / 14 |
+| Cull foxes | Removes a third at once, leaving at least one | Overhunting: under 5 rabbits per fox and rabbits falling | 8 or fewer foxes: risks losing them; foxes regrow within weeks | 14 / 5 vs 1 / 4 |
+| Feed foxes | Refills fox energy; fed foxes stop hunting briefly, then breed | 6 or fewer foxes | Overhunting: extra births while rabbits fall | 5 / 0 vs 7 / 15 |
+| Rabbit illness | Up to six cases; spreads through the warren | None found; intended for a rabbit boom on bare bushes | 60 or fewer rabbits: extinct within 60 days in 12/34 tuning runs | 0 / 4 vs 5 / 5 |
+| Fox illness | Up to six cases; peaks within 3–7 days, gone within a month | 20+ foxes with under 8 rabbits each, before the crash | 8 or fewer foxes: extinct within 60 days in 6/18 tuning runs | 15 / 8 vs 1 / 4 |
+
+These are situations a fixed rule found helpful over 60 days, not optimal play. On 20
+held-out seeds no action, nor a keeper using all eight, improved year survival beyond what a
+0.0001 nudge to one rabbit does: the meadow is chaotic, so single actions reshuffle outcomes.
+Rabbit illness has no demonstrated beneficial use; it is kept as a high-risk tool. See
+`validation.md` for the paired counts, illness outbreak shape and limitations.
 
 Illness is an abstract game mechanic: ten days of additional energy costs per case, local
 spread, then temporary immunity. Purple rings show ill animals. Illness can cause extinction;
