@@ -14,10 +14,10 @@ import { dateLabel, formatDuration } from '@/sim/time'
 import { cn } from '@/lib/utils'
 
 const TONE: Record<Tone, { icon: typeof Info; cls: string }> = {
-  good: { icon: CheckCircle2, cls: 'border-emerald-400/25 bg-emerald-400/8 text-emerald-100' },
-  info: { icon: Info, cls: 'border-sky-300/25 bg-sky-300/8 text-sky-100' },
-  warn: { icon: AlertTriangle, cls: 'border-amber-300/30 bg-amber-300/10 text-amber-100' },
-  danger: { icon: OctagonAlert, cls: 'border-red-400/35 bg-red-400/10 text-red-100' },
+  good: { icon: CheckCircle2, cls: 'border-tone-good-border bg-tone-good text-tone-good-foreground' },
+  info: { icon: Info, cls: 'border-tone-info-border bg-tone-info text-tone-info-foreground' },
+  warn: { icon: AlertTriangle, cls: 'border-tone-warn-border bg-tone-warn text-tone-warn-foreground' },
+  danger: { icon: OctagonAlert, cls: 'border-tone-danger-border bg-tone-danger text-tone-danger-foreground' },
 }
 
 
@@ -33,12 +33,12 @@ export function RunPanel() {
     switch (id) {
       case 'plantBushes':
       case 'rain':
-        return <CloudRain className="size-4 text-sky-300" />
+        return <CloudRain className="size-4 text-tone-info-foreground" />
       case 'illnessPrey':
       case 'releasePrey':
         return <img src={icons.rabbit} alt="" className="size-5" />
       case 'cullPred':
-        return <Crosshair className="size-4 text-red-300" />
+        return <Crosshair className="size-4 text-tone-danger-foreground" />
       case 'feedFoxes':
       case 'illnessPred':
       case 'releasePred':
@@ -59,7 +59,7 @@ export function RunPanel() {
           <tbody><tr><td>Rabbits</td><td>{game.history.stat(snap.tick, 'preyStarved')}</td><td>{game.history.stat(snap.tick, 'preyEaten')}</td><td>{game.history.stat(snap.tick, 'preyOld')}</td><td>{game.history.stat(snap.tick, 'preyIllness')}</td><td>—</td></tr>
           <tr><td>Foxes</td><td>{game.history.stat(snap.tick, 'predStarved')}</td><td>—</td><td>{game.history.stat(snap.tick, 'predOld')}</td><td>{game.history.stat(snap.tick, 'predIllness')}</td><td>{game.history.stat(snap.tick, 'predCulled')}</td></tr></tbody></table>
         <p className="mt-2 text-[11px] text-muted-foreground">Totals up to the displayed time. Illness deaths are energy exhaustion during illness.</p>
-        {game.history.stat(snap.tick, 'ceilingHits') > 0 && <p className="mt-2 text-xs text-amber-200">The performance safety limit has restricted births. This run is not valid for balance comparisons.</p>}
+        {game.history.stat(snap.tick, 'ceilingHits') > 0 && <p className="mt-2 text-xs text-tone-warn-foreground">The performance safety limit has restricted births. This run is not valid for balance comparisons.</p>}
       </section>
 
       <section>
@@ -83,7 +83,7 @@ export function RunPanel() {
         )}
       </section>
 
-      {(game.history.stat(snap.tick, 'preySick') + game.history.stat(snap.tick, 'predSick')) > 0 && <section className="rounded-lg border border-violet-400/30 bg-violet-400/10 p-3 text-xs">
+      {(game.history.stat(snap.tick, 'preySick') + game.history.stat(snap.tick, 'predSick')) > 0 && <section className="rounded-lg border border-tone-illness-border bg-tone-illness p-3 text-xs text-tone-illness-foreground">
         <strong>Illness in the meadow</strong>
         <p className="mt-1">{game.history.stat(snap.tick, 'preySick')} rabbits and {game.history.stat(snap.tick, 'predSick')} foxes are ill. Purple rings mark affected animals. Food can help them survive the added energy cost.</p>
       </section>}
@@ -192,7 +192,7 @@ function BestScore() {
   if (!snap.best) return null
   return (
     <section className="flex items-center gap-2 rounded-lg border bg-muted/30 px-3 py-2 text-sm">
-      <Trophy className="size-4 text-amber-300" />
+      <Trophy className="size-4 text-gold" />
       <span className="text-muted-foreground">Your best on this meadow</span>
       <span className="ml-auto font-semibold tabular">{snap.best.score.toLocaleString()}</span>
     </section>

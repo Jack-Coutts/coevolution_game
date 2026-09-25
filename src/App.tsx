@@ -19,6 +19,8 @@ import { STABLE_PRESET } from '@/game/presets'
 import { seedOf, type SeedChoice } from '@/game/seed'
 import { useAnimalIcons } from '@/hooks/use-animal-icons'
 import { useGame } from '@/hooks/use-game'
+import { useTheme } from '@/hooks/use-theme'
+import { ThemeToggle } from '@/components/theme-toggle'
 import { BUDGET, spent, type LeverValues } from '@/sim/levers'
 import { SCENARIO_BY_ID, SCENARIOS, type ScenarioId } from '@/sim/scenarios'
 
@@ -50,6 +52,7 @@ const initial = initialState()
 export default function App() {
   const [game, snap] = useGame()
   const icons = useAnimalIcons()
+  const [theme, setTheme] = useTheme()
   const [endless, setEndless] = useState(false)
   const [selected, setSelected] = useState<AnimalSelection | null>(null)
   const [loadStatus, setLoadStatus] = useState('')
@@ -185,6 +188,7 @@ export default function App() {
             <select aria-label="Run duration" className="rounded-md border bg-background px-2 py-2 text-xs" value={endless ? 'endless' : 'year'} disabled={locked} onChange={e => setEndless(e.target.value === 'endless')}>
               <option value="year">One year</option><option value="endless">Endless</option>
             </select>
+            <ThemeToggle theme={theme} onChange={setTheme} />
             <MeadowSettings onPractice={() => { setSelected(null); setLevers(STABLE_PRESET); setScenario('stable'); setSeedChoice({ kind: 'custom', seed: 5007 }); setEndless(false); reset() }} locked={locked} choice={seedChoice} onChange={setSeedChoice} />
           </div>
         </header>

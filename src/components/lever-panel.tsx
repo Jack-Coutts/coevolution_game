@@ -45,7 +45,7 @@ export function LeverPanel({ levers, base, locked, onChange, onResetLevers, onUn
       <div
         className={cn(
           'sticky top-0 z-10 rounded-lg border p-3 shadow-md backdrop-blur-md',
-          over ? 'border-destructive/60 bg-[oklch(0.24_0.05_25/0.92)]' : 'bg-[oklch(0.23_0.014_155/0.92)]',
+          over ? 'border-tone-danger-border bg-tone-danger/95' : 'bg-card/95',
         )}
       >
         <div className="flex items-baseline justify-between gap-2">
@@ -72,7 +72,7 @@ export function LeverPanel({ levers, base, locked, onChange, onResetLevers, onUn
       </div>
 
       {locked && (
-        <div className="flex items-center gap-2 rounded-lg border border-amber-300/30 bg-amber-300/10 p-2.5 text-xs text-amber-100">
+        <div className="flex items-center gap-2 rounded-lg border border-tone-warn-border bg-tone-warn p-2.5 text-xs text-tone-warn-foreground">
           <Lock className="size-4 shrink-0" />
           <span className="flex-1">Levers are locked while the meadow is running.</span>
           <Button size="xs" variant="outline" onClick={onUnlock}>
@@ -117,7 +117,7 @@ function GroupCost({ defs, levers, base }: { defs: LeverDef[]; levers: LeverValu
   const c = defs.reduce((t, d) => t + leverCost(d, levers[d.id], base[d.id]), 0)
   if (Math.abs(c) < 0.05) return null
   return (
-    <Badge variant={c > 0 ? 'secondary' : 'outline'} className={cn('tabular', c < 0 && 'text-emerald-300')}>
+    <Badge variant={c > 0 ? 'secondary' : 'outline'} className={cn('tabular', c < 0 && 'text-tone-good-foreground')}>
       {c > 0 ? `−${fmt(c)}` : `+${fmt(-c)}`} pts
     </Badge>
   )
@@ -205,7 +205,7 @@ function LeverRow({
         </Tooltip>
         <div className="ml-auto flex items-center gap-1.5">
           {moved && Math.abs(cost) >= 0.05 && (
-            <span className={cn('text-[11px] tabular', cost > 0 ? 'text-amber-300' : 'text-emerald-300')}>
+            <span className={cn('text-[11px] tabular', cost > 0 ? 'text-tone-warn-foreground' : 'text-tone-good-foreground')}>
               {cost > 0 ? `−${fmt(cost)}` : `+${fmt(-cost)}`}
             </span>
           )}

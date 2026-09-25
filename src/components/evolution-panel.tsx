@@ -23,7 +23,7 @@ export function EvolutionPanel({ selected, onSelect }: { selected: AnimalSelecti
   let animal: Float32Array | null = null
   if (inspected && selected) for (let i = 0; i < inspected.length; i += ANIMAL_STRIDE)
     if (inspected[i] === selected.id) animal = inspected.subarray(i, i + ANIMAL_STRIDE)
-  const color = species === 'prey' ? '#dcc7a3' : '#ec8a45'
+  const color = species === 'prey' ? 'var(--rabbit)' : 'var(--fox)'
   const from = samples.length >= 367 ? samples[1].tick : samples[0]?.tick ?? 0
   const end = Math.max(from + 24, latest?.tick ?? 24)
   const plotted = samples.filter(s => s.tick >= from)
@@ -48,8 +48,8 @@ export function EvolutionPanel({ selected, onSelect }: { selected: AnimalSelecti
       <div className="flex justify-between text-sm"><span>{LABELS[trait]}</span><strong style={{ color }}>{pop?.traits[trait].mean.toFixed(2) ?? '—'}</strong></div>
       <svg viewBox="0 0 340 152" className="mt-2 w-full" role="img" aria-label={`${LABELS[trait]} over time; average and middle 80 percent of ${species === 'prey' ? 'rabbits' : 'foxes'}`}>
         {[-1, 0, 1].map(v => <g key={v}><line x1="30" x2="320" y1={y(v)} y2={y(v)} stroke="currentColor" opacity="0.12" /><text x="4" y={y(v) + 3} fill="currentColor" fontSize="10">{v}</text></g>)}
-        {first && <line x1="30" x2="320" y1={y(first[species].traits[trait].mean)} y2={y(first[species].traits[trait].mean)} stroke={color} strokeDasharray="4 4" opacity="0.5" />}
-        <polygon points={band} fill={color} opacity="0.2" /><polyline points={line} fill="none" stroke={color} strokeWidth="2" />
+        {first && <line x1="30" x2="320" y1={y(first[species].traits[trait].mean)} y2={y(first[species].traits[trait].mean)} style={{ stroke: color }} strokeDasharray="4 4" opacity="0.5" />}
+        <polygon points={band} style={{ fill: color }} opacity="0.2" /><polyline points={line} fill="none" style={{ stroke: color }} strokeWidth="2" />
         <text x="30" y="147" fill="currentColor" fontSize="10">Day {Math.floor(from / 24) + 1}</text>
         <text x="320" y="147" textAnchor="end" fill="currentColor" fontSize="10">Day {Math.floor(end / 24) + 1}</text>
       </svg>

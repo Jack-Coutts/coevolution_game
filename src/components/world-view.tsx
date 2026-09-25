@@ -82,7 +82,8 @@ export function WorldView({ maxSize, selected, onSelect }: { maxSize: number; se
               </div>
             </div>
           </div>
-          <div className="flex items-center gap-1.5 rounded-lg bg-black/55 px-2 py-1.5 text-white shadow-lg backdrop-blur-md">
+          {/* `dark` scopes the species tokens to their light-on-dark values over this chip in both themes */}
+          <div className="dark flex items-center gap-1.5 rounded-lg bg-black/55 px-2 py-1.5 text-white shadow-lg backdrop-blur-md">
             <Count icon={icons.rabbit} value={snap.prey} label="rabbits" tone="text-rabbit" />
             <Count icon={icons.fox} value={snap.pred} label={`foxes · ${snap.predKits10d} kits born in the last 10 days`} tone="text-fox" />
             <div
