@@ -93,3 +93,16 @@ it('allows an intervention while the worker has already reached an end the playe
   expect(game.getSnapshot().end).toBeNull()
   game.dispose()
 })
+
+it('asks before resetting a run that has gone past a week, but not during planning', () => {
+  const { game, runId, frame } = ready()
+  expect(game.resetNeedsConfirm()).toBe(false)
+  game.stepBy(168)
+  const frames = Array.from({ length: 168 }, (_, i) => ({ ...frame, tick: i + 1 }))
+  mock.receive({ type: 'frames', runId, frames, stats: new Float64Array(168 * STAT_STRIDE), head: 168, end: null, evolution: [] })
+  expect(game.resetNeedsConfirm()).toBe(false)
+  game.stepBy(1)
+  mock.receive({ type: 'frames', runId, frames: [{ ...frame, tick: 169 }], stats: row(), head: 169, end: null, evolution: [] })
+  expect(game.resetNeedsConfirm()).toBe(true)
+  game.dispose()
+})

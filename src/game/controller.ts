@@ -31,6 +31,9 @@ export const SPEEDS = [
 ]
 export const DEFAULT_SPEED = 1
 
+/** Resetting a run that has gone further than this asks first; planning resets stay instant. */
+export const RESET_CONFIRM_HOURS = 7 * 24
+
 export const CHARGES = 4
 export const COOLDOWN = 400
 
@@ -425,6 +428,10 @@ export class GameController {
     this.intervening = true
     this.send({ type: 'intervene', runId: this.runId, action, at })
     this.notify(true)
+  }
+
+  resetNeedsConfirm(): boolean {
+    return (this.phase === 'running' || this.phase === 'ended') && this.history.head > RESET_CONFIRM_HOURS
   }
 
   budgetLeft(): number {

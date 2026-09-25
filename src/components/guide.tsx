@@ -5,7 +5,7 @@ const KEYS: [string, string][] = [
   ['← →', 'Back / forward one day (Shift: one hour)'],
   ['↑ ↓', 'Faster / slower'],
   ['Home End', 'Jump to start / live'],
-  ['R', 'Reset the run'],
+  ['R', 'Reset the run (asks first once it has run a week)'],
 ]
 
 export function Guide() {

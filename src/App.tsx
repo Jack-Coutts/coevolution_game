@@ -1,8 +1,9 @@
 import { AnimalInspector, type AnimalSelection } from '@/components/animal-inspector'
+import { ConfirmReset } from '@/components/confirm-reset'
 import { EvolutionView } from '@/components/evolution-view'
 import { Button } from '@/components/ui/button'
 import { readSave, type MeadowSave } from '@/game/saves'
-import { useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { BookOpen, Dna, FolderOpen, Save, Trees } from 'lucide-react'
 import { toast, Toaster } from 'sonner'
 import { Guide } from '@/components/guide'
@@ -102,6 +103,12 @@ export default function App() {
   }, [snap.saveStatus])
 
   const reset = () => setResetKey((k) => k + 1)
+  const [confirmReset, setConfirmReset] = useState(false)
+  const askReset = useCallback(() => {
+    if (!game.resetNeedsConfirm()) { setResetKey((k) => k + 1); return }
+    game.pause()
+    setConfirmReset(true)
+  }, [game])
 
   // On phones the side panel sits far below the meadow, so bring the card of an animal clicked in the meadow into view.
   const inspectorCard = useRef<HTMLElement>(null)
@@ -123,7 +130,7 @@ export default function App() {
     const onKey = (e: KeyboardEvent) => {
       if (e.defaultPrevented) return
       const t = e.target as HTMLElement
-      if (e.metaKey || e.ctrlKey || e.altKey) return
+      if (e.metaKey || e.ctrlKey || e.altKey || t.closest('[role="dialog"], [role="alertdialog"]')) return
       const clicked = e.key === ' ' && pointerFocus !== null && t.closest(CONTROL) === pointerFocus && !t.closest('input, textarea, select, [role="dialog"]')
       if (!clicked && t.closest('input, textarea, select, [role="slider"], [role="combobox"], [role="listbox"], [role="radiogroup"], [role="radio"]')) return
       const s = game.getSnapshot()
@@ -158,7 +165,7 @@ export default function App() {
           break
         case 'r':
         case 'R':
-          reset()
+          askReset()
           break
         default:
           break
@@ -172,7 +179,7 @@ export default function App() {
       window.removeEventListener('focusin', onFocus, true)
       window.removeEventListener('keydown', onKey)
     }
-  }, [game, left])
+  }, [game, left, askReset])
 
   const resume = async () => {
     try {
@@ -280,7 +287,7 @@ export default function App() {
               </div>
               <WorldView maxSize={worldMax} selected={selected} onSelect={(a) => { reveal.current = true; setSelected(a) }} />
               <Card className="gap-2 p-3">
-                <Transport onReset={reset} onShowResult={() => setDismissed(-1)} />
+                <Transport onReset={askReset} onShowResult={() => setDismissed(-1)} />
                 <Timeline />
                 <div className="flex flex-wrap items-center gap-x-4 gap-y-1 px-1 text-[11px] text-muted-foreground">
                   <Legend color="bg-rabbit" label="Rabbits (left scale)" />
@@ -298,7 +305,7 @@ export default function App() {
               <Card className="gap-0 p-0 lg:sticky lg:top-4 lg:max-h-[calc(100vh-2rem)]">
                 <div className="min-h-0 flex-1 p-3 lg:overflow-y-auto">
                   {locked ? (
-                    <RunPanel inspector={inspector} onShowResult={() => setDismissed(-1)} setup={<LockedSetup levers={levers} base={base} onUnlock={reset} />} />
+                    <RunPanel inspector={inspector} onShowResult={() => setDismissed(-1)} setup={<LockedSetup levers={levers} base={base} onUnlock={askReset} />} />
                   ) : (
                     <div className="flex flex-col gap-4">
                       <BestScore />
@@ -352,6 +359,15 @@ export default function App() {
           setDismissed(snap.runId)
           game.seek(0)
           game.play()
+        }}
+      />
+      <ConfirmReset
+        open={confirmReset}
+        hours={snap.head}
+        onCancel={() => setConfirmReset(false)}
+        onConfirm={() => {
+          setConfirmReset(false)
+          reset()
         }}
       />
       <Toaster
