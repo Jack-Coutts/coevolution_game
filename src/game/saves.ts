@@ -14,19 +14,21 @@ export interface MeadowSave {
   config: RunConfig
   state: MeadowState
   history: ReturnType<RunHistory['save']>
-  charges: number
-  cooldownUntil: number
-  interventions: { tick: number; action: Intervention }[]
-  evolution: EvolutionSample[]
-  journal: JournalEntry[]
+  /** Uses left when saved. Written for older builds; on resume, uses are recomputed from `interventions`. */
+  charges?: number
+  /** The fields below may be missing from early version-2 saves; resume treats them as empty. */
+  cooldownUntil?: number
+  interventions?: { tick: number; action: Intervention }[]
+  evolution?: EvolutionSample[]
+  journal?: JournalEntry[]
 }
 
 /** A version-2 save: a two-species meadow with a 23-column stats row. */
 export interface MeadowSaveV2 extends Omit<MeadowSave, 'version' | 'state' | 'history' | 'evolution'> {
   version: 2
   state: MeadowStateV2
-  history: Omit<ReturnType<RunHistory['save']>, 'highestGeneration'> & { highestGeneration: { prey: number; pred: number } }
-  evolution: Omit<EvolutionSample, 'vole'>[]
+  history: Omit<ReturnType<RunHistory['save']>, 'highestGeneration' | 'replayFrom'> & { highestGeneration: { prey: number; pred: number }; replayFrom?: number }
+  evolution?: Omit<EvolutionSample, 'vole'>[]
 }
 
 const ROWS = HISTORY_HOURS + 1
@@ -54,8 +56,8 @@ export function migrateSave(value: MeadowSave | MeadowSaveV2): MeadowSave {
       ...value,
       version: 3,
       state,
-      history: { ...value.history, stats, highestGeneration: { ...value.history.highestGeneration, vole: 0 } },
-      evolution: value.evolution.map(e => ({ ...e, vole: noAnimals() })),
+      history: { ...value.history, replayFrom: value.history.replayFrom ?? value.history.start, stats, highestGeneration: { ...value.history.highestGeneration, vole: 0 } },
+      evolution: (value.evolution ?? []).map(e => ({ ...e, vole: noAnimals() })),
     }
   } catch {
     throw new Error(INCOMPATIBLE_SAVE)

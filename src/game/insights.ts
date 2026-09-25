@@ -1,7 +1,9 @@
+import type { PopulationEvolution, TraitKey } from '@/sim/evolution'
 import type { Scenario } from '@/sim/scenarios'
 import { dateLabel, formatDuration } from '@/sim/time'
 import type { EndInfo } from '@/worker/protocol'
 import type { RunHistory } from './history'
+import { BUDGET_POINT_BONUS, CALM_BONUS, type ScoreBreakdown } from './scores'
 
 export type Tone = 'good' | 'info' | 'warn' | 'danger'
 
@@ -51,7 +53,35 @@ export function forecast(h: RunHistory, tick: number): Forecast | null {
   return { prey: project('prey'), pred: project('pred'), ahead }
 }
 
+const RANK: Record<Tone, number> = { danger: 0, warn: 1, info: 2, good: 3 }
+/** A danger note stays this many hours after its condition last held, so a one-hour blip does not hide it. */
+export const DANGER_HOLD = 48
+
+/**
+ * Field notes at `tick`, most urgent first. A danger note that held within the last DANGER_HOLD hours stays,
+ * marked with how long ago it was last true.
+ */
 export function hints(h: RunHistory, tick: number): Hint[] {
+  const out = notesAt(h, tick)
+  // Once a species is gone there is nothing left to warn about, so old danger notes are not carried.
+  const alive = h.stat(tick, 'prey') > 0 && h.stat(tick, 'pred') > 0
+  for (let lag = 1; alive && lag <= DANGER_HOLD && tick - lag - h.firstTick >= 24; lag++) {
+    for (const n of notesAt(h, tick - lag)) {
+      if (n.tone !== 'danger' || out.some(o => o.id === n.id)) continue
+      out.push({ ...n, text: `${n.text} (${lag} h ago)` })
+    }
+  }
+  const alarms = out.filter(n => n.id !== 'steady' && n.id !== 'trend')
+  return (alarms.length ? alarms : out).sort((a, b) => RANK[a.tone] - RANK[b.tone])
+}
+
+/** Red notes in `next` that were not in `prev`: what should stop the clock for a player who wants time to react. */
+export function newDangers(prev: Hint[], next: Hint[]): Hint[] {
+  const seen = new Set(prev.map(n => n.id))
+  return next.filter(n => n.tone === 'danger' && !seen.has(n.id))
+}
+
+function notesAt(h: RunHistory, tick: number): Hint[] {
   const out: Hint[] = []
   if (tick - h.firstTick < 24) return out
   const prey = h.stat(tick, 'prey')
@@ -72,7 +102,7 @@ export function hints(h: RunHistory, tick: number): Hint[] {
       text: `Rabbits are up ${Math.round(preyGrowth * 100)}% in 10 days while bushes are only ${Math.round(stock * 100)}% full. A food crash is likely.`,
     })
   }
-  if (pred > 0 && prey / pred < 5 && preyGrowth < -0.15) {
+  if (pred > 0 && prey > 0 && prey / pred < 5 && preyGrowth < -0.15) {
     out.push({
       id: 'overhunt',
       tone: 'danger',
@@ -97,7 +127,7 @@ export function hints(h: RunHistory, tick: number): Hint[] {
     out.push({ id: 'fewfox', tone: 'danger', text: `Only ${pred} fox${pred === 1 ? '' : 'es'} left. One bad week ends the run.` })
   }
   if (prey > 0 && prey <= 12) {
-    out.push({ id: 'fewprey', tone: 'danger', text: `Only ${prey} rabbits left.` })
+    out.push({ id: 'fewprey', tone: 'danger', text: `Only ${prey} rabbit${prey === 1 ? '' : 's'} left.` })
   }
   if (prey > 0 && stock < 0.12 && preyE >= 0.3) {
     out.push({
@@ -114,7 +144,7 @@ export function hints(h: RunHistory, tick: number): Hint[] {
       tone: kits >= foxOld ? 'info' : 'warn',
       text:
         kits >= foxOld
-          ? `Kits are replacing the foxes that die of old age (${kits} in the last 10 days).`
+          ? `Kits are replacing the foxes that die of old age (${kits} kits and ${Math.round(foxOld)} old-age deaths in 10 days).`
           : `Old foxes are dying faster than kits replace them (${kits} kits and ${Math.round(foxOld)} deaths of old age in 10 days).`,
     })
   }
@@ -142,11 +172,21 @@ export function hints(h: RunHistory, tick: number): Hint[] {
     }
   }
   if (out.length === 0) {
-    out.push({
-      id: 'steady',
-      tone: 'good',
-      text: `Holding steady: ${prey} rabbits and ${pred} foxes, with bushes ${Math.round(stock * 100)}% full.`,
-    })
+    // Only call it steady when the trend agrees; a forecast that halves or grows by half is not steady.
+    const moving = (now: number, next: number) => (next + 1) / (now + 1) > 1.5 || (now + 1) / (next + 1) > 1.5
+    if (f && f.ahead > 0 && (moving(prey, f.prey) || moving(pred, f.pred))) {
+      out.push({
+        id: 'trend',
+        tone: 'info',
+        text: `No warnings yet, but the meadow is changing: at the current trend, about ${Math.round(f.prey)} rabbits and ${Math.round(f.pred)} foxes by ${dateLabel(tick + f.ahead)} (now ${prey} and ${pred}).`,
+      })
+    } else {
+      out.push({
+        id: 'steady',
+        tone: 'good',
+        text: `Holding steady: ${prey} rabbits and ${pred} foxes, with bushes ${Math.round(stock * 100)}% full.`,
+      })
+    }
   }
   return out
 }
@@ -268,7 +308,7 @@ export function explain(h: RunHistory, end: EndInfo, scenario: Scenario): Explan
   if (eaten >= starved && eaten >= old) {
     return {
       headline: `Rabbits were eaten out on ${when}.`,
-      detail: `${eaten} of the last ${eaten + starved + old} rabbit deaths were to foxes, with about 1 fox for every ${(1 / Math.max(ratio, 1e-6)).toFixed(1)} rabbits.${ctx}`,
+      detail: `${eaten} of the last ${eaten + starved + old} rabbit deaths were to foxes, with ${ratio >= 1 ? `about ${ratio.toFixed(1)} foxes for every rabbit` : `about 1 fox for every ${(1 / Math.max(ratio, 1e-6)).toFixed(1)} rabbits`}.${ctx}`,
       suggestions: ['Start with fewer foxes', 'Speed up rabbit breeding', 'Give rabbits more speed or sense range'],
     }
   }
@@ -291,4 +331,42 @@ export function explain(h: RunHistory, end: EndInfo, scenario: Scenario): Explan
       'Shorten the rabbit birth gap',
     ],
   }
+}
+
+/** The intervention allowance in words, shown next to the dots. */
+export function usesLeft(charges: number, total: number, planning: boolean): string {
+  if (planning) return `${total} uses per run`
+  return charges === 0 ? `none of ${total} uses left` : `${charges} of ${total} uses left`
+}
+
+const n = (v: number) => v.toLocaleString('en-US')
+
+/** The score as a sum in words, so a player can see what earned each part. */
+export function scoreWords(score: ScoreBreakdown, survived: boolean, endless: boolean, interventions: number): string {
+  const hours = `${n(score.hours)} hours survived (one point per hour)`
+  if (!survived) {
+    return endless
+      ? `Score ${n(score.total)} = ${hours}. In Endless the score is hours survived only.`
+      : `Score ${n(score.total)} = ${hours}. The budget and calm bonuses count only when both species last the full year.`
+  }
+  const used = `${interventions} intervention${interventions === 1 ? '' : 's'} used`
+  return `Score ${n(score.total)} = ${hours} + ${n(score.budgetBonus)} budget bonus (${BUDGET_POINT_BONUS} per unspent point) + ${n(score.calmBonus)} calm bonus (${CALM_BONUS[0]} with no interventions, 100 less for each; ${used}).`
+}
+
+/** A trait's headline value; a species with no animals has no trait, so do not show the empty mean (0.00). */
+export function traitValue(pop: PopulationEvolution | undefined, trait: TraitKey): string {
+  if (!pop) return '—'
+  return pop.count === 0 ? 'none alive' : pop.traits[trait].mean.toFixed(2)
+}
+
+/** A playback rate in the speed buttons' units: "20 h/s", "3 d/s", "1.5 d/s". */
+export function rateLabel(tps: number): string {
+  if (tps < 23.5) return `${Math.max(0, Math.round(tps))} h/s`
+  const days = Math.round((tps / 24) * 10) / 10
+  return `${days} d/s`
+}
+
+/** The speed label, with the rate actually shown when the simulation cannot keep up. */
+export function speedLabel(label: string, effectiveTps: number | null): string {
+  return effectiveTps === null ? label : `${label} (running at ${rateLabel(effectiveTps)})`
 }

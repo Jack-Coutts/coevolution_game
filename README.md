@@ -8,21 +8,24 @@ population trends, then intervene before either species disappears.
   continues until extinction, with recurring seasons and a rolling year of replay.
 - **Eight interventions, four uses.** Rain, plant bushes, release rabbits, release foxes,
   cull foxes, feed foxes, rabbit illness and fox illness. Illness spreads locally, drains
-  energy and can overshoot; purple rings mark affected animals.
-- **Watch evolution.** The Evolution tab shows inherited trait distributions, generations,
+  energy and can overshoot; purple rings mark affected animals. An intervention applies at
+  the hour on screen and shows at once, even while paused.
+- **Watch evolution.** The Evolution page shows inherited trait distributions, generations,
   lineages and observed milestones. Click an animal to inspect its family, health and traits.
 - **Keep a world.** Save/resume preserves animals, genes, food, random streams, intervention
-  charges and recent replay in one device-local save slot.
+  charges, the population graph and the last 15 days of replay in one device-local save slot.
 - **Energy matters.** Movement, senses and metabolism cost energy. Hunting requires contact
   and hunger; deaths distinguish starvation, predation, age, illness and culling.
 - **Readable time.** The clock and seasonal scenery remain, without day/night dimming.
-  Default playback is one day per second.
+  Default playback is one day per second. The meadow pauses when a new red field note
+  appears (a switch turns this off), and the speed label says so when a crowded meadow runs
+  slower than the chosen speed.
 
 The starting meadow is intended to survive without help about 30–50% of the time. In the
 50-seed Node validation, 18 survived (36%); Chrome 153 produced 23/50 (46%) on the same seeds.
 Neither batch hit a population safety ceiling.
 Adaptation is measured separately from ecosystem survival. See [the results and their
-limitations](docs/validation.md), [game design](docs/game-design.md) and [roadmap](docs/roadmap.md).
+limitations](docs/validation.md), [game design](docs/game-design.md), [playtest](docs/playtest.md) and [roadmap](docs/roadmap.md).
 
 Seeds choose the world and its random streams. Repeating a seed with the same settings and
 interventions at the same hours repeats the outcome in the same runtime. Different seeds
@@ -51,7 +54,7 @@ npm run lint
 | Left / right | Back / forward one day; Shift for one hour |
 | Up / down | Change playback speed |
 | Home / End | Earliest available replay / live |
-| R | Reset run |
+| R | Reset run (asks first once the run is past a week) |
 
 ## Reproduce the experiments
 
