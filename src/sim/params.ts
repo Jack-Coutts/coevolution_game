@@ -77,6 +77,19 @@ export interface SimParams {
   prey: SpeciesParams
   pred: SpeciesParams
   eco: EcoParams
+  /** PROTOTYPE ONLY (third-species-prototype branch): optional third species. */
+  alt?: SpeciesParams
+  altRole?: 'vole' | 'hawk'
+  altCeiling?: number
+  altMealScale?: number
+  altBite?: number
+  altCoverSight?: number
+  /** PROTOTYPE: seed heads in tall grass that only voles eat. */
+  altGrass?: { max: number; every: number }
+  /** PROTOTYPE: energy multiplier on a vole's berry bite (grass seed is its main food). */
+  altBerryScale?: number
+  /** PROTOTYPE: keep simulating after an extinction, until every animal is gone or the horizon. */
+  protoRunOn?: boolean
 }
 
 export function defaultEco(): EcoParams {
