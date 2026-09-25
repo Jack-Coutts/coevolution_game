@@ -2,7 +2,7 @@
 
 This page tracks the work on the open issues in [roadmap #2](https://github.com/Jack-Coutts/coevolution_game/issues/2) and the UI update. A box is ticked when its pull request has merged into `main`. Every pull request updates its own line.
 
-Last updated: 25 September 2026, 17:25 UTC.
+Last updated: 25 September 2026, 17:35 UTC.
 
 ## How the work runs
 
@@ -43,8 +43,8 @@ Last updated: 25 September 2026, 17:25 UTC.
 
 ### Growing brains
 
-- [ ] #13 Test whether memory and growing brains help. Starts after #12. A negative result is a valid outcome.
-- [ ] #14 Growing brains in long-running worlds. Only if #13 supports it; otherwise it is deferred with the evidence.
+- [x] #13 Test whether memory and growing brains help: no variant beat the linear controller with an interval excluding zero, and none made rabbits visibly flee; they stay assay-only. [#26](https://github.com/Jack-Coutts/coevolution_game/pull/26)
+- [x] #14 Growing brains in long-running worlds: deferred with the #13 evidence; it reopens only when a variant shows a visible gain whose interval excludes zero. [#26](https://github.com/Jack-Coutts/coevolution_game/pull/26)
 
 ## Known limits
 

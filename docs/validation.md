@@ -164,7 +164,70 @@ are reported as missing, rather than zero or silently discarded. Year survival i
 **6/20 evolving, 13/20 founder-pool, 11/20 selection-only**. Individual adaptation does not
 imply more stable coexistence. Selection-only foraging at month one is 0.4680, so this
 experiment also does not prove that mutation improves on selection from founding variation.
-No claim is made that larger or growing brains outperform the default.
+No claim is made that larger or growing brains outperform the default; the next section tests it.
+
+## Do hidden layers, memory or growing brains help?
+
+The linear controller plausibly falls short in three situations. It cannot keep fleeing once a fox
+leaves view, because it has no memory. It cannot gate one cue by another, such as fleeing only when
+not starving, or hiding only when a fox is near; that needs hidden units. It cannot trade food
+against danger nonlinearly. Success was defined before running, in the fixed arenas:
+
+- **Net forage:** energy eaten per rabbit-hour minus brain upkeep (0.01 per hidden neuron per hour).
+- **Catches per encounter:** the share of fox encounters (a fox within chase range) that end in capture.
+- **Flee:** while a fox is within chase range, the rabbit's next move directly away from it, as a
+  fraction of top speed. This is the visible "rabbit bolts from a fox" behaviour.
+- **Catches per fox-day:** evolved foxes hunting the fixed reference rabbits.
+
+The 24-hour encounter-survival proxy is not used.
+
+The [brain assay](experiments/brains.json) (`npx tsx scripts/brain-assay.ts 20 --start 6100 --json …`)
+evolves four conditions on the same fresh seeds **6100–6119** in the two-species Open meadow for
+three months. The conditions are linear, 4 fixed hidden neurons, linear plus one memory channel,
+and growth from linear (a 5% chance per birth of adding a neutral neuron, up to 12). Each has a
+founder-pool control of the same architecture. Snapshots from month 0 and month 3 meet fixed
+opponents in fresh arena seeds 7100–7102, each 240 hours long. The opponents are linear founders
+from seeds 900–903, with their memory input cut so that they behave identically in every condition.
+The 160 runs took 7.0 minutes on one process, with no safety-ceiling hits.
+
+| Month 3, evolving | Linear | Hidden 4 | Memory | Growth |
+| --- | ---: | ---: | ---: | ---: |
+| Populations surviving (snapshots available) | 17/20 | 17/20 | 17/20 | 18/20 |
+| Net forage per rabbit-hour | 0.566 | 0.669 | 0.562 | 0.632 |
+| Catches per encounter | 0.095 | 0.086 | 0.093 | 0.090 |
+| Flee (fraction of top speed) | 0.005 | -0.004 | -0.010 | 0.007 |
+| Catches per fox-day | 0.117 | 0.122 | 0.111 | 0.118 |
+| Mean rabbit / fox hidden neurons | 0 / 0 | 4 / 4 | 0 / 0 | 0.69 / 0.26 |
+
+The paired comparisons against linear only use seeds where both populations survived. Each gain is
+the mean with an approximate 95% interval; positive favours the richer brain:
+
+| Versus linear | Net forage | Catches per encounter | Flee | Catches per fox-day |
+| --- | --- | --- | --- | --- |
+| Hidden 4 | +0.088 ± 0.162, 8/14 | +0.012 ± 0.020, 8/14 | −0.006 ± 0.043, 6/14 | +0.012 ± 0.038, 9/14 |
+| Memory | +0.065 ± 0.127, 10/15 | +0.007 ± 0.014, 9/15 | −0.010 ± 0.031, 8/15 | −0.010 ± 0.016, 6/15 |
+| Growth | +0.064 ± 0.072, 11/17 | +0.005 ± 0.013, 10/17 | +0.001 ± 0.023, 9/17 | −0.001 ± 0.019, 8/17 |
+
+Evolution itself works under every architecture. Against its own founder pool, each condition
+improves net forage in 15–18 of 16–18 paired seeds, by +0.31 to +0.46, and fox catch rate by
++0.02 to +0.03. The extra machinery adds nothing that can be distinguished from zero:
+
+- Every interval against linear includes zero. Growth's foraging gain comes closest, but it has
+  at most 0.69 neurons per rabbit, so it is still nearly linear.
+- Ecosystem survival is the same (17–18/20). The behavioural comparisons are therefore not
+  driven by different survivor sets, although they do condition on survival.
+- No condition evolves the visible escape behaviour. Rabbits near a fox move away at about
+  0% of top speed under every brain, so a player would see no difference.
+
+Performance cost is real. One forward pass takes 223 ns linear, 563 ns with 4 hidden neurons and
+1,243 ns with 12. Whole-simulation time is 3.9 ms per 1,000 animal-hours for linear and 4.3 ms
+for hidden 4 (+10%). Memory and growth stay close to linear, because they add almost no neurons.
+
+**Decision:** no variant earns a place in normal play. The default stays the linear controller,
+and hidden layers, memory and growth remain assay-only variants. Exposing brain growth in
+long-running worlds (#14) is deferred until a variant shows a repeatable, visible behavioural gain
+that is worth its cost. The gain should appear in this assay with an interval excluding zero,
+without an ecosystem cost.
 
 ## Reproducibility and gameplay checks
 

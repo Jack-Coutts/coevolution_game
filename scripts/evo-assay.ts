@@ -10,6 +10,7 @@
  * Variants tweak the eco settings (see VARIANTS); tuning seeds are 100+, reference 900+.
  */
 import { writeFileSync } from 'node:fs'
+import { fileURLToPath } from 'node:url'
 import { STABLE_PRESET } from '../src/game/presets'
 import type { Genome } from '../src/sim/brain'
 import { deriveParams } from '../src/sim/levers'
@@ -96,7 +97,7 @@ export function assay(p: SimParams, subject: Snap, reference: Snap): Assay {
   }
 }
 
-function pool(snaps: Snap[], s: Species, n: number): Genome[] {
+export function pool(snaps: Snap[], s: Species, n: number): Genome[] {
   const all = snaps.flatMap((x) => x[s] ?? [])
   const out: Genome[] = []
   for (let i = 0; i < n && all.length; i++) out.push(all[Math.floor((i * all.length) / n)])
@@ -152,4 +153,4 @@ function main(): void {
   if (jsonAt > 0) writeFileSync(process.argv[jsonAt + 1], JSON.stringify(result, null, 2))
 }
 
-main()
+if (process.argv[1] === fileURLToPath(import.meta.url)) main()
