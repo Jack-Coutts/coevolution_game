@@ -1,5 +1,7 @@
 import type { Intervention } from '@/sim/sim'
-import type { EvolutionSample, JournalEntry } from '@/sim/evolution'
+import type { EvolutionSample } from '@/sim/evolution'
+import { FamilyHistory } from './families'
+import { Journal, type JournalEntry } from './journal'
 import { STAT, STAT_STRIDE, type FrameData } from '@/worker/protocol'
 
 export const HISTORY_HOURS = 8760
@@ -18,11 +20,12 @@ export class RunHistory {
   replayFrom = 0
   interventions: { tick: number; action: Intervention }[] = []
   evolution: EvolutionSample[] = []
-  journal: JournalEntry[] = []
-  private highestGeneration = { prey: 0, pred: 0 }
+  readonly log: Journal
+  readonly families = new FamilyHistory()
   private frames = new Map<number, FrameData>()
 
-  constructor(horizon: number, endless = false) { this.limit = horizon; this.endless = endless }
+  constructor(horizon: number, endless = false) { this.limit = horizon; this.endless = endless; this.log = new Journal(endless) }
+  get journal(): JournalEntry[] { return this.log.entries }
   get horizon(): number { return this.endless ? Math.max(this.limit, this.head + 300) : this.limit }
   get firstTick(): number { return Math.max(this.start, this.head - HISTORY_HOURS) }
   /** The earliest hour the meadow can be replayed at. */
@@ -42,20 +45,11 @@ export class RunHistory {
   addEvolution(sample: EvolutionSample): void {
     const prev = this.evolution.at(-1)
     if (prev?.tick === sample.tick) return
-    for (const s of ['prey', 'pred'] as const) {
-      const label = s === 'prey' ? 'Rabbit' : 'Fox'
-      if (prev && Math.floor(sample[s].generation / 5) > Math.floor(this.highestGeneration[s] / 5))
-        this.journal.push({ tick: sample.tick, text: `${label} descendants reached generation ${sample[s].generation}.` })
-      this.highestGeneration[s] = Math.max(this.highestGeneration[s], sample[s].generation)
-      if (prev && prev[s].lineages > 1 && sample[s].lineages === 1)
-        this.journal.push({ tick: sample.tick, text: `One founding ${label.toLowerCase()} lineage remains.` })
-      if (prev && prev[s].count > 0 && sample[s].count === 0)
-        this.journal.push({ tick: sample.tick, text: `${label === 'Rabbit' ? 'Rabbits' : 'Foxes'} died out. The last ones were generation ${prev[s].generation}.` })
-    }
-    if (prev && sample.prey.count > 0 && sample.pred.count > 0 && Math.floor(sample.tick / 8760) > Math.floor(prev.tick / 8760))
-      this.journal.push({ tick: sample.tick, text: this.endless ? `Both species reached year ${Math.floor(sample.tick / 8760) + 1}.` : 'Both species lasted the full year.' })
-    this.journal = this.journal.slice(-80)
     this.evolution.push(sample)
+    // The frame at the sample's hour has just arrived with it.
+    const frame = this.frames.get(sample.tick)
+    this.log.observe(this.evolution, frame)
+    this.families.observe(sample.tick, frame)
     // Preserve the founder reference, plus the most recent daily observations.
     if (this.evolution.length > 367) this.evolution.splice(1, this.evolution.length - 367)
   }
@@ -66,19 +60,24 @@ export class RunHistory {
     for (const t of [...this.frames.keys()]) if (t > tick) this.frames.delete(t)
     this.head = Math.max(this.start, tick)
     while (this.evolution.length > 1 && (this.evolution.at(-1)?.tick ?? 0) > tick) this.evolution.pop()
-    this.journal = this.journal.filter(e => e.tick <= tick)
-    for (const s of ['prey', 'pred'] as const) this.highestGeneration[s] = Math.max(0, ...this.evolution.map(e => e[s].generation))
+    this.log.truncate(tick, this.evolution)
+    this.families.truncate(tick)
   }
 
   save() {
     const replayFrom = Math.max(this.replayStart, this.head - RECENT)
-    return { stats: this.stats, highestGeneration: this.highestGeneration, head: this.head, start: this.firstTick, replayFrom,
+    return { stats: this.stats, head: this.head, start: this.firstTick, replayFrom,
+      journal: this.log.save() as ReturnType<Journal['save']> | undefined, families: this.families.save() as ReturnType<FamilyHistory['save']> | undefined,
+      /** For older builds; this build reads `journal.highest`. */
+      highestGeneration: this.log.save().highest as { prey: number; pred: number } | undefined,
       frames: [...this.frames.entries()].filter(([t]) => t >= replayFrom) }
   }
 
-  restore(data: ReturnType<RunHistory['save']>): void {
+  /** `entries` are the journal entries stored beside the history by saves made before the journal state moved here. */
+  restore(data: ReturnType<RunHistory['save']>, entries?: readonly (JournalEntry | { tick: number; text: string })[]): void {
     this.stats.set(data.stats)
-    this.highestGeneration = data.highestGeneration
+    this.log.restore(data.journal ?? { entries: entries as JournalEntry[] | undefined }, data.highestGeneration)
+    this.families.restore(data.families)
     this.head = data.head
     this.start = data.start
     // Saves made before replayFrom existed stored the replay start as `start`.

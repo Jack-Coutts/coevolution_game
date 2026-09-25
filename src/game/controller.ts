@@ -475,13 +475,12 @@ export class GameController {
 
   restore(save: MeadowSave): void {
     this.configure(save.config, save.state)
-    this.history.restore(save.history)
+    this.history.restore(save.history, save.journal)
     // Uses are recomputed from the recorded interventions, so a save can neither duplicate nor lose one; the stored
     // `charges` is only for older builds. Saves from before a field existed get its empty default.
     this.cooldownUntil = save.cooldownUntil ?? 0
     this.history.interventions = save.interventions ?? []
     this.history.evolution = save.evolution ?? []
-    this.history.journal = save.journal ?? []
     this.saveStatus = 'Meadow restored and paused. The graph and journal are kept; replay covers the last 15 days before the save.'
   }
 

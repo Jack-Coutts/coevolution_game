@@ -1,7 +1,8 @@
 import type { RunHistory } from './history'
 import type { RunConfig } from './controller'
 import type { Sim, Intervention } from '@/sim/sim'
-import type { EvolutionSample, JournalEntry } from '@/sim/evolution'
+import type { EvolutionSample } from '@/sim/evolution'
+import type { JournalEntry } from './journal'
 
 export interface MeadowSave {
   version: 2
@@ -15,7 +16,8 @@ export interface MeadowSave {
   cooldownUntil?: number
   interventions?: { tick: number; action: Intervention }[]
   evolution?: EvolutionSample[]
-  journal?: JournalEntry[]
+  /** Journal entries, also kept (with the journal's state) in `history.journal`; older builds read them from here. */
+  journal?: (JournalEntry | { tick: number; text: string })[]
 }
 
 async function database(): Promise<IDBDatabase> {
