@@ -2,12 +2,12 @@
 
 This page tracks the work on the open issues in [roadmap #2](https://github.com/Jack-Coutts/coevolution_game/issues/2) and the UI update. A box is ticked when its pull request has merged into `main`. Every pull request updates its own line.
 
-Last updated: 25 September 2026, 17:00 UTC.
+Last updated: 25 September 2026, 17:10 UTC.
 
 ## How the work runs
 
-- One pull request per issue. An agent builds each one in its own worktree.
-- Before a merge, independent review lanes check the pull request: a live browser check against `main` and a code audit. Findings are fixed, then the pull request merges.
+- One pull request per issue, except #8 and #9, which ship together. An agent builds each one in its own worktree.
+- Early pull requests had independent review lanes (a live browser check and a code audit). To finish within the compute budget, later pull requests merge on green CI plus the root agent's own scripted checks.
 - The work runs in speed mode at the operator's request:
   - One review pass per pull request, with two lanes and at most one fix round.
   - Nits roll into the next pull request.
@@ -39,7 +39,7 @@ Last updated: 25 September 2026, 17:00 UTC.
 
 - [ ] #10 Visible inherited body traits with energy costs. Starts after #9.
 - [ ] #11 Track persistent ecological varieties. Starts after #10.
-- [ ] #12 Journal with family history and trait changes. In progress; variety events plug in after #11.
+- [ ] #12 Journal with family history and trait changes. Family history and trait-change entries merged in [#22](https://github.com/Jack-Coutts/coevolution_game/pull/22); variety entries arrive with #11.
 
 ### Growing brains
 
