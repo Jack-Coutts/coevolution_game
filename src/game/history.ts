@@ -63,6 +63,8 @@ export class RunHistory {
   /** Forget everything after `tick`: the worker recomputed those hours (an intervention at `tick`). */
   truncate(tick: number): void {
     if (tick >= this.head) return
+    // The stats ring still holds the discarded hours' values in its oldest slots, so keep the window from moving back.
+    this.start = Math.max(this.start, this.head - HISTORY_HOURS)
     for (const t of [...this.frames.keys()]) if (t > tick) this.frames.delete(t)
     this.head = Math.max(this.start, tick)
     while (this.evolution.length > 1 && (this.evolution.at(-1)?.tick ?? 0) > tick) this.evolution.pop()
