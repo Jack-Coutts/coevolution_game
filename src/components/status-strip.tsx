@@ -1,6 +1,7 @@
 import { ArrowLeft, ChevronLeft, ChevronRight, Pause, Play, Radio } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { SPEEDS } from '@/game/controller'
+import { speedLabel } from '@/game/insights'
 import { useAnimalIcons } from '@/hooks/use-animal-icons'
 import { useGame } from '@/hooks/use-game'
 import { hrefOf } from '@/hooks/use-view'
@@ -68,7 +69,7 @@ export function StatusStrip({ canStart }: { canStart: boolean }) {
           title="Change speed (↑ ↓)"
           aria-label={`Speed ${SPEEDS[snap.speed].label}; click for the next speed`}
         >
-          {SPEEDS[snap.speed].label}
+          {speedLabel(SPEEDS[snap.speed].label, snap.effectiveTps)}
         </Button>
         <Button asChild variant="ghost" size="sm" className="ml-auto">
           <a href={hrefOf('meadow')}>

@@ -9,6 +9,7 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog'
 import type { Snapshot } from '@/game/controller'
+import { scoreWords } from '@/game/insights'
 import { formatDuration } from '@/sim/time'
 import { cn } from '@/lib/utils'
 
@@ -45,7 +46,7 @@ export function ResultDialog({ snap, open, onOpenChange, onRetune, onReplay }: P
             ))}
           </div>
           <DialogTitle className="text-xl">
-            {end.survived ? 'The meadow made it through the year.' : 'The meadow collapsed.'}
+            {end.survived ? 'The meadow made it through the year.' : snap.endless ? 'Your Endless meadow has ended.' : 'The meadow collapsed.'}
           </DialogTitle>
           <DialogDescription className="text-[15px] text-foreground/90">{e.headline}</DialogDescription>
         </DialogHeader>
@@ -65,6 +66,8 @@ export function ResultDialog({ snap, open, onOpenChange, onRetune, onReplay }: P
             <div className="text-lg font-semibold text-primary tabular">{snap.score.total.toLocaleString()}</div>
           </div>
         </div>
+
+        <p className="text-xs text-muted-foreground">{scoreWords(snap.score, end.survived, snap.endless, snap.interventions.length)}</p>
 
         {snap.best && (
           <div className="flex items-center gap-2 text-sm">

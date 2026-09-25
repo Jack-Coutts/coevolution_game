@@ -1,8 +1,9 @@
 import { AnimalInspector, type AnimalSelection } from '@/components/animal-inspector'
+import { ConfirmReset } from '@/components/confirm-reset'
 import { EvolutionView } from '@/components/evolution-view'
 import { Button } from '@/components/ui/button'
 import { readSave, type MeadowSave } from '@/game/saves'
-import { useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { BookOpen, Dna, FolderOpen, Save, Trees } from 'lucide-react'
 import { toast, Toaster } from 'sonner'
 import { Guide } from '@/components/guide'
@@ -18,6 +19,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
 import { WorldView } from '@/components/world-view'
 import { SPEEDS } from '@/game/controller'
+import { speedLabel } from '@/game/insights'
 import { STABLE_PRESET } from '@/game/presets'
 import { seedOf, type SeedChoice } from '@/game/seed'
 import { useAnimalIcons } from '@/hooks/use-animal-icons'
@@ -57,6 +59,9 @@ function initialState(): { scenario: ScenarioId; seed: SeedChoice } {
 }
 
 const initial = initialState()
+
+/** Controls that keep focus after a click and would otherwise take the Space key. */
+const CONTROL = 'button, a, [role="radio"], [role="slider"]'
 
 export default function App() {
   const [game, snap] = useGame()
@@ -99,6 +104,12 @@ export default function App() {
   }, [snap.saveStatus])
 
   const reset = () => setResetKey((k) => k + 1)
+  const [confirmReset, setConfirmReset] = useState(false)
+  const askReset = useCallback(() => {
+    if (!game.resetNeedsConfirm()) { setResetKey((k) => k + 1); return }
+    game.pause()
+    setConfirmReset(true)
+  }, [game])
 
   // On phones the side panel sits far below the meadow, so bring the card of an animal clicked in the meadow into view.
   const inspectorCard = useRef<HTMLElement>(null)
@@ -112,15 +123,23 @@ export default function App() {
   }, [selected])
 
   useEffect(() => {
+    // A control focused by a mouse click keeps focus, and Space would then press it again (a speed button, Save).
+    // Remember which control the pointer focused, so Space stays play/pause until the keyboard moves focus.
+    let pointerFocus: Element | null = null
+    const onPointer = (e: PointerEvent) => { pointerFocus = (e.target as Element).closest?.(CONTROL) ?? null }
+    const onFocus = (e: FocusEvent) => { if (e.target !== pointerFocus) pointerFocus = null }
     const onKey = (e: KeyboardEvent) => {
-      if (e.defaultPrevented) return
       const t = e.target as HTMLElement
-      if (t.closest('input, textarea, select, [role="slider"], [role="combobox"], [role="listbox"], [role="radiogroup"], [role="radio"]')) return
-      if (e.metaKey || e.ctrlKey || e.altKey) return
+      // A control the mouse focused should not swallow the game's shortcuts (Space, R, arrows) until the keyboard moves focus.
+      const clicked = pointerFocus !== null && t.closest(CONTROL) === pointerFocus && !t.closest('input, textarea, select, [role="dialog"]') &&
+        (e.key === ' ' || !t.closest('[role="slider"]'))
+      if (e.defaultPrevented && !clicked) return
+      if (e.metaKey || e.ctrlKey || e.altKey || t.closest('[role="dialog"], [role="alertdialog"]')) return
+      if (!clicked && t.closest('input, textarea, select, [role="slider"], [role="combobox"], [role="listbox"], [role="radiogroup"], [role="radio"]')) return
       const s = game.getSnapshot()
       switch (e.key) {
         case ' ':
-          if (t.closest('button, a')) return
+          if (!clicked && t.closest('button, a')) return
           e.preventDefault()
           if (s.phase === 'planning' && left < 0) return
           game.toggle()
@@ -149,15 +168,21 @@ export default function App() {
           break
         case 'r':
         case 'R':
-          reset()
+          askReset()
           break
         default:
           break
       }
     }
+    window.addEventListener('pointerdown', onPointer, true)
+    window.addEventListener('focusin', onFocus, true)
     window.addEventListener('keydown', onKey)
-    return () => window.removeEventListener('keydown', onKey)
-  }, [game, left])
+    return () => {
+      window.removeEventListener('pointerdown', onPointer, true)
+      window.removeEventListener('focusin', onFocus, true)
+      window.removeEventListener('keydown', onKey)
+    }
+  }, [game, left, askReset])
 
   const resume = async () => {
     try {
@@ -265,7 +290,7 @@ export default function App() {
               </div>
               <WorldView maxSize={worldMax} selected={selected} onSelect={(a) => { reveal.current = true; setSelected(a) }} />
               <Card className="gap-2 p-3">
-                <Transport onReset={reset} />
+                <Transport onReset={askReset} onShowResult={() => setDismissed(-1)} />
                 <Timeline />
                 <div className="flex flex-wrap items-center gap-x-4 gap-y-1 px-1 text-[11px] text-muted-foreground">
                   <Legend color="bg-rabbit" label="Rabbits (left scale)" />
@@ -274,7 +299,7 @@ export default function App() {
                   <span className="flex items-center gap-1.5">
                     <span className="inline-block w-4 border-t border-dashed border-rabbit" /> Forecast
                   </span>
-                  <span className="ml-auto">Click or drag the graph to replay · {SPEEDS[snap.speed].label}</span>
+                  <span className="ml-auto">Click or drag the graph to replay · {speedLabel(SPEEDS[snap.speed].label, snap.effectiveTps)}</span>
                 </div>
               </Card>
             </section>
@@ -283,12 +308,13 @@ export default function App() {
               <Card className="gap-0 p-0 lg:sticky lg:top-4 lg:max-h-[calc(100vh-2rem)]">
                 <div className="min-h-0 flex-1 p-3 lg:overflow-y-auto">
                   {locked ? (
-                    <RunPanel inspector={inspector} setup={<LockedSetup levers={levers} base={base} onUnlock={reset} />} />
+                    <RunPanel inspector={inspector} onShowResult={() => setDismissed(-1)} setup={<LockedSetup levers={levers} base={base} onUnlock={askReset} />} />
                   ) : (
                     <div className="flex flex-col gap-4">
                       <BestScore />
                       {inspector}
                       <LeverPanel
+                        endless={endless}
                         levers={levers}
                         base={base}
                         onChange={(id, v) => setLevers((prev) => ({ ...prev, [id]: v }))}
@@ -337,6 +363,15 @@ export default function App() {
           setDismissed(snap.runId)
           game.seek(0)
           game.play()
+        }}
+      />
+      <ConfirmReset
+        open={confirmReset}
+        hours={snap.tick}
+        onCancel={() => setConfirmReset(false)}
+        onConfirm={() => {
+          setConfirmReset(false)
+          reset()
         }}
       />
       <Toaster

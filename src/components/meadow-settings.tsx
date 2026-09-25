@@ -9,6 +9,7 @@ import { cn } from '@/lib/utils'
 
 export function MeadowSettings({ choice, onChange, onPractice, locked = false }: { choice: SeedChoice; onChange: (c: SeedChoice) => void; locked?: boolean; onPractice: () => void }) {
   const [copied, setCopied] = useState(false)
+  const [open, setOpen] = useState(false)
   const custom = choice.kind === 'custom' ? choice.seed : null
   const copy = async () => {
     try {
@@ -20,7 +21,7 @@ export function MeadowSettings({ choice, onChange, onPractice, locked = false }:
     }
   }
   return (
-    <Popover>
+    <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
         <Button variant="outline" size="icon" aria-label="Meadow settings">
           <Settings2 />
@@ -78,7 +79,7 @@ export function MeadowSettings({ choice, onChange, onPractice, locked = false }:
               <Dices />
             </Button>
           </div>
-          <Button variant="outline" size="sm" disabled={locked} onClick={onPractice}>Practice meadow · seed 5007</Button>
+          <Button variant="outline" size="sm" disabled={locked} onClick={() => { onPractice(); setOpen(false) }}>Practice meadow · seed 5007</Button>
           <p className="text-[11px] text-muted-foreground">Practice restores the starting balance on a seed known to survive. Observe it, then compare your changes.</p>
           <Button variant="secondary" size="sm" onClick={copy} className="gap-1.5">
             {copied ? <Check /> : <Link2 />} {copied ? 'Link copied' : 'Copy link to this meadow'}

@@ -46,8 +46,8 @@ export function EvolutionView({ selected, onSelect }: { selected: AnimalSelectio
             <span className={s.tone}>{s.name}</span>
           </div>
           <dl className="mt-2 grid grid-cols-3 gap-2 text-xs">
-            <Tile label="Highest living generation" value={latest?.[s.id].generation ?? 0} />
-            <Tile label="Founder lineages" value={latest?.[s.id].lineages ?? 0} />
+            <Tile label="Highest living generation" value={latest?.[s.id].count === 0 ? '—' : latest?.[s.id].generation ?? 0} />
+            <Tile label="Founder lineages" value={latest?.[s.id].count === 0 ? '—' : latest?.[s.id].lineages ?? 0} />
             <Tile label="Animals now" value={s.id === 'prey' ? snap.prey : snap.pred} />
           </dl>
         </div>)}
@@ -80,7 +80,7 @@ export function EvolutionView({ selected, onSelect }: { selected: AnimalSelectio
   </div>
 }
 
-function Tile({ label, value }: { label: string; value: number }) {
+function Tile({ label, value }: { label: string; value: number | string }) {
   return <div className="flex flex-col-reverse rounded-md bg-card p-2 text-center">
     <dt className="text-muted-foreground">{label}</dt>
     <dd className="text-lg font-semibold tabular">{value}</dd>

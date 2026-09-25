@@ -5,7 +5,7 @@ const KEYS: [string, string][] = [
   ['← →', 'Back / forward one day (Shift: one hour)'],
   ['↑ ↓', 'Faster / slower'],
   ['Home End', 'Jump to start / live'],
-  ['R', 'Reset the run'],
+  ['R', 'Reset the run (asks first once it has run a week)'],
 ]
 
 export function Guide() {
@@ -54,7 +54,7 @@ export function Guide() {
         <h3 className="mb-1 font-semibold">Setup, then run</h3>
         <p className="text-muted-foreground">
           Tune the levers within the budget, then release the animals. During the run you can intervene with rain,
-          release animals, cull foxes, plant bushes, feed foxes or start species-specific illness, each followed by a cooldown. You have four uses shared across all eight options. Illness spreads between nearby animals of the same species, adds an energy drain for ten days per case, and gives survivors temporary immunity. Purple rings mark illness. It can overshoot and cause extinction.
+          release animals, cull foxes, plant bushes, feed foxes or start species-specific illness, each followed by a cooldown. You have four uses shared across all eight options. Illness spreads between nearby animals of the same species, adds an energy drain for ten days per case, and gives survivors temporary immunity. Purple rings mark illness. It can overshoot and cause extinction. The meadow pauses when a new red field note appears, so you have time to act; the switch beside the field notes turns this off.
         </p>
       </section>
       <section>
@@ -71,7 +71,7 @@ export function Guide() {
       </section>
       <section>
         <h3 className="mb-1 font-semibold">Keep a world</h3>
-        <p className="text-muted-foreground">Save meadow pauses and stores one world on this device, replacing your previous save. Resume restores its animals, food, genes and random state. Recent replay and the journal are included. In Endless mode, winters and droughts return each year; the fox invasion happens once. The four intervention charges last the whole run.</p>
+        <p className="text-muted-foreground">Save meadow pauses and stores one world on this device, replacing your previous save. Resume restores its animals, food, genes and random state. The population graph and the journal are kept whole; replay covers the last 15 days before the save. In Endless mode, winters and droughts return each year; the fox invasion happens once. The four intervention charges last the whole run.</p>
       </section>
       <section>
         <h3 className="mb-1 font-semibold">Keys</h3>

@@ -4,14 +4,15 @@ import { AlertTriangle, CheckCircle2, CloudRain, Crosshair, Info, OctagonAlert, 
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Progress } from '@/components/ui/progress'
+import { Switch } from '@/components/ui/switch'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
 import { useAnimalIcons } from '@/hooks/use-animal-icons'
 import { CHARGES, COOLDOWN } from '@/game/controller'
 import { CALM_BONUS } from '@/game/scores'
-import { forecast, type Tone } from '@/game/insights'
+import { forecast, usesLeft, type Tone } from '@/game/insights'
 import { useGame } from '@/hooks/use-game'
 import type { Intervention } from '@/sim/sim'
-import { dateLabel, formatDuration } from '@/sim/time'
+import { clockLabel, dateLabel, formatDuration } from '@/sim/time'
 import { cn } from '@/lib/utils'
 
 const TONE: Record<Tone, { icon: typeof Info; cls: string }> = {
@@ -23,19 +24,42 @@ const TONE: Record<Tone, { icon: typeof Info; cls: string }> = {
 
 
 /** The side panel while the meadow runs. Interventions come first so they stay in view without scrolling. */
-export function RunPanel({ inspector, setup }: { inspector: ReactNode; setup: ReactNode }) {
+export function RunPanel({ inspector, setup, onShowResult }: { inspector: ReactNode; setup: ReactNode; onShowResult: () => void }) {
   const [game, snap] = useGame()
   const icons = useAnimalIcons()
   const f = snap.tick > 48 && !snap.end && snap.atLive ? forecast(game.history, snap.tick) : null
 
   return (
     <div className="flex flex-col gap-4">
+      {snap.end && snap.score && snap.phase === 'ended' && (
+        <section className="flex items-center gap-2 rounded-lg border border-primary/40 bg-primary/10 px-3 py-2 text-sm">
+          <Trophy className="size-4 shrink-0 text-gold" />
+          <span className="min-w-0 flex-1">
+            {snap.end.survived ? 'Year complete' : `Run ended ${dateLabel(snap.end.tick)}`}
+            <span className="text-muted-foreground"> · score </span>
+            <span className="font-semibold tabular">{snap.score.total.toLocaleString()}</span>
+          </span>
+          <Button size="xs" variant="outline" onClick={onShowResult}>Show result</Button>
+        </section>
+      )}
+
       <Interventions />
 
       {inspector}
 
       <section>
-        <h3 className="mb-2 text-xs font-semibold tracking-wide text-muted-foreground uppercase">Field notes</h3>
+        <div className="mb-2 flex items-center justify-between gap-2">
+          <h3 className="text-xs font-semibold tracking-wide text-muted-foreground uppercase">Field notes</h3>
+          <label className="flex items-center gap-1.5 text-xs text-muted-foreground">
+            <Switch size="sm" checked={snap.autoPause} onCheckedChange={(on) => game.setAutoPause(on)} />
+            Pause on new red notes
+          </label>
+        </div>
+        {snap.pausedFor && !snap.playing && (
+          <p role="status" className="mb-2 rounded-lg border border-tone-danger-border px-2.5 py-1.5 text-xs">
+            Paused for a new warning, so you have time to decide. Press Space or Play to continue.
+          </p>
+        )}
         {snap.tick < 24 ? (
           <p className="rounded-lg border border-dashed p-3 text-sm text-muted-foreground">
             Notes on booms, busts and risks appear here once the animals are out.
@@ -112,19 +136,27 @@ export function BestScore() {
 /** With `preview`, a read-only list shown during setup so the options are known before the run. */
 export function Interventions({ preview = false }: { preview?: boolean }) {
   const [game, snap] = useGame()
-  const cooling = snap.head < snap.cooldownUntil
-  const coolLeft = Math.max(0, snap.cooldownUntil - snap.head)
+  const cooling = snap.tick < snap.cooldownUntil
+  const coolLeft = Math.max(0, snap.cooldownUntil - snap.tick)
   const canAct = game.canIntervene()
   return (
     <section aria-labelledby="interventions-heading">
       <div className="mb-2 flex items-center justify-between">
         <h3 id="interventions-heading" className="text-xs font-semibold tracking-wide text-muted-foreground uppercase">Interventions</h3>
-        <div className="flex items-center gap-1" aria-label={`${snap.charges} of ${CHARGES} left`}>
-          {Array.from({ length: CHARGES }, (_, i) => (
-            <span key={i} className={cn('size-2 rounded-full', i < snap.charges ? 'bg-primary' : 'bg-muted')} />
-          ))}
+        <div className="flex items-center gap-2">
+          <span className="text-xs text-muted-foreground tabular">{usesLeft(snap.charges, CHARGES, preview || snap.phase === 'planning')}</span>
+          <div className="flex items-center gap-1" aria-hidden="true">
+            {Array.from({ length: CHARGES }, (_, i) => (
+              <span key={i} className={cn('size-2 rounded-full', i < snap.charges ? 'bg-primary' : 'bg-muted')} />
+            ))}
+          </div>
         </div>
       </div>
+      {preview && (
+        <p className="mb-2 text-xs text-muted-foreground">
+          You get {CHARGES} uses per run, shared across all eight options, with a {formatDuration(COOLDOWN)} cooldown after each.
+        </p>
+      )}
       {preview ? (
         <ul className="flex flex-col gap-1.5 text-xs">
           {ACTIONS.map((a) => (
@@ -158,10 +190,12 @@ export function Interventions({ preview = false }: { preview?: boolean }) {
         </div>
       )}
       <p className="mt-2 text-xs text-muted-foreground">
-        {snap.phase !== 'running'
+        {snap.phase === 'ended'
+          ? 'This run has ended.'
+          : snap.phase !== 'running'
           ? 'Available once the run starts.'
           : snap.charges === 0
-            ? 'All interventions used.'
+            ? `All ${CHARGES} uses spent. No more interventions this run.`
             : !snap.atLive
               ? 'You are replaying the past. Return to live to intervene.'
               : cooling
@@ -228,7 +262,7 @@ export function Almanac() {
               </Badge>
               {ACTIONS.find((a) => a.id === iv.action)?.label}
             </span>
-            <span className="text-muted-foreground tabular">{dateLabel(iv.tick)}</span>
+            <span className="text-muted-foreground tabular">{dateLabel(iv.tick)} · {clockLabel(iv.tick)}</span>
           </li>
         ))}
       </ul>

@@ -54,7 +54,8 @@ export type ToWorker =
   | { type: 'save'; runId: number }
   | { type: 'restore'; runId: number; state: ReturnType<Sim['save']> }
   | { type: 'advance'; runId: number; target: number }
-  | { type: 'intervene'; runId: number; action: Intervention }
+  /** `at` is the hour on screen when the player acted; the worker rewinds to it if it has run ahead. */
+  | { type: 'intervene'; runId: number; action: Intervention; at: number }
 
 export interface EndInfo {
   tick: number
@@ -67,4 +68,6 @@ export type FromWorker =
   | { type: 'saved'; runId: number; state: ReturnType<Sim['save']> }
   | { type: 'ready'; restored?: boolean; end?: EndInfo | null; evolution: EvolutionSample; runId: number; cover: [number, number][]; frame: FrameData; stats: Float64Array }
   | { type: 'frames'; evolution: EvolutionSample[]; runId: number; frames: FrameData[]; stats: Float64Array; head: number; end: EndInfo | null }
-  | { type: 'intervened'; runId: number; action: Intervention; tick: number }
+  /** The action was queued at hour `from` and applied in the step to `tick` (`tick === from` when the run had already ended).
+   * The frame and stats row are for `tick`; the worker discarded any hours it had computed after `from`. */
+  | { type: 'intervened'; runId: number; action: Intervention; tick: number; from: number; frame: FrameData; stats: Float64Array; evolution: EvolutionSample[]; end: EndInfo | null }
