@@ -31,7 +31,7 @@ Last updated: 25 September 2026, 16:30 UTC.
 
 ### A third species
 
-- [ ] #7 Choose the third species. The design record is written: the field vole. It merges after #3 and #4.
+- [x] #7 Choose the third species: the field vole, alternative prey with its own seed food. [#24](https://github.com/Jack-Coutts/coevolution_game/pull/24)
 - [ ] #8 Add the vole to the simulation and saves. Built; merges after #4 and #7.
 - [ ] #9 Make the three-species meadow playable. In progress.
 
