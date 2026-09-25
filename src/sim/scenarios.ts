@@ -1,10 +1,13 @@
 import type { Disturbance } from './sim'
+import { THREE_SPECIES, TWO_SPECIES, type Species } from './species'
 import { tickAt } from './time'
 
-export type ScenarioId = 'stable' | 'drought' | 'invasion' | 'winter'
+export type ScenarioId = 'stable' | 'drought' | 'invasion' | 'winter' | 'voles'
 
 export interface Scenario {
   id: ScenarioId
+  /** The species in this meadow. Every one must survive; the run ends at the first extinction. */
+  species: readonly Species[]
   name: string
   tagline: string
   description: string
@@ -21,9 +24,11 @@ const DEC_1 = tickAt(3)
 const MAR_1 = tickAt(6)
 const MAY_1 = tickAt(8)
 
+/** Scenarios offered in the picker. The Vole meadow joins in #9. */
 export const SCENARIOS: Scenario[] = [
   {
     id: 'stable',
+    species: TWO_SPECIES,
     name: 'Open meadow',
     tagline: 'Watch, adapt, and keep both species alive.',
     description:
@@ -34,6 +39,7 @@ export const SCENARIOS: Scenario[] = [
   },
   {
     id: 'drought',
+    species: TWO_SPECIES,
     name: 'Drought',
     tagline: 'From May the bushes barely regrow.',
     description:
@@ -44,6 +50,7 @@ export const SCENARIOS: Scenario[] = [
   },
   {
     id: 'invasion',
+    species: TWO_SPECIES,
     name: 'Fox invasion',
     tagline: 'A pack of 14 moves in on 1 November.',
     description:
@@ -58,6 +65,7 @@ export const SCENARIOS: Scenario[] = [
   },
   {
     id: 'winter',
+    species: TWO_SPECIES,
     name: 'Harsh winter',
     tagline: 'December to February: little food, and cold burns energy.',
     description:
@@ -72,8 +80,28 @@ export const SCENARIOS: Scenario[] = [
   },
 ]
 
+/**
+ * The Vole meadow (docs/third-species.md section 11): the Open meadow preset plus field voles
+ * and grass seed, with no weather. Hidden from the scenario picker until #9 makes it playable;
+ * scripts and tests reach it through `SCENARIO_BY_ID.voles`.
+ */
+export const VOLE_MEADOW: Scenario = {
+  id: 'voles',
+  species: THREE_SPECIES,
+  name: 'Vole meadow',
+  tagline: 'Keep rabbits, voles and foxes alive for a year.',
+  description:
+    'Field voles live in the tall grass and eat its seeds, and berries when the seed runs short. Foxes eat them too.',
+  disturbance: { regrow: [], metabolism: [], arrivals: [] },
+  spans: [],
+  markers: [],
+}
+
+/** Every scenario, including ones not yet offered in the picker (`SCENARIOS`). */
+export const ALL_SCENARIOS: Scenario[] = [...SCENARIOS, VOLE_MEADOW]
+
 export const SCENARIO_BY_ID: Record<ScenarioId, Scenario> = Object.fromEntries(
-  SCENARIOS.map((s) => [s.id, s]),
+  ALL_SCENARIOS.map((s) => [s.id, s]),
 ) as Record<ScenarioId, Scenario>
 
 /** Seasonal spans in the visible window. Invasions are a one-time event; weather recurs. */

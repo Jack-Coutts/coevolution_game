@@ -1,4 +1,5 @@
-import { defaultParams, type SimParams, type SpeciesParams } from './params'
+import { defaultParams, defaultVole, type SimParams, type SpeciesParams } from './params'
+import { TWO_SPECIES, type Species } from './species'
 import { formatHours } from './time'
 
 export type LeverGroup = 'populations' | 'lifecycle' | 'energy' | 'movement' | 'food' | 'evolution'
@@ -386,8 +387,17 @@ export function litterGap(gap: number, litter: number): number {
   return Math.round(gap * (1 + 0.5 * (litter - 1)))
 }
 
-export function deriveParams(v: LeverValues): SimParams {
+/**
+ * Parameters for a meadow. The species set comes from the scenario, not the levers: voles
+ * bring their fixed provisional body (docs/third-species.md section 5); an optional
+ * `vole.initial` value sets how many start.
+ */
+export function deriveParams(v: LeverValues, species: readonly Species[] = TWO_SPECIES): SimParams {
   const p = defaultParams()
+  if (species.includes('vole')) {
+    p.vole = defaultVole()
+    if (v['vole.initial'] !== undefined) p.vole.body.initial = v['vole.initial']
+  }
   applySpecies(p.prey, v, 'prey')
   applySpecies(p.pred, v, 'pred')
   p.patches = v['food.patches']

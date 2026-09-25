@@ -43,6 +43,9 @@ export function RunPanel() {
       case 'illnessPred':
       case 'releasePred':
         return <img src={icons.fox} alt="" className="size-5" />
+      case 'illnessVole':
+      case 'releaseVole':
+        return null // Vole actions are not offered until the Vole meadow is playable (#9).
       default: {
         const never: never = id
         return never

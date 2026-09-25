@@ -77,6 +77,57 @@ export interface SimParams {
   prey: SpeciesParams
   pred: SpeciesParams
   eco: EcoParams
+  /** The field vole. Absent in two-species meadows; its presence adds voles and grass seed. */
+  vole?: VoleParams
+}
+
+/**
+ * The field vole's body and its place in the food web. Values are the provisional ones in
+ * docs/third-species.md section 5, for #9 to tune.
+ */
+export interface VoleParams {
+  body: SpeciesParams
+  /** Births stop here (a technical safeguard, like `ceilingPrey`). */
+  ceiling: number
+  /** Seed or berries a vole removes per bite. `body.mealEnergy` is the energy of a seed bite. */
+  bite: number
+  /** Energy of a berry bite as a share of a seed bite. */
+  berryValue: number
+  /** A vole's worth to a fox, as a share of the fox's `mealEnergy`. */
+  mealValue: number
+  /** Most seed heads a tall-grass patch holds. */
+  seedStock: number
+  /** Hours per +1 seed on every patch, scaled by the scenario regrowth factor. */
+  seedEvery: number
+}
+
+export function defaultVole(): VoleParams {
+  return {
+    body: {
+      initial: 60,
+      adultAge: 40,
+      birthGap: 96,
+      litter: 3,
+      lifespan: 480,
+      maxEnergy: 60,
+      metabolism: 0.22,
+      speedCost: 0.3,
+      mealEnergy: 14,
+      breedEnergy: 0.6,
+      childEnergy: 0.2,
+      visionUpkeep: 0.15,
+      step: 0.009,
+      baseStep: 0.009,
+      view: [0.12, 0.12],
+      turn: [1.2, 1.2],
+    },
+    ceiling: 800,
+    bite: 0.4,
+    berryValue: 0.25,
+    mealValue: 0.4,
+    seedStock: 20,
+    seedEvery: 6,
+  }
 }
 
 export function defaultEco(): EcoParams {
