@@ -1,10 +1,11 @@
 import { HISTORY_HOURS, type RunHistory } from './history'
 import type { RunConfig } from './controller'
 import { migrateState, type Intervention, type MeadowState, type MeadowStateV2 } from '@/sim/sim'
-import type { EvolutionSample, JournalEntry, PopulationEvolution } from '@/sim/evolution'
-import { TRAITS } from '@/sim/evolution'
+import type { EvolutionSample, PopulationEvolution } from '@/sim/evolution'
+import { CHARTED_TRAITS } from '@/sim/evolution'
 import { ALL_SPECIES } from '@/sim/species'
 import { ANIMAL_SIZE, ANIMAL_STRIDE, ANIMAL_STRIDE_V3, STAT_STRIDE, STAT_STRIDE_V2, type FrameData } from '@/worker/protocol'
+import type { JournalEntry } from './journal'
 
 export const SAVE_VERSION = 3
 export const INCOMPATIBLE_SAVE = 'This save belongs to another game version.'
@@ -15,26 +16,30 @@ export interface MeadowSave {
   config: RunConfig
   state: MeadowState
   history: ReturnType<RunHistory['save']>
-  charges: number
-  cooldownUntil: number
-  interventions: { tick: number; action: Intervention }[]
-  evolution: EvolutionSample[]
-  journal: JournalEntry[]
+  /** Uses left when saved. Written for older builds; on resume, uses are recomputed from `interventions`. */
+  charges?: number
+  /** The fields below may be missing from early version-2 saves; resume treats them as empty. */
+  cooldownUntil?: number
+  interventions?: { tick: number; action: Intervention }[]
+  evolution?: EvolutionSample[]
+  /** Journal entries, also kept (with the journal's state) in `history.journal`; older builds read them from here. */
+  journal?: (JournalEntry | { tick: number; text: string })[]
 }
 
 /** A version-2 save: a two-species meadow with a 23-column stats row. */
 export interface MeadowSaveV2 extends Omit<MeadowSave, 'version' | 'state' | 'history' | 'evolution'> {
   version: 2
   state: MeadowStateV2
-  history: Omit<ReturnType<RunHistory['save']>, 'highestGeneration' | 'animalStride'> & { highestGeneration: { prey: number; pred: number } }
-  evolution: Omit<EvolutionSample, 'vole'>[]
+  history: Omit<ReturnType<RunHistory['save']>, 'highestGeneration' | 'replayFrom' | 'journal' | 'families' | 'animalStride'> & { highestGeneration?: { prey: number; pred: number }; replayFrom?: number }
+    & Partial<Pick<ReturnType<RunHistory['save']>, 'journal' | 'families'>>
+  evolution?: Omit<EvolutionSample, 'vole'>[]
 }
 
 const ROWS = HISTORY_HOURS + 1
 
 function noAnimals(): PopulationEvolution {
   const none = { mean: 0, low: 0, high: 0 }
-  return { count: 0, generation: 0, lineages: 0, neurons: 0, traits: Object.fromEntries(TRAITS.map(k => [k, { ...none }])) as PopulationEvolution['traits'] }
+  return { count: 0, generation: 0, lineages: 0, neurons: 0, traits: Object.fromEntries(CHARTED_TRAITS.map(k => [k, { ...none }])) as PopulationEvolution['traits'] }
 }
 
 /**
@@ -55,8 +60,8 @@ export function migrateSave(value: MeadowSave | MeadowSaveV2): MeadowSave {
       ...value,
       version: 3,
       state,
-      history: { ...value.history, stats, highestGeneration: { ...value.history.highestGeneration, vole: 0 }, animalStride: ANIMAL_STRIDE_V3 },
-      evolution: value.evolution.map(e => ({ ...e, vole: noAnimals() })),
+      history: { ...value.history, journal: value.history.journal, families: value.history.families, replayFrom: value.history.replayFrom ?? value.history.start, stats, highestGeneration: { prey: 0, pred: 0, ...value.history.highestGeneration, vole: 0 }, animalStride: ANIMAL_STRIDE_V3 },
+      evolution: (value.evolution ?? []).map(e => ({ ...e, vole: noAnimals() })),
     })
   } catch {
     throw new Error(INCOMPATIBLE_SAVE)
@@ -81,15 +86,15 @@ function widenAnimals(a: Float32Array): Float32Array {
  */
 function withBodySize(save: MeadowSave): MeadowSave {
   const oldFrames = (save.history.animalStride ?? ANIMAL_STRIDE_V3) !== ANIMAL_STRIDE
-  const oldSamples = save.evolution.some(e => ALL_SPECIES.some(s => !e[s].traits.size))
+  const oldSamples = (save.evolution ?? []).some(e => ALL_SPECIES.some(s => e[s] && !e[s].traits.size))
   if (!oldFrames && !oldSamples) return save
   const frames = oldFrames
     ? save.history.frames.map(([t, f]): [number, FrameData] => [t, { ...f, prey: widenAnimals(f.prey), preds: widenAnimals(f.preds), ...(f.voles ? { voles: widenAnimals(f.voles) } : {}) }])
     : save.history.frames
-  const evolution = save.evolution.map(e => {
+  const evolution = save.evolution?.map(e => {
     const out = { ...e }
     for (const s of ALL_SPECIES) {
-      if (e[s].traits.size) continue
+      if (!e[s] || e[s].traits.size) continue
       const v = e[s].count > 0 ? 1 : 0
       out[s] = { ...e[s], traits: { ...e[s].traits, size: { mean: v, low: v, high: v } } }
     }

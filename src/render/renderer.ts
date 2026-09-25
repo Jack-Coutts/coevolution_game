@@ -1,5 +1,5 @@
 import { ANIMAL_SIZE, ANIMAL_STRIDE, BUSH_STRIDE, EVENT_KIND, EVENT_STRIDE, type FrameData } from '@/worker/protocol'
-import { foxSheet, GAIT_FRAMES, rabbitSheet, type SpriteSheet } from './sprites'
+import { foxSheet, GAIT_FRAMES, rabbitSheet, voleSheet, type SpriteSheet } from './sprites'
 import { paintBush, paintEarth, paintTerrain, type BushSprite, type TerrainLayers } from './terrain'
 
 export interface Weather {
@@ -29,16 +29,29 @@ const FX_MS: Record<Fx['kind'], number> = {
   withered: 1400,
 }
 
+/** Event species codes (EVENT_SPECIES order); plant events are -1. */
+const RABBIT = 0
+const FOX = 1
+const VOLE = 2
+
 /** Fox births and deaths are rare and matter, so they get longer, always-on markers. */
 function fxDuration(f: Fx): number {
-  if (f.species === 1 && (f.kind === 'born' || f.kind === 'old')) return 1800
+  if (f.species === FOX && (f.kind === 'born' || f.kind === 'old')) return 1800
   return FX_MS[f.kind]
 }
 
 const RABBIT_LEN = 0.033
 const FOX_LEN = 0.052
+/** Two thirds of a rabbit (docs/third-species.md section 6). */
+const VOLE_LEN = 0.022
 const BUSH_R = 0.03
 const MARGIN = 0.025
+
+function context2d(canvas: HTMLCanvasElement): CanvasRenderingContext2D {
+  const ctx = canvas.getContext('2d')
+  if (!ctx) throw new Error('2d context unavailable')
+  return ctx
+}
 
 export class WorldRenderer {
   private canvas: HTMLCanvasElement
@@ -50,6 +63,7 @@ export class WorldRenderer {
   private terrain: TerrainLayers | null = null
   private rabbits: SpriteSheet | null = null
   private foxes: SpriteSheet | null = null
+  private voles: SpriteSheet | null = null
   private bushSprites = new Map<number, BushSprite>()
   private earth: HTMLCanvasElement | null = null
   private fx: Fx[] = []
@@ -60,9 +74,20 @@ export class WorldRenderer {
 
   constructor(canvas: HTMLCanvasElement) {
     this.canvas = canvas
-    const ctx = canvas.getContext('2d')
-    if (!ctx) throw new Error('2d context unavailable')
-    this.ctx = ctx
+    this.ctx = context2d(canvas)
+  }
+
+  /** Frees the detached canvas's backing store; `setCanvas` sizes it again on return. */
+  releaseCanvas(): void {
+    this.canvas.width = 0
+    this.canvas.height = 0
+  }
+
+  /** Draw into another canvas element, keeping the painted terrain and sprites. */
+  setCanvas(canvas: HTMLCanvasElement): void {
+    this.canvas = canvas
+    this.ctx = context2d(canvas)
+    this.applySize()
   }
 
   setWorld(cover: [number, number][], coverR: number, seed: number, patchStock: number): void {
@@ -82,11 +107,16 @@ export class WorldRenderer {
     if (size === this.size && dpr === this.dpr) return
     this.size = size
     this.dpr = dpr
-    this.canvas.width = Math.round(size * dpr)
-    this.canvas.height = Math.round(size * dpr)
-    this.canvas.style.width = `${size}px`
-    this.canvas.style.height = `${size}px`
+    this.applySize()
     this.rebuild()
+  }
+
+  private applySize(): void {
+    if (!this.size) return
+    this.canvas.width = Math.round(this.size * this.dpr)
+    this.canvas.height = Math.round(this.size * this.dpr)
+    this.canvas.style.width = `${this.size}px`
+    this.canvas.style.height = `${this.size}px`
   }
 
   private rebuild(): void {
@@ -101,6 +131,7 @@ export class WorldRenderer {
     this.earth = paintEarth(this.size * 0.12, this.dpr)
     this.rabbits = rabbitSheet(RABBIT_LEN * inner, this.dpr)
     this.foxes = foxSheet(FOX_LEN * inner, this.dpr)
+    this.voles = voleSheet(VOLE_LEN * inner, this.dpr)
     this.bushSprites.clear()
   }
 
@@ -124,9 +155,11 @@ export class WorldRenderer {
     const ev = frame.events
     for (let i = 0; i < ev.length; i += EVENT_STRIDE) {
       const kind = EVENT_KIND[ev[i]]
-      const fox = ev[i + 1] === 1
+      const fox = ev[i + 1] === FOX
       if (kind === 'old' && !fox) continue
       if (busy && !fox && (kind === 'born' || kind === 'starved')) continue
+      // Voles are born and starve by the thousand; only their deaths to foxes, releases and illness are marked.
+      if (ev[i + 1] === VOLE && (kind === 'born' || kind === 'starved')) continue
       if (busy && kind === 'sprouted' && this.fx.length > 12) continue
       this.fx.push({ kind, species: ev[i + 1], x: ev[i + 2], y: ev[i + 3], t0: now })
     }
@@ -140,7 +173,7 @@ export class WorldRenderer {
 
   draw(a: FrameData, b: FrameData, alpha: number, weather: Weather, now: number): void {
     const { ctx, dpr } = this
-    if (!this.terrain || !this.rabbits || !this.foxes) return
+    if (!this.terrain || !this.rabbits || !this.foxes || !this.voles) return
     ctx.setTransform(1, 0, 0, 1, 0, 0)
     ctx.drawImage(this.terrain.base, 0, 0)
     if (weather.warm > 0.01) {
@@ -160,6 +193,7 @@ export class WorldRenderer {
 
     this.drawBushes(b.bushes)
     this.drawFx(now, 'under')
+    if (b.voles?.length) this.drawAnimals(a.voles ?? new Float32Array(), b.voles, alpha, this.voles, VOLE_LEN, now, 3.2)
     this.drawAnimals(a.prey, b.prey, alpha, this.rabbits, RABBIT_LEN, now, 2.4)
     this.drawAnimals(a.preds, b.preds, alpha, this.foxes, FOX_LEN, now, 1.8)
     ctx.setTransform(1, 0, 0, 1, 0, 0)
@@ -186,7 +220,8 @@ export class WorldRenderer {
     for (let i = 0; i < bushes.length; i += BUSH_STRIDE) {
       const id = bushes[i]
       live.add(id)
-      const fullness = bushes[i + 3]
+      // A vole-bitten bush can briefly regrow a little above its stock (docs/validation.md, #8); draw it as full.
+      const fullness = Math.min(1, bushes[i + 3])
       const grown = bushes[i + 4]
       const wither = Math.min(1, bushes[i + 5])
       const sprite = this.bushSprite(id)
@@ -324,7 +359,7 @@ export class WorldRenderer {
           break
         }
         case 'born': {
-          if (f.species === 1) {
+          if (f.species === FOX) {
             if (layer !== 'over') break
             const pulse = 1 - t
             ctx.strokeStyle = `rgba(255, 170, 90, ${0.95 * pulse})`
@@ -345,7 +380,7 @@ export class WorldRenderer {
             break
           }
           if (layer !== 'under') break
-          ctx.strokeStyle = f.species ? `rgba(255, 190, 120, ${0.5 * (1 - t)})` : `rgba(235, 250, 220, ${0.4 * (1 - t)})`
+          ctx.strokeStyle = f.species === RABBIT ? `rgba(235, 250, 220, ${0.4 * (1 - t)})` : `rgba(255, 190, 120, ${0.5 * (1 - t)})`
           ctx.lineWidth = 1
           ctx.beginPath()
           ctx.arc(x, y, inner * (0.005 + 0.01 * t), 0, Math.PI * 2)
@@ -356,7 +391,7 @@ export class WorldRenderer {
         case 'starved':
         case 'old': {
           if (layer !== 'under') break
-          ctx.fillStyle = f.species === 1 ? `rgba(90, 80, 70, ${0.4 * (1 - t)})` : `rgba(120, 110, 95, ${0.22 * (1 - t)})`
+          ctx.fillStyle = f.species === FOX ? `rgba(90, 80, 70, ${0.4 * (1 - t)})` : `rgba(120, 110, 95, ${0.22 * (1 - t)})`
           ctx.beginPath()
           ctx.arc(x, y, inner * (0.008 + 0.01 * t), 0, Math.PI * 2)
           ctx.fill()
@@ -366,7 +401,7 @@ export class WorldRenderer {
         case 'released':
         case 'culled': {
           if (layer !== 'over') break
-          const color = f.kind === 'culled' ? '150, 150, 150' : f.species ? '255, 140, 60' : '250, 245, 225'
+          const color = f.kind === 'culled' ? '150, 150, 150' : f.species === FOX ? '255, 140, 60' : f.species === VOLE ? '150, 180, 220' : '250, 245, 225'
           ctx.strokeStyle = `rgba(${color}, ${0.85 * (1 - t)})`
           ctx.lineWidth = 2
           ctx.beginPath()

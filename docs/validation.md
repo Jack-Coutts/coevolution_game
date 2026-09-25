@@ -27,19 +27,110 @@ independent trials. To reproduce the browser check, run the dev server and open
 
 ## Does intervention help?
 
-The [paired intervention experiment](experiments/interventions.json) starts from those same
-50 seeds and permits four actions, with the game's 400-hour cooldown. After hour 240, a
-simple fixed policy culls foxes when rabbits are scarce and foxes numerous, feeds very few
-hungry foxes, supplies rain when rabbits are hungry, or releases rabbits when very scarce.
-Exact priorities, thresholds and action times are in the script and raw report.
+Short answer: every action has a situation where it helps over the next 60 days, but a
+fixed heuristic does not reliably change **year** survival, and the 20 held-out seeds did
+not confirm the short-term gains. This is evidence about the actions and a fixed rule, not
+about skilled play.
 
-Raw outcomes: **18/50 untouched vs 23/50 with interventions**. The policy rescued nine
-otherwise failing seeds and spoiled four otherwise successful ones. One paired seed (5041)
-is excluded from balance evidence because its intervention run hit the rabbit safeguard;
-both versions failed. Among the remaining **49 valid pairs: 18 survived untouched, 23 with
-interventions**. This suggests useful agency; it is not evidence of optimal play or a
-statistically established general improvement. The new illness and planting choices have
-mechanical tests, but this policy does not establish their strategic balance.
+**Method.** `scripts/action-probes.ts` defines, for each action, a *timely* situation and a
+plausible-but-wrong *mistimed* one, read only from on-screen signals (counts, berry stock,
+mean energy, 10-day trends). `scripts/action-assay.ts` runs each seed untouched; each action
+once at the first hour at or after 240 where its situation holds (timely, then mistimed);
+fox illness at the hour a cull would be used; a *keeper* that uses all eight with the game
+budget (4 charges, 400-hour cooldown, two charges kept for releases/feeding/culls); and a
+placebo *nudge* that moves one rabbit 0.0001 at hour 241. Rows record action hours and
+signals, outcomes, deaths by cause, 30-day populations, illness shape and ceiling hits.
+Pairs with a ceiling hit are excluded from balance claims (there were two runs on tuning
+seeds, none on evaluation seeds). Node 22.22.2, Linux x64, four worker processes.
+
+- Tuning seeds **8000–8039**: situations were chosen from 60-day branches at checkpoints
+  every 480 hours ([summary](experiments/actions-explore.json)), then the paired assay was
+  run ([actions-tuning.json](experiments/actions-tuning.json), 1,447 s;
+  [keeper with reserve](experiments/actions-tuning-keeper.json)).
+- Evaluation seeds **8100–8119**, run once with everything frozen
+  ([actions-final.json](experiments/actions-final.json), 1,552 s). A 100-seed evaluation
+  (8100–8199) was started and stopped part-way to free a shared machine; no rows from it
+  were kept, so **20 seeds is the whole held-out sample**.
+
+**The chaos floor.** The meadow is chaotic: the placebo nudge changed the year outcome on
+15 of 40 tuning seeds (9 improved, 6 spoiled; 19 vs 16 survived) and 5 of 20 evaluation
+seeds (2 improved, 3 spoiled). Any single action reshuffles which seeds survive, so year
+counts below are only meaningful where they clearly exceed that floor. None does.
+
+**60-day branches (tuning seeds).** From each checkpoint, each action was branched for
+60 days and compared with the untouched run: *prevented* = the untouched run lost a species
+within 60 days and the branch did not; *caused* = the reverse. Applying an action at every
+checkpoint regardless of situation gives the noise reference (for example rain 16 / 35,
+planting 21 / 13).
+
+| Action | Timely: branches, prevented / caused | Mistimed: branches, prevented / caused |
+| --- | ---: | ---: |
+| Rain | 58: 3 / 1 | 63: 1 / 11 |
+| Plant bushes | 94: 8 / 3 | 100: 3 / 3 |
+| Release rabbits | 68: 12 / 1 | 68: 1 / 5 |
+| Release foxes | 24: 7 / 0 | 288: 9 / 14 |
+| Cull foxes | 132: 14 / 5 | 36: 1 / 4 |
+| Feed foxes | 27: 5 / 0 | 132: 7 / 15 |
+| Rabbit illness | 29: 0 / 4 | 68: 5 / 5 |
+| Fox illness | 288: 15 / 8 | 37: 1 / 4 |
+
+**Held-out paired runs (20 evaluation seeds; 10/20 survived untouched, Wilson 30–70%).**
+Counts are seeds improved / spoiled versus untouched, over seeds where the situation arose.
+
+| Action | Timely arose | Year | 60 days | Mistimed arose | Year | 60 days | Timely-only / mistimed-only survivals |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| Rain | 14 | 1 / 5 | 0 / 1 | 19 | 3 / 4 | 2 / 1 | 0 / 3 |
+| Plant bushes | 16 | 0 / 3 | 0 / 3 | 16 | 3 / 3 | 2 / 2 | 1 / 4 |
+| Release rabbits | 18 | 2 / 2 | 2 / 3 | 19 | 0 / 5 | 1 / 1 | 6 / 1 |
+| Release foxes | 6 | 0 / 1 | 0 / 0 | 19 | 4 / 5 | 2 / 1 | 1 / 0 |
+| Cull foxes | 19 | 1 / 2 | 1 / 0 | 8 | 1 / 3 | 0 / 1 | 2 / 1 |
+| Feed foxes | 6 | 1 / 0 | 0 / 0 | 19 | 2 / 4 | 2 / 1 | 4 / 0 |
+| Rabbit illness | 15 | 2 / 4 | 0 / 0 | 18 | 5 / 4 | 3 / 4 | 2 / 4 |
+| Fox illness | 19 | 3 / 5 | 2 / 1 | 8 | 1 / 3 | 0 / 2 | 1 / 0 |
+| Keeper (all eight) | 20 | 2 / 5 | 3 / 0 | | | | |
+| Placebo nudge | 20 | 2 / 3 | 2 / 1 | | | | |
+
+The keeper survived 7/20 against 10/20 untouched (tuning: 19/40 against 16/40, equal to the
+placebo). Where evaluation agrees with tuning is the mistimed column: releasing rabbits into
+a boom (0 / 5), culling or infecting a small fox group (1 / 3 each) and feeding foxes while
+they overhunt (2 / 4) spoiled more seeds than they rescued. The held-out sample is too small
+to confirm any timely benefit. Comparing timely with mistimed use of the same action favours
+timely use for releases, culls, feeding and fox illness, and does not for rain, planting or
+rabbit illness.
+
+**Illness versus culling (evaluation seeds, medians).** A cull at the overhunting signal
+removed 12 of 36 foxes at once; foxes were back to 37 thirty days later. Fox illness at the
+same moment infected 42 foxes over the outbreak, peaked at 23 ill after 120 hours, killed 19
+within 60 days and left 9 fewer foxes than untouched at day 30. Neither beat the placebo on
+year survival. Players can watch it develop: ill foxes numbered 11, 16, 16, 4 and 0 at days
+1, 3, 7, 14 and 30 (median; under 1 by day 30). Overshoot (target extinct within 60 days):
+
+| Illness use | Tuning seeds | Evaluation seeds |
+| --- | ---: | ---: |
+| Fox illness, fox-heavy meadow (median 28–30 foxes) | 1/40 | 0/19 (Wilson 0–17%) |
+| Fox illness, 8 or fewer foxes | 6/18 | 2/8 (7–59%) |
+| Rabbit illness, 300+ rabbits on bare bushes | 5/36 | 1/15 (1–30%) |
+| Rabbit illness, 60 or fewer rabbits | 12/34 | 6/18 (16–56%) |
+
+Rabbit illness is far larger than fox illness: in a boom of about 310 rabbits it caused 969
+cases and 728 illness deaths within 60 days (it reaches newborns too), peaking at 140 ill
+after 205 hours.
+
+**Tuning outcome: no mechanics changed.** The one-year budget (4 charges, 400-hour cooldown)
+and all effects are unchanged; untouched runs are identical (`validate-balance.ts 5000 50`
+gives the same 50 rows, 19/50 on this runtime). Rabbit illness never showed a useful situation
+on tuning seeds, so four small variants were branched: drain 0.35 per hour, 120-hour illness,
+spread chance 0.05 and a 40% slowdown while ill. In the rabbit-boom situation they gave
+prevented / caused of 0 / 2, 2 / 2, 1 / 2 and 1 / 1 (game: 0 / 4), inside the noise, so none
+was adopted. Fox illness in a fox-heavy meadow gave 21 / 12, 15 / 7, 14 / 8 and 16 / 4 under the same
+variants (game: 15 / 8): no variant was clearly better. Culling was not dominated by fox
+illness at 60 days (overhunting: cull 14 / 5, fox illness 8 / 7 on tuning seeds), so neither
+was changed.
+
+**Limitations.** The situations are fixed thresholds, not a model of skilled play. 20
+evaluation seeds cannot confirm small effects; the 60-day branch table uses tuning seeds only.
+A held-out branch check of the frozen situations (`action-explore.ts 8100 100 … --evaluate`)
+is scripted but was not run. Rabbit illness still has no demonstrated beneficial use.
 
 ## Does evolution improve behaviour?
 
@@ -73,7 +164,70 @@ are reported as missing, rather than zero or silently discarded. Year survival i
 **6/20 evolving, 13/20 founder-pool, 11/20 selection-only**. Individual adaptation does not
 imply more stable coexistence. Selection-only foraging at month one is 0.4680, so this
 experiment also does not prove that mutation improves on selection from founding variation.
-No claim is made that larger or growing brains outperform the default.
+No claim is made that larger or growing brains outperform the default; the next section tests it.
+
+## Do hidden layers, memory or growing brains help?
+
+The linear controller plausibly falls short in three situations. It cannot keep fleeing once a fox
+leaves view, because it has no memory. It cannot gate one cue by another, such as fleeing only when
+not starving, or hiding only when a fox is near; that needs hidden units. It cannot trade food
+against danger nonlinearly. Success was defined before running, in the fixed arenas:
+
+- **Net forage:** energy eaten per rabbit-hour minus brain upkeep (0.01 per hidden neuron per hour).
+- **Catches per encounter:** the share of fox encounters (a fox within chase range) that end in capture.
+- **Flee:** while a fox is within chase range, the rabbit's next move directly away from it, as a
+  fraction of top speed. This is the visible "rabbit bolts from a fox" behaviour.
+- **Catches per fox-day:** evolved foxes hunting the fixed reference rabbits.
+
+The 24-hour encounter-survival proxy is not used.
+
+The [brain assay](experiments/brains.json) (`npx tsx scripts/brain-assay.ts 20 --start 6100 --json …`)
+evolves four conditions on the same fresh seeds **6100–6119** in the two-species Open meadow for
+three months. The conditions are linear, 4 fixed hidden neurons, linear plus one memory channel,
+and growth from linear (a 5% chance per birth of adding a neutral neuron, up to 12). Each has a
+founder-pool control of the same architecture. Snapshots from month 0 and month 3 meet fixed
+opponents in fresh arena seeds 7100–7102, each 240 hours long. The opponents are linear founders
+from seeds 900–903, with their memory input cut so that they behave identically in every condition.
+The 160 runs took 7.0 minutes on one process, with no safety-ceiling hits.
+
+| Month 3, evolving | Linear | Hidden 4 | Memory | Growth |
+| --- | ---: | ---: | ---: | ---: |
+| Populations surviving (snapshots available) | 17/20 | 17/20 | 17/20 | 18/20 |
+| Net forage per rabbit-hour | 0.566 | 0.669 | 0.562 | 0.632 |
+| Catches per encounter | 0.095 | 0.086 | 0.093 | 0.090 |
+| Flee (fraction of top speed) | 0.005 | -0.004 | -0.010 | 0.007 |
+| Catches per fox-day | 0.117 | 0.122 | 0.111 | 0.118 |
+| Mean rabbit / fox hidden neurons | 0 / 0 | 4 / 4 | 0 / 0 | 0.69 / 0.26 |
+
+The paired comparisons against linear only use seeds where both populations survived. Each gain is
+the mean with an approximate 95% interval; positive favours the richer brain:
+
+| Versus linear | Net forage | Catches per encounter | Flee | Catches per fox-day |
+| --- | --- | --- | --- | --- |
+| Hidden 4 | +0.088 ± 0.162, 8/14 | +0.012 ± 0.020, 8/14 | −0.006 ± 0.043, 6/14 | +0.012 ± 0.038, 9/14 |
+| Memory | +0.065 ± 0.127, 10/15 | +0.007 ± 0.014, 9/15 | −0.010 ± 0.031, 8/15 | −0.010 ± 0.016, 6/15 |
+| Growth | +0.064 ± 0.072, 11/17 | +0.005 ± 0.013, 10/17 | +0.001 ± 0.023, 9/17 | −0.001 ± 0.019, 8/17 |
+
+Evolution itself works under every architecture. Against its own founder pool, each condition
+improves net forage in 15–18 of 16–18 paired seeds, by +0.31 to +0.46, and fox catch rate by
++0.02 to +0.03. The extra machinery adds nothing that can be distinguished from zero:
+
+- Every interval against linear includes zero. Growth's foraging gain comes closest, but it has
+  at most 0.69 neurons per rabbit, so it is still nearly linear.
+- Ecosystem survival is the same (17–18/20). The behavioural comparisons are therefore not
+  driven by different survivor sets, although they do condition on survival.
+- No condition evolves the visible escape behaviour. Rabbits near a fox move away at about
+  0% of top speed under every brain, so a player would see no difference.
+
+Performance cost is real. One forward pass takes 223 ns linear, 563 ns with 4 hidden neurons and
+1,243 ns with 12. Whole-simulation time is 3.9 ms per 1,000 animal-hours for linear and 4.3 ms
+for hidden 4 (+10%). Memory and growth stay close to linear, because they add almost no neurons.
+
+**Decision:** no variant earns a place in normal play. The default stays the linear controller,
+and hidden layers, memory and growth remain assay-only variants. Exposing brain growth in
+long-running worlds (#14) is deferred until a variant shows a repeatable, visible behavioural gain
+that is worth its cost. The gain should appear in this assay with an interval excluding zero,
+without an ecosystem cost.
 
 ## Reproducibility and gameplay checks
 
@@ -94,7 +248,7 @@ founder-pool controls, illness spread/recovery/death attribution, planting/feedi
 checkpoint continuation (including hidden controller memory), repeat seasons, bounded
 Endless history and journal milestones. See the README for reproduction commands.
 
-Final local checks: **33 tests passed** across five test files; TypeScript and the production
+Final local checks: **35 tests passed** across five test files; TypeScript and the production
 build passed; lint completed with no errors and four existing component-export warnings.
 Vite reports a roughly 507 kB main JavaScript chunk (162 kB gzip), just above its advisory
 500 kB threshold. The reusable browser validation page was also checked through worker
@@ -162,6 +316,198 @@ Implementation notes and deviations from the design record:
 - Deferred to #9: vole levers (only an optional `vole.initial` value is read), hints and
   forecasts, full vole explanations (a plain cause summary stands in), rendering, the run
   panel's vole actions (`VOLE_ACTIONS` exists but is not shown) and picker visibility.
+
+## Playable Vole meadow (#9)
+
+Measured with Node 22.22.2 on Linux x64 (shared container), `scripts/vole-play.ts`, raw rows in
+`experiments/vole-play-untouched.json` and `experiments/vole-play-decision.json`. Engine and
+parameters are the #8 ones: no tuning pass was made, because the #8 batch (5/10) was already
+inside the 30 to 50% guide.
+
+**Untouched, fresh seeds 9300 to 9319**, default settings (60 starting voles), game rules:
+
+| Measure | Result |
+| --- | ---: |
+| All three alive at a year | **6/20 (30%)**, Wilson 95% interval 15 to 52% |
+| First species lost (rabbit / vole / fox) | 11 / 2 / 1 |
+| Safety-ceiling hits | 0 in every run |
+| Peak voles (range) | 223 to 353 (ceiling 800) |
+
+Survival sits at the lower edge of the band. Rabbits are 79% of first losses, above the
+design's 70% guide for "no single fragile species": a flag for a later calibration on a larger
+batch, not tuned here.
+
+**Decision 1: cull foxes when they overhunt, with voles present.** Each run was branched at the
+first overhunting warning (10 or more foxes, under 5 rabbits per fox, rabbits down 15% in ten
+days; in the Vole meadow there were 82 to 147 voles at that moment) into cull foxes, release
+rabbits, or wait. Same seeds in both meadows.
+
+| | Open meadow | Vole meadow |
+| --- | ---: | ---: |
+| Year survival: cull / release rabbits / wait | 9 / 7 / 10 | 6 / 3 / 6 |
+| Cull lasted longer / shorter than waiting | 7 / 6 | 11 / 5 |
+| Cull lasted longer / shorter than releasing | 12 / 4 | 12 / 5 |
+| 30 days on, after a cull vs after waiting: voles | | 95 vs 84 |
+| 30 days on: highest vole count, cull vs wait | | 149 vs 136 |
+| 30 days on: barest bushes (mean fullness), cull vs wait | 9.1% vs 11.1% | 6.4% vs 8.2% |
+
+Whether the cull or the release lasted longer differed between the meadows on **8 of 20 seeds**:
+with voles the cull compared better on 9302, 9303, 9307 and 9311, and worse on 9300, 9312,
+9316 and 9318. On three seeds a cull that kept the Open meadow alive for the year lost the Vole
+meadow: 9300 (Vole: cull ends at hour 4289, waiting survives), 9311 (cull ends at 5899, waiting
+survives) and 9318 (cull ends at 2865 with 3 foxes left a month on; releasing rabbits lasts to
+5619). So the vole link makes
+the familiar fix a real trade-off: the cull still helps more often than it hurts, but it frees
+the voles and strips berries, and it can backfire. The new overhunting note says so.
+
+Not measured here (left for a later pass): decision 2 (culling when voles crash), mistimed
+actions, the browser worker batch and playback speed, the 50-seed batch the design asks for,
+and Starting voles values other than the default.
+
+**Browser check.** A production build (`vite build`, `vite preview`) was driven with Playwright
+in light and dark themes through planning, running, inspecting a vole, the Evolution page, the
+Guide and the result dialog, in the Vole meadow (seed 9302) and the Open meadow (seed 9305).
+The Open meadow shows no vole lever, action, count, row or legend entry.
+
+## Scenario calibration: Drought, Harsh winter, Fox invasion
+
+Issue #6. The raw reports are in `docs/experiments/scenarios-*.json`, one row per run. The
+scenarios use the open-meadow starting balance (`STABLE_PRESET`), and each adds one
+disturbance. We tuned on seeds **8200–8219** in one pass. Then we froze the settings and
+evaluated on fresh seeds **8300–8319**. Each seed runs four conditions:
+
+- **untouched**: no actions.
+- **keeper**: the scenario-blind policy from the intervention assay (#4). It reads only
+  on-screen signals and uses four charges with a 400-hour cooldown.
+- **informed**: the scenario's intended decision (below), triggered by the warning. The keeper
+  then uses any charges left.
+- **nudge**: a placebo. It moves one rabbit by 0.0001 at hour 240.
+
+These are **20-seed samples**. A 95% interval spans about ±20 points, so every difference
+below is suggestive rather than established. No run in any condition hit a population safety
+ceiling (`ceilingHits` is 0 in every row), so no seed is excluded. All runs used Node 22.22.2
+on linux x64 with two worker processes.
+
+### Intended difficulty and decision
+
+| Scenario | Disturbance | Intended difficulty | Decision the player should read |
+| --- | --- | --- | --- |
+| Drought | Bushes regrow at 35% from 1 May to the end of the year (unchanged) | Hardest. A late endurance test: most meadows that reach May fail without help | Save charges for the dry months. Once bushes are stripped (<25% full) during the drought, use rain |
+| Harsh winter | 1 Dec–28 Feb: regrowth **60%** (was 30%), energy use **+15%** (was +35%) | Hard. Below the open meadow, but a prepared player should do clearly better | Go into winter with fewer foxes: cull on the warning if there are 12+. Rain once bushes are stripped in the cold |
+| Fox invasion | 14 fed foxes arrive on 1 Nov (unchanged) | Moderate. Somewhat below the open meadow | Save charges for the pack. Cull two days after it arrives while 12+ foxes remain (within 30 days) |
+
+The exact rules are in `PLANS` in `scripts/scenario-assay.ts`, and every report records them.
+
+### Survival (all 20 seeds; paired changes against untouched)
+
+| Seeds | Condition | Open meadow | Drought | Harsh winter | Fox invasion |
+| --- | --- | ---: | ---: | ---: | ---: |
+| Tuning 8200–8219 | untouched | 11/20 | 2/20 | 0/20 (old winter) · 3/20 (retuned) | 7/20 |
+| | informed | – | 5/20 (+4 −1) | 1/20 (old winter) · 9/20 (retuned, +7 −1) | 10/20 (+5 −2, final plan) |
+| | keeper | – | 3/20 (+2 −1) | 0/20 (old winter) | 7/20 (+2 −2) |
+| **Final 8300–8319** | untouched | **11/20** | **2/20** | **6/20** | **11/20** |
+| | informed | – | **6/20 (+4 −0)** | **9/20 (+6 −3)** | **11/20 (+3 −3)** |
+| | keeper | – | 4/20 (+2 −0) | 8/20 (+4 −2) | 13/20 (+2 −0) |
+| | nudge (placebo) | – | 2/20 (+1 −1) | 1/20 (+1 −6) | 11/20 (+2 −2) |
+
+What we can and cannot claim from these samples:
+
+- **Drought** behaves as intended. Six of 20 final seeds die before 1 May, from the open
+  meadow's own dynamics. Of the 14 that reach the drought, 2 survive untouched. The informed
+  decision rescued 4 and lost none on the final seeds, and rescued 4 and lost 1 on the
+  tuning seeds (8 rescued vs 1 lost over both sets). The placebo reshuffled only 1 each way.
+  This is the most consistent benefit in the experiment. We made no change.
+- **Harsh winter** was **unwinnable as shipped**: 0/20 untouched, 0/20 keeper and 1/20
+  informed on the tuning seeds, and 18 of 20 runs died during the winter. On the tuning
+  seeds we tried regrowth 50% with energy +20% (2/20 untouched, 4/20 informed) and regrowth 60%
+  with energy +15% (3/20 untouched, 9/20 informed), and adopted the second. On the final
+  seeds it sits below the open meadow (6/20 vs 11/20), and informed play reaches 9/20. The
+  placebo lost 6 of the 6 untouched survivors, though. Survival through this winter is
+  highly sensitive to tiny changes, so the +6 −3 informed result is **not distinguishable
+  from noise** at 20 seeds.
+- **Fox invasion** does **not** measurably change difficulty on the final seeds. The result
+  was 11/20 untouched, the same as the open meadow on those seeds. On tuning seeds it was
+  7/20 vs 11/20. The prompt cull did not help on the final seeds (+3 −3, the same as the
+  placebo's ±2). At onset the meadow already holds a median of 48 foxes, so the 14 newcomers
+  add about 30%. Only 1 of 9 final untouched collapses came within 30 days of the arrival;
+  the rest came 42–246 days later. A second tuning pass (below) found no setting that held
+  up, so the scenario stays as shipped.
+
+### Fox invasion: second tuning pass
+
+This was one pass on tuning seeds 8200–8219, running untouched and informed only, with the
+informed cull following the arrival. On these seeds the open meadow gave 11/20 and the shipped
+invasion gave 7/20.
+
+| Variant (tuning seeds) | Untouched | Informed (paired) | Report |
+| --- | ---: | ---: | --- |
+| 14 foxes on 1 Nov (shipped) | 7/20 | 10/20 (+5 −2) | `scenarios-tuning.json`, `scenarios-tuning-invasion-plan.json` |
+| max(14, 60% of current foxes) on 1 Nov | 9/20 | 12/20 (+5 −2) | `scenarios-tuning-invasion-share60.json` |
+| 14 foxes on 1 Oct | **5/20** | **10/20 (+6 −1)** | `scenarios-tuning-invasion-oct1.json` |
+| max(14, 60% of current foxes) on 1 Oct | 4/20 | 9/20 (+8 −3) | `scenarios-tuning-invasion-oct1-share60.json` |
+
+The 60% variants used a temporary `share` field on arrivals in `src/sim/sim.ts`. That field was
+not adopted and has been removed. The 1 October arrival did best on the tuning seeds, needs no
+simulation change, and was evaluated on final seeds 8300–8319
+(`scenarios-final-invasion-oct1.json`). It gave **11/20 untouched**, the same as the open
+meadow on those seeds. Informed play gave 9/20 (+2 −4), keeper 11/20 (+5 −5) and the placebo
+8/20 (+1 −4). The tuning-seed gap did not generalise; it was within the seed-to-seed noise that
+the placebo shows. We therefore kept the shipped scenario (14 foxes on 1 November) rather than
+adopt an unproven change. A pack large enough to matter probably needs a larger share (at onset
+the meadow already holds a median of about 40–50 foxes) or a pack that arrives hungry, and
+settling that needs more than 20 seeds. The informed cull is a readable decision, but at this
+sample size it is not a demonstrated rescue.
+
+During tuning, two informed plans changed before the freeze. The first winter rule (feed
+foxes when hungry) gave 1/20. The first invasion rule allowed keeper actions from the
+warning, so the keeper spent charges before the pack arrived. The first-pass report
+`scenarios-tuning.json` records the old rules and the old winter. The files
+`scenarios-tuning-{stable,winter-a,winter-c,winter-plan,invasion-plan}.json` record the
+comparisons that led to the frozen settings.
+
+### Warnings and intervention opportunities
+
+- **Warning lead time.** A new field note appears **14 days** before each disturbance, for
+  example "Harsh winter starts in 14 days (1 Dec)." or "Foxes arrive in 3 days (1 Nov).".
+  Every untouched run still alive at that point received it. That was all 14 drought,
+  19 winter and 20 invasion final runs, and the note appeared exactly 336 hours before onset.
+  Before this change, a Challenge player saw the dates only in the almanac and the timeline
+  shading, both visible from hour 0: 242 days ahead for the drought, 91 for the winter and
+  61 for the invasion. Nothing announced the disturbance as it approached. In Endless, the
+  almanac lists the first year's dates, and the timeline shows the next year's span only
+  about 12 days ahead. The field note now repeats every year for weather and appears once for
+  the invasion (see `tests/scenarios.test.ts`).
+- **Useful opportunities.** The 400-hour cooldown allows about seven actions across the
+  4-month drought, six from the winter warning to 1 March, and two within 30 days of the
+  arrival. The four charges, not the cooldown, are the limit. In the final informed runs,
+  rain was the main drought and winter action (30 and 37 uses across 20 seeds), and culls
+  were the invasion action (64 uses).
+- **Failure causes (final, untouched).** Drought: foxes could not catch rabbits (9), rabbits
+  eaten out (8), foxes starved for lack of rabbits (1). Bushes were already only 8% full at
+  onset (median). Winter: rabbits eaten out (6), foxes could not catch (3), old foxes without
+  successors (2), rabbits starved (2), foxes starved for lack of rabbits (1). Invasion:
+  foxes could not catch (5), rabbits eaten out (4). Every collapse after onset had at least
+  one warning field note in its last ten days, such as `fewfox`, `fcfox`, `overhunt` or
+  `foxhungry`.
+- **Explanations after a collapse.** The end screen adds "This happened during the
+  drought/harsh winter period" for a collapse inside a weather span. It adds "...foxes
+  arrive period" for a collapse within 30 days of the arrival. In Endless, weather is
+  matched per year, and the one-time arrival is no longer matched in later years. Most
+  invasion collapses fall outside that 30-day window, so the end screen does not link
+  them to the pack. That matches the finding that the pack has little lasting effect.
+
+### Reproduction
+
+```
+node --import tsx scripts/scenario-assay.ts 8300 20 docs/experiments/scenarios-final.json --jobs 2
+node --import tsx scripts/scenario-assay.ts 8300 20 docs/experiments/scenarios-final-stable.json --jobs 2 --scenarios stable --conditions untouched
+node --import tsx scripts/scenario-summary.ts docs/experiments/scenarios-final.json
+```
+
+The tuning reports record their exact commands. Their output paths pointed at a scratch
+directory, and the files were then copied here. The practice meadow (seed 5007), the open
+meadow and the two-species simulation are unchanged: this work does not touch
+`src/sim/sim.ts`, `src/sim/levers.ts` or `src/game/presets.ts`.
 
 ## Inherited body size (#10)
 

@@ -1,0 +1,193 @@
+{
+  "experiment": "scenario-assay",
+  "note": "Fixed rules reading on-screen signals and the scenario warning; not optimal play. Exclude any seed with ceilingHits > 0 in any condition from claims.",
+  "seeds": {
+    "start": 8200,
+    "count": 20
+  },
+  "command": "node --import tsx scripts/scenario-assay.ts 8200 20 /tmp/claude-0/-home-user-coevolution-game/de370d50-e627-57ba-b947-1eedd998ffb2/scratchpad/i6/wA.json --scenarios winter --conditions untouched,informed --disturbance {\"regrow\":[{\"from\":2176,\"to\":4336,\"factor\":0.5}],\"metabolism\":[{\"from\":2176,\"to\":4336,\"factor\":1.2}]}",
+  "runtime": {
+    "node": "v22.22.2",
+    "platform": "linux x64",
+    "cpus": "Intel(R) Xeon(R) Processor @ 2.80GHz",
+    "workers": 2,
+    "wallSeconds": 94.492
+  },
+  "budget": {
+    "charges": 4,
+    "cooldownHours": 400,
+    "firstHour": 240,
+    "keeperOrder": [
+      "releasePred",
+      "feedFoxes",
+      "releasePrey",
+      "cullPred",
+      "illnessPred",
+      "plantBushes",
+      "rain",
+      "illnessPrey"
+    ],
+    "keeperEmergencies": [
+      "releasePred",
+      "feedFoxes",
+      "releasePrey",
+      "cullPred"
+    ],
+    "keeperReserve": 2
+  },
+  "noticeDays": 14,
+  "scenarios": [
+    {
+      "id": "winter",
+      "disturbance": {
+        "regrow": [
+          {
+            "from": 2176,
+            "to": 4336,
+            "factor": 0.5
+          }
+        ],
+        "metabolism": [
+          {
+            "from": 2176,
+            "to": 4336,
+            "factor": 1.2
+          }
+        ],
+        "arrivals": []
+      },
+      "onset": 2176,
+      "end": 4336,
+      "decision": "Go into winter with fewer foxes: cull on the warning if there are 12 or more; rain once bushes are stripped in the cold.",
+      "from": -336,
+      "move": "(x,start)=>x.hour<start?x.foxes>=12?\"cullPred\":null:x.stock<.25?\"rain\":null"
+    }
+  ],
+  "parameters": {
+    "horizon": 8760,
+    "patches": 19,
+    "patchStock": 30,
+    "regrowEvery": 9,
+    "sproutPerDay": 2,
+    "seedSpread": 0.5,
+    "witherHours": 240,
+    "maxBushes": 48,
+    "patchSpacing": 0.15,
+    "eatR": 0.008,
+    "feedR": 0.02,
+    "birthR": 0.02,
+    "foodScent": 0.3,
+    "wallView": 0.1,
+    "geneInit": 1,
+    "mutationRate": 0.03,
+    "mutationSigma": 0.1,
+    "founderEnergy": 0.75,
+    "prey": {
+      "initial": 160,
+      "adultAge": 50,
+      "birthGap": 135,
+      "litter": 2,
+      "lifespan": 840,
+      "maxEnergy": 180,
+      "metabolism": 0.35,
+      "speedCost": 0.5,
+      "mealEnergy": 55,
+      "breedEnergy": 0.65,
+      "childEnergy": 0.45,
+      "visionUpkeep": 0.2,
+      "step": 0.0125,
+      "baseStep": 0.01,
+      "view": [
+        0.2,
+        0.2
+      ],
+      "turn": [
+        1,
+        1
+      ]
+    },
+    "pred": {
+      "initial": 6,
+      "adultAge": 130,
+      "birthGap": 350,
+      "litter": 1,
+      "lifespan": 1000,
+      "maxEnergy": 240,
+      "metabolism": 0.15,
+      "speedCost": 0.9,
+      "mealEnergy": 90,
+      "breedEnergy": 0.95,
+      "childEnergy": 0.6,
+      "visionUpkeep": 0.05,
+      "step": 0.014,
+      "baseStep": 0.014,
+      "view": [
+        0.13,
+        1.3
+      ],
+      "turn": [
+        0.2,
+        0.8
+      ]
+    },
+    "eco": {
+      "hidden": 0,
+      "maxHidden": 12,
+      "growRate": 0,
+      "memory": false,
+      "sexual": false,
+      "heredity": true,
+      "mateR": 0.1,
+      "kinR": 0.12,
+      "cover": 8,
+      "coverR": 0.07,
+      "coverSight": 0.04,
+      "coverSlow": 0.75,
+      "brainUpkeep": 0.01,
+      "ceilingPrey": 800,
+      "ceilingPred": 400
+    }
+  },
+  "rows": [
+    {"seed":8200,"scenario":"winter","condition":"untouched","survived":false,"endHour":2665,"extinct":"rabbits","ceilingHits":0,"actions":[],"noticeHour":1840,"atOnset":{"rabbits":182,"foxes":91,"bushes":16,"stock":0.042},"lowDuring":{"rabbits":1,"foxes":51},"phase":"during","headline":"Rabbits were eaten out on 21 Dec (day 112).","cause":"rabbits eaten out","notesBeforeEnd":["fcprey","fewprey","foxhungry","overhunt","preyhungry","replace"],"deaths":{"preyBorn":2353,"predBorn":159,"preyStarved":1691,"preyEaten":822,"preyOld":0,"predStarved":61,"predOld":54,"predCulled":0,"preyIllness":0,"predIllness":0},"ms":3197},
+    {"seed":8200,"scenario":"winter","condition":"informed","survived":false,"endHour":7535,"extinct":"rabbits","ceilingHits":0,"actions":[{"hour":1841,"action":"cullPred"},{"hour":2241,"action":"rain"},{"hour":2641,"action":"releasePrey"},{"hour":3041,"action":"releasePrey"}],"noticeHour":1840,"atOnset":{"rabbits":204,"foxes":69,"bushes":19,"stock":0.074},"lowDuring":{"rabbits":3,"foxes":10},"phase":"after","headline":"Rabbits were eaten out on 12 Jul (day 314).","cause":"rabbits eaten out","notesBeforeEnd":["fcprey","fewprey","overhunt","replace"],"deaths":{"preyBorn":6282,"predBorn":349,"preyStarved":4278,"preyEaten":2167,"preyOld":13,"predStarved":193,"predOld":116,"predCulled":18,"preyIllness":0,"predIllness":0},"ms":10346},
+    {"seed":8201,"scenario":"winter","condition":"untouched","survived":false,"endHour":1790,"extinct":"rabbits","ceilingHits":0,"actions":[],"noticeHour":null,"atOnset":null,"lowDuring":null,"phase":"before","headline":"Rabbits were eaten out on 14 Nov (day 75).","cause":"rabbits eaten out","notesBeforeEnd":["fcprey","fewprey","overhunt","replace"],"deaths":{"preyBorn":1637,"predBorn":104,"preyStarved":1222,"preyEaten":572,"preyOld":3,"predStarved":53,"predOld":22,"predCulled":0,"preyIllness":0,"predIllness":0},"ms":2446},
+    {"seed":8201,"scenario":"winter","condition":"informed","survived":false,"endHour":1790,"extinct":"rabbits","ceilingHits":0,"actions":[],"noticeHour":null,"atOnset":null,"lowDuring":null,"phase":"before","headline":"Rabbits were eaten out on 14 Nov (day 75).","cause":"rabbits eaten out","notesBeforeEnd":["fcprey","fewprey","overhunt","replace"],"deaths":{"preyBorn":1637,"predBorn":104,"preyStarved":1222,"preyEaten":572,"preyOld":3,"predStarved":53,"predOld":22,"predCulled":0,"preyIllness":0,"predIllness":0},"ms":1603},
+    {"seed":8202,"scenario":"winter","condition":"untouched","survived":false,"endHour":4238,"extinct":"foxes","ceilingHits":0,"actions":[],"noticeHour":1840,"atOnset":{"rabbits":90,"foxes":65,"bushes":30,"stock":0.443},"lowDuring":{"rabbits":9,"foxes":1},"phase":"during","headline":"Foxes starved on 24 Feb (day 177). There were too few rabbits to live on (about 18 over the last 12 days).","cause":"foxes starved: too few rabbits","notesBeforeEnd":["fcfox","fewfox","foxhungry","overhunt","replace"],"deaths":{"preyBorn":2790,"predBorn":216,"preyStarved":1931,"preyEaten":988,"preyOld":15,"predStarved":158,"predOld":64,"predCulled":0,"preyIllness":0,"predIllness":0},"ms":2558},
+    {"seed":8202,"scenario":"winter","condition":"informed","survived":false,"endHour":4062,"extinct":"foxes","ceilingHits":0,"actions":[{"hour":1841,"action":"cullPred"},{"hour":2241,"action":"rain"},{"hour":2641,"action":"rain"},{"hour":3041,"action":"releasePrey"}],"noticeHour":1840,"atOnset":{"rabbits":216,"foxes":52,"bushes":27,"stock":0.131},"lowDuring":{"rabbits":2,"foxes":1},"phase":"during","headline":"Foxes starved on 17 Feb (day 170). There were too few rabbits to live on (about 20 over the last 12 days).","cause":"foxes starved: too few rabbits","notesBeforeEnd":["fcfox","fewfox","foxhungry","replace"],"deaths":{"preyBorn":3146,"predBorn":221,"preyStarved":2175,"preyEaten":1094,"preyOld":18,"predStarved":151,"predOld":55,"predCulled":21,"preyIllness":0,"predIllness":0},"ms":2911},
+    {"seed":8203,"scenario":"winter","condition":"untouched","survived":false,"endHour":2231,"extinct":"rabbits","ceilingHits":0,"actions":[],"noticeHour":1840,"atOnset":{"rabbits":6,"foxes":47,"bushes":37,"stock":0.846},"lowDuring":{"rabbits":1,"foxes":40},"phase":"during","headline":"Rabbits were eaten out on 3 Dec (day 93).","cause":"rabbits eaten out","notesBeforeEnd":["fcprey","fewprey","overhunt","replace","upcoming"],"deaths":{"preyBorn":1880,"predBorn":97,"preyStarved":1457,"preyEaten":580,"preyOld":3,"predStarved":41,"predOld":21,"predCulled":0,"preyIllness":0,"predIllness":0},"ms":2852},
+    {"seed":8203,"scenario":"winter","condition":"informed","survived":false,"endHour":4297,"extinct":"foxes","ceilingHits":0,"actions":[{"hour":1841,"action":"cullPred"},{"hour":2241,"action":"illnessPred"},{"hour":2641,"action":"releasePrey"},{"hour":3148,"action":"rain"}],"noticeHour":1840,"atOnset":{"rabbits":77,"foxes":31,"bushes":38,"stock":0.659},"lowDuring":{"rabbits":1,"foxes":1},"phase":"during","headline":"Foxes starved on 27 Feb (day 180). There were too few rabbits to live on (about 5 over the last 12 days).","cause":"foxes starved: too few rabbits","notesBeforeEnd":["fcfox","fcprey","fewfox","fewprey","foxhungry","overhunt"],"deaths":{"preyBorn":2903,"predBorn":185,"preyStarved":1873,"preyEaten":1183,"preyOld":2,"predStarved":118,"predOld":36,"predCulled":14,"preyIllness":0,"predIllness":23},"ms":2188},
+    {"seed":8204,"scenario":"winter","condition":"untouched","survived":false,"endHour":6735,"extinct":"rabbits","ceilingHits":0,"actions":[],"noticeHour":1840,"atOnset":{"rabbits":152,"foxes":57,"bushes":45,"stock":0.624},"lowDuring":{"rabbits":2,"foxes":1},"phase":"after","headline":"Rabbits were eaten out on 8 Jun (day 281).","cause":"rabbits eaten out","notesBeforeEnd":["fcprey","fewprey","overhunt","preyhungry","replace"],"deaths":{"preyBorn":4948,"predBorn":360,"preyStarved":3148,"preyEaten":1945,"preyOld":15,"predStarved":271,"predOld":88,"predCulled":0,"preyIllness":0,"predIllness":0},"ms":5008},
+    {"seed":8204,"scenario":"winter","condition":"informed","survived":false,"endHour":6251,"extinct":"foxes","ceilingHits":0,"actions":[{"hour":1841,"action":"cullPred"},{"hour":2241,"action":"illnessPred"},{"hour":2641,"action":"cullPred"},{"hour":3041,"action":"rain"}],"noticeHour":1840,"atOnset":{"rabbits":192,"foxes":39,"bushes":45,"stock":0.601},"lowDuring":{"rabbits":45,"foxes":8},"phase":"after","headline":"Foxes died out during illness on 19 May (day 261).","cause":"illness","notesBeforeEnd":["fcfox","fewfox","foxhungry"],"deaths":{"preyBorn":4703,"predBorn":310,"preyStarved":2914,"preyEaten":1890,"preyOld":9,"predStarved":88,"predOld":61,"predCulled":22,"preyIllness":0,"predIllness":145},"ms":4122},
+    {"seed":8205,"scenario":"winter","condition":"untouched","survived":false,"endHour":3250,"extinct":"foxes","ceilingHits":0,"actions":[],"noticeHour":1840,"atOnset":{"rabbits":22,"foxes":88,"bushes":25,"stock":0.665},"lowDuring":{"rabbits":22,"foxes":1},"phase":"during","headline":"The last foxes died of old age on 14 Jan (day 136).","cause":"foxes died of old age","notesBeforeEnd":["fcfox","fewfox","foxhungry","replace"],"deaths":{"preyBorn":2258,"predBorn":146,"preyStarved":1693,"preyEaten":642,"preyOld":6,"predStarved":68,"predOld":84,"predCulled":0,"preyIllness":0,"predIllness":0},"ms":2358},
+    {"seed":8205,"scenario":"winter","condition":"informed","survived":false,"endHour":4235,"extinct":"rabbits","ceilingHits":0,"actions":[{"hour":1841,"action":"cullPred"},{"hour":2241,"action":"illnessPred"},{"hour":2641,"action":"releasePrey"},{"hour":3041,"action":"releasePrey"}],"noticeHour":1840,"atOnset":{"rabbits":90,"foxes":65,"bushes":27,"stock":0.391},"lowDuring":{"rabbits":1,"foxes":14},"phase":"during","headline":"Rabbits were eaten out on 24 Feb (day 177).","cause":"rabbits eaten out","notesBeforeEnd":["fcprey","fewprey","overhunt","preyhungry","replace"],"deaths":{"preyBorn":2673,"predBorn":186,"preyStarved":1981,"preyEaten":862,"preyOld":6,"predStarved":34,"predOld":76,"predCulled":29,"preyIllness":0,"predIllness":39},"ms":4729},
+    {"seed":8206,"scenario":"winter","condition":"untouched","survived":false,"endHour":3723,"extinct":"foxes","ceilingHits":0,"actions":[],"noticeHour":1840,"atOnset":{"rabbits":202,"foxes":47,"bushes":25,"stock":0.207},"lowDuring":{"rabbits":1,"foxes":1},"phase":"during","headline":"The last foxes died of old age on 3 Feb (day 156).","cause":"foxes died of old age","notesBeforeEnd":["fcfox","fewfox","fewprey","foxhungry","replace"],"deaths":{"preyBorn":2699,"predBorn":97,"preyStarved":2415,"preyEaten":409,"preyOld":8,"predStarved":49,"predOld":54,"predCulled":0,"preyIllness":0,"predIllness":0},"ms":2348},
+    {"seed":8206,"scenario":"winter","condition":"informed","survived":false,"endHour":3543,"extinct":"rabbits","ceilingHits":0,"actions":[{"hour":1841,"action":"cullPred"},{"hour":2241,"action":"rain"},{"hour":2641,"action":"rain"},{"hour":3041,"action":"releasePrey"}],"noticeHour":1840,"atOnset":{"rabbits":242,"foxes":26,"bushes":21,"stock":0.056},"lowDuring":{"rabbits":1,"foxes":22},"phase":"during","headline":"Rabbits were eaten out on 26 Jan (day 148).","cause":"rabbits eaten out","notesBeforeEnd":["fcprey","fewprey","overhunt","preyhungry","replace"],"deaths":{"preyBorn":3036,"predBorn":104,"preyStarved":2762,"preyEaten":434,"preyOld":8,"predStarved":27,"predOld":51,"predCulled":10,"preyIllness":0,"predIllness":0},"ms":2520},
+    {"seed":8207,"scenario":"winter","condition":"untouched","survived":false,"endHour":3019,"extinct":"rabbits","ceilingHits":0,"actions":[],"noticeHour":1840,"atOnset":{"rabbits":405,"foxes":23,"bushes":26,"stock":0.01},"lowDuring":{"rabbits":1,"foxes":16},"phase":"during","headline":"Rabbits were eaten out on 5 Jan (day 126).","cause":"rabbits eaten out","notesBeforeEnd":["fcprey","fewprey","foxhungry","overhunt","preyhungry","replace"],"deaths":{"preyBorn":2222,"predBorn":91,"preyStarved":1962,"preyEaten":414,"preyOld":6,"predStarved":44,"predOld":37,"predCulled":0,"preyIllness":0,"predIllness":0},"ms":3345},
+    {"seed":8207,"scenario":"winter","condition":"informed","survived":true,"endHour":8760,"extinct":null,"ceilingHits":0,"actions":[{"hour":1841,"action":"cullPred"},{"hour":2241,"action":"rain"},{"hour":2641,"action":"rain"},{"hour":3041,"action":"releasePrey"}],"noticeHour":1840,"atOnset":{"rabbits":403,"foxes":13,"bushes":25,"stock":0.004},"lowDuring":{"rabbits":19,"foxes":4},"phase":"survived","headline":"Both species made it through 1 year.","cause":"survived","notesBeforeEnd":[],"deaths":{"preyBorn":7712,"predBorn":714,"preyStarved":5010,"preyEaten":2749,"preyOld":35,"predStarved":124,"predOld":366,"predCulled":4,"preyIllness":0,"predIllness":0},"ms":18821},
+    {"seed":8208,"scenario":"winter","condition":"untouched","survived":false,"endHour":2703,"extinct":"rabbits","ceilingHits":0,"actions":[],"noticeHour":1840,"atOnset":{"rabbits":155,"foxes":57,"bushes":23,"stock":0.31},"lowDuring":{"rabbits":1,"foxes":42},"phase":"during","headline":"Rabbits starved on 22 Dec (day 113). Bushes were out of reach.","cause":"rabbits starved","notesBeforeEnd":["fcprey","fewprey","overhunt","preyhungry","replace"],"deaths":{"preyBorn":2343,"predBorn":120,"preyStarved":2018,"preyEaten":471,"preyOld":14,"predStarved":23,"predOld":61,"predCulled":0,"preyIllness":0,"predIllness":0},"ms":3073},
+    {"seed":8208,"scenario":"winter","condition":"informed","survived":false,"endHour":7551,"extinct":"rabbits","ceilingHits":0,"actions":[{"hour":1841,"action":"cullPred"},{"hour":2241,"action":"rain"},{"hour":2641,"action":"rain"},{"hour":3041,"action":"releasePrey"}],"noticeHour":1840,"atOnset":{"rabbits":176,"foxes":38,"bushes":23,"stock":0.18},"lowDuring":{"rabbits":4,"foxes":17},"phase":"after","headline":"Rabbits were eaten out on 12 Jul (day 315).","cause":"rabbits eaten out","notesBeforeEnd":["fcprey","fewprey","overhunt","replace"],"deaths":{"preyBorn":5010,"predBorn":345,"preyStarved":3761,"preyEaten":1390,"preyOld":27,"predStarved":117,"predOld":199,"predCulled":18,"preyIllness":0,"predIllness":0},"ms":8916},
+    {"seed":8209,"scenario":"winter","condition":"untouched","survived":false,"endHour":3452,"extinct":"rabbits","ceilingHits":0,"actions":[],"noticeHour":1840,"atOnset":{"rabbits":185,"foxes":11,"bushes":37,"stock":0.611},"lowDuring":{"rabbits":1,"foxes":7},"phase":"during","headline":"Rabbits starved on 23 Jan (day 144). Bushes were out of reach.","cause":"rabbits starved","notesBeforeEnd":["fcprey","fewprey","overhunt","preyhungry","replace"],"deaths":{"preyBorn":1917,"predBorn":58,"preyStarved":1757,"preyEaten":311,"preyOld":9,"predStarved":31,"predOld":24,"predCulled":0,"preyIllness":0,"predIllness":0},"ms":1953},
+    {"seed":8209,"scenario":"winter","condition":"informed","survived":false,"endHour":3364,"extinct":"rabbits","ceilingHits":0,"actions":[{"hour":1902,"action":"feedFoxes"},{"hour":2778,"action":"illnessPred"},{"hour":3178,"action":"releasePred"}],"noticeHour":1840,"atOnset":{"rabbits":190,"foxes":13,"bushes":39,"stock":0.568},"lowDuring":{"rabbits":1,"foxes":5},"phase":"during","headline":"Rabbits were eaten out on 19 Jan (day 141).","cause":"rabbits eaten out","notesBeforeEnd":["fcfox","fcprey","fewprey","foxboom","overhunt","preyhungry","replace"],"deaths":{"preyBorn":1903,"predBorn":57,"preyStarved":1767,"preyEaten":288,"preyOld":8,"predStarved":30,"predOld":22,"predCulled":0,"preyIllness":0,"predIllness":4},"ms":1799},
+    {"seed":8210,"scenario":"winter","condition":"untouched","survived":true,"endHour":8760,"extinct":null,"ceilingHits":0,"actions":[],"noticeHour":1840,"atOnset":{"rabbits":99,"foxes":39,"bushes":20,"stock":0.333},"lowDuring":{"rabbits":8,"foxes":10},"phase":"survived","headline":"Both species made it through 1 year.","cause":"survived","notesBeforeEnd":[],"deaths":{"preyBorn":8128,"predBorn":594,"preyStarved":5226,"preyEaten":2662,"preyOld":41,"predStarved":156,"predOld":281,"predCulled":0,"preyIllness":0,"predIllness":0},"ms":9176},
+    {"seed":8210,"scenario":"winter","condition":"informed","survived":false,"endHour":3721,"extinct":"rabbits","ceilingHits":0,"actions":[{"hour":1841,"action":"cullPred"},{"hour":2241,"action":"cullPred"},{"hour":2641,"action":"rain"},{"hour":3041,"action":"releasePrey"}],"noticeHour":1840,"atOnset":{"rabbits":107,"foxes":29,"bushes":20,"stock":0.308},"lowDuring":{"rabbits":1,"foxes":22},"phase":"during","headline":"Rabbits were eaten out on 3 Feb (day 156).","cause":"rabbits eaten out","notesBeforeEnd":["fcprey","fewprey","overhunt","replace"],"deaths":{"preyBorn":2270,"predBorn":127,"preyStarved":1902,"preyEaten":522,"preyOld":14,"predStarved":30,"predOld":55,"predCulled":23,"preyIllness":0,"predIllness":0},"ms":2036},
+    {"seed":8211,"scenario":"winter","condition":"untouched","survived":false,"endHour":3257,"extinct":"rabbits","ceilingHits":0,"actions":[],"noticeHour":1840,"atOnset":{"rabbits":95,"foxes":75,"bushes":27,"stock":0.467},"lowDuring":{"rabbits":1,"foxes":45},"phase":"during","headline":"Rabbits were eaten out on 15 Jan (day 136).","cause":"rabbits eaten out","notesBeforeEnd":["fcprey","fewprey","overhunt","replace"],"deaths":{"preyBorn":2236,"predBorn":202,"preyStarved":1544,"preyEaten":849,"preyOld":3,"predStarved":72,"predOld":91,"predCulled":0,"preyIllness":0,"predIllness":0},"ms":2055},
+    {"seed":8211,"scenario":"winter","condition":"informed","survived":true,"endHour":8760,"extinct":null,"ceilingHits":0,"actions":[{"hour":1841,"action":"cullPred"},{"hour":2241,"action":"rain"},{"hour":2641,"action":"rain"},{"hour":3041,"action":"releasePrey"}],"noticeHour":1840,"atOnset":{"rabbits":130,"foxes":55,"bushes":28,"stock":0.271},"lowDuring":{"rabbits":16,"foxes":24},"phase":"survived","headline":"Both species made it through 1 year.","cause":"survived","notesBeforeEnd":[],"deaths":{"preyBorn":7656,"predBorn":821,"preyStarved":4124,"preyEaten":3582,"preyOld":9,"predStarved":267,"predOld":383,"predCulled":22,"preyIllness":0,"predIllness":0},"ms":9396},
+    {"seed":8212,"scenario":"winter","condition":"untouched","survived":false,"endHour":2646,"extinct":"rabbits","ceilingHits":0,"actions":[],"noticeHour":1840,"atOnset":{"rabbits":184,"foxes":58,"bushes":29,"stock":0.224},"lowDuring":{"rabbits":1,"foxes":31},"phase":"during","headline":"Rabbits starved on 20 Dec (day 111). Bushes were out of reach.","cause":"rabbits starved","notesBeforeEnd":["fcprey","fewprey","overhunt","preyhungry","replace"],"deaths":{"preyBorn":2677,"predBorn":135,"preyStarved":2154,"preyEaten":678,"preyOld":5,"predStarved":75,"predOld":35,"predCulled":0,"preyIllness":0,"predIllness":0},"ms":2536},
+    {"seed":8212,"scenario":"winter","condition":"informed","survived":true,"endHour":8760,"extinct":null,"ceilingHits":0,"actions":[{"hour":1841,"action":"cullPred"},{"hour":2241,"action":"rain"},{"hour":2641,"action":"cullPred"},{"hour":3041,"action":"releasePrey"}],"noticeHour":1840,"atOnset":{"rabbits":267,"foxes":40,"bushes":31,"stock":0.142},"lowDuring":{"rabbits":24,"foxes":5},"phase":"survived","headline":"Both species made it through 1 year.","cause":"survived","notesBeforeEnd":[],"deaths":{"preyBorn":8649,"predBorn":546,"preyStarved":6117,"preyEaten":2553,"preyOld":33,"predStarved":204,"predOld":197,"predCulled":32,"preyIllness":0,"predIllness":0},"ms":7651},
+    {"seed":8213,"scenario":"winter","condition":"untouched","survived":false,"endHour":1954,"extinct":"rabbits","ceilingHits":0,"actions":[],"noticeHour":1840,"atOnset":null,"lowDuring":null,"phase":"before","headline":"Rabbits starved on 21 Nov (day 82). Bushes were out of reach.","cause":"rabbits starved","notesBeforeEnd":["fcprey","fewprey","overhunt","preyhungry","replace","upcoming"],"deaths":{"preyBorn":1583,"predBorn":92,"preyStarved":1306,"preyEaten":434,"preyOld":3,"predStarved":30,"predOld":24,"predCulled":0,"preyIllness":0,"predIllness":0},"ms":1548},
+    {"seed":8213,"scenario":"winter","condition":"informed","survived":false,"endHour":2015,"extinct":"rabbits","ceilingHits":0,"actions":[{"hour":1841,"action":"cullPred"}],"noticeHour":1840,"atOnset":null,"lowDuring":null,"phase":"before","headline":"Rabbits starved on 24 Nov (day 84). Bushes were out of reach.","cause":"rabbits starved","notesBeforeEnd":["fcprey","fewprey","overhunt","preyhungry","replace","upcoming"],"deaths":{"preyBorn":1601,"predBorn":94,"preyStarved":1310,"preyEaten":448,"preyOld":3,"predStarved":31,"predOld":26,"predCulled":15,"preyIllness":0,"predIllness":0},"ms":1414},
+    {"seed":8214,"scenario":"winter","condition":"untouched","survived":false,"endHour":2999,"extinct":"foxes","ceilingHits":0,"actions":[],"noticeHour":1840,"atOnset":{"rabbits":159,"foxes":8,"bushes":24,"stock":0.421},"lowDuring":{"rabbits":22,"foxes":1},"phase":"during","headline":"Foxes starved on 4 Jan (day 125). Foxes could not catch the 54 rabbits around them.","cause":"foxes starved: could not catch","notesBeforeEnd":["fcfox","fewfox","foxhungry","preyhungry","replace","steady"],"deaths":{"preyBorn":2406,"predBorn":26,"preyStarved":2408,"preyEaten":121,"preyOld":15,"predStarved":20,"predOld":12,"predCulled":0,"preyIllness":0,"predIllness":0},"ms":1969},
+    {"seed":8214,"scenario":"winter","condition":"informed","survived":false,"endHour":3599,"extinct":"foxes","ceilingHits":0,"actions":[{"hour":1841,"action":"plantBushes"},{"hour":2241,"action":"rain"},{"hour":2641,"action":"rain"},{"hour":3054,"action":"releasePrey"}],"noticeHour":1840,"atOnset":{"rabbits":268,"foxes":10,"bushes":24,"stock":0.215},"lowDuring":{"rabbits":32,"foxes":1},"phase":"during","headline":"Foxes starved on 29 Jan (day 150). Foxes could not catch the 43 rabbits around them.","cause":"foxes starved: could not catch","notesBeforeEnd":["fcfox","fewfox","foxhungry","replace","steady"],"deaths":{"preyBorn":3039,"predBorn":36,"preyStarved":2983,"preyEaten":171,"preyOld":20,"predStarved":29,"predOld":13,"predCulled":0,"preyIllness":0,"predIllness":0},"ms":2595},
+    {"seed":8215,"scenario":"winter","condition":"untouched","survived":false,"endHour":3627,"extinct":"foxes","ceilingHits":0,"actions":[],"noticeHour":1840,"atOnset":{"rabbits":354,"foxes":21,"bushes":33,"stock":0.143},"lowDuring":{"rabbits":16,"foxes":1},"phase":"during","headline":"Foxes starved on 30 Jan (day 152). Foxes could not catch the 63 rabbits around them.","cause":"foxes starved: could not catch","notesBeforeEnd":["boom","fcfox","fewfox","foxhungry","replace"],"deaths":{"preyBorn":2488,"predBorn":123,"preyStarved":1945,"preyEaten":625,"preyOld":5,"predStarved":84,"predOld":45,"predCulled":0,"preyIllness":0,"predIllness":0},"ms":4561},
+    {"seed":8215,"scenario":"winter","condition":"informed","survived":false,"endHour":3510,"extinct":"foxes","ceilingHits":0,"actions":[{"hour":1841,"action":"cullPred"},{"hour":2241,"action":"rain"},{"hour":2641,"action":"rain"},{"hour":3041,"action":"releasePrey"}],"noticeHour":1840,"atOnset":{"rabbits":407,"foxes":14,"bushes":32,"stock":0.053},"lowDuring":{"rabbits":10,"foxes":1},"phase":"during","headline":"The last foxes died of old age on 25 Jan (day 147).","cause":"foxes died of old age","notesBeforeEnd":["bare","fcfox","fewfox","foxhungry","replace"],"deaths":{"preyBorn":2831,"predBorn":119,"preyStarved":2309,"preyEaten":609,"preyOld":12,"predStarved":76,"predOld":40,"predCulled":9,"preyIllness":0,"predIllness":0},"ms":2703},
+    {"seed":8216,"scenario":"winter","condition":"untouched","survived":false,"endHour":3275,"extinct":"foxes","ceilingHits":0,"actions":[],"noticeHour":1840,"atOnset":{"rabbits":244,"foxes":15,"bushes":36,"stock":0.342},"lowDuring":{"rabbits":6,"foxes":1},"phase":"during","headline":"Foxes starved on 15 Jan (day 137). There were too few rabbits to live on (about 17 over the last 12 days).","cause":"foxes starved: too few rabbits","notesBeforeEnd":["fcfox","fewfox","fewprey","foxhungry","overhunt","replace"],"deaths":{"preyBorn":2617,"predBorn":62,"preyStarved":2417,"preyEaten":321,"preyOld":10,"predStarved":48,"predOld":20,"predCulled":0,"preyIllness":0,"predIllness":0},"ms":4348},
+    {"seed":8216,"scenario":"winter","condition":"informed","survived":false,"endHour":3330,"extinct":"foxes","ceilingHits":0,"actions":[{"hour":1841,"action":"cullPred"},{"hour":2241,"action":"rain"},{"hour":2641,"action":"rain"},{"hour":3041,"action":"releasePrey"}],"noticeHour":1840,"atOnset":{"rabbits":328,"foxes":13,"bushes":32,"stock":0.119},"lowDuring":{"rabbits":6,"foxes":1},"phase":"during","headline":"Foxes starved on 18 Jan (day 139). Foxes could not catch the 31 rabbits around them.","cause":"foxes starved: could not catch","notesBeforeEnd":["bare","boom","fcfox","fewfox","foxhungry","overhunt","preyhungry","replace"],"deaths":{"preyBorn":2966,"predBorn":67,"preyStarved":2760,"preyEaten":325,"preyOld":10,"predStarved":49,"predOld":19,"predCulled":5,"preyIllness":0,"predIllness":0},"ms":2996},
+    {"seed":8217,"scenario":"winter","condition":"untouched","survived":true,"endHour":8760,"extinct":null,"ceilingHits":0,"actions":[],"noticeHour":1840,"atOnset":{"rabbits":351,"foxes":39,"bushes":39,"stock":0.25},"lowDuring":{"rabbits":4,"foxes":4},"phase":"survived","headline":"Both species made it through 1 year.","cause":"survived","notesBeforeEnd":[],"deaths":{"preyBorn":7620,"predBorn":926,"preyStarved":3824,"preyEaten":3886,"preyOld":13,"predStarved":325,"predOld":423,"predCulled":0,"preyIllness":0,"predIllness":0},"ms":18807},
+    {"seed":8217,"scenario":"winter","condition":"informed","survived":true,"endHour":8760,"extinct":null,"ceilingHits":0,"actions":[{"hour":1841,"action":"cullPred"},{"hour":2241,"action":"rain"},{"hour":2641,"action":"rain"},{"hour":3041,"action":"releasePrey"}],"noticeHour":1840,"atOnset":{"rabbits":335,"foxes":31,"bushes":38,"stock":0.306},"lowDuring":{"rabbits":8,"foxes":6},"phase":"survived","headline":"Both species made it through 1 year.","cause":"survived","notesBeforeEnd":[],"deaths":{"preyBorn":7990,"predBorn":725,"preyStarved":4813,"preyEaten":2899,"preyOld":46,"predStarved":183,"predOld":422,"predCulled":16,"preyIllness":0,"predIllness":0},"ms":12149},
+    {"seed":8218,"scenario":"winter","condition":"untouched","survived":false,"endHour":2884,"extinct":"rabbits","ceilingHits":0,"actions":[],"noticeHour":1840,"atOnset":{"rabbits":113,"foxes":36,"bushes":27,"stock":0.469},"lowDuring":{"rabbits":1,"foxes":27},"phase":"during","headline":"Rabbits starved on 30 Dec (day 121). Bushes were out of reach.","cause":"rabbits starved","notesBeforeEnd":["fcprey","fewprey","overhunt","preyhungry","replace"],"deaths":{"preyBorn":1982,"predBorn":89,"preyStarved":1734,"preyEaten":400,"preyOld":8,"predStarved":26,"predOld":42,"predCulled":0,"preyIllness":0,"predIllness":0},"ms":4553},
+    {"seed":8218,"scenario":"winter","condition":"informed","survived":false,"endHour":3527,"extinct":"rabbits","ceilingHits":0,"actions":[{"hour":1841,"action":"cullPred"},{"hour":2241,"action":"illnessPred"},{"hour":2641,"action":"releasePrey"},{"hour":3041,"action":"releasePrey"}],"noticeHour":1840,"atOnset":{"rabbits":116,"foxes":30,"bushes":25,"stock":0.392},"lowDuring":{"rabbits":1,"foxes":10},"phase":"during","headline":"Rabbits starved on 26 Jan (day 147). Bushes were out of reach.","cause":"rabbits starved","notesBeforeEnd":["fcprey","fewprey","overhunt","preyhungry","replace"],"deaths":{"preyBorn":2095,"predBorn":99,"preyStarved":1820,"preyEaten":442,"preyOld":9,"predStarved":24,"predOld":39,"predCulled":11,"preyIllness":0,"predIllness":16},"ms":5405},
+    {"seed":8219,"scenario":"winter","condition":"untouched","survived":false,"endHour":3052,"extinct":"foxes","ceilingHits":0,"actions":[],"noticeHour":1840,"atOnset":{"rabbits":99,"foxes":7,"bushes":14,"stock":0.036},"lowDuring":{"rabbits":8,"foxes":1},"phase":"during","headline":"Foxes starved on 6 Jan (day 128). There were too few rabbits to live on (about 17 over the last 12 days).","cause":"foxes starved: too few rabbits","notesBeforeEnd":["bare","boom","fcfox","fewfox","foxhungry"],"deaths":{"preyBorn":2222,"predBorn":42,"preyStarved":2164,"preyEaten":186,"preyOld":12,"predStarved":34,"predOld":14,"predCulled":0,"preyIllness":0,"predIllness":0},"ms":2073},
+    {"seed":8219,"scenario":"winter","condition":"informed","survived":false,"endHour":3366,"extinct":"foxes","ceilingHits":0,"actions":[{"hour":1841,"action":"plantBushes"},{"hour":2241,"action":"rain"},{"hour":2641,"action":"rain"},{"hour":3041,"action":"rain"}],"noticeHour":1840,"atOnset":{"rabbits":135,"foxes":10,"bushes":15,"stock":0.033},"lowDuring":{"rabbits":28,"foxes":1},"phase":"during","headline":"Foxes starved on 19 Jan (day 141). Foxes could not catch the 70 rabbits around them.","cause":"foxes starved: could not catch","notesBeforeEnd":["bare","boom","fcfox","fewfox","foxhungry","preyhungry"],"deaths":{"preyBorn":2629,"predBorn":47,"preyStarved":2530,"preyEaten":211,"preyOld":10,"predStarved":36,"predOld":17,"predCulled":0,"preyIllness":0,"predIllness":0},"ms":2209}
+  ]
+}

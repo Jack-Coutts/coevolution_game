@@ -136,7 +136,7 @@ describe('version-2 saves', () => {
     expect(save.history.stats[57 * STAT_STRIDE + STAT.predIllness]).toBe(1)
     expect(save.history.stats[57 * STAT_STRIDE + STAT.vole]).toBe(0)
     expect(save.history.highestGeneration).toEqual({ prey: 3, pred: 1, vole: 0 })
-    expect(save.evolution[0].vole.count).toBe(0)
+    expect(save.evolution?.[0].vole.count).toBe(0)
     expect(save.charges).toBe(3)
     expect(Sim.restore(save.state).tick).toBe(120)
     expect(migrateSave(save)).toBe(save)
