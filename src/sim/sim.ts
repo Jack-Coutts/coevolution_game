@@ -1223,6 +1223,8 @@ export interface RunResult {
   survived: boolean
   prey_end: number
   predator_end: number
+  /** Present only in meadows with voles. */
+  vole_end?: number
 }
 
 export function runHeadless(p: SimParams, seed: number, dist: Disturbance = NO_DISTURBANCE): RunResult {
@@ -1236,5 +1238,6 @@ export function runHeadless(p: SimParams, seed: number, dist: Disturbance = NO_D
     survived: sim.survived,
     prey_end: sim.prey.length,
     predator_end: sim.preds.length,
+    ...(sim.species.includes('vole') ? { vole_end: sim.voles.length } : {}),
   }
 }

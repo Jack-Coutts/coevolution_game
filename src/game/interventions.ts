@@ -9,3 +9,8 @@ export const ACTIONS: { id: Intervention; label: string; blurb: string }[] = [
   { id: 'illnessPrey', label: 'Rabbit illness', blurb: 'Start illness in up to six rabbits. Spreads among nearby rabbits, draining energy for ten days per case. Can cause extinction.' },
   { id: 'illnessPred', label: 'Fox illness', blurb: 'Start illness in up to six foxes. Spreads among nearby foxes, draining energy for ten days per case. Slower and less precise than culling.' },
 ]
+/** Vole meadow actions (docs/third-species.md section 9). Not shown until the Vole meadow is playable (#9). */
+export const VOLE_ACTIONS: { id: Intervention; label: string; blurb: string }[] = [
+  { id: 'releaseVole', label: 'Release voles', blurb: 'Add twelve voles in the tall grass, descended from living voles.' },
+  { id: 'illnessVole', label: 'Vole illness', blurb: 'Start illness in up to six voles. Spreads among nearby voles, draining energy for ten days per case.' },
+]
