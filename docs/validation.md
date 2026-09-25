@@ -162,8 +162,33 @@ What we can and cannot claim from these samples:
   7/20 vs 11/20. The prompt cull did not help on the final seeds (+3 −3, the same as the
   placebo's ±2). At onset the meadow already holds a median of 48 foxes, so the 14 newcomers
   add about 30%. Only 1 of 9 final untouched collapses came within 30 days of the arrival;
-  the rest came 42–246 days later. We did not retune it in this pass. A larger pack or an
-  earlier arrival is the obvious next step and needs its own tuning and fresh seeds.
+  the rest came 42–246 days later. A second tuning pass (below) found no setting that held
+  up, so the scenario stays as shipped.
+
+### Fox invasion: second tuning pass
+
+This was one pass on tuning seeds 8200–8219, running untouched and informed only, with the
+informed cull following the arrival. On these seeds the open meadow gave 11/20 and the shipped
+invasion gave 7/20.
+
+| Variant (tuning seeds) | Untouched | Informed (paired) | Report |
+| --- | ---: | ---: | --- |
+| 14 foxes on 1 Nov (shipped) | 7/20 | 10/20 (+5 −2) | `scenarios-tuning.json`, `scenarios-tuning-invasion-plan.json` |
+| max(14, 60% of current foxes) on 1 Nov | 9/20 | 12/20 (+5 −2) | `scenarios-tuning-invasion-share60.json` |
+| 14 foxes on 1 Oct | **5/20** | **10/20 (+6 −1)** | `scenarios-tuning-invasion-oct1.json` |
+| max(14, 60% of current foxes) on 1 Oct | 4/20 | 9/20 (+8 −3) | `scenarios-tuning-invasion-oct1-share60.json` |
+
+The 60% variants used a temporary `share` field on arrivals in `src/sim/sim.ts`. That field was
+not adopted and has been removed. The 1 October arrival did best on the tuning seeds, needs no
+simulation change, and was evaluated on final seeds 8300–8319
+(`scenarios-final-invasion-oct1.json`). It gave **11/20 untouched**, the same as the open
+meadow on those seeds. Informed play gave 9/20 (+2 −4), keeper 11/20 (+5 −5) and the placebo
+8/20 (+1 −4). The tuning-seed gap did not generalise; it was within the seed-to-seed noise that
+the placebo shows. We therefore kept the shipped scenario (14 foxes on 1 November) rather than
+adopt an unproven change. A pack large enough to matter probably needs a larger share (at onset
+the meadow already holds a median of about 40–50 foxes) or a pack that arrives hungry, and
+settling that needs more than 20 seeds. The informed cull is a readable decision, but at this
+sample size it is not a demonstrated rescue.
 
 During tuning, two informed plans changed before the freeze. The first winter rule (feed
 foxes when hungry) gave 1/20. The first invasion rule allowed keeper actions from the
