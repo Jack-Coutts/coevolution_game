@@ -66,5 +66,11 @@ useful behaviour under controlled comparisons. Gate: repeatable behavioural gain
 player feedback, and acceptable performance. Greater ecosystem stability is not a required
 consequence of better individual adaptation.
 
+Status (September 2026): deferred. The [brain assay](experiments/brains.json) compared linear,
+fixed hidden, memory and growing brains on 20 paired seeds. It found no behavioural gain
+distinguishable from zero, no visible escape behaviour under any brain, and a forward pass that is
+up to 5.6 times slower. Details are in [validation](validation.md#do-hidden-layers-memory-or-growing-brains-help).
+Growth is not exposed in long-running worlds, and gameplay is unchanged.
+
 Save/resume and the small journal were brought forward because they make long-lived worlds
 worth following now, before these larger additions.

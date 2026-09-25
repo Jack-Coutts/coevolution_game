@@ -1,0 +1,5881 @@
+{
+  "startSeed": 6100,
+  "nSeeds": 20,
+  "months": 3,
+  "arenas": [
+    7100,
+    7101,
+    7102
+  ],
+  "arenaTicks": 240,
+  "conditions": {
+    "linear": {
+      "hidden": 0,
+      "memory": false,
+      "growRate": 0
+    },
+    "hidden": {
+      "hidden": 4,
+      "memory": false,
+      "growRate": 0
+    },
+    "memory": {
+      "hidden": 0,
+      "memory": true,
+      "growRate": 0
+    },
+    "growth": {
+      "hidden": 0,
+      "memory": false,
+      "growRate": 0.05
+    }
+  },
+  "parameters": {
+    "horizon": 2160,
+    "patches": 19,
+    "patchStock": 30,
+    "regrowEvery": 9,
+    "sproutPerDay": 2,
+    "seedSpread": 0.5,
+    "witherHours": 240,
+    "maxBushes": 48,
+    "patchSpacing": 0.15,
+    "eatR": 0.008,
+    "feedR": 0.02,
+    "birthR": 0.02,
+    "foodScent": 0.3,
+    "wallView": 0.1,
+    "geneInit": 1,
+    "mutationRate": 0.03,
+    "mutationSigma": 0.1,
+    "founderEnergy": 0.75,
+    "prey": {
+      "initial": 160,
+      "adultAge": 50,
+      "birthGap": 135,
+      "litter": 2,
+      "lifespan": 840,
+      "maxEnergy": 180,
+      "metabolism": 0.35,
+      "speedCost": 0.5,
+      "mealEnergy": 55,
+      "breedEnergy": 0.65,
+      "childEnergy": 0.45,
+      "visionUpkeep": 0.2,
+      "step": 0.0125,
+      "baseStep": 0.01,
+      "view": [
+        0.2,
+        0.2
+      ],
+      "turn": [
+        1,
+        1
+      ]
+    },
+    "pred": {
+      "initial": 6,
+      "adultAge": 130,
+      "birthGap": 350,
+      "litter": 1,
+      "lifespan": 1000,
+      "maxEnergy": 240,
+      "metabolism": 0.15,
+      "speedCost": 0.9,
+      "mealEnergy": 90,
+      "breedEnergy": 0.95,
+      "childEnergy": 0.6,
+      "visionUpkeep": 0.05,
+      "step": 0.014,
+      "baseStep": 0.014,
+      "view": [
+        0.13,
+        1.3
+      ],
+      "turn": [
+        0.2,
+        0.8
+      ]
+    },
+    "eco": {
+      "hidden": 0,
+      "maxHidden": 12,
+      "growRate": 0,
+      "memory": false,
+      "sexual": false,
+      "heredity": true,
+      "mateR": 0.1,
+      "kinR": 0.12,
+      "cover": 8,
+      "coverR": 0.07,
+      "coverSight": 0.04,
+      "coverSlow": 0.75,
+      "brainUpkeep": 0.01,
+      "ceilingPrey": 800,
+      "ceilingPred": 400
+    }
+  },
+  "runtimeMinutes": 6.9781763629,
+  "thinkNs": {
+    "0": 222.93384200002765,
+    "4": 562.6876390000107,
+    "12": 1242.5042319999775
+  },
+  "note": "Month-3 assays condition on populations that survived; missing snapshots are counted (available/total), never zero. meanGain is signed so positive favours the subject; ci95 is an approximate paired t-interval half-width. thinkNs is a micro-benchmark of one brain forward pass.",
+  "table": [
+    {
+      "condition": "linear",
+      "control": "evolving",
+      "month": 0,
+      "available": 20,
+      "total": 20,
+      "netForage": 0.1977014212271872,
+      "catchPerEncounter": 0.10584423284699443,
+      "flee": -0.01687317280670802,
+      "catchPerFoxDay": 0.08920097952843706,
+      "preySurvival": 0.5788888888888889,
+      "forage": 0.1977014212271872,
+      "preyHidden": 0,
+      "predHidden": 0
+    },
+    {
+      "condition": "linear",
+      "control": "evolving",
+      "month": 3,
+      "available": 17,
+      "total": 20,
+      "netForage": 0.5655215520090023,
+      "catchPerEncounter": 0.0951106635271356,
+      "flee": 0.004582025296950288,
+      "catchPerFoxDay": 0.11718183851487363,
+      "preySurvival": 0.7679738562091503,
+      "forage": 0.5655215520090023,
+      "preyHidden": 0,
+      "predHidden": 0
+    },
+    {
+      "condition": "linear",
+      "control": "founder-pool",
+      "month": 3,
+      "available": 19,
+      "total": 20,
+      "netForage": 0.251074283183593,
+      "catchPerEncounter": 0.10073669877922514,
+      "flee": -0.007702706926642903,
+      "catchPerFoxDay": 0.08871798454623261,
+      "preySurvival": 0.6780701754385965,
+      "forage": 0.251074283183593,
+      "preyHidden": 0,
+      "predHidden": 0
+    },
+    {
+      "condition": "hidden",
+      "control": "evolving",
+      "month": 0,
+      "available": 20,
+      "total": 20,
+      "netForage": 0.16649998159882778,
+      "catchPerEncounter": 0.10527959189696567,
+      "flee": -0.01840176332960272,
+      "catchPerFoxDay": 0.09816731063394975,
+      "preySurvival": 0.5633333333333332,
+      "forage": 0.20649998159882782,
+      "preyHidden": 4,
+      "predHidden": 4
+    },
+    {
+      "condition": "hidden",
+      "control": "evolving",
+      "month": 3,
+      "available": 17,
+      "total": 20,
+      "netForage": 0.6691891901472462,
+      "catchPerEncounter": 0.08569959500266107,
+      "flee": -0.003892826411242483,
+      "catchPerFoxDay": 0.12145577253281138,
+      "preySurvival": 0.792483660130719,
+      "forage": 0.7091891901472461,
+      "preyHidden": 4,
+      "predHidden": 4
+    },
+    {
+      "condition": "hidden",
+      "control": "founder-pool",
+      "month": 3,
+      "available": 18,
+      "total": 20,
+      "netForage": 0.2155394455287108,
+      "catchPerEncounter": 0.10466089734308381,
+      "flee": -0.002978667125463434,
+      "catchPerFoxDay": 0.09971198174312065,
+      "preySurvival": 0.6567901234567901,
+      "forage": 0.2555394455287108,
+      "preyHidden": 4,
+      "predHidden": 4
+    },
+    {
+      "condition": "memory",
+      "control": "evolving",
+      "month": 0,
+      "available": 20,
+      "total": 20,
+      "netForage": 0.19538300620635624,
+      "catchPerEncounter": 0.10736165940205888,
+      "flee": -0.018152596710924486,
+      "catchPerFoxDay": 0.09379840365861371,
+      "preySurvival": 0.5838888888888888,
+      "forage": 0.19538300620635624,
+      "preyHidden": 0,
+      "predHidden": 0
+    },
+    {
+      "condition": "memory",
+      "control": "evolving",
+      "month": 3,
+      "available": 17,
+      "total": 20,
+      "netForage": 0.5618413750037837,
+      "catchPerEncounter": 0.09348102392262457,
+      "flee": -0.010005072956739318,
+      "catchPerFoxDay": 0.11108079826593918,
+      "preySurvival": 0.7781045751633986,
+      "forage": 0.5618413750037837,
+      "preyHidden": 0,
+      "predHidden": 0
+    },
+    {
+      "condition": "memory",
+      "control": "founder-pool",
+      "month": 3,
+      "available": 19,
+      "total": 20,
+      "netForage": 0.26860973891903345,
+      "catchPerEncounter": 0.0997527247330249,
+      "flee": -0.0045702313108309965,
+      "catchPerFoxDay": 0.09184370198833144,
+      "preySurvival": 0.7131578947368422,
+      "forage": 0.26860973891903345,
+      "preyHidden": 0,
+      "predHidden": 0
+    },
+    {
+      "condition": "growth",
+      "control": "evolving",
+      "month": 0,
+      "available": 20,
+      "total": 20,
+      "netForage": 0.1977014212271872,
+      "catchPerEncounter": 0.10584423284699443,
+      "flee": -0.01687317280670802,
+      "catchPerFoxDay": 0.08920097952843706,
+      "preySurvival": 0.5788888888888889,
+      "forage": 0.1977014212271872,
+      "preyHidden": 0,
+      "predHidden": 0
+    },
+    {
+      "condition": "growth",
+      "control": "evolving",
+      "month": 3,
+      "available": 18,
+      "total": 20,
+      "netForage": 0.6316432333983828,
+      "catchPerEncounter": 0.08980403585137678,
+      "flee": 0.007152561673293094,
+      "catchPerFoxDay": 0.1183760683760684,
+      "preySurvival": 0.7790123456790122,
+      "forage": 0.6385536890197897,
+      "preyHidden": 0.6910455621407017,
+      "predHidden": 0.2556726277662053
+    },
+    {
+      "condition": "growth",
+      "control": "founder-pool",
+      "month": 3,
+      "available": 19,
+      "total": 20,
+      "netForage": 0.251074283183593,
+      "catchPerEncounter": 0.10073669877922514,
+      "flee": -0.007702706926642903,
+      "catchPerFoxDay": 0.08871798454623261,
+      "preySurvival": 0.6780701754385965,
+      "forage": 0.251074283183593,
+      "preyHidden": 0,
+      "predHidden": 0
+    }
+  ],
+  "cost": [
+    {
+      "condition": "linear",
+      "survivedMonths3": 17,
+      "total": 20,
+      "safetyLimitHits": 0,
+      "msPerHour": 0.8286498461005658,
+      "msPer1000AnimalHours": 3.882174973983422
+    },
+    {
+      "condition": "hidden",
+      "survivedMonths3": 17,
+      "total": 20,
+      "safetyLimitHits": 0,
+      "msPerHour": 0.8261590042935116,
+      "msPer1000AnimalHours": 4.260389139318517
+    },
+    {
+      "condition": "memory",
+      "survivedMonths3": 17,
+      "total": 20,
+      "safetyLimitHits": 0,
+      "msPerHour": 0.8794144193208584,
+      "msPer1000AnimalHours": 3.9275707073132606
+    },
+    {
+      "condition": "growth",
+      "survivedMonths3": 18,
+      "total": 20,
+      "safetyLimitHits": 0,
+      "msPerHour": 0.8278954638527724,
+      "msPer1000AnimalHours": 3.7966612574063228
+    }
+  ],
+  "comparisons": [
+    {
+      "subject": "hidden/evolving",
+      "baseline": "linear/evolving",
+      "netForage": {
+        "n": 14,
+        "better": 8,
+        "meanGain": 0.08804335012687935,
+        "ci95": 0.16173289940524682
+      },
+      "catchPerEncounter": {
+        "n": 14,
+        "better": 8,
+        "meanGain": 0.01198567724979223,
+        "ci95": 0.01971062809030213
+      },
+      "flee": {
+        "n": 14,
+        "better": 6,
+        "meanGain": -0.006383150762102901,
+        "ci95": 0.04322857138453836
+      },
+      "catchPerFoxDay": {
+        "n": 14,
+        "better": 9,
+        "meanGain": 0.01209453892654346,
+        "ci95": 0.038202425400622235
+      },
+      "preySurvival": {
+        "n": 14,
+        "better": 9,
+        "meanGain": 0.0484126984126984,
+        "ci95": 0.06159936905953194
+      }
+    },
+    {
+      "subject": "memory/evolving",
+      "baseline": "linear/evolving",
+      "netForage": {
+        "n": 15,
+        "better": 10,
+        "meanGain": 0.06474591764148883,
+        "ci95": 0.1268464255843162
+      },
+      "catchPerEncounter": {
+        "n": 15,
+        "better": 9,
+        "meanGain": 0.006883013066163635,
+        "ci95": 0.013970682585062035
+      },
+      "flee": {
+        "n": 15,
+        "better": 8,
+        "meanGain": -0.00997153385196819,
+        "ci95": 0.031072154669332858
+      },
+      "catchPerFoxDay": {
+        "n": 15,
+        "better": 6,
+        "meanGain": -0.0095811789487924,
+        "ci95": 0.015813279125475192
+      },
+      "preySurvival": {
+        "n": 15,
+        "better": 7,
+        "meanGain": -0.0014814814814814725,
+        "ci95": 0.0639184877463614
+      }
+    },
+    {
+      "subject": "growth/evolving",
+      "baseline": "linear/evolving",
+      "netForage": {
+        "n": 17,
+        "better": 11,
+        "meanGain": 0.06399142851763902,
+        "ci95": 0.07243197141860605
+      },
+      "catchPerEncounter": {
+        "n": 17,
+        "better": 10,
+        "meanGain": 0.005221296958302477,
+        "ci95": 0.012866739744126233
+      },
+      "flee": {
+        "n": 17,
+        "better": 9,
+        "meanGain": 0.0008447657008378969,
+        "ci95": 0.022464327838705167
+      },
+      "catchPerFoxDay": {
+        "n": 17,
+        "better": 8,
+        "meanGain": -0.001058158273546328,
+        "ci95": 0.0188730647717109
+      },
+      "preySurvival": {
+        "n": 17,
+        "better": 9,
+        "meanGain": 0.017647058823529405,
+        "ci95": 0.05250267213377545
+      }
+    },
+    {
+      "subject": "linear/evolving",
+      "baseline": "linear/founder-pool",
+      "netForage": {
+        "n": 17,
+        "better": 17,
+        "meanGain": 0.31255869633114863,
+        "ci95": 0.09156808962529751
+      },
+      "catchPerEncounter": {
+        "n": 17,
+        "better": 9,
+        "meanGain": 0.0051898249415160145,
+        "ci95": 0.015045551329205735
+      },
+      "flee": {
+        "n": 17,
+        "better": 12,
+        "meanGain": 0.012852580920453294,
+        "ci95": 0.01992102059151542
+      },
+      "catchPerFoxDay": {
+        "n": 17,
+        "better": 13,
+        "meanGain": 0.02939899304163327,
+        "ci95": 0.019803412048025833
+      },
+      "preySurvival": {
+        "n": 17,
+        "better": 15,
+        "meanGain": 0.09052287581699348,
+        "ci95": 0.0640458402617501
+      }
+    },
+    {
+      "subject": "hidden/evolving",
+      "baseline": "hidden/founder-pool",
+      "netForage": {
+        "n": 17,
+        "better": 17,
+        "meanGain": 0.4565076453348432,
+        "ci95": 0.11876778109014974
+      },
+      "catchPerEncounter": {
+        "n": 17,
+        "better": 14,
+        "meanGain": 0.019335173669676943,
+        "ci95": 0.009807064100849052
+      },
+      "flee": {
+        "n": 17,
+        "better": 9,
+        "meanGain": -0.00033825717702570937,
+        "ci95": 0.022481802684772668
+      },
+      "catchPerFoxDay": {
+        "n": 17,
+        "better": 13,
+        "meanGain": 0.023348034627396985,
+        "ci95": 0.017874594733800882
+      },
+      "preySurvival": {
+        "n": 17,
+        "better": 16,
+        "meanGain": 0.12973856209150325,
+        "ci95": 0.03649123060387374
+      }
+    },
+    {
+      "subject": "memory/evolving",
+      "baseline": "memory/founder-pool",
+      "netForage": {
+        "n": 16,
+        "better": 15,
+        "meanGain": 0.31518239721312935,
+        "ci95": 0.09191632804389828
+      },
+      "catchPerEncounter": {
+        "n": 16,
+        "better": 11,
+        "meanGain": 0.0070857259832911605,
+        "ci95": 0.01724029946719452
+      },
+      "flee": {
+        "n": 16,
+        "better": 6,
+        "meanGain": -0.008839299226232085,
+        "ci95": 0.029300043076106848
+      },
+      "catchPerFoxDay": {
+        "n": 16,
+        "better": 10,
+        "meanGain": 0.020024154277936992,
+        "ci95": 0.018144823234256206
+      },
+      "preySurvival": {
+        "n": 16,
+        "better": 14,
+        "meanGain": 0.06458333333333335,
+        "ci95": 0.059648320770847287
+      }
+    },
+    {
+      "subject": "growth/evolving",
+      "baseline": "growth/founder-pool",
+      "netForage": {
+        "n": 18,
+        "better": 18,
+        "meanGain": 0.3802408344494681,
+        "ci95": 0.07089896555547713
+      },
+      "catchPerEncounter": {
+        "n": 18,
+        "better": 13,
+        "meanGain": 0.009247592795302647,
+        "ci95": 0.011574403396044266
+      },
+      "flee": {
+        "n": 18,
+        "better": 10,
+        "meanGain": 0.015080476420738917,
+        "ci95": 0.0308122931599806
+      },
+      "catchPerFoxDay": {
+        "n": 18,
+        "better": 16,
+        "meanGain": 0.030284862466156186,
+        "ci95": 0.014360928138780704
+      },
+      "preySurvival": {
+        "n": 18,
+        "better": 15,
+        "meanGain": 0.10061728395061728,
+        "ci95": 0.05817411126265317
+      }
+    }
+  ],
+  "outcomes": [
+    {
+      "seed": 6100,
+      "condition": "linear",
+      "control": "evolving",
+      "ticks": 2160,
+      "survived": true,
+      "safetyLimitHits": 0,
+      "msPerHour": 0.7099122601851852,
+      "msPer1000AnimalHours": 4.156552697918756
+    },
+    {
+      "seed": 6100,
+      "condition": "linear",
+      "control": "founder-pool",
+      "ticks": 2160,
+      "survived": true,
+      "safetyLimitHits": 0,
+      "msPerHour": 1.0934942666666665,
+      "msPer1000AnimalHours": 4.101109018646395
+    },
+    {
+      "seed": 6100,
+      "condition": "hidden",
+      "control": "evolving",
+      "ticks": 2160,
+      "survived": true,
+      "safetyLimitHits": 0,
+      "msPerHour": 0.7544928624999999,
+      "msPer1000AnimalHours": 4.797792565311854
+    },
+    {
+      "seed": 6100,
+      "condition": "hidden",
+      "control": "founder-pool",
+      "ticks": 2160,
+      "survived": true,
+      "safetyLimitHits": 0,
+      "msPerHour": 0.824332543055556,
+      "msPer1000AnimalHours": 4.079143311729818
+    },
+    {
+      "seed": 6100,
+      "condition": "memory",
+      "control": "evolving",
+      "ticks": 2160,
+      "survived": true,
+      "safetyLimitHits": 0,
+      "msPerHour": 0.7555578037037035,
+      "msPer1000AnimalHours": 3.9929166456664005
+    },
+    {
+      "seed": 6100,
+      "condition": "memory",
+      "control": "founder-pool",
+      "ticks": 2160,
+      "survived": true,
+      "safetyLimitHits": 0,
+      "msPerHour": 1.432639953703703,
+      "msPer1000AnimalHours": 4.927983023990952
+    },
+    {
+      "seed": 6100,
+      "condition": "growth",
+      "control": "evolving",
+      "ticks": 2160,
+      "survived": true,
+      "safetyLimitHits": 0,
+      "msPerHour": 0.7719750870370372,
+      "msPer1000AnimalHours": 3.6253678447811044
+    },
+    {
+      "seed": 6100,
+      "condition": "growth",
+      "control": "founder-pool",
+      "ticks": 2160,
+      "survived": true,
+      "safetyLimitHits": 0,
+      "msPerHour": 1.022813125462963,
+      "msPer1000AnimalHours": 3.83602206348352
+    },
+    {
+      "seed": 6101,
+      "condition": "linear",
+      "control": "evolving",
+      "ticks": 2160,
+      "survived": true,
+      "safetyLimitHits": 0,
+      "msPerHour": 0.6201633314814815,
+      "msPer1000AnimalHours": 3.244074067077881
+    },
+    {
+      "seed": 6101,
+      "condition": "linear",
+      "control": "founder-pool",
+      "ticks": 2160,
+      "survived": true,
+      "safetyLimitHits": 0,
+      "msPerHour": 1.1451490273148146,
+      "msPer1000AnimalHours": 4.250753389746039
+    },
+    {
+      "seed": 6101,
+      "condition": "hidden",
+      "control": "evolving",
+      "ticks": 2160,
+      "survived": true,
+      "safetyLimitHits": 0,
+      "msPerHour": 1.3449307203703702,
+      "msPer1000AnimalHours": 6.369285788517066
+    },
+    {
+      "seed": 6101,
+      "condition": "hidden",
+      "control": "founder-pool",
+      "ticks": 2160,
+      "survived": true,
+      "safetyLimitHits": 0,
+      "msPerHour": 1.3186035004629637,
+      "msPer1000AnimalHours": 4.853374754194459
+    },
+    {
+      "seed": 6101,
+      "condition": "memory",
+      "control": "evolving",
+      "ticks": 1894,
+      "survived": false,
+      "safetyLimitHits": 0,
+      "msPerHour": 0.7134388833157338,
+      "msPer1000AnimalHours": 3.655473918712735
+    },
+    {
+      "seed": 6101,
+      "condition": "memory",
+      "control": "founder-pool",
+      "ticks": 2160,
+      "survived": true,
+      "safetyLimitHits": 0,
+      "msPerHour": 0.9383109722222192,
+      "msPer1000AnimalHours": 4.000062564143036
+    },
+    {
+      "seed": 6101,
+      "condition": "growth",
+      "control": "evolving",
+      "ticks": 2160,
+      "survived": true,
+      "safetyLimitHits": 0,
+      "msPerHour": 0.7204750175925929,
+      "msPer1000AnimalHours": 3.426761493727693
+    },
+    {
+      "seed": 6101,
+      "condition": "growth",
+      "control": "founder-pool",
+      "ticks": 2160,
+      "survived": true,
+      "safetyLimitHits": 0,
+      "msPerHour": 1.4980010092592608,
+      "msPer1000AnimalHours": 5.560527683355622
+    },
+    {
+      "seed": 6102,
+      "condition": "linear",
+      "control": "evolving",
+      "ticks": 2160,
+      "survived": true,
+      "safetyLimitHits": 0,
+      "msPerHour": 0.6555666254629614,
+      "msPer1000AnimalHours": 3.3066051849309073
+    },
+    {
+      "seed": 6102,
+      "condition": "linear",
+      "control": "founder-pool",
+      "ticks": 2160,
+      "survived": true,
+      "safetyLimitHits": 0,
+      "msPerHour": 1.0974042861111128,
+      "msPer1000AnimalHours": 3.904131199868243
+    },
+    {
+      "seed": 6102,
+      "condition": "hidden",
+      "control": "evolving",
+      "ticks": 2160,
+      "survived": true,
+      "safetyLimitHits": 0,
+      "msPerHour": 1.073886909722222,
+      "msPer1000AnimalHours": 5.105429481070301
+    },
+    {
+      "seed": 6102,
+      "condition": "hidden",
+      "control": "founder-pool",
+      "ticks": 2160,
+      "survived": true,
+      "safetyLimitHits": 0,
+      "msPerHour": 1.0671427023148141,
+      "msPer1000AnimalHours": 4.504031570822828
+    },
+    {
+      "seed": 6102,
+      "condition": "memory",
+      "control": "evolving",
+      "ticks": 2160,
+      "survived": true,
+      "safetyLimitHits": 0,
+      "msPerHour": 0.7143821273148172,
+      "msPer1000AnimalHours": 3.669753746890485
+    },
+    {
+      "seed": 6102,
+      "condition": "memory",
+      "control": "founder-pool",
+      "ticks": 2160,
+      "survived": true,
+      "safetyLimitHits": 0,
+      "msPerHour": 1.4917212629629661,
+      "msPer1000AnimalHours": 5.235734167033643
+    },
+    {
+      "seed": 6102,
+      "condition": "growth",
+      "control": "evolving",
+      "ticks": 2160,
+      "survived": true,
+      "safetyLimitHits": 0,
+      "msPerHour": 0.7178757444444441,
+      "msPer1000AnimalHours": 3.5829178587685617
+    },
+    {
+      "seed": 6102,
+      "condition": "growth",
+      "control": "founder-pool",
+      "ticks": 2160,
+      "survived": true,
+      "safetyLimitHits": 0,
+      "msPerHour": 1.1275307712962954,
+      "msPer1000AnimalHours": 4.0113093403606985
+    },
+    {
+      "seed": 6103,
+      "condition": "linear",
+      "control": "evolving",
+      "ticks": 2160,
+      "survived": true,
+      "safetyLimitHits": 0,
+      "msPerHour": 0.6918748861111116,
+      "msPer1000AnimalHours": 3.188601627959079
+    },
+    {
+      "seed": 6103,
+      "condition": "linear",
+      "control": "founder-pool",
+      "ticks": 2160,
+      "survived": true,
+      "safetyLimitHits": 0,
+      "msPerHour": 0.9924908685185174,
+      "msPer1000AnimalHours": 4.287148985697368
+    },
+    {
+      "seed": 6103,
+      "condition": "hidden",
+      "control": "evolving",
+      "ticks": 2160,
+      "survived": true,
+      "safetyLimitHits": 0,
+      "msPerHour": 0.9671070606481441,
+      "msPer1000AnimalHours": 4.5624036303514846
+    },
+    {
+      "seed": 6103,
+      "condition": "hidden",
+      "control": "founder-pool",
+      "ticks": 2160,
+      "survived": true,
+      "safetyLimitHits": 0,
+      "msPerHour": 1.0483377643518503,
+      "msPer1000AnimalHours": 4.3832683337107925
+    },
+    {
+      "seed": 6103,
+      "condition": "memory",
+      "control": "evolving",
+      "ticks": 2160,
+      "survived": true,
+      "safetyLimitHits": 0,
+      "msPerHour": 0.8190654185185176,
+      "msPer1000AnimalHours": 3.520842893760643
+    },
+    {
+      "seed": 6103,
+      "condition": "memory",
+      "control": "founder-pool",
+      "ticks": 2160,
+      "survived": true,
+      "safetyLimitHits": 0,
+      "msPerHour": 0.8892133791666613,
+      "msPer1000AnimalHours": 3.8582779055588916
+    },
+    {
+      "seed": 6103,
+      "condition": "growth",
+      "control": "evolving",
+      "ticks": 2160,
+      "survived": true,
+      "safetyLimitHits": 0,
+      "msPerHour": 0.8716630624999973,
+      "msPer1000AnimalHours": 3.8033824447357722
+    },
+    {
+      "seed": 6103,
+      "condition": "growth",
+      "control": "founder-pool",
+      "ticks": 2160,
+      "survived": true,
+      "safetyLimitHits": 0,
+      "msPerHour": 0.8595593995370412,
+      "msPer1000AnimalHours": 3.7129401637442987
+    },
+    {
+      "seed": 6104,
+      "condition": "linear",
+      "control": "evolving",
+      "ticks": 1868,
+      "survived": false,
+      "safetyLimitHits": 0,
+      "msPerHour": 0.8615684737687337,
+      "msPer1000AnimalHours": 3.7069938363026904
+    },
+    {
+      "seed": 6104,
+      "condition": "linear",
+      "control": "founder-pool",
+      "ticks": 1793,
+      "survived": false,
+      "safetyLimitHits": 0,
+      "msPerHour": 1.1638344300055765,
+      "msPer1000AnimalHours": 4.37359341767164
+    },
+    {
+      "seed": 6104,
+      "condition": "hidden",
+      "control": "evolving",
+      "ticks": 2160,
+      "survived": true,
+      "safetyLimitHits": 0,
+      "msPerHour": 0.7801231277777737,
+      "msPer1000AnimalHours": 3.953697691224757
+    },
+    {
+      "seed": 6104,
+      "condition": "hidden",
+      "control": "founder-pool",
+      "ticks": 2160,
+      "survived": true,
+      "safetyLimitHits": 0,
+      "msPerHour": 1.167432887500002,
+      "msPer1000AnimalHours": 4.7740624972784955
+    },
+    {
+      "seed": 6104,
+      "condition": "memory",
+      "control": "evolving",
+      "ticks": 2160,
+      "survived": true,
+      "safetyLimitHits": 0,
+      "msPerHour": 0.8548121138888881,
+      "msPer1000AnimalHours": 4.057367111138453
+    },
+    {
+      "seed": 6104,
+      "condition": "memory",
+      "control": "founder-pool",
+      "ticks": 1895,
+      "survived": false,
+      "safetyLimitHits": 0,
+      "msPerHour": 1.0394061773087022,
+      "msPer1000AnimalHours": 4.196949796616723
+    },
+    {
+      "seed": 6104,
+      "condition": "growth",
+      "control": "evolving",
+      "ticks": 1677,
+      "survived": false,
+      "safetyLimitHits": 0,
+      "msPerHour": 0.9416632218246809,
+      "msPer1000AnimalHours": 4.145769544591755
+    },
+    {
+      "seed": 6104,
+      "condition": "growth",
+      "control": "founder-pool",
+      "ticks": 1793,
+      "survived": false,
+      "safetyLimitHits": 0,
+      "msPerHour": 1.1668934868934735,
+      "msPer1000AnimalHours": 4.385089100153834
+    },
+    {
+      "seed": 6105,
+      "condition": "linear",
+      "control": "evolving",
+      "ticks": 2160,
+      "survived": true,
+      "safetyLimitHits": 0,
+      "msPerHour": 0.8183472421296284,
+      "msPer1000AnimalHours": 3.392418895966432
+    },
+    {
+      "seed": 6105,
+      "condition": "linear",
+      "control": "founder-pool",
+      "ticks": 2160,
+      "survived": true,
+      "safetyLimitHits": 0,
+      "msPerHour": 1.247591413425929,
+      "msPer1000AnimalHours": 4.223601997075397
+    },
+    {
+      "seed": 6105,
+      "condition": "hidden",
+      "control": "evolving",
+      "ticks": 2160,
+      "survived": true,
+      "safetyLimitHits": 0,
+      "msPerHour": 0.7544979902777817,
+      "msPer1000AnimalHours": 4.661178079488407
+    },
+    {
+      "seed": 6105,
+      "condition": "hidden",
+      "control": "founder-pool",
+      "ticks": 2160,
+      "survived": true,
+      "safetyLimitHits": 0,
+      "msPerHour": 0.994356325925926,
+      "msPer1000AnimalHours": 4.705723095798873
+    },
+    {
+      "seed": 6105,
+      "condition": "memory",
+      "control": "evolving",
+      "ticks": 2160,
+      "survived": true,
+      "safetyLimitHits": 0,
+      "msPerHour": 0.9760842537037038,
+      "msPer1000AnimalHours": 3.671170122776194
+    },
+    {
+      "seed": 6105,
+      "condition": "memory",
+      "control": "founder-pool",
+      "ticks": 2160,
+      "survived": true,
+      "safetyLimitHits": 0,
+      "msPerHour": 1.3394263574074068,
+      "msPer1000AnimalHours": 4.257710223969882
+    },
+    {
+      "seed": 6105,
+      "condition": "growth",
+      "control": "evolving",
+      "ticks": 2160,
+      "survived": true,
+      "safetyLimitHits": 0,
+      "msPerHour": 0.9276721185185158,
+      "msPer1000AnimalHours": 3.834096686113582
+    },
+    {
+      "seed": 6105,
+      "condition": "growth",
+      "control": "founder-pool",
+      "ticks": 2160,
+      "survived": true,
+      "safetyLimitHits": 0,
+      "msPerHour": 1.29776020694444,
+      "msPer1000AnimalHours": 4.393443672976148
+    },
+    {
+      "seed": 6106,
+      "condition": "linear",
+      "control": "evolving",
+      "ticks": 2160,
+      "survived": true,
+      "safetyLimitHits": 0,
+      "msPerHour": 0.8713072703703734,
+      "msPer1000AnimalHours": 3.8362611886144924
+    },
+    {
+      "seed": 6106,
+      "condition": "linear",
+      "control": "founder-pool",
+      "ticks": 2160,
+      "survived": true,
+      "safetyLimitHits": 0,
+      "msPerHour": 1.3282101722222217,
+      "msPer1000AnimalHours": 4.464585902850613
+    },
+    {
+      "seed": 6106,
+      "condition": "hidden",
+      "control": "evolving",
+      "ticks": 2160,
+      "survived": true,
+      "safetyLimitHits": 0,
+      "msPerHour": 0.6585518629629641,
+      "msPer1000AnimalHours": 3.7990941392645836
+    },
+    {
+      "seed": 6106,
+      "condition": "hidden",
+      "control": "founder-pool",
+      "ticks": 2160,
+      "survived": true,
+      "safetyLimitHits": 0,
+      "msPerHour": 1.3169209930555519,
+      "msPer1000AnimalHours": 4.741650530832266
+    },
+    {
+      "seed": 6106,
+      "condition": "memory",
+      "control": "evolving",
+      "ticks": 2160,
+      "survived": true,
+      "safetyLimitHits": 0,
+      "msPerHour": 0.7975228648148173,
+      "msPer1000AnimalHours": 3.6686771929226873
+    },
+    {
+      "seed": 6106,
+      "condition": "memory",
+      "control": "founder-pool",
+      "ticks": 2160,
+      "survived": true,
+      "safetyLimitHits": 0,
+      "msPerHour": 1.3186901754629718,
+      "msPer1000AnimalHours": 4.547243798242354
+    },
+    {
+      "seed": 6106,
+      "condition": "growth",
+      "control": "evolving",
+      "ticks": 2160,
+      "survived": true,
+      "safetyLimitHits": 0,
+      "msPerHour": 0.7648646046296226,
+      "msPer1000AnimalHours": 3.556452961867457
+    },
+    {
+      "seed": 6106,
+      "condition": "growth",
+      "control": "founder-pool",
+      "ticks": 2160,
+      "survived": true,
+      "safetyLimitHits": 0,
+      "msPerHour": 1.3565850004629654,
+      "msPer1000AnimalHours": 4.559963773618974
+    },
+    {
+      "seed": 6107,
+      "condition": "linear",
+      "control": "evolving",
+      "ticks": 2160,
+      "survived": true,
+      "safetyLimitHits": 0,
+      "msPerHour": 0.6821280314814901,
+      "msPer1000AnimalHours": 3.4730914876765984
+    },
+    {
+      "seed": 6107,
+      "condition": "linear",
+      "control": "founder-pool",
+      "ticks": 2160,
+      "survived": true,
+      "safetyLimitHits": 0,
+      "msPerHour": 1.22066954768518,
+      "msPer1000AnimalHours": 4.361762578764595
+    },
+    {
+      "seed": 6107,
+      "condition": "hidden",
+      "control": "evolving",
+      "ticks": 1429,
+      "survived": false,
+      "safetyLimitHits": 0,
+      "msPerHour": 0.8017272617214717,
+      "msPer1000AnimalHours": 4.143061100724281
+    },
+    {
+      "seed": 6107,
+      "condition": "hidden",
+      "control": "founder-pool",
+      "ticks": 2160,
+      "survived": true,
+      "safetyLimitHits": 0,
+      "msPerHour": 0.8410879870370317,
+      "msPer1000AnimalHours": 4.490059839452687
+    },
+    {
+      "seed": 6107,
+      "condition": "memory",
+      "control": "evolving",
+      "ticks": 2160,
+      "survived": true,
+      "safetyLimitHits": 0,
+      "msPerHour": 0.8438035060185131,
+      "msPer1000AnimalHours": 4.0764001417982625
+    },
+    {
+      "seed": 6107,
+      "condition": "memory",
+      "control": "founder-pool",
+      "ticks": 2160,
+      "survived": true,
+      "safetyLimitHits": 0,
+      "msPerHour": 0.8877129898148134,
+      "msPer1000AnimalHours": 4.1395853160938705
+    },
+    {
+      "seed": 6107,
+      "condition": "growth",
+      "control": "evolving",
+      "ticks": 2160,
+      "survived": true,
+      "safetyLimitHits": 0,
+      "msPerHour": 0.6625722148148203,
+      "msPer1000AnimalHours": 3.4633818960614966
+    },
+    {
+      "seed": 6107,
+      "condition": "growth",
+      "control": "founder-pool",
+      "ticks": 2160,
+      "survived": true,
+      "safetyLimitHits": 0,
+      "msPerHour": 1.7614941800925914,
+      "msPer1000AnimalHours": 6.2942664638514
+    },
+    {
+      "seed": 6108,
+      "condition": "linear",
+      "control": "evolving",
+      "ticks": 2160,
+      "survived": true,
+      "safetyLimitHits": 0,
+      "msPerHour": 1.3854030458333404,
+      "msPer1000AnimalHours": 6.881441607778153
+    },
+    {
+      "seed": 6108,
+      "condition": "linear",
+      "control": "founder-pool",
+      "ticks": 2160,
+      "survived": true,
+      "safetyLimitHits": 0,
+      "msPerHour": 1.6345405791666658,
+      "msPer1000AnimalHours": 4.981196961851724
+    },
+    {
+      "seed": 6108,
+      "condition": "hidden",
+      "control": "evolving",
+      "ticks": 2160,
+      "survived": true,
+      "safetyLimitHits": 0,
+      "msPerHour": 0.798542078240738,
+      "msPer1000AnimalHours": 3.795819811711048
+    },
+    {
+      "seed": 6108,
+      "condition": "hidden",
+      "control": "founder-pool",
+      "ticks": 2160,
+      "survived": true,
+      "safetyLimitHits": 0,
+      "msPerHour": 1.0250269800925944,
+      "msPer1000AnimalHours": 4.856221627822311
+    },
+    {
+      "seed": 6108,
+      "condition": "memory",
+      "control": "evolving",
+      "ticks": 2160,
+      "survived": true,
+      "safetyLimitHits": 0,
+      "msPerHour": 0.9741526412037071,
+      "msPer1000AnimalHours": 3.948007777173214
+    },
+    {
+      "seed": 6108,
+      "condition": "memory",
+      "control": "founder-pool",
+      "ticks": 2160,
+      "survived": true,
+      "safetyLimitHits": 0,
+      "msPerHour": 2.217390336574075,
+      "msPer1000AnimalHours": 7.436482342565869
+    },
+    {
+      "seed": 6108,
+      "condition": "growth",
+      "control": "evolving",
+      "ticks": 2160,
+      "survived": true,
+      "safetyLimitHits": 0,
+      "msPerHour": 1.259077800462964,
+      "msPer1000AnimalHours": 5.759867946586473
+    },
+    {
+      "seed": 6108,
+      "condition": "growth",
+      "control": "founder-pool",
+      "ticks": 2160,
+      "survived": true,
+      "safetyLimitHits": 0,
+      "msPerHour": 1.7485602555555588,
+      "msPer1000AnimalHours": 5.328667359869759
+    },
+    {
+      "seed": 6109,
+      "condition": "linear",
+      "control": "evolving",
+      "ticks": 2160,
+      "survived": true,
+      "safetyLimitHits": 0,
+      "msPerHour": 0.8363544759259336,
+      "msPer1000AnimalHours": 3.5760605655103936
+    },
+    {
+      "seed": 6109,
+      "condition": "linear",
+      "control": "founder-pool",
+      "ticks": 2160,
+      "survived": true,
+      "safetyLimitHits": 0,
+      "msPerHour": 1.7068019069444373,
+      "msPer1000AnimalHours": 5.994533606825241
+    },
+    {
+      "seed": 6109,
+      "condition": "hidden",
+      "control": "evolving",
+      "ticks": 2160,
+      "survived": true,
+      "safetyLimitHits": 0,
+      "msPerHour": 0.8957373199073994,
+      "msPer1000AnimalHours": 4.121262479071929
+    },
+    {
+      "seed": 6109,
+      "condition": "hidden",
+      "control": "founder-pool",
+      "ticks": 2160,
+      "survived": true,
+      "safetyLimitHits": 0,
+      "msPerHour": 1.4236569324074178,
+      "msPer1000AnimalHours": 4.996959629115692
+    },
+    {
+      "seed": 6109,
+      "condition": "memory",
+      "control": "evolving",
+      "ticks": 2160,
+      "survived": true,
+      "safetyLimitHits": 0,
+      "msPerHour": 1.202488894907408,
+      "msPer1000AnimalHours": 4.90803446842363
+    },
+    {
+      "seed": 6109,
+      "condition": "memory",
+      "control": "founder-pool",
+      "ticks": 2160,
+      "survived": true,
+      "safetyLimitHits": 0,
+      "msPerHour": 1.3662896569444354,
+      "msPer1000AnimalHours": 4.47993742599685
+    },
+    {
+      "seed": 6109,
+      "condition": "growth",
+      "control": "evolving",
+      "ticks": 2160,
+      "survived": true,
+      "safetyLimitHits": 0,
+      "msPerHour": 1.1739988523148188,
+      "msPer1000AnimalHours": 4.723540649081419
+    },
+    {
+      "seed": 6109,
+      "condition": "growth",
+      "control": "founder-pool",
+      "ticks": 2160,
+      "survived": true,
+      "safetyLimitHits": 0,
+      "msPerHour": 1.0620899333333338,
+      "msPer1000AnimalHours": 3.730212494451302
+    },
+    {
+      "seed": 6110,
+      "condition": "linear",
+      "control": "evolving",
+      "ticks": 2160,
+      "survived": true,
+      "safetyLimitHits": 0,
+      "msPerHour": 0.7068598685185188,
+      "msPer1000AnimalHours": 3.797684592788263
+    },
+    {
+      "seed": 6110,
+      "condition": "linear",
+      "control": "founder-pool",
+      "ticks": 2160,
+      "survived": true,
+      "safetyLimitHits": 0,
+      "msPerHour": 1.303649970833336,
+      "msPer1000AnimalHours": 4.129994495558175
+    },
+    {
+      "seed": 6110,
+      "condition": "hidden",
+      "control": "evolving",
+      "ticks": 2160,
+      "survived": true,
+      "safetyLimitHits": 0,
+      "msPerHour": 0.7225588587963069,
+      "msPer1000AnimalHours": 3.65100305512089
+    },
+    {
+      "seed": 6110,
+      "condition": "hidden",
+      "control": "founder-pool",
+      "ticks": 2160,
+      "survived": true,
+      "safetyLimitHits": 0,
+      "msPerHour": 1.0026604055555557,
+      "msPer1000AnimalHours": 3.911895244305323
+    },
+    {
+      "seed": 6110,
+      "condition": "memory",
+      "control": "evolving",
+      "ticks": 2160,
+      "survived": true,
+      "safetyLimitHits": 0,
+      "msPerHour": 0.5953263972222178,
+      "msPer1000AnimalHours": 3.292422562185527
+    },
+    {
+      "seed": 6110,
+      "condition": "memory",
+      "control": "founder-pool",
+      "ticks": 2160,
+      "survived": true,
+      "safetyLimitHits": 0,
+      "msPerHour": 1.0584413018518481,
+      "msPer1000AnimalHours": 3.7288633052691194
+    },
+    {
+      "seed": 6110,
+      "condition": "growth",
+      "control": "evolving",
+      "ticks": 2160,
+      "survived": true,
+      "safetyLimitHits": 0,
+      "msPerHour": 0.590287470370364,
+      "msPer1000AnimalHours": 3.294678821893844
+    },
+    {
+      "seed": 6110,
+      "condition": "growth",
+      "control": "founder-pool",
+      "ticks": 2160,
+      "survived": true,
+      "safetyLimitHits": 0,
+      "msPerHour": 1.244843069907411,
+      "msPer1000AnimalHours": 3.943692817532091
+    },
+    {
+      "seed": 6111,
+      "condition": "linear",
+      "control": "evolving",
+      "ticks": 2160,
+      "survived": true,
+      "safetyLimitHits": 0,
+      "msPerHour": 1.2428136305555435,
+      "msPer1000AnimalHours": 4.207420673506387
+    },
+    {
+      "seed": 6111,
+      "condition": "linear",
+      "control": "founder-pool",
+      "ticks": 2160,
+      "survived": true,
+      "safetyLimitHits": 0,
+      "msPerHour": 1.42756759999999,
+      "msPer1000AnimalHours": 4.593004937760355
+    },
+    {
+      "seed": 6111,
+      "condition": "hidden",
+      "control": "evolving",
+      "ticks": 2160,
+      "survived": true,
+      "safetyLimitHits": 0,
+      "msPerHour": 0.7417225805555602,
+      "msPer1000AnimalHours": 3.653964147324414
+    },
+    {
+      "seed": 6111,
+      "condition": "hidden",
+      "control": "founder-pool",
+      "ticks": 2160,
+      "survived": true,
+      "safetyLimitHits": 0,
+      "msPerHour": 1.4137142995370393,
+      "msPer1000AnimalHours": 4.764630168171344
+    },
+    {
+      "seed": 6111,
+      "condition": "memory",
+      "control": "evolving",
+      "ticks": 2160,
+      "survived": true,
+      "safetyLimitHits": 0,
+      "msPerHour": 0.851685197685179,
+      "msPer1000AnimalHours": 3.7065454019769155
+    },
+    {
+      "seed": 6111,
+      "condition": "memory",
+      "control": "founder-pool",
+      "ticks": 2160,
+      "survived": true,
+      "safetyLimitHits": 0,
+      "msPerHour": 1.0992687120370344,
+      "msPer1000AnimalHours": 4.127173018560289
+    },
+    {
+      "seed": 6111,
+      "condition": "growth",
+      "control": "evolving",
+      "ticks": 2160,
+      "survived": true,
+      "safetyLimitHits": 0,
+      "msPerHour": 0.9336641736110997,
+      "msPer1000AnimalHours": 3.745330887473699
+    },
+    {
+      "seed": 6111,
+      "condition": "growth",
+      "control": "founder-pool",
+      "ticks": 2160,
+      "survived": true,
+      "safetyLimitHits": 0,
+      "msPerHour": 1.3080452847222155,
+      "msPer1000AnimalHours": 4.208458115428878
+    },
+    {
+      "seed": 6112,
+      "condition": "linear",
+      "control": "evolving",
+      "ticks": 2160,
+      "survived": true,
+      "safetyLimitHits": 0,
+      "msPerHour": 0.6292547791666611,
+      "msPer1000AnimalHours": 3.11695861148501
+    },
+    {
+      "seed": 6112,
+      "condition": "linear",
+      "control": "founder-pool",
+      "ticks": 2160,
+      "survived": true,
+      "safetyLimitHits": 0,
+      "msPerHour": 1.8001990898148237,
+      "msPer1000AnimalHours": 6.402120029767914
+    },
+    {
+      "seed": 6112,
+      "condition": "hidden",
+      "control": "evolving",
+      "ticks": 2084,
+      "survived": false,
+      "safetyLimitHits": 0,
+      "msPerHour": 0.9483104688099777,
+      "msPer1000AnimalHours": 4.434658644568295
+    },
+    {
+      "seed": 6112,
+      "condition": "hidden",
+      "control": "founder-pool",
+      "ticks": 1976,
+      "survived": false,
+      "safetyLimitHits": 0,
+      "msPerHour": 1.4303297920040665,
+      "msPer1000AnimalHours": 5.739630215018024
+    },
+    {
+      "seed": 6112,
+      "condition": "memory",
+      "control": "evolving",
+      "ticks": 2160,
+      "survived": true,
+      "safetyLimitHits": 0,
+      "msPerHour": 1.189101398611092,
+      "msPer1000AnimalHours": 4.465821223464946
+    },
+    {
+      "seed": 6112,
+      "condition": "memory",
+      "control": "founder-pool",
+      "ticks": 2160,
+      "survived": true,
+      "safetyLimitHits": 0,
+      "msPerHour": 1.249518367592585,
+      "msPer1000AnimalHours": 4.376483184583625
+    },
+    {
+      "seed": 6112,
+      "condition": "growth",
+      "control": "evolving",
+      "ticks": 2160,
+      "survived": true,
+      "safetyLimitHits": 0,
+      "msPerHour": 0.679547138425928,
+      "msPer1000AnimalHours": 3.4049712560487433
+    },
+    {
+      "seed": 6112,
+      "condition": "growth",
+      "control": "founder-pool",
+      "ticks": 2160,
+      "survived": true,
+      "safetyLimitHits": 0,
+      "msPerHour": 1.4436111768518727,
+      "msPer1000AnimalHours": 5.13397217163958
+    },
+    {
+      "seed": 6113,
+      "condition": "linear",
+      "control": "evolving",
+      "ticks": 2160,
+      "survived": true,
+      "safetyLimitHits": 0,
+      "msPerHour": 0.8162656763888932,
+      "msPer1000AnimalHours": 3.8659705546358727
+    },
+    {
+      "seed": 6113,
+      "condition": "linear",
+      "control": "founder-pool",
+      "ticks": 2160,
+      "survived": true,
+      "safetyLimitHits": 0,
+      "msPerHour": 1.2953495004629616,
+      "msPer1000AnimalHours": 4.46900543221313
+    },
+    {
+      "seed": 6113,
+      "condition": "hidden",
+      "control": "evolving",
+      "ticks": 2160,
+      "survived": true,
+      "safetyLimitHits": 0,
+      "msPerHour": 0.8077571004629405,
+      "msPer1000AnimalHours": 4.150888312361749
+    },
+    {
+      "seed": 6113,
+      "condition": "hidden",
+      "control": "founder-pool",
+      "ticks": 2160,
+      "survived": true,
+      "safetyLimitHits": 0,
+      "msPerHour": 1.4652486041666566,
+      "msPer1000AnimalHours": 4.933873838411991
+    },
+    {
+      "seed": 6113,
+      "condition": "memory",
+      "control": "evolving",
+      "ticks": 2160,
+      "survived": true,
+      "safetyLimitHits": 0,
+      "msPerHour": 0.8975726379629729,
+      "msPer1000AnimalHours": 4.038210338198307
+    },
+    {
+      "seed": 6113,
+      "condition": "memory",
+      "control": "founder-pool",
+      "ticks": 2160,
+      "survived": true,
+      "safetyLimitHits": 0,
+      "msPerHour": 1.349239461111116,
+      "msPer1000AnimalHours": 4.2726872348224
+    },
+    {
+      "seed": 6113,
+      "condition": "growth",
+      "control": "evolving",
+      "ticks": 2160,
+      "survived": true,
+      "safetyLimitHits": 0,
+      "msPerHour": 0.7215606564814893,
+      "msPer1000AnimalHours": 3.3331145247454392
+    },
+    {
+      "seed": 6113,
+      "condition": "growth",
+      "control": "founder-pool",
+      "ticks": 2160,
+      "survived": true,
+      "safetyLimitHits": 0,
+      "msPerHour": 1.2260226856481664,
+      "msPer1000AnimalHours": 4.229825263544658
+    },
+    {
+      "seed": 6114,
+      "condition": "linear",
+      "control": "evolving",
+      "ticks": 2024,
+      "survived": false,
+      "safetyLimitHits": 0,
+      "msPerHour": 1.0250117747035632,
+      "msPer1000AnimalHours": 4.49936093586329
+    },
+    {
+      "seed": 6114,
+      "condition": "linear",
+      "control": "founder-pool",
+      "ticks": 2160,
+      "survived": true,
+      "safetyLimitHits": 0,
+      "msPerHour": 0.8862943069444521,
+      "msPer1000AnimalHours": 4.252889552139371
+    },
+    {
+      "seed": 6114,
+      "condition": "hidden",
+      "control": "evolving",
+      "ticks": 2160,
+      "survived": true,
+      "safetyLimitHits": 0,
+      "msPerHour": 0.9200303518518383,
+      "msPer1000AnimalHours": 4.164577447226684
+    },
+    {
+      "seed": 6114,
+      "condition": "hidden",
+      "control": "founder-pool",
+      "ticks": 2160,
+      "survived": true,
+      "safetyLimitHits": 0,
+      "msPerHour": 1.0430598842592627,
+      "msPer1000AnimalHours": 4.268461730832275
+    },
+    {
+      "seed": 6114,
+      "condition": "memory",
+      "control": "evolving",
+      "ticks": 1499,
+      "survived": false,
+      "safetyLimitHits": 0,
+      "msPerHour": 0.7352257785190076,
+      "msPer1000AnimalHours": 3.6101988109081726
+    },
+    {
+      "seed": 6114,
+      "condition": "memory",
+      "control": "founder-pool",
+      "ticks": 2160,
+      "survived": true,
+      "safetyLimitHits": 0,
+      "msPerHour": 0.5559851069444482,
+      "msPer1000AnimalHours": 3.6508579910258527
+    },
+    {
+      "seed": 6114,
+      "condition": "growth",
+      "control": "evolving",
+      "ticks": 2160,
+      "survived": true,
+      "safetyLimitHits": 0,
+      "msPerHour": 0.963186804629637,
+      "msPer1000AnimalHours": 4.076469927346004
+    },
+    {
+      "seed": 6114,
+      "condition": "growth",
+      "control": "founder-pool",
+      "ticks": 2160,
+      "survived": true,
+      "safetyLimitHits": 0,
+      "msPerHour": 0.8999772777777926,
+      "msPer1000AnimalHours": 4.318547385257991
+    },
+    {
+      "seed": 6115,
+      "condition": "linear",
+      "control": "evolving",
+      "ticks": 2160,
+      "survived": true,
+      "safetyLimitHits": 0,
+      "msPerHour": 1.012773342592576,
+      "msPer1000AnimalHours": 4.481031772530647
+    },
+    {
+      "seed": 6115,
+      "condition": "linear",
+      "control": "founder-pool",
+      "ticks": 2160,
+      "survived": true,
+      "safetyLimitHits": 0,
+      "msPerHour": 1.2970339226851744,
+      "msPer1000AnimalHours": 4.216403125286856
+    },
+    {
+      "seed": 6115,
+      "condition": "hidden",
+      "control": "evolving",
+      "ticks": 2160,
+      "survived": true,
+      "safetyLimitHits": 0,
+      "msPerHour": 0.8286984249999848,
+      "msPer1000AnimalHours": 3.776219785829945
+    },
+    {
+      "seed": 6115,
+      "condition": "hidden",
+      "control": "founder-pool",
+      "ticks": 2160,
+      "survived": true,
+      "safetyLimitHits": 0,
+      "msPerHour": 1.1220902236111148,
+      "msPer1000AnimalHours": 3.952439390430853
+    },
+    {
+      "seed": 6115,
+      "condition": "memory",
+      "control": "evolving",
+      "ticks": 2160,
+      "survived": true,
+      "safetyLimitHits": 0,
+      "msPerHour": 1.0305950416666747,
+      "msPer1000AnimalHours": 4.238007127803607
+    },
+    {
+      "seed": 6115,
+      "condition": "memory",
+      "control": "founder-pool",
+      "ticks": 2160,
+      "survived": true,
+      "safetyLimitHits": 0,
+      "msPerHour": 1.1629871615740908,
+      "msPer1000AnimalHours": 4.266045344469263
+    },
+    {
+      "seed": 6115,
+      "condition": "growth",
+      "control": "evolving",
+      "ticks": 2160,
+      "survived": true,
+      "safetyLimitHits": 0,
+      "msPerHour": 0.6945445138888856,
+      "msPer1000AnimalHours": 3.507201936631638
+    },
+    {
+      "seed": 6115,
+      "condition": "growth",
+      "control": "founder-pool",
+      "ticks": 2160,
+      "survived": true,
+      "safetyLimitHits": 0,
+      "msPerHour": 1.2836379166666625,
+      "msPer1000AnimalHours": 4.172855334704878
+    },
+    {
+      "seed": 6116,
+      "condition": "linear",
+      "control": "evolving",
+      "ticks": 2079,
+      "survived": false,
+      "safetyLimitHits": 0,
+      "msPerHour": 0.5341594425204648,
+      "msPer1000AnimalHours": 3.1929129689743054
+    },
+    {
+      "seed": 6116,
+      "condition": "linear",
+      "control": "founder-pool",
+      "ticks": 2160,
+      "survived": true,
+      "safetyLimitHits": 0,
+      "msPerHour": 1.4726993314814874,
+      "msPer1000AnimalHours": 4.330006419400872
+    },
+    {
+      "seed": 6116,
+      "condition": "hidden",
+      "control": "evolving",
+      "ticks": 2160,
+      "survived": true,
+      "safetyLimitHits": 0,
+      "msPerHour": 0.7282265106481242,
+      "msPer1000AnimalHours": 4.090021927418109
+    },
+    {
+      "seed": 6116,
+      "condition": "hidden",
+      "control": "founder-pool",
+      "ticks": 2160,
+      "survived": true,
+      "safetyLimitHits": 0,
+      "msPerHour": 1.1333071129629657,
+      "msPer1000AnimalHours": 4.472411931823383
+    },
+    {
+      "seed": 6116,
+      "condition": "memory",
+      "control": "evolving",
+      "ticks": 2160,
+      "survived": true,
+      "safetyLimitHits": 0,
+      "msPerHour": 0.5975072490740718,
+      "msPer1000AnimalHours": 3.400294177468635
+    },
+    {
+      "seed": 6116,
+      "condition": "memory",
+      "control": "founder-pool",
+      "ticks": 2160,
+      "survived": true,
+      "safetyLimitHits": 0,
+      "msPerHour": 1.596440006944451,
+      "msPer1000AnimalHours": 4.683645274331255
+    },
+    {
+      "seed": 6116,
+      "condition": "growth",
+      "control": "evolving",
+      "ticks": 1819,
+      "survived": false,
+      "safetyLimitHits": 0,
+      "msPerHour": 0.556840223749309,
+      "msPer1000AnimalHours": 3.1608831659624186
+    },
+    {
+      "seed": 6116,
+      "condition": "growth",
+      "control": "founder-pool",
+      "ticks": 2160,
+      "survived": true,
+      "safetyLimitHits": 0,
+      "msPerHour": 1.5607231291666621,
+      "msPer1000AnimalHours": 4.588812545600056
+    },
+    {
+      "seed": 6117,
+      "condition": "linear",
+      "control": "evolving",
+      "ticks": 2160,
+      "survived": true,
+      "safetyLimitHits": 0,
+      "msPerHour": 0.8839198527777895,
+      "msPer1000AnimalHours": 3.7955328350198307
+    },
+    {
+      "seed": 6117,
+      "condition": "linear",
+      "control": "founder-pool",
+      "ticks": 2160,
+      "survived": true,
+      "safetyLimitHits": 0,
+      "msPerHour": 1.164105513888865,
+      "msPer1000AnimalHours": 4.06203369212792
+    },
+    {
+      "seed": 6117,
+      "condition": "hidden",
+      "control": "evolving",
+      "ticks": 2115,
+      "survived": false,
+      "safetyLimitHits": 0,
+      "msPerHour": 0.5935381895981137,
+      "msPer1000AnimalHours": 3.9996217171186483
+    },
+    {
+      "seed": 6117,
+      "condition": "hidden",
+      "control": "founder-pool",
+      "ticks": 1903,
+      "survived": false,
+      "safetyLimitHits": 0,
+      "msPerHour": 1.057966400420383,
+      "msPer1000AnimalHours": 4.479806283223426
+    },
+    {
+      "seed": 6117,
+      "condition": "memory",
+      "control": "evolving",
+      "ticks": 2160,
+      "survived": true,
+      "safetyLimitHits": 0,
+      "msPerHour": 1.0798681777777717,
+      "msPer1000AnimalHours": 4.053925571630157
+    },
+    {
+      "seed": 6117,
+      "condition": "memory",
+      "control": "founder-pool",
+      "ticks": 2160,
+      "survived": true,
+      "safetyLimitHits": 0,
+      "msPerHour": 1.2481426041666526,
+      "msPer1000AnimalHours": 4.03892126914971
+    },
+    {
+      "seed": 6117,
+      "condition": "growth",
+      "control": "evolving",
+      "ticks": 2160,
+      "survived": true,
+      "safetyLimitHits": 0,
+      "msPerHour": 0.877198434259265,
+      "msPer1000AnimalHours": 3.587465527361154
+    },
+    {
+      "seed": 6117,
+      "condition": "growth",
+      "control": "founder-pool",
+      "ticks": 2160,
+      "survived": true,
+      "safetyLimitHits": 0,
+      "msPerHour": 1.2615438259259262,
+      "msPer1000AnimalHours": 4.402035265590445
+    },
+    {
+      "seed": 6118,
+      "condition": "linear",
+      "control": "evolving",
+      "ticks": 2160,
+      "survived": true,
+      "safetyLimitHits": 0,
+      "msPerHour": 0.8480003768518617,
+      "msPer1000AnimalHours": 3.7574095900387112
+    },
+    {
+      "seed": 6118,
+      "condition": "linear",
+      "control": "founder-pool",
+      "ticks": 2160,
+      "survived": true,
+      "safetyLimitHits": 0,
+      "msPerHour": 1.1906366861110858,
+      "msPer1000AnimalHours": 3.801595038573516
+    },
+    {
+      "seed": 6118,
+      "condition": "hidden",
+      "control": "evolving",
+      "ticks": 2160,
+      "survived": true,
+      "safetyLimitHits": 0,
+      "msPerHour": 0.5503603634259316,
+      "msPer1000AnimalHours": 3.759482318600454
+    },
+    {
+      "seed": 6118,
+      "condition": "hidden",
+      "control": "founder-pool",
+      "ticks": 2160,
+      "survived": true,
+      "safetyLimitHits": 0,
+      "msPerHour": 0.7915746189814753,
+      "msPer1000AnimalHours": 4.041051402951461
+    },
+    {
+      "seed": 6118,
+      "condition": "memory",
+      "control": "evolving",
+      "ticks": 2160,
+      "survived": true,
+      "safetyLimitHits": 0,
+      "msPerHour": 1.2421922462962998,
+      "msPer1000AnimalHours": 4.955691466038708
+    },
+    {
+      "seed": 6118,
+      "condition": "memory",
+      "control": "founder-pool",
+      "ticks": 2160,
+      "survived": true,
+      "safetyLimitHits": 0,
+      "msPerHour": 1.4765067925925972,
+      "msPer1000AnimalHours": 4.843417293370121
+    },
+    {
+      "seed": 6118,
+      "condition": "growth",
+      "control": "evolving",
+      "ticks": 2160,
+      "survived": true,
+      "safetyLimitHits": 0,
+      "msPerHour": 0.9484746504629449,
+      "msPer1000AnimalHours": 4.147478854734274
+    },
+    {
+      "seed": 6118,
+      "condition": "growth",
+      "control": "founder-pool",
+      "ticks": 2160,
+      "survived": true,
+      "safetyLimitHits": 0,
+      "msPerHour": 1.3118455699073954,
+      "msPer1000AnimalHours": 4.188604020109378
+    },
+    {
+      "seed": 6119,
+      "condition": "linear",
+      "control": "evolving",
+      "ticks": 2160,
+      "survived": true,
+      "safetyLimitHits": 0,
+      "msPerHour": 0.7413125351852041,
+      "msPer1000AnimalHours": 4.167115785090736
+    },
+    {
+      "seed": 6119,
+      "condition": "linear",
+      "control": "founder-pool",
+      "ticks": 2160,
+      "survived": true,
+      "safetyLimitHits": 0,
+      "msPerHour": 1.2090693587963028,
+      "msPer1000AnimalHours": 4.769931225126095
+    },
+    {
+      "seed": 6119,
+      "condition": "hidden",
+      "control": "evolving",
+      "ticks": 2160,
+      "survived": true,
+      "safetyLimitHits": 0,
+      "msPerHour": 0.8523800425925907,
+      "msPer1000AnimalHours": 4.218320664065444
+    },
+    {
+      "seed": 6119,
+      "condition": "hidden",
+      "control": "founder-pool",
+      "ticks": 2160,
+      "survived": true,
+      "safetyLimitHits": 0,
+      "msPerHour": 1.2393937129629464,
+      "msPer1000AnimalHours": 4.643341045956534
+    },
+    {
+      "seed": 6119,
+      "condition": "memory",
+      "control": "evolving",
+      "ticks": 2018,
+      "survived": false,
+      "safetyLimitHits": 0,
+      "msPerHour": 0.7179057542120725,
+      "msPer1000AnimalHours": 3.621653447327539
+    },
+    {
+      "seed": 6119,
+      "condition": "memory",
+      "control": "founder-pool",
+      "ticks": 2160,
+      "survived": true,
+      "safetyLimitHits": 0,
+      "msPerHour": 1.0006255990740707,
+      "msPer1000AnimalHours": 4.067583736073458
+    },
+    {
+      "seed": 6119,
+      "condition": "growth",
+      "control": "evolving",
+      "ticks": 2160,
+      "survived": true,
+      "safetyLimitHits": 0,
+      "msPerHour": 0.7807674870370344,
+      "msPer1000AnimalHours": 3.754090919613906
+    },
+    {
+      "seed": 6119,
+      "condition": "growth",
+      "control": "founder-pool",
+      "ticks": 2160,
+      "survived": true,
+      "safetyLimitHits": 0,
+      "msPerHour": 1.1562386402777822,
+      "msPer1000AnimalHours": 4.561507372454635
+    }
+  ],
+  "rows": [
+    {
+      "seed": 6100,
+      "condition": "linear",
+      "control": "evolving",
+      "month": 0,
+      "assay": {
+        "forage": 0.2054760797485183,
+        "netForage": 0.2054760797485183,
+        "catchPerEncounter": 0.1262135922330097,
+        "flee": -0.02513553866588292,
+        "preySurvival": 0.5611111111111111,
+        "catchPerFoxDay": 0.07889095326568529,
+        "preyHidden": 0,
+        "predHidden": 0
+      }
+    },
+    {
+      "seed": 6100,
+      "condition": "linear",
+      "control": "evolving",
+      "month": 3,
+      "assay": {
+        "forage": 0.7254975262856804,
+        "netForage": 0.7254975262856804,
+        "catchPerEncounter": 0.10059171597633136,
+        "flee": -0.06339153410535774,
+        "preySurvival": 0.7722222222222223,
+        "catchPerFoxDay": 0.05333333333333333,
+        "preyHidden": 0,
+        "predHidden": 0
+      }
+    },
+    {
+      "seed": 6100,
+      "condition": "linear",
+      "control": "founder-pool",
+      "month": 3,
+      "assay": {
+        "forage": 0.32867177131777336,
+        "netForage": 0.32867177131777336,
+        "catchPerEncounter": 0.09285714285714286,
+        "flee": -0.0024441863590023566,
+        "preySurvival": 0.6555555555555556,
+        "catchPerFoxDay": 0.07390817469204927,
+        "preyHidden": 0,
+        "predHidden": 0
+      }
+    },
+    {
+      "seed": 6100,
+      "condition": "hidden",
+      "control": "evolving",
+      "month": 0,
+      "assay": {
+        "forage": 0.24774540716846105,
+        "netForage": 0.20774540716846104,
+        "catchPerEncounter": 0.13615023474178403,
+        "flee": -0.01129809484675759,
+        "preySurvival": 0.6055555555555555,
+        "catchPerFoxDay": 0.10333333333333333,
+        "preyHidden": 4,
+        "predHidden": 4
+      }
+    },
+    {
+      "seed": 6100,
+      "condition": "hidden",
+      "control": "evolving",
+      "month": 3,
+      "assay": {
+        "forage": 0.6404841734984457,
+        "netForage": 0.6004841734984456,
+        "catchPerEncounter": 0.1111111111111111,
+        "flee": 0.10000667254512116,
+        "preySurvival": 0.6111111111111112,
+        "catchPerFoxDay": 0.13,
+        "preyHidden": 4,
+        "predHidden": 4
+      }
+    },
+    {
+      "seed": 6100,
+      "condition": "hidden",
+      "control": "founder-pool",
+      "month": 3,
+      "assay": {
+        "forage": 0.27611217269508537,
+        "netForage": 0.23611217269508536,
+        "catchPerEncounter": 0.11636363636363636,
+        "flee": -0.005304360448265427,
+        "preySurvival": 0.55,
+        "catchPerFoxDay": 0.12666666666666668,
+        "preyHidden": 4,
+        "predHidden": 4
+      }
+    },
+    {
+      "seed": 6100,
+      "condition": "memory",
+      "control": "evolving",
+      "month": 0,
+      "assay": {
+        "forage": 0.1992055973882029,
+        "netForage": 0.1992055973882029,
+        "catchPerEncounter": 0.10080645161290322,
+        "flee": -0.00495668526264351,
+        "preySurvival": 0.5555555555555556,
+        "catchPerFoxDay": 0.08914285714285713,
+        "preyHidden": 0,
+        "predHidden": 0
+      }
+    },
+    {
+      "seed": 6100,
+      "condition": "memory",
+      "control": "evolving",
+      "month": 3,
+      "assay": {
+        "forage": 0.9058444506692563,
+        "netForage": 0.9058444506692563,
+        "catchPerEncounter": 0.05893909626719057,
+        "flee": -0.058407099111908216,
+        "preySurvival": 0.8333333333333334,
+        "catchPerFoxDay": 0.05333333333333333,
+        "preyHidden": 0,
+        "predHidden": 0
+      }
+    },
+    {
+      "seed": 6100,
+      "condition": "memory",
+      "control": "founder-pool",
+      "month": 3,
+      "assay": {
+        "forage": 0.35941785464374626,
+        "netForage": 0.35941785464374626,
+        "catchPerEncounter": 0.10526315789473684,
+        "flee": -0.002860904721223674,
+        "preySurvival": 0.7055555555555556,
+        "catchPerFoxDay": 0.08,
+        "preyHidden": 0,
+        "predHidden": 0
+      }
+    },
+    {
+      "seed": 6100,
+      "condition": "growth",
+      "control": "evolving",
+      "month": 0,
+      "assay": {
+        "forage": 0.2054760797485183,
+        "netForage": 0.2054760797485183,
+        "catchPerEncounter": 0.1262135922330097,
+        "flee": -0.02513553866588292,
+        "preySurvival": 0.5611111111111111,
+        "catchPerFoxDay": 0.07889095326568529,
+        "preyHidden": 0,
+        "predHidden": 0
+      }
+    },
+    {
+      "seed": 6100,
+      "condition": "growth",
+      "control": "evolving",
+      "month": 3,
+      "assay": {
+        "forage": 0.8284000034859352,
+        "netForage": 0.8229454580313897,
+        "catchPerEncounter": 0.10294117647058823,
+        "flee": -0.04211914440791324,
+        "preySurvival": 0.7833333333333333,
+        "catchPerFoxDay": 0.09333333333333332,
+        "preyHidden": 0.5454545454545454,
+        "predHidden": 0.38095238095238093
+      }
+    },
+    {
+      "seed": 6100,
+      "condition": "growth",
+      "control": "founder-pool",
+      "month": 3,
+      "assay": {
+        "forage": 0.32867177131777336,
+        "netForage": 0.32867177131777336,
+        "catchPerEncounter": 0.09285714285714286,
+        "flee": -0.0024441863590023566,
+        "preySurvival": 0.6555555555555556,
+        "catchPerFoxDay": 0.07390817469204927,
+        "preyHidden": 0,
+        "predHidden": 0
+      }
+    },
+    {
+      "seed": 6101,
+      "condition": "linear",
+      "control": "evolving",
+      "month": 0,
+      "assay": {
+        "forage": 0.25322443810137485,
+        "netForage": 0.25322443810137485,
+        "catchPerEncounter": 0.11895910780669144,
+        "flee": -0.0046094368137156155,
+        "preySurvival": 0.5666666666666667,
+        "catchPerFoxDay": 0.07372242390393745,
+        "preyHidden": 0,
+        "predHidden": 0
+      }
+    },
+    {
+      "seed": 6101,
+      "condition": "linear",
+      "control": "evolving",
+      "month": 3,
+      "assay": {
+        "forage": 0.8220785005708741,
+        "netForage": 0.8220785005708741,
+        "catchPerEncounter": 0.050955414012738856,
+        "flee": 0.01169686455663767,
+        "preySurvival": 0.8277777777777777,
+        "catchPerFoxDay": 0.13666666666666666,
+        "preyHidden": 0,
+        "predHidden": 0
+      }
+    },
+    {
+      "seed": 6101,
+      "condition": "linear",
+      "control": "founder-pool",
+      "month": 3,
+      "assay": {
+        "forage": 0.21488189274680597,
+        "netForage": 0.21488189274680597,
+        "catchPerEncounter": 0.10526315789473684,
+        "flee": -0.020884025138991867,
+        "preySurvival": 0.6277777777777778,
+        "catchPerFoxDay": 0.1,
+        "preyHidden": 0,
+        "predHidden": 0
+      }
+    },
+    {
+      "seed": 6101,
+      "condition": "hidden",
+      "control": "evolving",
+      "month": 0,
+      "assay": {
+        "forage": 0.17332883993608192,
+        "netForage": 0.1333288399360819,
+        "catchPerEncounter": 0.0945945945945946,
+        "flee": -0.01911006115389527,
+        "preySurvival": 0.6055555555555555,
+        "catchPerFoxDay": 0.06,
+        "preyHidden": 4,
+        "predHidden": 4
+      }
+    },
+    {
+      "seed": 6101,
+      "condition": "hidden",
+      "control": "evolving",
+      "month": 3,
+      "assay": {
+        "forage": 0.5004630748132638,
+        "netForage": 0.4604630748132638,
+        "catchPerEncounter": 0.08359133126934984,
+        "flee": -0.03225043265340303,
+        "preySurvival": 0.8333333333333334,
+        "catchPerFoxDay": 0.09333333333333332,
+        "preyHidden": 4,
+        "predHidden": 4
+      }
+    },
+    {
+      "seed": 6101,
+      "condition": "hidden",
+      "control": "founder-pool",
+      "month": 3,
+      "assay": {
+        "forage": 0.23425827945611238,
+        "netForage": 0.19425827945611238,
+        "catchPerEncounter": 0.09205020920502092,
+        "flee": -0.0016433978418367483,
+        "preySurvival": 0.7166666666666667,
+        "catchPerFoxDay": 0.06666666666666667,
+        "preyHidden": 4,
+        "predHidden": 4
+      }
+    },
+    {
+      "seed": 6101,
+      "condition": "memory",
+      "control": "evolving",
+      "month": 0,
+      "assay": {
+        "forage": 0.2214168361711203,
+        "netForage": 0.2214168361711203,
+        "catchPerEncounter": 0.10526315789473684,
+        "flee": -0.03626198742750937,
+        "preySurvival": 0.5777777777777777,
+        "catchPerFoxDay": 0.07,
+        "preyHidden": 0,
+        "predHidden": 0
+      }
+    },
+    {
+      "seed": 6101,
+      "condition": "memory",
+      "control": "evolving",
+      "month": 3,
+      "assay": null
+    },
+    {
+      "seed": 6101,
+      "condition": "memory",
+      "control": "founder-pool",
+      "month": 3,
+      "assay": {
+        "forage": 0.2977807890665299,
+        "netForage": 0.2977807890665299,
+        "catchPerEncounter": 0.09090909090909091,
+        "flee": -0.012216401296112397,
+        "preySurvival": 0.7055555555555556,
+        "catchPerFoxDay": 0.0903765690376569,
+        "preyHidden": 0,
+        "predHidden": 0
+      }
+    },
+    {
+      "seed": 6101,
+      "condition": "growth",
+      "control": "evolving",
+      "month": 0,
+      "assay": {
+        "forage": 0.25322443810137485,
+        "netForage": 0.25322443810137485,
+        "catchPerEncounter": 0.11895910780669144,
+        "flee": -0.0046094368137156155,
+        "preySurvival": 0.5666666666666667,
+        "catchPerFoxDay": 0.07372242390393745,
+        "preyHidden": 0,
+        "predHidden": 0
+      }
+    },
+    {
+      "seed": 6101,
+      "condition": "growth",
+      "control": "evolving",
+      "month": 3,
+      "assay": {
+        "forage": 0.6640851377722864,
+        "netForage": 0.6635295822167309,
+        "catchPerEncounter": 0.08298755186721991,
+        "flee": 0.07117878353030072,
+        "preySurvival": 0.8166666666666667,
+        "catchPerFoxDay": 0.13,
+        "preyHidden": 0.05555555555555555,
+        "predHidden": 0.33783783783783783
+      }
+    },
+    {
+      "seed": 6101,
+      "condition": "growth",
+      "control": "founder-pool",
+      "month": 3,
+      "assay": {
+        "forage": 0.21488189274680597,
+        "netForage": 0.21488189274680597,
+        "catchPerEncounter": 0.10526315789473684,
+        "flee": -0.020884025138991867,
+        "preySurvival": 0.6277777777777778,
+        "catchPerFoxDay": 0.1,
+        "preyHidden": 0,
+        "predHidden": 0
+      }
+    },
+    {
+      "seed": 6102,
+      "condition": "linear",
+      "control": "evolving",
+      "month": 0,
+      "assay": {
+        "forage": 0.18943996326206164,
+        "netForage": 0.18943996326206164,
+        "catchPerEncounter": 0.07516339869281045,
+        "flee": -0.01578040696321391,
+        "preySurvival": 0.5722222222222222,
+        "catchPerFoxDay": 0.0641079713201181,
+        "preyHidden": 0,
+        "predHidden": 0
+      }
+    },
+    {
+      "seed": 6102,
+      "condition": "linear",
+      "control": "evolving",
+      "month": 3,
+      "assay": {
+        "forage": 0.7100939272448321,
+        "netForage": 0.7100939272448321,
+        "catchPerEncounter": 0.061696658097686374,
+        "flee": -0.041831519513595934,
+        "preySurvival": 0.6888888888888889,
+        "catchPerFoxDay": 0.06333333333333334,
+        "preyHidden": 0,
+        "predHidden": 0
+      }
+    },
+    {
+      "seed": 6102,
+      "condition": "linear",
+      "control": "founder-pool",
+      "month": 3,
+      "assay": {
+        "forage": 0.2927144013337607,
+        "netForage": 0.2927144013337607,
+        "catchPerEncounter": 0.1,
+        "flee": -0.036544786584937324,
+        "preySurvival": 0.7222222222222222,
+        "catchPerFoxDay": 0.07,
+        "preyHidden": 0,
+        "predHidden": 0
+      }
+    },
+    {
+      "seed": 6102,
+      "condition": "hidden",
+      "control": "evolving",
+      "month": 0,
+      "assay": {
+        "forage": 0.19226585414354044,
+        "netForage": 0.15226585414354044,
+        "catchPerEncounter": 0.10843373493975904,
+        "flee": -0.004669322642455819,
+        "preySurvival": 0.5777777777777777,
+        "catchPerFoxDay": 0.07333333333333333,
+        "preyHidden": 4,
+        "predHidden": 4
+      }
+    },
+    {
+      "seed": 6102,
+      "condition": "hidden",
+      "control": "evolving",
+      "month": 3,
+      "assay": {
+        "forage": 0.8136684720795274,
+        "netForage": 0.7736684720795274,
+        "catchPerEncounter": 0.09900990099009901,
+        "flee": 0.014347725966215738,
+        "preySurvival": 0.7888888888888889,
+        "catchPerFoxDay": 0.09343715239154615,
+        "preyHidden": 4,
+        "predHidden": 4
+      }
+    },
+    {
+      "seed": 6102,
+      "condition": "hidden",
+      "control": "founder-pool",
+      "month": 3,
+      "assay": {
+        "forage": 0.2996501222642842,
+        "netForage": 0.25965012226428424,
+        "catchPerEncounter": 0.08139534883720931,
+        "flee": -0.019686206748131693,
+        "preySurvival": 0.7277777777777777,
+        "catchPerFoxDay": 0.06,
+        "preyHidden": 4,
+        "predHidden": 4
+      }
+    },
+    {
+      "seed": 6102,
+      "condition": "memory",
+      "control": "evolving",
+      "month": 0,
+      "assay": {
+        "forage": 0.17326858793921096,
+        "netForage": 0.17326858793921096,
+        "catchPerEncounter": 0.09252669039145907,
+        "flee": -0.006288230558127367,
+        "preySurvival": 0.5888888888888889,
+        "catchPerFoxDay": 0.078531796841656,
+        "preyHidden": 0,
+        "predHidden": 0
+      }
+    },
+    {
+      "seed": 6102,
+      "condition": "memory",
+      "control": "evolving",
+      "month": 3,
+      "assay": {
+        "forage": 0.7169450499911525,
+        "netForage": 0.7169450499911525,
+        "catchPerEncounter": 0.07407407407407407,
+        "flee": 0.043927456582110655,
+        "preySurvival": 0.8,
+        "catchPerFoxDay": 0.07666666666666667,
+        "preyHidden": 0,
+        "predHidden": 0
+      }
+    },
+    {
+      "seed": 6102,
+      "condition": "memory",
+      "control": "founder-pool",
+      "month": 3,
+      "assay": {
+        "forage": 0.3036475144083079,
+        "netForage": 0.3036475144083079,
+        "catchPerEncounter": 0.11522633744855967,
+        "flee": -0.0073681738489763515,
+        "preySurvival": 0.7277777777777777,
+        "catchPerFoxDay": 0.07666666666666667,
+        "preyHidden": 0,
+        "predHidden": 0
+      }
+    },
+    {
+      "seed": 6102,
+      "condition": "growth",
+      "control": "evolving",
+      "month": 0,
+      "assay": {
+        "forage": 0.18943996326206164,
+        "netForage": 0.18943996326206164,
+        "catchPerEncounter": 0.07516339869281045,
+        "flee": -0.01578040696321391,
+        "preySurvival": 0.5722222222222222,
+        "catchPerFoxDay": 0.0641079713201181,
+        "preyHidden": 0,
+        "predHidden": 0
+      }
+    },
+    {
+      "seed": 6102,
+      "condition": "growth",
+      "control": "evolving",
+      "month": 3,
+      "assay": {
+        "forage": 0.8059841386331545,
+        "netForage": 0.802522600171616,
+        "catchPerEncounter": 0.06769230769230769,
+        "flee": -0.00016872028278368427,
+        "preySurvival": 0.7666666666666667,
+        "catchPerFoxDay": 0.06,
+        "preyHidden": 0.34615384615384615,
+        "predHidden": 0.8888888888888888
+      }
+    },
+    {
+      "seed": 6102,
+      "condition": "growth",
+      "control": "founder-pool",
+      "month": 3,
+      "assay": {
+        "forage": 0.2927144013337607,
+        "netForage": 0.2927144013337607,
+        "catchPerEncounter": 0.1,
+        "flee": -0.036544786584937324,
+        "preySurvival": 0.7222222222222222,
+        "catchPerFoxDay": 0.07,
+        "preyHidden": 0,
+        "predHidden": 0
+      }
+    },
+    {
+      "seed": 6103,
+      "condition": "linear",
+      "control": "evolving",
+      "month": 0,
+      "assay": {
+        "forage": 0.18405222324726214,
+        "netForage": 0.18405222324726214,
+        "catchPerEncounter": 0.11764705882352941,
+        "flee": -0.017954826673307445,
+        "preySurvival": 0.6111111111111112,
+        "catchPerFoxDay": 0.09666666666666666,
+        "preyHidden": 0,
+        "predHidden": 0
+      }
+    },
+    {
+      "seed": 6103,
+      "condition": "linear",
+      "control": "evolving",
+      "month": 3,
+      "assay": {
+        "forage": 0.7433027936819222,
+        "netForage": 0.7433027936819222,
+        "catchPerEncounter": 0.11870503597122302,
+        "flee": -0.025233285496382984,
+        "preySurvival": 0.6611111111111111,
+        "catchPerFoxDay": 0.18333333333333332,
+        "preyHidden": 0,
+        "predHidden": 0
+      }
+    },
+    {
+      "seed": 6103,
+      "condition": "linear",
+      "control": "founder-pool",
+      "month": 3,
+      "assay": {
+        "forage": 0.20946431927269937,
+        "netForage": 0.20946431927269937,
+        "catchPerEncounter": 0.09931506849315068,
+        "flee": -0.00008523510431162334,
+        "preySurvival": 0.6333333333333333,
+        "catchPerFoxDay": 0.11333333333333334,
+        "preyHidden": 0,
+        "predHidden": 0
+      }
+    },
+    {
+      "seed": 6103,
+      "condition": "hidden",
+      "control": "evolving",
+      "month": 0,
+      "assay": {
+        "forage": 0.14881798874000002,
+        "netForage": 0.10881798874000001,
+        "catchPerEncounter": 0.12015503875968993,
+        "flee": -0.002772328541056699,
+        "preySurvival": 0.4666666666666667,
+        "catchPerFoxDay": 0.14223225624382674,
+        "preyHidden": 4,
+        "predHidden": 4
+      }
+    },
+    {
+      "seed": 6103,
+      "condition": "hidden",
+      "control": "evolving",
+      "month": 3,
+      "assay": {
+        "forage": 0.5126065507965083,
+        "netForage": 0.4726065507965083,
+        "catchPerEncounter": 0.09583333333333334,
+        "flee": 0.022815084140362325,
+        "preySurvival": 0.8333333333333334,
+        "catchPerFoxDay": 0.1745210460075514,
+        "preyHidden": 4,
+        "predHidden": 4
+      }
+    },
+    {
+      "seed": 6103,
+      "condition": "hidden",
+      "control": "founder-pool",
+      "month": 3,
+      "assay": {
+        "forage": 0.2330134017728604,
+        "netForage": 0.1930134017728604,
+        "catchPerEncounter": 0.12236286919831224,
+        "flee": 0.013200675839439017,
+        "preySurvival": 0.6777777777777778,
+        "catchPerFoxDay": 0.12028400389809273,
+        "preyHidden": 4,
+        "predHidden": 4
+      }
+    },
+    {
+      "seed": 6103,
+      "condition": "memory",
+      "control": "evolving",
+      "month": 0,
+      "assay": {
+        "forage": 0.20632332467912334,
+        "netForage": 0.20632332467912334,
+        "catchPerEncounter": 0.10984848484848485,
+        "flee": -0.020078020484448112,
+        "preySurvival": 0.6444444444444445,
+        "catchPerFoxDay": 0.11333333333333334,
+        "preyHidden": 0,
+        "predHidden": 0
+      }
+    },
+    {
+      "seed": 6103,
+      "condition": "memory",
+      "control": "evolving",
+      "month": 3,
+      "assay": {
+        "forage": 0.7575042505812744,
+        "netForage": 0.7575042505812744,
+        "catchPerEncounter": 0.06713780918727916,
+        "flee": 0.056575726303927334,
+        "preySurvival": 0.8388888888888889,
+        "catchPerFoxDay": 0.13333333333333333,
+        "preyHidden": 0,
+        "predHidden": 0
+      }
+    },
+    {
+      "seed": 6103,
+      "condition": "memory",
+      "control": "founder-pool",
+      "month": 3,
+      "assay": {
+        "forage": 0.31952164852666554,
+        "netForage": 0.31952164852666554,
+        "catchPerEncounter": 0.09465020576131687,
+        "flee": -0.011462922543557212,
+        "preySurvival": 0.7611111111111111,
+        "catchPerFoxDay": 0.07004864489228631,
+        "preyHidden": 0,
+        "predHidden": 0
+      }
+    },
+    {
+      "seed": 6103,
+      "condition": "growth",
+      "control": "evolving",
+      "month": 0,
+      "assay": {
+        "forage": 0.18405222324726214,
+        "netForage": 0.18405222324726214,
+        "catchPerEncounter": 0.11764705882352941,
+        "flee": -0.017954826673307445,
+        "preySurvival": 0.6111111111111112,
+        "catchPerFoxDay": 0.09666666666666666,
+        "preyHidden": 0,
+        "predHidden": 0
+      }
+    },
+    {
+      "seed": 6103,
+      "condition": "growth",
+      "control": "evolving",
+      "month": 3,
+      "assay": {
+        "forage": 0.6095046531208439,
+        "netForage": 0.6064981171731315,
+        "catchPerEncounter": 0.08831168831168831,
+        "flee": -0.05816462811767836,
+        "preySurvival": 0.7722222222222223,
+        "catchPerFoxDay": 0.16333333333333333,
+        "preyHidden": 0.3006535947712418,
+        "predHidden": 0.09574468085106383
+      }
+    },
+    {
+      "seed": 6103,
+      "condition": "growth",
+      "control": "founder-pool",
+      "month": 3,
+      "assay": {
+        "forage": 0.20946431927269937,
+        "netForage": 0.20946431927269937,
+        "catchPerEncounter": 0.09931506849315068,
+        "flee": -0.00008523510431162334,
+        "preySurvival": 0.6333333333333333,
+        "catchPerFoxDay": 0.11333333333333334,
+        "preyHidden": 0,
+        "predHidden": 0
+      }
+    },
+    {
+      "seed": 6104,
+      "condition": "linear",
+      "control": "evolving",
+      "month": 0,
+      "assay": {
+        "forage": 0.19771123447692798,
+        "netForage": 0.19771123447692798,
+        "catchPerEncounter": 0.13679245283018868,
+        "flee": -0.003416139008866757,
+        "preySurvival": 0.6055555555555555,
+        "catchPerFoxDay": 0.12,
+        "preyHidden": 0,
+        "predHidden": 0
+      }
+    },
+    {
+      "seed": 6104,
+      "condition": "linear",
+      "control": "evolving",
+      "month": 3,
+      "assay": null
+    },
+    {
+      "seed": 6104,
+      "condition": "linear",
+      "control": "founder-pool",
+      "month": 3,
+      "assay": null
+    },
+    {
+      "seed": 6104,
+      "condition": "hidden",
+      "control": "evolving",
+      "month": 0,
+      "assay": {
+        "forage": 0.2217649743735058,
+        "netForage": 0.1817649743735058,
+        "catchPerEncounter": 0.08366533864541832,
+        "flee": -0.014316922222789892,
+        "preySurvival": 0.6,
+        "catchPerFoxDay": 0.11078472513638271,
+        "preyHidden": 4,
+        "predHidden": 4
+      }
+    },
+    {
+      "seed": 6104,
+      "condition": "hidden",
+      "control": "evolving",
+      "month": 3,
+      "assay": {
+        "forage": 0.9760565102708593,
+        "netForage": 0.9360565102708592,
+        "catchPerEncounter": 0.07202216066481995,
+        "flee": 0.016341083799606106,
+        "preySurvival": 0.7222222222222222,
+        "catchPerFoxDay": 0.11666666666666667,
+        "preyHidden": 4,
+        "predHidden": 4
+      }
+    },
+    {
+      "seed": 6104,
+      "condition": "hidden",
+      "control": "founder-pool",
+      "month": 3,
+      "assay": {
+        "forage": 0.2322177755456507,
+        "netForage": 0.1922177755456507,
+        "catchPerEncounter": 0.12560386473429952,
+        "flee": -0.0005173119876831301,
+        "preySurvival": 0.5333333333333333,
+        "catchPerFoxDay": 0.1,
+        "preyHidden": 4,
+        "predHidden": 4
+      }
+    },
+    {
+      "seed": 6104,
+      "condition": "memory",
+      "control": "evolving",
+      "month": 0,
+      "assay": {
+        "forage": 0.18408582161169476,
+        "netForage": 0.18408582161169476,
+        "catchPerEncounter": 0.1278538812785388,
+        "flee": -0.024461178350919804,
+        "preySurvival": 0.55,
+        "catchPerFoxDay": 0.13666666666666666,
+        "preyHidden": 0,
+        "predHidden": 0
+      }
+    },
+    {
+      "seed": 6104,
+      "condition": "memory",
+      "control": "evolving",
+      "month": 3,
+      "assay": {
+        "forage": 0.26839234151129426,
+        "netForage": 0.26839234151129426,
+        "catchPerEncounter": 0.09482758620689655,
+        "flee": 0.022708871238972982,
+        "preySurvival": 0.75,
+        "catchPerFoxDay": 0.15333333333333335,
+        "preyHidden": 0,
+        "predHidden": 0
+      }
+    },
+    {
+      "seed": 6104,
+      "condition": "memory",
+      "control": "founder-pool",
+      "month": 3,
+      "assay": null
+    },
+    {
+      "seed": 6104,
+      "condition": "growth",
+      "control": "evolving",
+      "month": 0,
+      "assay": {
+        "forage": 0.19771123447692798,
+        "netForage": 0.19771123447692798,
+        "catchPerEncounter": 0.13679245283018868,
+        "flee": -0.003416139008866757,
+        "preySurvival": 0.6055555555555555,
+        "catchPerFoxDay": 0.12,
+        "preyHidden": 0,
+        "predHidden": 0
+      }
+    },
+    {
+      "seed": 6104,
+      "condition": "growth",
+      "control": "evolving",
+      "month": 3,
+      "assay": null
+    },
+    {
+      "seed": 6104,
+      "condition": "growth",
+      "control": "founder-pool",
+      "month": 3,
+      "assay": null
+    },
+    {
+      "seed": 6105,
+      "condition": "linear",
+      "control": "evolving",
+      "month": 0,
+      "assay": {
+        "forage": 0.1320688043544723,
+        "netForage": 0.1320688043544723,
+        "catchPerEncounter": 0.07803468208092486,
+        "flee": -0.029368713638301073,
+        "preySurvival": 0.49444444444444446,
+        "catchPerFoxDay": 0.07333333333333333,
+        "preyHidden": 0,
+        "predHidden": 0
+      }
+    },
+    {
+      "seed": 6105,
+      "condition": "linear",
+      "control": "evolving",
+      "month": 3,
+      "assay": {
+        "forage": 0.38857930050366524,
+        "netForage": 0.38857930050366524,
+        "catchPerEncounter": 0.13725490196078433,
+        "flee": 0.02803635042108261,
+        "preySurvival": 0.75,
+        "catchPerFoxDay": 0.08,
+        "preyHidden": 0,
+        "predHidden": 0
+      }
+    },
+    {
+      "seed": 6105,
+      "condition": "linear",
+      "control": "founder-pool",
+      "month": 3,
+      "assay": {
+        "forage": 0.2108974020577831,
+        "netForage": 0.2108974020577831,
+        "catchPerEncounter": 0.1179245283018868,
+        "flee": -0.02402747553417348,
+        "preySurvival": 0.6944444444444444,
+        "catchPerFoxDay": 0.07,
+        "preyHidden": 0,
+        "predHidden": 0
+      }
+    },
+    {
+      "seed": 6105,
+      "condition": "hidden",
+      "control": "evolving",
+      "month": 0,
+      "assay": {
+        "forage": 0.23346458356029917,
+        "netForage": 0.19346458356029916,
+        "catchPerEncounter": 0.11740890688259109,
+        "flee": -0.011738160560502345,
+        "preySurvival": 0.5777777777777777,
+        "catchPerFoxDay": 0.09179770505737356,
+        "preyHidden": 4,
+        "predHidden": 4
+      }
+    },
+    {
+      "seed": 6105,
+      "condition": "hidden",
+      "control": "evolving",
+      "month": 3,
+      "assay": {
+        "forage": 1.2193143760817815,
+        "netForage": 1.1793143760817815,
+        "catchPerEncounter": 0.05958549222797927,
+        "flee": -0.03608221275121586,
+        "preySurvival": 0.8722222222222222,
+        "catchPerFoxDay": 0.10333333333333333,
+        "preyHidden": 4,
+        "predHidden": 4
+      }
+    },
+    {
+      "seed": 6105,
+      "condition": "hidden",
+      "control": "founder-pool",
+      "month": 3,
+      "assay": {
+        "forage": 0.14959087165822432,
+        "netForage": 0.10959087165822431,
+        "catchPerEncounter": 0.10384615384615385,
+        "flee": 0.022637983034117237,
+        "preySurvival": 0.6277777777777778,
+        "catchPerFoxDay": 0.09333333333333332,
+        "preyHidden": 4,
+        "predHidden": 4
+      }
+    },
+    {
+      "seed": 6105,
+      "condition": "memory",
+      "control": "evolving",
+      "month": 0,
+      "assay": {
+        "forage": 0.13550968992048293,
+        "netForage": 0.13550968992048293,
+        "catchPerEncounter": 0.10561056105610561,
+        "flee": -0.024496671683531743,
+        "preySurvival": 0.49444444444444446,
+        "catchPerFoxDay": 0.08333333333333333,
+        "preyHidden": 0,
+        "predHidden": 0
+      }
+    },
+    {
+      "seed": 6105,
+      "condition": "memory",
+      "control": "evolving",
+      "month": 3,
+      "assay": {
+        "forage": 0.5459243971249343,
+        "netForage": 0.5459243971249343,
+        "catchPerEncounter": 0.13736263736263737,
+        "flee": 0.05404513018908569,
+        "preySurvival": 0.7777777777777778,
+        "catchPerFoxDay": 0.06666666666666667,
+        "preyHidden": 0,
+        "predHidden": 0
+      }
+    },
+    {
+      "seed": 6105,
+      "condition": "memory",
+      "control": "founder-pool",
+      "month": 3,
+      "assay": {
+        "forage": 0.3572976376999129,
+        "netForage": 0.3572976376999129,
+        "catchPerEncounter": 0.0942622950819672,
+        "flee": -0.011298337545372602,
+        "preySurvival": 0.6944444444444444,
+        "catchPerFoxDay": 0.08666666666666667,
+        "preyHidden": 0,
+        "predHidden": 0
+      }
+    },
+    {
+      "seed": 6105,
+      "condition": "growth",
+      "control": "evolving",
+      "month": 0,
+      "assay": {
+        "forage": 0.1320688043544723,
+        "netForage": 0.1320688043544723,
+        "catchPerEncounter": 0.07803468208092486,
+        "flee": -0.029368713638301073,
+        "preySurvival": 0.49444444444444446,
+        "catchPerFoxDay": 0.07333333333333333,
+        "preyHidden": 0,
+        "predHidden": 0
+      }
+    },
+    {
+      "seed": 6105,
+      "condition": "growth",
+      "control": "evolving",
+      "month": 3,
+      "assay": {
+        "forage": 0.6530932914273816,
+        "netForage": 0.648521862855953,
+        "catchPerEncounter": 0.10747663551401869,
+        "flee": -0.006437775780826549,
+        "preySurvival": 0.85,
+        "catchPerFoxDay": 0.07666666666666667,
+        "preyHidden": 0.45714285714285713,
+        "predHidden": 0.020833333333333332
+      }
+    },
+    {
+      "seed": 6105,
+      "condition": "growth",
+      "control": "founder-pool",
+      "month": 3,
+      "assay": {
+        "forage": 0.2108974020577831,
+        "netForage": 0.2108974020577831,
+        "catchPerEncounter": 0.1179245283018868,
+        "flee": -0.02402747553417348,
+        "preySurvival": 0.6944444444444444,
+        "catchPerFoxDay": 0.07,
+        "preyHidden": 0,
+        "predHidden": 0
+      }
+    },
+    {
+      "seed": 6106,
+      "condition": "linear",
+      "control": "evolving",
+      "month": 0,
+      "assay": {
+        "forage": 0.2004815693167788,
+        "netForage": 0.2004815693167788,
+        "catchPerEncounter": 0.09863945578231292,
+        "flee": -0.017453539999636128,
+        "preySurvival": 0.6055555555555555,
+        "catchPerFoxDay": 0.040336134453781515,
+        "preyHidden": 0,
+        "predHidden": 0
+      }
+    },
+    {
+      "seed": 6106,
+      "condition": "linear",
+      "control": "evolving",
+      "month": 3,
+      "assay": {
+        "forage": 0.7687216736266062,
+        "netForage": 0.7687216736266062,
+        "catchPerEncounter": 0.12669683257918551,
+        "flee": 0.011272310503689998,
+        "preySurvival": 0.7777777777777778,
+        "catchPerFoxDay": 0.05333333333333333,
+        "preyHidden": 0,
+        "predHidden": 0
+      }
+    },
+    {
+      "seed": 6106,
+      "condition": "linear",
+      "control": "founder-pool",
+      "month": 3,
+      "assay": {
+        "forage": 0.27870079330406056,
+        "netForage": 0.27870079330406056,
+        "catchPerEncounter": 0.10071942446043165,
+        "flee": -0.012772473548295969,
+        "preySurvival": 0.6833333333333333,
+        "catchPerFoxDay": 0.05027932960893855,
+        "preyHidden": 0,
+        "predHidden": 0
+      }
+    },
+    {
+      "seed": 6106,
+      "condition": "hidden",
+      "control": "evolving",
+      "month": 0,
+      "assay": {
+        "forage": 0.3042718297589318,
+        "netForage": 0.2642718297589318,
+        "catchPerEncounter": 0.10852713178294573,
+        "flee": -0.02035111380879726,
+        "preySurvival": 0.5611111111111111,
+        "catchPerFoxDay": 0.06385660271670635,
+        "preyHidden": 4,
+        "predHidden": 4
+      }
+    },
+    {
+      "seed": 6106,
+      "condition": "hidden",
+      "control": "evolving",
+      "month": 3,
+      "assay": {
+        "forage": 1.059838521551884,
+        "netForage": 1.019838521551884,
+        "catchPerEncounter": 0.07446808510638298,
+        "flee": -0.06037007203843298,
+        "preySurvival": 0.7777777777777778,
+        "catchPerFoxDay": 0.08,
+        "preyHidden": 4,
+        "predHidden": 4
+      }
+    },
+    {
+      "seed": 6106,
+      "condition": "hidden",
+      "control": "founder-pool",
+      "month": 3,
+      "assay": {
+        "forage": 0.30659554880308093,
+        "netForage": 0.26659554880308095,
+        "catchPerEncounter": 0.1124031007751938,
+        "flee": 0.004248603568426453,
+        "preySurvival": 0.6944444444444444,
+        "catchPerFoxDay": 0.09666666666666666,
+        "preyHidden": 4,
+        "predHidden": 4
+      }
+    },
+    {
+      "seed": 6106,
+      "condition": "memory",
+      "control": "evolving",
+      "month": 0,
+      "assay": {
+        "forage": 0.18857898530929085,
+        "netForage": 0.18857898530929085,
+        "catchPerEncounter": 0.09405940594059406,
+        "flee": -0.017245779406958567,
+        "preySurvival": 0.6722222222222223,
+        "catchPerFoxDay": 0.06362494767685223,
+        "preyHidden": 0,
+        "predHidden": 0
+      }
+    },
+    {
+      "seed": 6106,
+      "condition": "memory",
+      "control": "evolving",
+      "month": 3,
+      "assay": {
+        "forage": 0.5538671253160703,
+        "netForage": 0.5538671253160703,
+        "catchPerEncounter": 0.13100436681222707,
+        "flee": -0.04400921556518784,
+        "preySurvival": 0.7777777777777778,
+        "catchPerFoxDay": 0.07333333333333333,
+        "preyHidden": 0,
+        "predHidden": 0
+      }
+    },
+    {
+      "seed": 6106,
+      "condition": "memory",
+      "control": "founder-pool",
+      "month": 3,
+      "assay": {
+        "forage": 0.3092822266266044,
+        "netForage": 0.3092822266266044,
+        "catchPerEncounter": 0.08,
+        "flee": -0.010444151841935442,
+        "preySurvival": 0.7111111111111111,
+        "catchPerFoxDay": 0.06340378197997776,
+        "preyHidden": 0,
+        "predHidden": 0
+      }
+    },
+    {
+      "seed": 6106,
+      "condition": "growth",
+      "control": "evolving",
+      "month": 0,
+      "assay": {
+        "forage": 0.2004815693167788,
+        "netForage": 0.2004815693167788,
+        "catchPerEncounter": 0.09863945578231292,
+        "flee": -0.017453539999636128,
+        "preySurvival": 0.6055555555555555,
+        "catchPerFoxDay": 0.040336134453781515,
+        "preyHidden": 0,
+        "predHidden": 0
+      }
+    },
+    {
+      "seed": 6106,
+      "condition": "growth",
+      "control": "evolving",
+      "month": 3,
+      "assay": {
+        "forage": 0.7658344572866591,
+        "netForage": 0.7583741398263416,
+        "catchPerEncounter": 0.0776255707762557,
+        "flee": 0.06652786077055349,
+        "preySurvival": 0.8666666666666667,
+        "catchPerFoxDay": 0.05333333333333333,
+        "preyHidden": 0.746031746031746,
+        "predHidden": 0
+      }
+    },
+    {
+      "seed": 6106,
+      "condition": "growth",
+      "control": "founder-pool",
+      "month": 3,
+      "assay": {
+        "forage": 0.27870079330406056,
+        "netForage": 0.27870079330406056,
+        "catchPerEncounter": 0.10071942446043165,
+        "flee": -0.012772473548295969,
+        "preySurvival": 0.6833333333333333,
+        "catchPerFoxDay": 0.05027932960893855,
+        "preyHidden": 0,
+        "predHidden": 0
+      }
+    },
+    {
+      "seed": 6107,
+      "condition": "linear",
+      "control": "evolving",
+      "month": 0,
+      "assay": {
+        "forage": 0.2275237436337543,
+        "netForage": 0.2275237436337543,
+        "catchPerEncounter": 0.11320754716981132,
+        "flee": -0.026742773853882493,
+        "preySurvival": 0.5666666666666667,
+        "catchPerFoxDay": 0.12381483547127718,
+        "preyHidden": 0,
+        "predHidden": 0
+      }
+    },
+    {
+      "seed": 6107,
+      "condition": "linear",
+      "control": "evolving",
+      "month": 3,
+      "assay": {
+        "forage": 0.3975737929885977,
+        "netForage": 0.3975737929885977,
+        "catchPerEncounter": 0.08708708708708708,
+        "flee": -0.031193578437247724,
+        "preySurvival": 0.8055555555555556,
+        "catchPerFoxDay": 0.22333333333333333,
+        "preyHidden": 0,
+        "predHidden": 0
+      }
+    },
+    {
+      "seed": 6107,
+      "condition": "linear",
+      "control": "founder-pool",
+      "month": 3,
+      "assay": {
+        "forage": 0.25256023956172025,
+        "netForage": 0.25256023956172025,
+        "catchPerEncounter": 0.11153846153846154,
+        "flee": -0.03630949824532884,
+        "preySurvival": 0.6333333333333333,
+        "catchPerFoxDay": 0.12333333333333334,
+        "preyHidden": 0,
+        "predHidden": 0
+      }
+    },
+    {
+      "seed": 6107,
+      "condition": "hidden",
+      "control": "evolving",
+      "month": 0,
+      "assay": {
+        "forage": 0.22392164945568793,
+        "netForage": 0.18392164945568792,
+        "catchPerEncounter": 0.1111111111111111,
+        "flee": -0.008594708807411686,
+        "preySurvival": 0.4777777777777778,
+        "catchPerFoxDay": 0.1184934405416843,
+        "preyHidden": 4,
+        "predHidden": 4
+      }
+    },
+    {
+      "seed": 6107,
+      "condition": "hidden",
+      "control": "evolving",
+      "month": 3,
+      "assay": null
+    },
+    {
+      "seed": 6107,
+      "condition": "hidden",
+      "control": "founder-pool",
+      "month": 3,
+      "assay": {
+        "forage": 0.30412375770594563,
+        "netForage": 0.26412375770594565,
+        "catchPerEncounter": 0.09830508474576272,
+        "flee": 0.006811668723343353,
+        "preySurvival": 0.5555555555555556,
+        "catchPerFoxDay": 0.12698412698412698,
+        "preyHidden": 4,
+        "predHidden": 4
+      }
+    },
+    {
+      "seed": 6107,
+      "condition": "memory",
+      "control": "evolving",
+      "month": 0,
+      "assay": {
+        "forage": 0.2165694098037954,
+        "netForage": 0.2165694098037954,
+        "catchPerEncounter": 0.11538461538461539,
+        "flee": -0.026417147506984703,
+        "preySurvival": 0.5333333333333333,
+        "catchPerFoxDay": 0.11666666666666667,
+        "preyHidden": 0,
+        "predHidden": 0
+      }
+    },
+    {
+      "seed": 6107,
+      "condition": "memory",
+      "control": "evolving",
+      "month": 3,
+      "assay": {
+        "forage": 0.7242500949370346,
+        "netForage": 0.7242500949370346,
+        "catchPerEncounter": 0.08385744234800839,
+        "flee": -0.10917230221936636,
+        "preySurvival": 0.5833333333333334,
+        "catchPerFoxDay": 0.16333333333333333,
+        "preyHidden": 0,
+        "predHidden": 0
+      }
+    },
+    {
+      "seed": 6107,
+      "condition": "memory",
+      "control": "founder-pool",
+      "month": 3,
+      "assay": {
+        "forage": 0.2293150361917245,
+        "netForage": 0.2293150361917245,
+        "catchPerEncounter": 0.05084745762711865,
+        "flee": 0.021327813951169373,
+        "preySurvival": 0.8277777777777777,
+        "catchPerFoxDay": 0.1,
+        "preyHidden": 0,
+        "predHidden": 0
+      }
+    },
+    {
+      "seed": 6107,
+      "condition": "growth",
+      "control": "evolving",
+      "month": 0,
+      "assay": {
+        "forage": 0.2275237436337543,
+        "netForage": 0.2275237436337543,
+        "catchPerEncounter": 0.11320754716981132,
+        "flee": -0.026742773853882493,
+        "preySurvival": 0.5666666666666667,
+        "catchPerFoxDay": 0.12381483547127718,
+        "preyHidden": 0,
+        "predHidden": 0
+      }
+    },
+    {
+      "seed": 6107,
+      "condition": "growth",
+      "control": "evolving",
+      "month": 3,
+      "assay": {
+        "forage": 0.45714664819387474,
+        "netForage": 0.4403819423115218,
+        "catchPerEncounter": 0.12396694214876033,
+        "flee": 0.007691988041941915,
+        "preySurvival": 0.8166666666666667,
+        "catchPerFoxDay": 0.23076923076923078,
+        "preyHidden": 1.6764705882352942,
+        "predHidden": 0.32
+      }
+    },
+    {
+      "seed": 6107,
+      "condition": "growth",
+      "control": "founder-pool",
+      "month": 3,
+      "assay": {
+        "forage": 0.25256023956172025,
+        "netForage": 0.25256023956172025,
+        "catchPerEncounter": 0.11153846153846154,
+        "flee": -0.03630949824532884,
+        "preySurvival": 0.6333333333333333,
+        "catchPerFoxDay": 0.12333333333333334,
+        "preyHidden": 0,
+        "predHidden": 0
+      }
+    },
+    {
+      "seed": 6108,
+      "condition": "linear",
+      "control": "evolving",
+      "month": 0,
+      "assay": {
+        "forage": 0.24892017819352286,
+        "netForage": 0.24892017819352286,
+        "catchPerEncounter": 0.0858085808580858,
+        "flee": -0.00661266262276193,
+        "preySurvival": 0.55,
+        "catchPerFoxDay": 0.06666666666666667,
+        "preyHidden": 0,
+        "predHidden": 0
+      }
+    },
+    {
+      "seed": 6108,
+      "condition": "linear",
+      "control": "evolving",
+      "month": 3,
+      "assay": {
+        "forage": 0.43417570014283874,
+        "netForage": 0.43417570014283874,
+        "catchPerEncounter": 0.10152284263959391,
+        "flee": 0.02280834927225579,
+        "preySurvival": 0.85,
+        "catchPerFoxDay": 0.05666666666666667,
+        "preyHidden": 0,
+        "predHidden": 0
+      }
+    },
+    {
+      "seed": 6108,
+      "condition": "linear",
+      "control": "founder-pool",
+      "month": 3,
+      "assay": {
+        "forage": 0.2937403148319282,
+        "netForage": 0.2937403148319282,
+        "catchPerEncounter": 0.10266159695817491,
+        "flee": 0.007200090629196406,
+        "preySurvival": 0.6944444444444444,
+        "catchPerFoxDay": 0.05,
+        "preyHidden": 0,
+        "predHidden": 0
+      }
+    },
+    {
+      "seed": 6108,
+      "condition": "hidden",
+      "control": "evolving",
+      "month": 0,
+      "assay": {
+        "forage": 0.250719206311092,
+        "netForage": 0.210719206311092,
+        "catchPerEncounter": 0.09615384615384616,
+        "flee": -0.014103778446302163,
+        "preySurvival": 0.6055555555555555,
+        "catchPerFoxDay": 0.10417250070008402,
+        "preyHidden": 4,
+        "predHidden": 4
+      }
+    },
+    {
+      "seed": 6108,
+      "condition": "hidden",
+      "control": "evolving",
+      "month": 3,
+      "assay": {
+        "forage": 0.6864104648236391,
+        "netForage": 0.6464104648236391,
+        "catchPerEncounter": 0.10526315789473684,
+        "flee": 0.03129246306888102,
+        "preySurvival": 0.8722222222222222,
+        "catchPerFoxDay": 0.13,
+        "preyHidden": 4,
+        "predHidden": 4
+      }
+    },
+    {
+      "seed": 6108,
+      "condition": "hidden",
+      "control": "founder-pool",
+      "month": 3,
+      "assay": {
+        "forage": 0.1850468559586814,
+        "netForage": 0.1450468559586814,
+        "catchPerEncounter": 0.1016260162601626,
+        "flee": -0.0002158526052223888,
+        "preySurvival": 0.6611111111111111,
+        "catchPerFoxDay": 0.13,
+        "preyHidden": 4,
+        "predHidden": 4
+      }
+    },
+    {
+      "seed": 6108,
+      "condition": "memory",
+      "control": "evolving",
+      "month": 0,
+      "assay": {
+        "forage": 0.22451763073440567,
+        "netForage": 0.22451763073440567,
+        "catchPerEncounter": 0.1103202846975089,
+        "flee": -0.019918048251260635,
+        "preySurvival": 0.5722222222222222,
+        "catchPerFoxDay": 0.06666666666666667,
+        "preyHidden": 0,
+        "predHidden": 0
+      }
+    },
+    {
+      "seed": 6108,
+      "condition": "memory",
+      "control": "evolving",
+      "month": 3,
+      "assay": {
+        "forage": 0.45402754281520175,
+        "netForage": 0.45402754281520175,
+        "catchPerEncounter": 0.09055118110236221,
+        "flee": 0.05069975441472252,
+        "preySurvival": 0.7722222222222223,
+        "catchPerFoxDay": 0.08333333333333333,
+        "preyHidden": 0,
+        "predHidden": 0
+      }
+    },
+    {
+      "seed": 6108,
+      "condition": "memory",
+      "control": "founder-pool",
+      "month": 3,
+      "assay": {
+        "forage": 0.18348850187932866,
+        "netForage": 0.18348850187932866,
+        "catchPerEncounter": 0.10038610038610038,
+        "flee": -0.0023758192678536814,
+        "preySurvival": 0.65,
+        "catchPerFoxDay": 0.05,
+        "preyHidden": 0,
+        "predHidden": 0
+      }
+    },
+    {
+      "seed": 6108,
+      "condition": "growth",
+      "control": "evolving",
+      "month": 0,
+      "assay": {
+        "forage": 0.24892017819352286,
+        "netForage": 0.24892017819352286,
+        "catchPerEncounter": 0.0858085808580858,
+        "flee": -0.00661266262276193,
+        "preySurvival": 0.55,
+        "catchPerFoxDay": 0.06666666666666667,
+        "preyHidden": 0,
+        "predHidden": 0
+      }
+    },
+    {
+      "seed": 6108,
+      "condition": "growth",
+      "control": "evolving",
+      "month": 3,
+      "assay": {
+        "forage": 0.5711596944284697,
+        "netForage": 0.5615499383309087,
+        "catchPerEncounter": 0.08984375,
+        "flee": 0.034871518790859216,
+        "preySurvival": 0.8222222222222222,
+        "catchPerFoxDay": 0.07666666666666667,
+        "preyHidden": 0.9609756097560975,
+        "predHidden": 0.14084507042253522
+      }
+    },
+    {
+      "seed": 6108,
+      "condition": "growth",
+      "control": "founder-pool",
+      "month": 3,
+      "assay": {
+        "forage": 0.2937403148319282,
+        "netForage": 0.2937403148319282,
+        "catchPerEncounter": 0.10266159695817491,
+        "flee": 0.007200090629196406,
+        "preySurvival": 0.6944444444444444,
+        "catchPerFoxDay": 0.05,
+        "preyHidden": 0,
+        "predHidden": 0
+      }
+    },
+    {
+      "seed": 6109,
+      "condition": "linear",
+      "control": "evolving",
+      "month": 0,
+      "assay": {
+        "forage": 0.2082025506667646,
+        "netForage": 0.2082025506667646,
+        "catchPerEncounter": 0.13636363636363635,
+        "flee": -0.044038604728922265,
+        "preySurvival": 0.5444444444444444,
+        "catchPerFoxDay": 0.11,
+        "preyHidden": 0,
+        "predHidden": 0
+      }
+    },
+    {
+      "seed": 6109,
+      "condition": "linear",
+      "control": "evolving",
+      "month": 3,
+      "assay": {
+        "forage": 0.619273068981353,
+        "netForage": 0.619273068981353,
+        "catchPerEncounter": 0.08666666666666667,
+        "flee": -0.005073097693286262,
+        "preySurvival": 0.7722222222222223,
+        "catchPerFoxDay": 0.16333333333333333,
+        "preyHidden": 0,
+        "predHidden": 0
+      }
+    },
+    {
+      "seed": 6109,
+      "condition": "linear",
+      "control": "founder-pool",
+      "month": 3,
+      "assay": {
+        "forage": 0.25752911767247455,
+        "netForage": 0.25752911767247455,
+        "catchPerEncounter": 0.09210526315789473,
+        "flee": -0.014144030069861334,
+        "preySurvival": 0.5555555555555556,
+        "catchPerFoxDay": 0.11666666666666667,
+        "preyHidden": 0,
+        "predHidden": 0
+      }
+    },
+    {
+      "seed": 6109,
+      "condition": "hidden",
+      "control": "evolving",
+      "month": 0,
+      "assay": {
+        "forage": 0.14758717832890866,
+        "netForage": 0.10758717832890866,
+        "catchPerEncounter": 0.10943396226415095,
+        "flee": -0.02012249034956331,
+        "preySurvival": 0.45,
+        "catchPerFoxDay": 0.09726103968697597,
+        "preyHidden": 4,
+        "predHidden": 4
+      }
+    },
+    {
+      "seed": 6109,
+      "condition": "hidden",
+      "control": "evolving",
+      "month": 3,
+      "assay": {
+        "forage": 0.7310439147820458,
+        "netForage": 0.6910439147820457,
+        "catchPerEncounter": 0.0781758957654723,
+        "flee": -0.007762842763821825,
+        "preySurvival": 0.8277777777777777,
+        "catchPerFoxDay": 0.12678993465869595,
+        "preyHidden": 4,
+        "predHidden": 4
+      }
+    },
+    {
+      "seed": 6109,
+      "condition": "hidden",
+      "control": "founder-pool",
+      "month": 3,
+      "assay": {
+        "forage": 0.3565605433669227,
+        "netForage": 0.31656054336692274,
+        "catchPerEncounter": 0.08695652173913043,
+        "flee": -0.0022676940560941434,
+        "preySurvival": 0.6611111111111111,
+        "catchPerFoxDay": 0.0836470096194061,
+        "preyHidden": 4,
+        "predHidden": 4
+      }
+    },
+    {
+      "seed": 6109,
+      "condition": "memory",
+      "control": "evolving",
+      "month": 0,
+      "assay": {
+        "forage": 0.19322111852110924,
+        "netForage": 0.19322111852110924,
+        "catchPerEncounter": 0.11152416356877323,
+        "flee": -0.023500128379476272,
+        "preySurvival": 0.5555555555555556,
+        "catchPerFoxDay": 0.10666666666666666,
+        "preyHidden": 0,
+        "predHidden": 0
+      }
+    },
+    {
+      "seed": 6109,
+      "condition": "memory",
+      "control": "evolving",
+      "month": 3,
+      "assay": {
+        "forage": 0.5774015413188006,
+        "netForage": 0.5774015413188006,
+        "catchPerEncounter": 0.0681198910081744,
+        "flee": -0.029263351535273784,
+        "preySurvival": 0.7944444444444444,
+        "catchPerFoxDay": 0.12333333333333334,
+        "preyHidden": 0,
+        "predHidden": 0
+      }
+    },
+    {
+      "seed": 6109,
+      "condition": "memory",
+      "control": "founder-pool",
+      "month": 3,
+      "assay": {
+        "forage": 0.20741781174085258,
+        "netForage": 0.20741781174085258,
+        "catchPerEncounter": 0.10775862068965517,
+        "flee": 0.0019144861291591601,
+        "preySurvival": 0.7388888888888889,
+        "catchPerFoxDay": 0.11,
+        "preyHidden": 0,
+        "predHidden": 0
+      }
+    },
+    {
+      "seed": 6109,
+      "condition": "growth",
+      "control": "evolving",
+      "month": 0,
+      "assay": {
+        "forage": 0.2082025506667646,
+        "netForage": 0.2082025506667646,
+        "catchPerEncounter": 0.13636363636363635,
+        "flee": -0.044038604728922265,
+        "preySurvival": 0.5444444444444444,
+        "catchPerFoxDay": 0.11,
+        "preyHidden": 0,
+        "predHidden": 0
+      }
+    },
+    {
+      "seed": 6109,
+      "condition": "growth",
+      "control": "evolving",
+      "month": 3,
+      "assay": {
+        "forage": 0.6599446789427569,
+        "netForage": 0.6584062174042954,
+        "catchPerEncounter": 0.056338028169014086,
+        "flee": -0.02768151463973269,
+        "preySurvival": 0.8666666666666667,
+        "catchPerFoxDay": 0.17666666666666667,
+        "preyHidden": 0.15384615384615385,
+        "predHidden": 0.5694444444444444
+      }
+    },
+    {
+      "seed": 6109,
+      "condition": "growth",
+      "control": "founder-pool",
+      "month": 3,
+      "assay": {
+        "forage": 0.25752911767247455,
+        "netForage": 0.25752911767247455,
+        "catchPerEncounter": 0.09210526315789473,
+        "flee": -0.014144030069861334,
+        "preySurvival": 0.5555555555555556,
+        "catchPerFoxDay": 0.11666666666666667,
+        "preyHidden": 0,
+        "predHidden": 0
+      }
+    },
+    {
+      "seed": 6110,
+      "condition": "linear",
+      "control": "evolving",
+      "month": 0,
+      "assay": {
+        "forage": 0.16271093317922092,
+        "netForage": 0.16271093317922092,
+        "catchPerEncounter": 0.12195121951219512,
+        "flee": -0.027647146217363642,
+        "preySurvival": 0.5833333333333334,
+        "catchPerFoxDay": 0.06701102889850621,
+        "preyHidden": 0,
+        "predHidden": 0
+      }
+    },
+    {
+      "seed": 6110,
+      "condition": "linear",
+      "control": "evolving",
+      "month": 3,
+      "assay": {
+        "forage": 0.5181442440173126,
+        "netForage": 0.5181442440173126,
+        "catchPerEncounter": 0.08074534161490683,
+        "flee": -0.0044598719240769216,
+        "preySurvival": 0.8444444444444444,
+        "catchPerFoxDay": 0.06666666666666667,
+        "preyHidden": 0,
+        "predHidden": 0
+      }
+    },
+    {
+      "seed": 6110,
+      "condition": "linear",
+      "control": "founder-pool",
+      "month": 3,
+      "assay": {
+        "forage": 0.2584664468675835,
+        "netForage": 0.2584664468675835,
+        "catchPerEncounter": 0.0898876404494382,
+        "flee": -0.02557201842539092,
+        "preySurvival": 0.65,
+        "catchPerFoxDay": 0.05333333333333333,
+        "preyHidden": 0,
+        "predHidden": 0
+      }
+    },
+    {
+      "seed": 6110,
+      "condition": "hidden",
+      "control": "evolving",
+      "month": 0,
+      "assay": {
+        "forage": 0.18176161393466392,
+        "netForage": 0.1417616139346639,
+        "catchPerEncounter": 0.10600706713780919,
+        "flee": -0.029518429360439694,
+        "preySurvival": 0.5666666666666667,
+        "catchPerFoxDay": 0.08069487251330905,
+        "preyHidden": 4,
+        "predHidden": 4
+      }
+    },
+    {
+      "seed": 6110,
+      "condition": "hidden",
+      "control": "evolving",
+      "month": 3,
+      "assay": {
+        "forage": 0.5446613713394968,
+        "netForage": 0.5046613713394967,
+        "catchPerEncounter": 0.09349593495934959,
+        "flee": 0.011354628767824651,
+        "preySurvival": 0.8555555555555555,
+        "catchPerFoxDay": 0.08333333333333333,
+        "preyHidden": 4,
+        "predHidden": 4
+      }
+    },
+    {
+      "seed": 6110,
+      "condition": "hidden",
+      "control": "founder-pool",
+      "month": 3,
+      "assay": {
+        "forage": 0.27518074136739773,
+        "netForage": 0.23518074136739772,
+        "catchPerEncounter": 0.13247863247863248,
+        "flee": -0.0023234816020074565,
+        "preySurvival": 0.6833333333333333,
+        "catchPerFoxDay": 0.07666666666666667,
+        "preyHidden": 4,
+        "predHidden": 4
+      }
+    },
+    {
+      "seed": 6110,
+      "condition": "memory",
+      "control": "evolving",
+      "month": 0,
+      "assay": {
+        "forage": 0.15921067071949033,
+        "netForage": 0.15921067071949033,
+        "catchPerEncounter": 0.0931174089068826,
+        "flee": -0.006844157441150286,
+        "preySurvival": 0.6388888888888888,
+        "catchPerFoxDay": 0.07033212391850405,
+        "preyHidden": 0,
+        "predHidden": 0
+      }
+    },
+    {
+      "seed": 6110,
+      "condition": "memory",
+      "control": "evolving",
+      "month": 3,
+      "assay": {
+        "forage": 0.857723295791114,
+        "netForage": 0.857723295791114,
+        "catchPerEncounter": 0.09477124183006536,
+        "flee": -0.06175017037484381,
+        "preySurvival": 0.7277777777777777,
+        "catchPerFoxDay": 0.07666666666666667,
+        "preyHidden": 0,
+        "predHidden": 0
+      }
+    },
+    {
+      "seed": 6110,
+      "condition": "memory",
+      "control": "founder-pool",
+      "month": 3,
+      "assay": {
+        "forage": 0.22586027803568595,
+        "netForage": 0.22586027803568595,
+        "catchPerEncounter": 0.10927152317880795,
+        "flee": -0.0044571862115768204,
+        "preySurvival": 0.7,
+        "catchPerFoxDay": 0.07666666666666667,
+        "preyHidden": 0,
+        "predHidden": 0
+      }
+    },
+    {
+      "seed": 6110,
+      "condition": "growth",
+      "control": "evolving",
+      "month": 0,
+      "assay": {
+        "forage": 0.16271093317922092,
+        "netForage": 0.16271093317922092,
+        "catchPerEncounter": 0.12195121951219512,
+        "flee": -0.027647146217363642,
+        "preySurvival": 0.5833333333333334,
+        "catchPerFoxDay": 0.06701102889850621,
+        "preyHidden": 0,
+        "predHidden": 0
+      }
+    },
+    {
+      "seed": 6110,
+      "condition": "growth",
+      "control": "evolving",
+      "month": 3,
+      "assay": {
+        "forage": 0.7262404438941258,
+        "netForage": 0.7233056612854302,
+        "catchPerEncounter": 0.07917888563049853,
+        "flee": -0.025351165535582615,
+        "preySurvival": 0.8166666666666667,
+        "catchPerFoxDay": 0.06,
+        "preyHidden": 0.29347826086956524,
+        "predHidden": 0.17391304347826086
+      }
+    },
+    {
+      "seed": 6110,
+      "condition": "growth",
+      "control": "founder-pool",
+      "month": 3,
+      "assay": {
+        "forage": 0.2584664468675835,
+        "netForage": 0.2584664468675835,
+        "catchPerEncounter": 0.0898876404494382,
+        "flee": -0.02557201842539092,
+        "preySurvival": 0.65,
+        "catchPerFoxDay": 0.05333333333333333,
+        "preyHidden": 0,
+        "predHidden": 0
+      }
+    },
+    {
+      "seed": 6111,
+      "condition": "linear",
+      "control": "evolving",
+      "month": 0,
+      "assay": {
+        "forage": 0.1273834832231217,
+        "netForage": 0.1273834832231217,
+        "catchPerEncounter": 0.07011070110701106,
+        "flee": -0.011115312262680503,
+        "preySurvival": 0.5611111111111111,
+        "catchPerFoxDay": 0.08977125593439793,
+        "preyHidden": 0,
+        "predHidden": 0
+      }
+    },
+    {
+      "seed": 6111,
+      "condition": "linear",
+      "control": "evolving",
+      "month": 3,
+      "assay": {
+        "forage": 0.24073363573308665,
+        "netForage": 0.24073363573308665,
+        "catchPerEncounter": 0.11961722488038277,
+        "flee": 0.01728270825689448,
+        "preySurvival": 0.8388888888888889,
+        "catchPerFoxDay": 0.1520912547528517,
+        "preyHidden": 0,
+        "predHidden": 0
+      }
+    },
+    {
+      "seed": 6111,
+      "condition": "linear",
+      "control": "founder-pool",
+      "month": 3,
+      "assay": {
+        "forage": 0.22652611200648784,
+        "netForage": 0.22652611200648784,
+        "catchPerEncounter": 0.09954751131221719,
+        "flee": 0.003814277992141883,
+        "preySurvival": 0.7333333333333333,
+        "catchPerFoxDay": 0.07478753541076487,
+        "preyHidden": 0,
+        "predHidden": 0
+      }
+    },
+    {
+      "seed": 6111,
+      "condition": "hidden",
+      "control": "evolving",
+      "month": 0,
+      "assay": {
+        "forage": 0.2406201900568988,
+        "netForage": 0.2006201900568988,
+        "catchPerEncounter": 0.109375,
+        "flee": -0.04185765710287965,
+        "preySurvival": 0.5833333333333334,
+        "catchPerFoxDay": 0.07435572454583861,
+        "preyHidden": 4,
+        "predHidden": 4
+      }
+    },
+    {
+      "seed": 6111,
+      "condition": "hidden",
+      "control": "evolving",
+      "month": 3,
+      "assay": {
+        "forage": 0.5813363968842232,
+        "netForage": 0.5413363968842232,
+        "catchPerEncounter": 0.06666666666666667,
+        "flee": 0.00968438902779732,
+        "preySurvival": 0.8388888888888889,
+        "catchPerFoxDay": 0.18,
+        "preyHidden": 4,
+        "predHidden": 4
+      }
+    },
+    {
+      "seed": 6111,
+      "condition": "hidden",
+      "control": "founder-pool",
+      "month": 3,
+      "assay": {
+        "forage": 0.24071623106396264,
+        "netForage": 0.20071623106396264,
+        "catchPerEncounter": 0.09,
+        "flee": -0.011517109517901334,
+        "preySurvival": 0.7388888888888889,
+        "catchPerFoxDay": 0.14666666666666667,
+        "preyHidden": 4,
+        "predHidden": 4
+      }
+    },
+    {
+      "seed": 6111,
+      "condition": "memory",
+      "control": "evolving",
+      "month": 0,
+      "assay": {
+        "forage": 0.14070314633900918,
+        "netForage": 0.14070314633900918,
+        "catchPerEncounter": 0.09578544061302682,
+        "flee": 0.002086955999003087,
+        "preySurvival": 0.5611111111111111,
+        "catchPerFoxDay": 0.11131412508784258,
+        "preyHidden": 0,
+        "predHidden": 0
+      }
+    },
+    {
+      "seed": 6111,
+      "condition": "memory",
+      "control": "evolving",
+      "month": 3,
+      "assay": {
+        "forage": 0.7440833257331975,
+        "netForage": 0.7440833257331975,
+        "catchPerEncounter": 0.085995085995086,
+        "flee": -0.06497226109849678,
+        "preySurvival": 0.6777777777777778,
+        "catchPerFoxDay": 0.10504023718763236,
+        "preyHidden": 0,
+        "predHidden": 0
+      }
+    },
+    {
+      "seed": 6111,
+      "condition": "memory",
+      "control": "founder-pool",
+      "month": 3,
+      "assay": {
+        "forage": 0.2639667799469762,
+        "netForage": 0.2639667799469762,
+        "catchPerEncounter": 0.10040160642570281,
+        "flee": 0.005884672195359799,
+        "preySurvival": 0.6722222222222223,
+        "catchPerFoxDay": 0.11991434689507495,
+        "preyHidden": 0,
+        "predHidden": 0
+      }
+    },
+    {
+      "seed": 6111,
+      "condition": "growth",
+      "control": "evolving",
+      "month": 0,
+      "assay": {
+        "forage": 0.1273834832231217,
+        "netForage": 0.1273834832231217,
+        "catchPerEncounter": 0.07011070110701106,
+        "flee": -0.011115312262680503,
+        "preySurvival": 0.5611111111111111,
+        "catchPerFoxDay": 0.08977125593439793,
+        "preyHidden": 0,
+        "predHidden": 0
+      }
+    },
+    {
+      "seed": 6111,
+      "condition": "growth",
+      "control": "evolving",
+      "month": 3,
+      "assay": {
+        "forage": 0.595181407447956,
+        "netForage": 0.5919255934944676,
+        "catchPerEncounter": 0.09019607843137255,
+        "flee": -0.01408054057520425,
+        "preySurvival": 0.8277777777777777,
+        "catchPerFoxDay": 0.06,
+        "preyHidden": 0.32558139534883723,
+        "predHidden": 0.046153846153846156
+      }
+    },
+    {
+      "seed": 6111,
+      "condition": "growth",
+      "control": "founder-pool",
+      "month": 3,
+      "assay": {
+        "forage": 0.22652611200648784,
+        "netForage": 0.22652611200648784,
+        "catchPerEncounter": 0.09954751131221719,
+        "flee": 0.003814277992141883,
+        "preySurvival": 0.7333333333333333,
+        "catchPerFoxDay": 0.07478753541076487,
+        "preyHidden": 0,
+        "predHidden": 0
+      }
+    },
+    {
+      "seed": 6112,
+      "condition": "linear",
+      "control": "evolving",
+      "month": 0,
+      "assay": {
+        "forage": 0.15246448407588675,
+        "netForage": 0.15246448407588675,
+        "catchPerEncounter": 0.08759124087591241,
+        "flee": -0.0052476766614649095,
+        "preySurvival": 0.6111111111111112,
+        "catchPerFoxDay": 0.11756231090620947,
+        "preyHidden": 0,
+        "predHidden": 0
+      }
+    },
+    {
+      "seed": 6112,
+      "condition": "linear",
+      "control": "evolving",
+      "month": 3,
+      "assay": {
+        "forage": 0.702644417241957,
+        "netForage": 0.702644417241957,
+        "catchPerEncounter": 0.08256880733944955,
+        "flee": 0.04616913386866628,
+        "preySurvival": 0.8833333333333333,
+        "catchPerFoxDay": 0.15666666666666668,
+        "preyHidden": 0,
+        "predHidden": 0
+      }
+    },
+    {
+      "seed": 6112,
+      "condition": "linear",
+      "control": "founder-pool",
+      "month": 3,
+      "assay": {
+        "forage": 0.21091023339429113,
+        "netForage": 0.21091023339429113,
+        "catchPerEncounter": 0.11764705882352941,
+        "flee": -0.016747522570437764,
+        "preySurvival": 0.7055555555555556,
+        "catchPerFoxDay": 0.12666666666666668,
+        "preyHidden": 0,
+        "predHidden": 0
+      }
+    },
+    {
+      "seed": 6112,
+      "condition": "hidden",
+      "control": "evolving",
+      "month": 0,
+      "assay": {
+        "forage": 0.17915263059188408,
+        "netForage": 0.13915263059188407,
+        "catchPerEncounter": 0.09803921568627451,
+        "flee": -0.009517650378873083,
+        "preySurvival": 0.5611111111111111,
+        "catchPerFoxDay": 0.14009728978457262,
+        "preyHidden": 4,
+        "predHidden": 4
+      }
+    },
+    {
+      "seed": 6112,
+      "condition": "hidden",
+      "control": "evolving",
+      "month": 3,
+      "assay": null
+    },
+    {
+      "seed": 6112,
+      "condition": "hidden",
+      "control": "founder-pool",
+      "month": 3,
+      "assay": null
+    },
+    {
+      "seed": 6112,
+      "condition": "memory",
+      "control": "evolving",
+      "month": 0,
+      "assay": {
+        "forage": 0.13907889345867264,
+        "netForage": 0.13907889345867264,
+        "catchPerEncounter": 0.09558823529411764,
+        "flee": -0.007176968643483419,
+        "preySurvival": 0.5944444444444444,
+        "catchPerFoxDay": 0.09619238476953906,
+        "preyHidden": 0,
+        "predHidden": 0
+      }
+    },
+    {
+      "seed": 6112,
+      "condition": "memory",
+      "control": "evolving",
+      "month": 3,
+      "assay": {
+        "forage": 0.35986836182400367,
+        "netForage": 0.35986836182400367,
+        "catchPerEncounter": 0.06598984771573604,
+        "flee": -0.02241781564199811,
+        "preySurvival": 0.8555555555555555,
+        "catchPerFoxDay": 0.16,
+        "preyHidden": 0,
+        "predHidden": 0
+      }
+    },
+    {
+      "seed": 6112,
+      "condition": "memory",
+      "control": "founder-pool",
+      "month": 3,
+      "assay": {
+        "forage": 0.175743640251274,
+        "netForage": 0.175743640251274,
+        "catchPerEncounter": 0.0916030534351145,
+        "flee": -0.021077238868158633,
+        "preySurvival": 0.7222222222222222,
+        "catchPerFoxDay": 0.1377186843946816,
+        "preyHidden": 0,
+        "predHidden": 0
+      }
+    },
+    {
+      "seed": 6112,
+      "condition": "growth",
+      "control": "evolving",
+      "month": 0,
+      "assay": {
+        "forage": 0.15246448407588675,
+        "netForage": 0.15246448407588675,
+        "catchPerEncounter": 0.08759124087591241,
+        "flee": -0.0052476766614649095,
+        "preySurvival": 0.6111111111111112,
+        "catchPerFoxDay": 0.11756231090620947,
+        "preyHidden": 0,
+        "predHidden": 0
+      }
+    },
+    {
+      "seed": 6112,
+      "condition": "growth",
+      "control": "evolving",
+      "month": 3,
+      "assay": {
+        "forage": 0.7014306363924726,
+        "netForage": 0.686876180946928,
+        "catchPerEncounter": 0.09473684210526316,
+        "flee": 0.05643349770026655,
+        "preySurvival": 0.7444444444444445,
+        "catchPerFoxDay": 0.14666666666666667,
+        "preyHidden": 1.4554455445544554,
+        "predHidden": 0
+      }
+    },
+    {
+      "seed": 6112,
+      "condition": "growth",
+      "control": "founder-pool",
+      "month": 3,
+      "assay": {
+        "forage": 0.21091023339429113,
+        "netForage": 0.21091023339429113,
+        "catchPerEncounter": 0.11764705882352941,
+        "flee": -0.016747522570437764,
+        "preySurvival": 0.7055555555555556,
+        "catchPerFoxDay": 0.12666666666666668,
+        "preyHidden": 0,
+        "predHidden": 0
+      }
+    },
+    {
+      "seed": 6113,
+      "condition": "linear",
+      "control": "evolving",
+      "month": 0,
+      "assay": {
+        "forage": 0.21124196460409977,
+        "netForage": 0.21124196460409977,
+        "catchPerEncounter": 0.11705685618729098,
+        "flee": -0.027118667911367057,
+        "preySurvival": 0.5555555555555556,
+        "catchPerFoxDay": 0.08666666666666667,
+        "preyHidden": 0,
+        "predHidden": 0
+      }
+    },
+    {
+      "seed": 6113,
+      "condition": "linear",
+      "control": "evolving",
+      "month": 3,
+      "assay": {
+        "forage": 0.6365154509659204,
+        "netForage": 0.6365154509659204,
+        "catchPerEncounter": 0.11945392491467577,
+        "flee": -0.03856893244260776,
+        "preySurvival": 0.45,
+        "catchPerFoxDay": 0.09333333333333332,
+        "preyHidden": 0,
+        "predHidden": 0
+      }
+    },
+    {
+      "seed": 6113,
+      "condition": "linear",
+      "control": "founder-pool",
+      "month": 3,
+      "assay": {
+        "forage": 0.24845834406691433,
+        "netForage": 0.24845834406691433,
+        "catchPerEncounter": 0.08050847457627118,
+        "flee": 0.004819447796365763,
+        "preySurvival": 0.7611111111111111,
+        "catchPerFoxDay": 0.09666666666666666,
+        "preyHidden": 0,
+        "predHidden": 0
+      }
+    },
+    {
+      "seed": 6113,
+      "condition": "hidden",
+      "control": "evolving",
+      "month": 0,
+      "assay": {
+        "forage": 0.18107393887371442,
+        "netForage": 0.14107393887371442,
+        "catchPerEncounter": 0.09606986899563319,
+        "flee": 0.0026154163779103764,
+        "preySurvival": 0.6222222222222222,
+        "catchPerFoxDay": 0.10130856901646265,
+        "preyHidden": 4,
+        "predHidden": 4
+      }
+    },
+    {
+      "seed": 6113,
+      "condition": "hidden",
+      "control": "evolving",
+      "month": 3,
+      "assay": {
+        "forage": 0.9210375662718305,
+        "netForage": 0.8810375662718305,
+        "catchPerEncounter": 0.0836734693877551,
+        "flee": -0.04670863034137908,
+        "preySurvival": 0.7,
+        "catchPerFoxDay": 0.13666666666666666,
+        "preyHidden": 4,
+        "predHidden": 4
+      }
+    },
+    {
+      "seed": 6113,
+      "condition": "hidden",
+      "control": "founder-pool",
+      "month": 3,
+      "assay": {
+        "forage": 0.2846947338118954,
+        "netForage": 0.2446947338118954,
+        "catchPerEncounter": 0.10526315789473684,
+        "flee": 0.013223450511342228,
+        "preySurvival": 0.7055555555555556,
+        "catchPerFoxDay": 0.09723386420787929,
+        "preyHidden": 4,
+        "predHidden": 4
+      }
+    },
+    {
+      "seed": 6113,
+      "condition": "memory",
+      "control": "evolving",
+      "month": 0,
+      "assay": {
+        "forage": 0.21745158230649864,
+        "netForage": 0.21745158230649864,
+        "catchPerEncounter": 0.13409961685823754,
+        "flee": -0.024680115424038463,
+        "preySurvival": 0.5222222222222223,
+        "catchPerFoxDay": 0.10681502086230876,
+        "preyHidden": 0,
+        "predHidden": 0
+      }
+    },
+    {
+      "seed": 6113,
+      "condition": "memory",
+      "control": "evolving",
+      "month": 3,
+      "assay": {
+        "forage": 0.45147312519085075,
+        "netForage": 0.45147312519085075,
+        "catchPerEncounter": 0.11510791366906475,
+        "flee": -0.02016191552219247,
+        "preySurvival": 0.6444444444444445,
+        "catchPerFoxDay": 0.11666666666666667,
+        "preyHidden": 0,
+        "predHidden": 0
+      }
+    },
+    {
+      "seed": 6113,
+      "condition": "memory",
+      "control": "founder-pool",
+      "month": 3,
+      "assay": {
+        "forage": 0.3070423097774708,
+        "netForage": 0.3070423097774708,
+        "catchPerEncounter": 0.09259259259259259,
+        "flee": -0.015477758670697252,
+        "preySurvival": 0.7555555555555555,
+        "catchPerFoxDay": 0.09666666666666666,
+        "preyHidden": 0,
+        "predHidden": 0
+      }
+    },
+    {
+      "seed": 6113,
+      "condition": "growth",
+      "control": "evolving",
+      "month": 0,
+      "assay": {
+        "forage": 0.21124196460409977,
+        "netForage": 0.21124196460409977,
+        "catchPerEncounter": 0.11705685618729098,
+        "flee": -0.027118667911367057,
+        "preySurvival": 0.5555555555555556,
+        "catchPerFoxDay": 0.08666666666666667,
+        "preyHidden": 0,
+        "predHidden": 0
+      }
+    },
+    {
+      "seed": 6113,
+      "condition": "growth",
+      "control": "evolving",
+      "month": 3,
+      "assay": {
+        "forage": 0.5438857238838856,
+        "netForage": 0.5383443226100002,
+        "catchPerEncounter": 0.1044776119402985,
+        "flee": -0.018000204034584803,
+        "preySurvival": 0.5666666666666667,
+        "catchPerFoxDay": 0.13666666666666666,
+        "preyHidden": 0.554140127388535,
+        "predHidden": 0.3695652173913043
+      }
+    },
+    {
+      "seed": 6113,
+      "condition": "growth",
+      "control": "founder-pool",
+      "month": 3,
+      "assay": {
+        "forage": 0.24845834406691433,
+        "netForage": 0.24845834406691433,
+        "catchPerEncounter": 0.08050847457627118,
+        "flee": 0.004819447796365763,
+        "preySurvival": 0.7611111111111111,
+        "catchPerFoxDay": 0.09666666666666666,
+        "preyHidden": 0,
+        "predHidden": 0
+      }
+    },
+    {
+      "seed": 6114,
+      "condition": "linear",
+      "control": "evolving",
+      "month": 0,
+      "assay": {
+        "forage": 0.23797388594395702,
+        "netForage": 0.23797388594395702,
+        "catchPerEncounter": 0.10902255639097744,
+        "flee": -0.005451776171179708,
+        "preySurvival": 0.6055555555555555,
+        "catchPerFoxDay": 0.10666666666666666,
+        "preyHidden": 0,
+        "predHidden": 0
+      }
+    },
+    {
+      "seed": 6114,
+      "condition": "linear",
+      "control": "evolving",
+      "month": 3,
+      "assay": null
+    },
+    {
+      "seed": 6114,
+      "condition": "linear",
+      "control": "founder-pool",
+      "month": 3,
+      "assay": {
+        "forage": 0.22487463455694642,
+        "netForage": 0.22487463455694642,
+        "catchPerEncounter": 0.07782101167315175,
+        "flee": -0.002103019854473585,
+        "preySurvival": 0.6944444444444444,
+        "catchPerFoxDay": 0.09333333333333332,
+        "preyHidden": 0,
+        "predHidden": 0
+      }
+    },
+    {
+      "seed": 6114,
+      "condition": "hidden",
+      "control": "evolving",
+      "month": 0,
+      "assay": {
+        "forage": 0.17725103467465977,
+        "netForage": 0.13725103467465977,
+        "catchPerEncounter": 0.09352517985611511,
+        "flee": -0.016587566383890525,
+        "preySurvival": 0.5555555555555556,
+        "catchPerFoxDay": 0.11,
+        "preyHidden": 4,
+        "predHidden": 4
+      }
+    },
+    {
+      "seed": 6114,
+      "condition": "hidden",
+      "control": "evolving",
+      "month": 3,
+      "assay": {
+        "forage": 0.46809233844642195,
+        "netForage": 0.42809233844642197,
+        "catchPerEncounter": 0.10218978102189781,
+        "flee": 0.001963798450023516,
+        "preySurvival": 0.8222222222222222,
+        "catchPerFoxDay": 0.15000000000000002,
+        "preyHidden": 4,
+        "predHidden": 4
+      }
+    },
+    {
+      "seed": 6114,
+      "condition": "hidden",
+      "control": "founder-pool",
+      "month": 3,
+      "assay": {
+        "forage": 0.2930901057206672,
+        "netForage": 0.2530901057206672,
+        "catchPerEncounter": 0.0931899641577061,
+        "flee": -0.012499182570725203,
+        "preySurvival": 0.6444444444444445,
+        "catchPerFoxDay": 0.12,
+        "preyHidden": 4,
+        "predHidden": 4
+      }
+    },
+    {
+      "seed": 6114,
+      "condition": "memory",
+      "control": "evolving",
+      "month": 0,
+      "assay": {
+        "forage": 0.21606906698132194,
+        "netForage": 0.21606906698132194,
+        "catchPerEncounter": 0.11969111969111969,
+        "flee": -0.007303713602947567,
+        "preySurvival": 0.5666666666666667,
+        "catchPerFoxDay": 0.11,
+        "preyHidden": 0,
+        "predHidden": 0
+      }
+    },
+    {
+      "seed": 6114,
+      "condition": "memory",
+      "control": "evolving",
+      "month": 3,
+      "assay": null
+    },
+    {
+      "seed": 6114,
+      "condition": "memory",
+      "control": "founder-pool",
+      "month": 3,
+      "assay": {
+        "forage": 0.3015606023741737,
+        "netForage": 0.3015606023741737,
+        "catchPerEncounter": 0.09293680297397769,
+        "flee": -0.016293450147095382,
+        "preySurvival": 0.6944444444444444,
+        "catchPerFoxDay": 0.12666666666666668,
+        "preyHidden": 0,
+        "predHidden": 0
+      }
+    },
+    {
+      "seed": 6114,
+      "condition": "growth",
+      "control": "evolving",
+      "month": 0,
+      "assay": {
+        "forage": 0.23797388594395702,
+        "netForage": 0.23797388594395702,
+        "catchPerEncounter": 0.10902255639097744,
+        "flee": -0.005451776171179708,
+        "preySurvival": 0.6055555555555555,
+        "catchPerFoxDay": 0.10666666666666666,
+        "preyHidden": 0,
+        "predHidden": 0
+      }
+    },
+    {
+      "seed": 6114,
+      "condition": "growth",
+      "control": "evolving",
+      "month": 3,
+      "assay": {
+        "forage": 0.6791075322179824,
+        "netForage": 0.6678575322179824,
+        "catchPerEncounter": 0.08835341365461848,
+        "flee": 0.03649066315687656,
+        "preySurvival": 0.6666666666666666,
+        "catchPerFoxDay": 0.15666666666666668,
+        "preyHidden": 1.125,
+        "predHidden": 0.34615384615384615
+      }
+    },
+    {
+      "seed": 6114,
+      "condition": "growth",
+      "control": "founder-pool",
+      "month": 3,
+      "assay": {
+        "forage": 0.22487463455694642,
+        "netForage": 0.22487463455694642,
+        "catchPerEncounter": 0.07782101167315175,
+        "flee": -0.002103019854473585,
+        "preySurvival": 0.6944444444444444,
+        "catchPerFoxDay": 0.09333333333333332,
+        "preyHidden": 0,
+        "predHidden": 0
+      }
+    },
+    {
+      "seed": 6115,
+      "condition": "linear",
+      "control": "evolving",
+      "month": 0,
+      "assay": {
+        "forage": 0.2266308949797531,
+        "netForage": 0.2266308949797531,
+        "catchPerEncounter": 0.10756972111553785,
+        "flee": -0.008988656056788053,
+        "preySurvival": 0.6166666666666667,
+        "catchPerFoxDay": 0.10050251256281406,
+        "preyHidden": 0,
+        "predHidden": 0
+      }
+    },
+    {
+      "seed": 6115,
+      "condition": "linear",
+      "control": "evolving",
+      "month": 3,
+      "assay": {
+        "forage": 0.5504431282390038,
+        "netForage": 0.5504431282390038,
+        "catchPerEncounter": 0.05161290322580645,
+        "flee": 0.02101615754017158,
+        "preySurvival": 0.8722222222222222,
+        "catchPerFoxDay": 0.20666666666666667,
+        "preyHidden": 0,
+        "predHidden": 0
+      }
+    },
+    {
+      "seed": 6115,
+      "condition": "linear",
+      "control": "founder-pool",
+      "month": 3,
+      "assay": {
+        "forage": 0.2833596904609036,
+        "netForage": 0.2833596904609036,
+        "catchPerEncounter": 0.11797752808988764,
+        "flee": 0.012681156091286975,
+        "preySurvival": 0.75,
+        "catchPerFoxDay": 0.1,
+        "preyHidden": 0,
+        "predHidden": 0
+      }
+    },
+    {
+      "seed": 6115,
+      "condition": "hidden",
+      "control": "evolving",
+      "month": 0,
+      "assay": {
+        "forage": 0.14017192938931655,
+        "netForage": 0.10017192938931654,
+        "catchPerEncounter": 0.09022556390977443,
+        "flee": -0.041084330439176545,
+        "preySurvival": 0.5666666666666667,
+        "catchPerFoxDay": 0.07333333333333333,
+        "preyHidden": 4,
+        "predHidden": 4
+      }
+    },
+    {
+      "seed": 6115,
+      "condition": "hidden",
+      "control": "evolving",
+      "month": 3,
+      "assay": {
+        "forage": 0.7531865222824744,
+        "netForage": 0.7131865222824744,
+        "catchPerEncounter": 0.07394366197183098,
+        "flee": 0.033470326258708584,
+        "preySurvival": 0.8055555555555556,
+        "catchPerFoxDay": 0.09,
+        "preyHidden": 4,
+        "predHidden": 4
+      }
+    },
+    {
+      "seed": 6115,
+      "condition": "hidden",
+      "control": "founder-pool",
+      "month": 3,
+      "assay": {
+        "forage": 0.24612307187734062,
+        "netForage": 0.2061230718773406,
+        "catchPerEncounter": 0.09765625,
+        "flee": -0.01077435906715286,
+        "preySurvival": 0.6611111111111111,
+        "catchPerFoxDay": 0.11,
+        "preyHidden": 4,
+        "predHidden": 4
+      }
+    },
+    {
+      "seed": 6115,
+      "condition": "memory",
+      "control": "evolving",
+      "month": 0,
+      "assay": {
+        "forage": 0.22706155572344733,
+        "netForage": 0.22706155572344733,
+        "catchPerEncounter": 0.10408921933085502,
+        "flee": -0.026940646867512023,
+        "preySurvival": 0.5888888888888889,
+        "catchPerFoxDay": 0.10668148353938048,
+        "preyHidden": 0,
+        "predHidden": 0
+      }
+    },
+    {
+      "seed": 6115,
+      "condition": "memory",
+      "control": "evolving",
+      "month": 3,
+      "assay": {
+        "forage": 0.4349841514741299,
+        "netForage": 0.4349841514741299,
+        "catchPerEncounter": 0.09326424870466321,
+        "flee": 0.041015062764578246,
+        "preySurvival": 0.8388888888888889,
+        "catchPerFoxDay": 0.17666666666666667,
+        "preyHidden": 0,
+        "predHidden": 0
+      }
+    },
+    {
+      "seed": 6115,
+      "condition": "memory",
+      "control": "founder-pool",
+      "month": 3,
+      "assay": {
+        "forage": 0.2513637661006199,
+        "netForage": 0.2513637661006199,
+        "catchPerEncounter": 0.11602209944751381,
+        "flee": 0.009771575363532542,
+        "preySurvival": 0.7277777777777777,
+        "catchPerFoxDay": 0.0769016439119532,
+        "preyHidden": 0,
+        "predHidden": 0
+      }
+    },
+    {
+      "seed": 6115,
+      "condition": "growth",
+      "control": "evolving",
+      "month": 0,
+      "assay": {
+        "forage": 0.2266308949797531,
+        "netForage": 0.2266308949797531,
+        "catchPerEncounter": 0.10756972111553785,
+        "flee": -0.008988656056788053,
+        "preySurvival": 0.6166666666666667,
+        "catchPerFoxDay": 0.10050251256281406,
+        "preyHidden": 0,
+        "predHidden": 0
+      }
+    },
+    {
+      "seed": 6115,
+      "condition": "growth",
+      "control": "evolving",
+      "month": 3,
+      "assay": {
+        "forage": 0.4909541470700803,
+        "netForage": 0.48553041825652093,
+        "catchPerEncounter": 0.06103286384976526,
+        "flee": -0.04574236157300897,
+        "preySurvival": 0.6777777777777778,
+        "catchPerFoxDay": 0.13,
+        "preyHidden": 0.5423728813559322,
+        "predHidden": 0.1
+      }
+    },
+    {
+      "seed": 6115,
+      "condition": "growth",
+      "control": "founder-pool",
+      "month": 3,
+      "assay": {
+        "forage": 0.2833596904609036,
+        "netForage": 0.2833596904609036,
+        "catchPerEncounter": 0.11797752808988764,
+        "flee": 0.012681156091286975,
+        "preySurvival": 0.75,
+        "catchPerFoxDay": 0.1,
+        "preyHidden": 0,
+        "predHidden": 0
+      }
+    },
+    {
+      "seed": 6116,
+      "condition": "linear",
+      "control": "evolving",
+      "month": 0,
+      "assay": {
+        "forage": 0.2254021896528209,
+        "netForage": 0.2254021896528209,
+        "catchPerEncounter": 0.0949367088607595,
+        "flee": -0.016482207666301357,
+        "preySurvival": 0.5777777777777777,
+        "catchPerFoxDay": 0.09333333333333332,
+        "preyHidden": 0,
+        "predHidden": 0
+      }
+    },
+    {
+      "seed": 6116,
+      "condition": "linear",
+      "control": "evolving",
+      "month": 3,
+      "assay": null
+    },
+    {
+      "seed": 6116,
+      "condition": "linear",
+      "control": "founder-pool",
+      "month": 3,
+      "assay": {
+        "forage": 0.24516819940780396,
+        "netForage": 0.24516819940780396,
+        "catchPerEncounter": 0.13106796116504854,
+        "flee": -0.0036489661521904014,
+        "preySurvival": 0.6722222222222223,
+        "catchPerFoxDay": 0.1,
+        "preyHidden": 0,
+        "predHidden": 0
+      }
+    },
+    {
+      "seed": 6116,
+      "condition": "hidden",
+      "control": "evolving",
+      "month": 0,
+      "assay": {
+        "forage": 0.2195450027488798,
+        "netForage": 0.1795450027488798,
+        "catchPerEncounter": 0.10780669144981413,
+        "flee": -0.007762818064664057,
+        "preySurvival": 0.5555555555555556,
+        "catchPerFoxDay": 0.11,
+        "preyHidden": 4,
+        "predHidden": 4
+      }
+    },
+    {
+      "seed": 6116,
+      "condition": "hidden",
+      "control": "evolving",
+      "month": 3,
+      "assay": {
+        "forage": 0.6027028968898324,
+        "netForage": 0.5627028968898323,
+        "catchPerEncounter": 0.10571428571428572,
+        "flee": -0.030704356502297577,
+        "preySurvival": 0.7277777777777777,
+        "catchPerFoxDay": 0.12666666666666668,
+        "preyHidden": 4,
+        "predHidden": 4
+      }
+    },
+    {
+      "seed": 6116,
+      "condition": "hidden",
+      "control": "founder-pool",
+      "month": 3,
+      "assay": {
+        "forage": 0.23928285827642753,
+        "netForage": 0.19928285827642753,
+        "catchPerEncounter": 0.11940298507462686,
+        "flee": -0.009455182986674868,
+        "preySurvival": 0.6388888888888888,
+        "catchPerFoxDay": 0.10666666666666666,
+        "preyHidden": 4,
+        "predHidden": 4
+      }
+    },
+    {
+      "seed": 6116,
+      "condition": "memory",
+      "control": "evolving",
+      "month": 0,
+      "assay": {
+        "forage": 0.25453421065291776,
+        "netForage": 0.25453421065291776,
+        "catchPerEncounter": 0.11627906976744186,
+        "flee": -0.01570128631711474,
+        "preySurvival": 0.6111111111111112,
+        "catchPerFoxDay": 0.09,
+        "preyHidden": 0,
+        "predHidden": 0
+      }
+    },
+    {
+      "seed": 6116,
+      "condition": "memory",
+      "control": "evolving",
+      "month": 3,
+      "assay": {
+        "forage": 0.1590213265412469,
+        "netForage": 0.1590213265412469,
+        "catchPerEncounter": 0.11363636363636363,
+        "flee": 0.011349137754296893,
+        "preySurvival": 0.8888888888888888,
+        "catchPerFoxDay": 0.15666666666666668,
+        "preyHidden": 0,
+        "predHidden": 0
+      }
+    },
+    {
+      "seed": 6116,
+      "condition": "memory",
+      "control": "founder-pool",
+      "month": 3,
+      "assay": {
+        "forage": 0.1748606748718734,
+        "netForage": 0.1748606748718734,
+        "catchPerEncounter": 0.1141732283464567,
+        "flee": -0.0006316230563762831,
+        "preySurvival": 0.6388888888888888,
+        "catchPerFoxDay": 0.11666666666666667,
+        "preyHidden": 0,
+        "predHidden": 0
+      }
+    },
+    {
+      "seed": 6116,
+      "condition": "growth",
+      "control": "evolving",
+      "month": 0,
+      "assay": {
+        "forage": 0.2254021896528209,
+        "netForage": 0.2254021896528209,
+        "catchPerEncounter": 0.0949367088607595,
+        "flee": -0.016482207666301357,
+        "preySurvival": 0.5777777777777777,
+        "catchPerFoxDay": 0.09333333333333332,
+        "preyHidden": 0,
+        "predHidden": 0
+      }
+    },
+    {
+      "seed": 6116,
+      "condition": "growth",
+      "control": "evolving",
+      "month": 3,
+      "assay": null
+    },
+    {
+      "seed": 6116,
+      "condition": "growth",
+      "control": "founder-pool",
+      "month": 3,
+      "assay": {
+        "forage": 0.24516819940780396,
+        "netForage": 0.24516819940780396,
+        "catchPerEncounter": 0.13106796116504854,
+        "flee": -0.0036489661521904014,
+        "preySurvival": 0.6722222222222223,
+        "catchPerFoxDay": 0.1,
+        "preyHidden": 0,
+        "predHidden": 0
+      }
+    },
+    {
+      "seed": 6117,
+      "condition": "linear",
+      "control": "evolving",
+      "month": 0,
+      "assay": {
+        "forage": 0.16988019554361994,
+        "netForage": 0.16988019554361994,
+        "catchPerEncounter": 0.08620689655172414,
+        "flee": -0.002279709184313486,
+        "preySurvival": 0.5611111111111111,
+        "catchPerFoxDay": 0.06666666666666667,
+        "preyHidden": 0,
+        "predHidden": 0
+      }
+    },
+    {
+      "seed": 6117,
+      "condition": "linear",
+      "control": "evolving",
+      "month": 3,
+      "assay": {
+        "forage": 0.296890588802727,
+        "netForage": 0.296890588802727,
+        "catchPerEncounter": 0.10245901639344263,
+        "flee": 0.02733333868575,
+        "preySurvival": 0.8444444444444444,
+        "catchPerFoxDay": 0.11,
+        "preyHidden": 0,
+        "predHidden": 0
+      }
+    },
+    {
+      "seed": 6117,
+      "condition": "linear",
+      "control": "founder-pool",
+      "month": 3,
+      "assay": {
+        "forage": 0.26434257749002615,
+        "netForage": 0.26434257749002615,
+        "catchPerEncounter": 0.09302325581395349,
+        "flee": -0.0025302053545623246,
+        "preySurvival": 0.7055555555555556,
+        "catchPerFoxDay": 0.07666666666666667,
+        "preyHidden": 0,
+        "predHidden": 0
+      }
+    },
+    {
+      "seed": 6117,
+      "condition": "hidden",
+      "control": "evolving",
+      "month": 0,
+      "assay": {
+        "forage": 0.22297437644271367,
+        "netForage": 0.18297437644271367,
+        "catchPerEncounter": 0.11026615969581749,
+        "flee": -0.023886815116223568,
+        "preySurvival": 0.5388888888888889,
+        "catchPerFoxDay": 0.15333333333333335,
+        "preyHidden": 4,
+        "predHidden": 4
+      }
+    },
+    {
+      "seed": 6117,
+      "condition": "hidden",
+      "control": "evolving",
+      "month": 3,
+      "assay": null
+    },
+    {
+      "seed": 6117,
+      "condition": "hidden",
+      "control": "founder-pool",
+      "month": 3,
+      "assay": null
+    },
+    {
+      "seed": 6117,
+      "condition": "memory",
+      "control": "evolving",
+      "month": 0,
+      "assay": {
+        "forage": 0.20531509413739246,
+        "netForage": 0.20531509413739246,
+        "catchPerEncounter": 0.10197368421052631,
+        "flee": -0.02615296592369832,
+        "preySurvival": 0.5611111111111111,
+        "catchPerFoxDay": 0.05666666666666667,
+        "preyHidden": 0,
+        "predHidden": 0
+      }
+    },
+    {
+      "seed": 6117,
+      "condition": "memory",
+      "control": "evolving",
+      "month": 3,
+      "assay": {
+        "forage": 0.5223443202018448,
+        "netForage": 0.5223443202018448,
+        "catchPerEncounter": 0.13059701492537312,
+        "flee": -0.04285274541851003,
+        "preySurvival": 0.8055555555555556,
+        "catchPerFoxDay": 0.11,
+        "preyHidden": 0,
+        "predHidden": 0
+      }
+    },
+    {
+      "seed": 6117,
+      "condition": "memory",
+      "control": "founder-pool",
+      "month": 3,
+      "assay": {
+        "forage": 0.3084249020992888,
+        "netForage": 0.3084249020992888,
+        "catchPerEncounter": 0.10526315789473684,
+        "flee": -0.010270777768185337,
+        "preySurvival": 0.7055555555555556,
+        "catchPerFoxDay": 0.08333333333333333,
+        "preyHidden": 0,
+        "predHidden": 0
+      }
+    },
+    {
+      "seed": 6117,
+      "condition": "growth",
+      "control": "evolving",
+      "month": 0,
+      "assay": {
+        "forage": 0.16988019554361994,
+        "netForage": 0.16988019554361994,
+        "catchPerEncounter": 0.08620689655172414,
+        "flee": -0.002279709184313486,
+        "preySurvival": 0.5611111111111111,
+        "catchPerFoxDay": 0.06666666666666667,
+        "preyHidden": 0,
+        "predHidden": 0
+      }
+    },
+    {
+      "seed": 6117,
+      "condition": "growth",
+      "control": "evolving",
+      "month": 3,
+      "assay": {
+        "forage": 0.33015999247030564,
+        "netForage": 0.3205284135229372,
+        "catchPerEncounter": 0.13732394366197184,
+        "flee": -0.04059182396333777,
+        "preySurvival": 0.7388888888888889,
+        "catchPerFoxDay": 0.11333333333333334,
+        "preyHidden": 0.9631578947368421,
+        "predHidden": 0.3877551020408163
+      }
+    },
+    {
+      "seed": 6117,
+      "condition": "growth",
+      "control": "founder-pool",
+      "month": 3,
+      "assay": {
+        "forage": 0.26434257749002615,
+        "netForage": 0.26434257749002615,
+        "catchPerEncounter": 0.09302325581395349,
+        "flee": -0.0025302053545623246,
+        "preySurvival": 0.7055555555555556,
+        "catchPerFoxDay": 0.07666666666666667,
+        "preyHidden": 0,
+        "predHidden": 0
+      }
+    },
+    {
+      "seed": 6118,
+      "condition": "linear",
+      "control": "evolving",
+      "month": 0,
+      "assay": {
+        "forage": 0.18597508486087663,
+        "netForage": 0.18597508486087663,
+        "catchPerEncounter": 0.11428571428571428,
+        "flee": -0.021246874529605046,
+        "preySurvival": 0.6055555555555555,
+        "catchPerFoxDay": 0.08722393066815767,
+        "preyHidden": 0,
+        "predHidden": 0
+      }
+    },
+    {
+      "seed": 6118,
+      "condition": "linear",
+      "control": "evolving",
+      "month": 3,
+      "assay": {
+        "forage": 0.4201116939339488,
+        "netForage": 0.4201116939339488,
+        "catchPerEncounter": 0.10727969348659004,
+        "flee": -0.018737770414270855,
+        "preySurvival": 0.8,
+        "catchPerFoxDay": 0.06,
+        "preyHidden": 0,
+        "predHidden": 0
+      }
+    },
+    {
+      "seed": 6118,
+      "condition": "linear",
+      "control": "founder-pool",
+      "month": 3,
+      "assay": {
+        "forage": 0.26273227106412184,
+        "netForage": 0.26273227106412184,
+        "catchPerEncounter": 0.1016949152542373,
+        "flee": 0.0026280837808501673,
+        "preySurvival": 0.7,
+        "catchPerFoxDay": 0.06666666666666667,
+        "preyHidden": 0,
+        "predHidden": 0
+      }
+    },
+    {
+      "seed": 6118,
+      "condition": "hidden",
+      "control": "evolving",
+      "month": 0,
+      "assay": {
+        "forage": 0.21272072233326997,
+        "netForage": 0.17272072233326996,
+        "catchPerEncounter": 0.1183206106870229,
+        "flee": -0.03574348492687703,
+        "preySurvival": 0.5666666666666667,
+        "catchPerFoxDay": 0.10343389406367302,
+        "preyHidden": 4,
+        "predHidden": 4
+      }
+    },
+    {
+      "seed": 6118,
+      "condition": "hidden",
+      "control": "evolving",
+      "month": 3,
+      "assay": {
+        "forage": 0.42140861213253444,
+        "netForage": 0.38140861213253446,
+        "catchPerEncounter": 0.08611111111111111,
+        "flee": -0.040916898757846,
+        "preySurvival": 0.7888888888888889,
+        "catchPerFoxDay": 0.2,
+        "preyHidden": 4,
+        "predHidden": 4
+      }
+    },
+    {
+      "seed": 6118,
+      "condition": "hidden",
+      "control": "founder-pool",
+      "month": 3,
+      "assay": {
+        "forage": 0.1815915046599391,
+        "netForage": 0.14159150465993908,
+        "catchPerEncounter": 0.11160714285714286,
+        "flee": -0.024195160040766207,
+        "preySurvival": 0.5722222222222222,
+        "catchPerFoxDay": 0.07,
+        "preyHidden": 4,
+        "predHidden": 4
+      }
+    },
+    {
+      "seed": 6118,
+      "condition": "memory",
+      "control": "evolving",
+      "month": 0,
+      "assay": {
+        "forage": 0.18255981026797463,
+        "netForage": 0.18255981026797463,
+        "catchPerEncounter": 0.09657320872274143,
+        "flee": -0.013886382693874114,
+        "preySurvival": 0.6444444444444445,
+        "catchPerFoxDay": 0.07666666666666667,
+        "preyHidden": 0,
+        "predHidden": 0
+      }
+    },
+    {
+      "seed": 6118,
+      "condition": "memory",
+      "control": "evolving",
+      "month": 3,
+      "assay": {
+        "forage": 0.5176486740429191,
+        "netForage": 0.5176486740429191,
+        "catchPerEncounter": 0.08394160583941605,
+        "flee": 0.0025994969755146562,
+        "preySurvival": 0.8611111111111112,
+        "catchPerFoxDay": 0.06,
+        "preyHidden": 0,
+        "predHidden": 0
+      }
+    },
+    {
+      "seed": 6118,
+      "condition": "memory",
+      "control": "founder-pool",
+      "month": 3,
+      "assay": {
+        "forage": 0.26334209534262987,
+        "netForage": 0.26334209534262987,
+        "catchPerEncounter": 0.13,
+        "flee": 0.007460022820864408,
+        "preySurvival": 0.7055555555555556,
+        "catchPerFoxDay": 0.07,
+        "preyHidden": 0,
+        "predHidden": 0
+      }
+    },
+    {
+      "seed": 6118,
+      "condition": "growth",
+      "control": "evolving",
+      "month": 0,
+      "assay": {
+        "forage": 0.18597508486087663,
+        "netForage": 0.18597508486087663,
+        "catchPerEncounter": 0.11428571428571428,
+        "flee": -0.021246874529605046,
+        "preySurvival": 0.6055555555555555,
+        "catchPerFoxDay": 0.08722393066815767,
+        "preyHidden": 0,
+        "predHidden": 0
+      }
+    },
+    {
+      "seed": 6118,
+      "condition": "growth",
+      "control": "evolving",
+      "month": 3,
+      "assay": {
+        "forage": 0.5377751650270814,
+        "netForage": 0.5349903549004992,
+        "catchPerEncounter": 0.09221902017291066,
+        "flee": -0.05801512459356568,
+        "preySurvival": 0.7944444444444444,
+        "catchPerFoxDay": 0.09666666666666666,
+        "preyHidden": 0.27848101265822783,
+        "predHidden": 0.041666666666666664
+      }
+    },
+    {
+      "seed": 6118,
+      "condition": "growth",
+      "control": "founder-pool",
+      "month": 3,
+      "assay": {
+        "forage": 0.26273227106412184,
+        "netForage": 0.26273227106412184,
+        "catchPerEncounter": 0.1016949152542373,
+        "flee": 0.0026280837808501673,
+        "preySurvival": 0.7,
+        "catchPerFoxDay": 0.06666666666666667,
+        "preyHidden": 0,
+        "predHidden": 0
+      }
+    },
+    {
+      "seed": 6119,
+      "condition": "linear",
+      "control": "evolving",
+      "month": 0,
+      "assay": {
+        "forage": 0.20726452347895047,
+        "netForage": 0.20726452347895047,
+        "catchPerEncounter": 0.1213235294117647,
+        "flee": -0.020772786504606053,
+        "preySurvival": 0.6222222222222222,
+        "catchPerFoxDay": 0.12107623318385649,
+        "preyHidden": 0,
+        "predHidden": 0
+      }
+    },
+    {
+      "seed": 6119,
+      "condition": "linear",
+      "control": "evolving",
+      "month": 3,
+      "assay": {
+        "forage": 0.639086941192716,
+        "netForage": 0.639086941192716,
+        "catchPerEncounter": 0.08196721311475409,
+        "flee": 0.12076880696983265,
+        "preySurvival": 0.6166666666666667,
+        "catchPerFoxDay": 0.13333333333333333,
+        "preyHidden": 0,
+        "predHidden": 0
+      }
+    },
+    {
+      "seed": 6119,
+      "condition": "linear",
+      "control": "founder-pool",
+      "month": 3,
+      "assay": {
+        "forage": 0.20641261907418149,
+        "netForage": 0.20641261907418149,
+        "catchPerEncounter": 0.08243727598566308,
+        "flee": 0.020318955045901477,
+        "preySurvival": 0.6111111111111112,
+        "catchPerFoxDay": 0.13,
+        "preyHidden": 0,
+        "predHidden": 0
+      }
+    },
+    {
+      "seed": 6119,
+      "condition": "hidden",
+      "control": "evolving",
+      "month": 0,
+      "assay": {
+        "forage": 0.23084068115404555,
+        "netForage": 0.19084068115404554,
+        "catchPerEncounter": 0.09032258064516129,
+        "flee": -0.03761494981740866,
+        "preySurvival": 0.6222222222222222,
+        "catchPerFoxDay": 0.051524259338772,
+        "preyHidden": 4,
+        "predHidden": 4
+      }
+    },
+    {
+      "seed": 6119,
+      "condition": "hidden",
+      "control": "evolving",
+      "month": 3,
+      "assay": {
+        "forage": 0.6239044695584168,
+        "netForage": 0.5839044695584168,
+        "catchPerEncounter": 0.0660377358490566,
+        "flee": -0.052658775207266285,
+        "preySurvival": 0.7944444444444444,
+        "catchPerFoxDay": 0.05,
+        "preyHidden": 4,
+        "predHidden": 4
+      }
+    },
+    {
+      "seed": 6119,
+      "condition": "hidden",
+      "control": "founder-pool",
+      "month": 3,
+      "assay": {
+        "forage": 0.26186144351231616,
+        "netForage": 0.22186144351231615,
+        "catchPerEncounter": 0.0933852140077821,
+        "flee": -0.013339090462548636,
+        "preySurvival": 0.7722222222222223,
+        "catchPerFoxDay": 0.06333333333333334,
+        "preyHidden": 4,
+        "predHidden": 4
+      }
+    },
+    {
+      "seed": 6119,
+      "condition": "memory",
+      "control": "evolving",
+      "month": 0,
+      "assay": {
+        "forage": 0.2229790914619642,
+        "netForage": 0.2229790914619642,
+        "catchPerEncounter": 0.11683848797250859,
+        "flee": -0.03282877599181383,
+        "preySurvival": 0.6444444444444445,
+        "catchPerFoxDay": 0.12666666666666668,
+        "preyHidden": 0,
+        "predHidden": 0
+      }
+    },
+    {
+      "seed": 6119,
+      "condition": "memory",
+      "control": "evolving",
+      "month": 3,
+      "assay": null
+    },
+    {
+      "seed": 6119,
+      "condition": "memory",
+      "control": "founder-pool",
+      "month": 3,
+      "assay": {
+        "forage": 0.2642509698779692,
+        "netForage": 0.2642509698779692,
+        "catchPerEncounter": 0.1037344398340249,
+        "flee": -0.006958219578753174,
+        "preySurvival": 0.7055555555555556,
+        "catchPerFoxDay": 0.11333333333333334,
+        "preyHidden": 0,
+        "predHidden": 0
+      }
+    },
+    {
+      "seed": 6119,
+      "condition": "growth",
+      "control": "evolving",
+      "month": 0,
+      "assay": {
+        "forage": 0.20726452347895047,
+        "netForage": 0.20726452347895047,
+        "catchPerEncounter": 0.1213235294117647,
+        "flee": -0.020772786504606053,
+        "preySurvival": 0.6222222222222222,
+        "catchPerFoxDay": 0.12107623318385649,
+        "preyHidden": 0,
+        "predHidden": 0
+      }
+    },
+    {
+      "seed": 6119,
+      "condition": "growth",
+      "control": "evolving",
+      "month": 3,
+      "assay": {
+        "forage": 0.8740786506609622,
+        "netForage": 0.8574898656142332,
+        "catchPerEncounter": 0.07177033492822966,
+        "flee": 0.19190480163269585,
+        "preySurvival": 0.8277777777777777,
+        "catchPerFoxDay": 0.16999999999999998,
+        "preyHidden": 1.658878504672897,
+        "predHidden": 0.38235294117647056
+      }
+    },
+    {
+      "seed": 6119,
+      "condition": "growth",
+      "control": "founder-pool",
+      "month": 3,
+      "assay": {
+        "forage": 0.20641261907418149,
+        "netForage": 0.20641261907418149,
+        "catchPerEncounter": 0.08243727598566308,
+        "flee": 0.020318955045901477,
+        "preySurvival": 0.6111111111111112,
+        "catchPerFoxDay": 0.13,
+        "preyHidden": 0,
+        "predHidden": 0
+      }
+    }
+  ]
+}
