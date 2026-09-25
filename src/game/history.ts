@@ -14,6 +14,8 @@ export class RunHistory {
   readonly stats = new Float64Array(CAPACITY * STAT_STRIDE)
   head = 0
   start = 0
+  /** A resumed run keeps its whole graph but only the recent replay; frames exist from here on. */
+  replayFrom = 0
   interventions: { tick: number; action: Intervention }[] = []
   evolution: EvolutionSample[] = []
   journal: JournalEntry[] = []
@@ -23,6 +25,8 @@ export class RunHistory {
   constructor(horizon: number, endless = false) { this.limit = horizon; this.endless = endless }
   get horizon(): number { return this.endless ? Math.max(this.limit, this.head + 300) : this.limit }
   get firstTick(): number { return Math.max(this.start, this.head - HISTORY_HOURS) }
+  /** The earliest hour the meadow can be replayed at. */
+  get replayStart(): number { return Math.max(this.firstTick, this.replayFrom) }
 
   add(frame: FrameData, row: Float64Array, rowOffset: number): void {
     const t = frame.tick
@@ -65,8 +69,9 @@ export class RunHistory {
   }
 
   save() {
-    return { stats: this.stats, highestGeneration: this.highestGeneration, head: this.head, start: Math.max(this.firstTick, this.head - RECENT),
-      frames: [...this.frames.entries()].filter(([t]) => t >= this.head - RECENT) }
+    const replayFrom = Math.max(this.replayStart, this.head - RECENT)
+    return { stats: this.stats, highestGeneration: this.highestGeneration, head: this.head, start: this.firstTick, replayFrom,
+      frames: [...this.frames.entries()].filter(([t]) => t >= replayFrom) }
   }
 
   restore(data: ReturnType<RunHistory['save']>): void {
@@ -74,6 +79,8 @@ export class RunHistory {
     this.highestGeneration = data.highestGeneration
     this.head = data.head
     this.start = data.start
+    // Saves made before replayFrom existed stored the replay start as `start`.
+    this.replayFrom = data.replayFrom ?? data.start
     this.frames = new Map(data.frames)
   }
 
@@ -83,10 +90,11 @@ export class RunHistory {
   }
 
   frameAt(tick: number): { a: FrameData; b: FrameData; alpha: number } | null {
-    const t = Math.max(this.firstTick, Math.min(this.head, tick))
+    const first = this.replayStart
+    const t = Math.max(first, Math.min(this.head, tick))
     let lo = Math.floor(t)
     let a = this.frames.get(lo)
-    while (!a && lo > this.firstTick) a = this.frames.get(--lo)
+    while (!a && lo > first) a = this.frames.get(--lo)
     if (!a) {
       lo = Math.ceil(t)
       while (!a && lo <= this.head && lo < t + KEY_EVERY + 1) a = this.frames.get(lo++)

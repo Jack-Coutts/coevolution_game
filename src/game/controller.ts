@@ -334,7 +334,7 @@ export class GameController {
   play(): void {
     if (this.phase === 'loading' || this.saving) return
     if (this.phase === 'planning' && this.budgetLeft() < 0) return
-    if (this.phase === 'ended' && this.displayTick >= this.history.head) this.displayTick = this.history.firstTick
+    if (this.phase === 'ended' && this.displayTick >= this.history.head) this.displayTick = this.history.replayStart
     if (this.phase === 'planning') this.phase = 'running'
     this.playing = true
     this.last = performance.now()
@@ -360,7 +360,7 @@ export class GameController {
   /** Jump the view to a tick already simulated (scrub). */
   seek(tick: number): void {
     this.stepTarget = null
-    this.displayTick = Math.max(this.history.firstTick, Math.min(this.history.head, tick))
+    this.displayTick = Math.max(this.history.replayStart, Math.min(this.history.head, tick))
     this.lastFxTick = Math.floor(this.displayTick)
     this.renderer?.clearFx()
     if (this.end && this.displayTick >= this.end.tick) this.finalize()
@@ -400,7 +400,7 @@ export class GameController {
     this.history.interventions = save.interventions
     this.history.evolution = save.evolution
     this.history.journal = save.journal
-    this.saveStatus = 'Meadow restored and paused. Recent replay and the evolution journal are preserved.'
+    this.saveStatus = 'Meadow restored and paused. The graph and journal are kept; replay covers the last 15 days before the save.'
   }
 
   /** The worker may already have simulated past the displayed hour (even to the end); what counts is what the player sees. */

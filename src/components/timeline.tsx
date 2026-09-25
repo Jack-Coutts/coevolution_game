@@ -166,6 +166,28 @@ export function Timeline() {
         ctx.globalAlpha = 1
       }
 
+      // A resumed run keeps its graph from the start but its replay only from shortly before the save.
+      const replay = h.replayStart
+      if (replay > start) {
+        ctx.fillStyle = c.background
+        ctx.globalAlpha = 0.45
+        ctx.fillRect(xOf(start), PAD_T, xOf(replay) - xOf(start), ih)
+        ctx.globalAlpha = 1
+        ctx.strokeStyle = c['muted-foreground']
+        ctx.setLineDash([2, 3])
+        ctx.beginPath()
+        ctx.moveTo(xOf(replay), PAD_T)
+        ctx.lineTo(xOf(replay), PAD_T + ih)
+        ctx.stroke()
+        ctx.setLineDash([])
+        const text = `Replay kept from ${dateLabel(replay)}`
+        ctx.font = '500 10px Geist Variable, sans-serif'
+        const w = ctx.measureText(text).width
+        const tx = xOf(replay) - w - 4 > PAD_L ? xOf(replay) - w - 4 : xOf(replay) + 4
+        ctx.fillStyle = c['muted-foreground']
+        ctx.fillText(text, tx, PAD_T + ih - 4)
+      }
+
       for (const m of game.scenario.markers) {
         if (m.tick < start) continue
         const x = xOf(m.tick)
@@ -253,7 +275,7 @@ export function Timeline() {
         onPointerLeave={() => setHover(null)}
         role="slider"
         aria-label="Population timeline. Click or drag to replay an earlier moment."
-        aria-valuemin={game.history.firstTick}
+        aria-valuemin={game.history.replayStart}
         aria-valuemax={snap.horizon}
         aria-valuenow={snap.tick}
         aria-valuetext={dateLabel(snap.tick)}
