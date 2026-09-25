@@ -56,11 +56,37 @@ generation and lineage milestones, without inventing causal evolutionary explana
 
 The challenge is 8,760 hours, starting 1 September at 08:00. Day/night dimming is removed.
 Seasonal scenery remains. In Endless mode, seasonal disturbances recur each year; a fox
-invasion is a one-time event. The four intervention uses last the entire run.
+invasion is a one-time event. Endless starts with four intervention uses and renews one at the
+start of each season, holding at most four (below).
+
+### Endless intervention budget
+
+The one-year challenge keeps four uses for the year. Endless used to share the same four across
+an unlimited run, so after them the player could only watch: in playtest session 3 the Endless
+player had used three by day 94 (4 Dec) and could not answer the winter crash on day 110, and
+said every use "feels like a mistake unless it's in winter". We compared four rules with a greedy
+threshold keeper (`scripts/endless-budget.ts`, seeds 7300–7304, stable and harsh-winter, up to
+three years; `docs/experiments/endless-budget.json`):
+
+| Rule | Uses per year (stable, mean) | Days wanting to act with none left (stable / winter) | Verdict |
+| --- | --- | --- | --- |
+| Four for the whole run (old) | 4 / 0 / 0; every run past year 1 used none in year 2 | 90 / 57 | Endless becomes watch-only after autumn. |
+| +1 every 30 days, cap 4 | 9.4 / 5.6 / 3.6; up to 16 in a year | 3 / 2 | Almost never short: only the cooldown limits it, so no scarcity. |
+| Refill to four each 1 Sep | 4 / 2.4 / 0.8 | 60 / 23 | Spent in an autumn burst, then months with none, including winter. |
+| **+1 at each season start, cap 4 (chosen)** | 5.6 / 1.2 / 0 (runs reaching year 2 used 4 and 2 there) | 47 / 17 | Still scarce, and a use returns on 1 Dec, as winter begins. |
+
+Chosen rule: one use comes back at 00:00 on 1 Dec, 1 Mar, 1 Jun and 1 Sep, with at most four
+held, and the 400-hour cooldown unchanged. At most eight uses fit in the first year and four a
+year after that, so a player still has to choose when to act, and saving uses has a ceiling.
+Survival under the keeper is not the test: it acts on every trigger, and on these five seeds
+survival did not rise with more uses (the no-renewal keeper sometimes lasted longest because it
+could not act). Uses are recomputed from the recorded intervention hours by one pure function
+(`src/game/budget.ts`), so replay, save and resume cannot create or lose a use. The panel shows
+uses left and the date of the next renewal. Endless scoring is unchanged (hours survived).
 
 A rolling year of statistics and replay bounds memory. Daily evolution samples retain the
 founder reference plus the latest year, and the journal retains its latest 80 milestones.
-A save includes the exact world, every RNG state, queued actions, charges/cooldown, recent
+A save includes the displayed hour's exact world, every RNG state, queued actions, charges/cooldown, recent
 15-day replay, and evolution observations. There is one device-local IndexedDB slot; saving
 replaces it. Resume is paused. It does not regenerate the world from the seed.
 

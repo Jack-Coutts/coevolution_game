@@ -25,7 +25,18 @@ readable warning signs, enough time to respond, and useful choices are the gamep
 Identical seed + settings + intervention actions/times gives identical simulation outcomes
 within the same runtime/version; exact cross-engine trajectories are not guaranteed.
 Different seeds create different worlds. Replay and save/resume preserve this property.
-The four-use intervention budget is shared by eight choices and lasts the whole run.
+The four-use intervention budget is shared by eight choices. The one-year challenge keeps
+four for the year.
+
+Endless intervention budget (issue #5): Endless now renews one use at the start of each season
+(1 Dec, 1 Mar, 1 Jun, 1 Sep), holding at most four, with the 400-hour cooldown unchanged. We
+compared this with the old four-per-run budget, a 30-day recovery and a yearly refill using a
+greedy keeper over three years on five seeds (`docs/experiments/endless-budget.json`). The
+four-per-run budget left long Endless runs with no uses after year 1, and a playtest player out of
+answers for the winter crash. The 30-day recovery was almost never short, so it removed
+scarcity. The yearly refill was spent in an autumn burst and left winter bare. The seasonal rule
+keeps uses scarce, returns one as winter begins, and is shown in the panel as uses left plus the
+next renewal date. See the Endless intervention budget section in `game-design.md`.
 
 ## Next: a third animal species
 
