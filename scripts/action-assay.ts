@@ -16,7 +16,7 @@ import { fileURLToPath } from 'node:url'
 import { STABLE_PRESET } from '../src/game/presets'
 import { deriveParams } from '../src/sim/levers'
 import { EFFECTS, Sim, type Counters, type Intervention } from '../src/sim/sim'
-import { CHARGES, COOLDOWN, KEEPER_ORDER, PROBES, type Signals, Watch } from './action-probes'
+import { CHARGES, COOLDOWN, EMERGENCIES, KEEPER_ORDER, KEEPER_RESERVE, PROBES, type Signals, Watch } from './action-probes'
 
 const FIRST_HOUR = 240
 const AFTER = 720
@@ -128,7 +128,7 @@ export function runOne(seed: number, c: Condition): Row {
       actions.push({ hour: s.tick + 1, action: 'nudge', signals: x })
     }
     if (c.kind === 'keeper' && s.tick >= FIRST_HOUR && charges > 0 && s.tick >= cooldownUntil) {
-      const probe = KEEPER_ORDER.map(a => PROBES.find(p => p.action === a)!).find(p => p.timely(x))
+      const probe = KEEPER_ORDER.map(a => PROBES.find(p => p.action === a)!).find(p => (charges > KEEPER_RESERVE || EMERGENCIES.includes(p.action)) && p.timely(x))
       if (probe) {
         arose = true
         s.queue(probe.action)
@@ -213,7 +213,7 @@ if (process.argv[2] === '--child') {
     seeds: { start, count },
     command: `node --import tsx scripts/action-assay.ts ${process.argv.slice(2).join(' ')}`,
     runtime: { node: process.version, platform: `${process.platform} ${process.arch}`, cpus: os.cpus()[0]?.model ?? '', workers: jobsN, wallSeconds },
-    budget: { charges: CHARGES, cooldownHours: COOLDOWN, firstHour: FIRST_HOUR, keeperOrder: KEEPER_ORDER },
+    budget: { charges: CHARGES, cooldownHours: COOLDOWN, firstHour: FIRST_HOUR, keeperOrder: KEEPER_ORDER, keeperEmergencies: EMERGENCIES, keeperReserve: KEEPER_RESERVE },
     windows: { afterHours: AFTER, lossWindowHours: LOSS_WINDOW },
     effects: EFFECTS,
     probes: PROBES.map(p => ({ action: p.action, situation: p.situation, mistimedSituation: p.mistimedSituation, timelyRule: p.timely.toString(), mistimedRule: p.mistimed.toString() })),

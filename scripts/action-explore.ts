@@ -7,6 +7,8 @@
  * lowest count over that window. Used to choose the situations in scripts/action-probes.ts.
  *
  *   node --import tsx scripts/action-explore.ts 8000 40 out.json [--every 240] [--effects '{"cullDivisor":2}']
+ *   node --import tsx scripts/action-explore.ts 8100 100 out.json --every 480 --evaluate   # held-out check of frozen probes
+ *   node --import tsx scripts/action-explore.ts --summarise summary.json label=out.json ...
  */
 import { fork } from 'node:child_process'
 import { readFileSync, writeFileSync } from 'node:fs'
@@ -15,7 +17,7 @@ import { fileURLToPath } from 'node:url'
 import { STABLE_PRESET } from '../src/game/presets'
 import { deriveParams } from '../src/sim/levers'
 import { EFFECTS, Sim, type Intervention } from '../src/sim/sim'
-import { type Signals, Watch } from './action-probes'
+import { PROBES, type Signals, Watch } from './action-probes'
 
 const WINDOW = 1440
 const ALL: Intervention[] = ['rain', 'plantBushes', 'releasePrey', 'releasePred', 'cullPred', 'feedFoxes', 'illnessPrey', 'illnessPred']
@@ -117,9 +119,14 @@ export function summarise(rows: Branch[]) {
   const out: Record<string, Record<string, unknown>> = {}
   for (const action of [...new Set(rows.map(r => r.action))]) {
     out[action] = {}
-    for (const [name, f] of Object.entries(CANDIDATES)) {
+    const probe = PROBES.find(p => p.action === action)!
+    const situations: [string, (x: Signals) => boolean, number][] = [
+      ['probe: timely', probe.timely, 1], ['probe: mistimed', probe.mistimed, 1],
+      ...Object.entries(CANDIDATES).map(([k, f]) => [k, f, 5] as [string, (x: Signals) => boolean, number]),
+    ]
+    for (const [name, f, min] of situations) {
       const rs = rows.filter(r => r.action === action && r.ceilingHits === 0 && f(r.signals))
-      if (rs.length < 5) continue
+      if (rs.length < min) continue
       const round = (x: number | null) => (x === null ? null : Math.round(x * 100) / 100)
       out[action][name] = {
         branches: rs.length,
@@ -164,8 +171,10 @@ if (process.argv[2] === '--summarise') {
   const actions = (flag('--actions')?.split(',') ?? ALL) as Intervention[]
   const workers = Number(flag('--jobs') ?? Math.min(4, os.availableParallelism()))
   applyEffects(override)
+  const evaluate = args.includes('--evaluate')
+  if (evaluate) args.splice(args.indexOf('--evaluate'), 1)
   const [start, count, out] = [Number(args[0] ?? 8000), Number(args[1] ?? 40), args[2] ?? '/tmp/explore.json']
-  if (start + count > 8100 && start < 8200) throw new Error('Exploration is for tuning seeds only; 8100-8199 are held out for final evaluation.')
+  if (!evaluate && start + count > 8100 && start < 8200) throw new Error('Tuning exploration must not use evaluation seeds 8100-8199; pass --evaluate only after the probes are frozen.')
   const seeds = Array.from({ length: count }, (_, k) => start + k)
   const results: Branch[][] = []
   const t0 = Date.now()

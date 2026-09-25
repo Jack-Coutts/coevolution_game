@@ -130,4 +130,7 @@ export const PROBES: ActionProbe[] = [
 
 /** Keeper policy priority: emergencies first, then early warnings, then food. */
 export const KEEPER_ORDER: Intervention[] = ['releasePred', 'feedFoxes', 'releasePrey', 'cullPred', 'illnessPred', 'plantBushes', 'rain', 'illnessPrey']
+/** The keeper uses these whenever their situation holds; other actions only while it has more than KEEPER_RESERVE charges. */
+export const EMERGENCIES: Intervention[] = ['releasePred', 'feedFoxes', 'releasePrey', 'cullPred']
+export const KEEPER_RESERVE = Number(process.env.KEEPER_RESERVE ?? 2)
 
