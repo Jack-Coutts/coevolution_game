@@ -3,6 +3,7 @@ import { AnimalInspector, type AnimalSelection } from '@/components/animal-inspe
 import { EvolutionJournal, FamiliesCard } from '@/components/journal'
 import { TraitChart, type TraitSeries } from '@/components/trait-chart'
 import { Card } from '@/components/ui/card'
+import { VarietiesCard } from '@/components/varieties'
 import { iconFor, useAnimalIcons } from '@/hooks/use-animal-icons'
 import { displayOrder, SPECIES_UI } from '@/game/species-ui'
 import { useGame } from '@/hooks/use-game'
@@ -85,6 +86,8 @@ export function EvolutionView({ selected, onSelect }: { selected: AnimalSelectio
     </div>
 
     <FamiliesCard family={family} onFamily={showFamily} onInspect={inspect} endless={snap.endless} />
+
+    <VarietiesCard />
   </div>
 }
 

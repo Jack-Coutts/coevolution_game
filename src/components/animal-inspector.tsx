@@ -66,6 +66,7 @@ export function AnimalInspector({ selected, onSelect, onFamily, picker = false, 
           {facts(animal, selected.species).map(([k, v, tip]) => <div key={k} title={tip}><dt className="text-muted-foreground">{k}</dt><dd>{v}</dd></div>)}
         </dl>
         <Family animal={animal} selected={selected} tick={snap.tick} rows={rows} choose={choose} onFamily={onFamily} />
+        <Variety animal={animal} species={selected.species} tick={snap.tick} />
       </> : <Absent selected={selected} tick={snap.tick} onShow={at => choose(selected, at)} />}
     </div>}
   </section>
@@ -117,6 +118,17 @@ function Family({ animal, selected, tick, rows, choose, onFamily }: {
       {offspring.slice(0, 8).map((id, i) => <span key={id}>{i > 0 && ', '}<button type="button" className={link} onClick={() => choose({ species: s, id })}>#{id}</button></span>)}
       {offspring.length > 8 && ` and ${offspring.length - 8} more`}</>}</p>
   </div>
+}
+
+/** The observed ecological variety the animal belongs to (nearest group centre), kept apart from its founder family. */
+function Variety({ animal, species, tick }: { animal: Float32Array; species: Species; tick: number }) {
+  const [game] = useGame()
+  const v = game.history.varieties.varietyOf(species, animal, tick)
+  return <p className="mt-2 border-t pt-2 text-xs" aria-label="Variety" title="Observed ecological varieties group animals by inherited traits, not by ancestry. They are not subspecies.">
+    <span className="text-muted-foreground">Observed variety: </span>
+    {v ? <>{one(species)} variety {v.id} <span className="text-muted-foreground">(nearest of the two named groups; see Observed ecological varieties)</span></>
+      : <span className="text-muted-foreground">none named for {SPECIES_UI[species].Plural.toLowerCase()} at this time</span>}
+  </p>
 }
 
 /** The inspector's rows: label, value and an optional explanation shown on hover. */

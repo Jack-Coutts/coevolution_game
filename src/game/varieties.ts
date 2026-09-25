@@ -241,11 +241,11 @@ export class VarietyTracker {
           + `have differed in inherited traits for ${cand.samples} daily samples in a row (since day ${day(cand.since)}), mostly in ${LABEL[diff.trait]} `
           + `(${dimText(diff.trait, diff.a)} vs ${dimText(diff.trait, diff.b)}).`,
         caveat: VARIETY_CAVEAT,
-        evidence: { measure: 'Deterministic 2-means on the inherited traits (food seeking, threat avoidance, cruising pace, cover seeking, body size), each on its fixed scale.',
+        evidence: { measure: 'Deterministic 2-means on the inherited traits (food seeking, threat avoidance, cruising pace, cover seeking, body size), each on its fixed scale',
           threshold: `A clear gap (separation above ${VARIETY.minSeparation}), the smaller group at least ${pct(VARIETY.minShare)}, centroids at least ${VARIETY.minDistance} apart, `
-            + `in ${VARIETY.persistDays} consecutive daily samples while the mean generation rose by at least ${VARIETY.persistGenerations}.`,
+            + `in ${VARIETY.persistDays} consecutive daily samples while the mean generation rose by at least ${VARIETY.persistGenerations}`,
           since: cand.since, samples: cand.samples,
-          values: { share: r3(split.share[1]), distance: r3(split.dist), separation: r3(split.sep), days: Math.round((tick - cand.since) / 24) + 1, generations: r3(gen - cand.sinceGen) } } })
+          values: { 'smaller group share': r3(split.share[1]), 'centroid distance': r3(split.dist), separation: r3(split.sep), days: Math.round((tick - cand.since) / 24) + 1, generations: r3(gen - cand.sinceGen) } } })
     }
     return this.finish(st, out, gen)
   }
@@ -267,10 +267,10 @@ export class VarietyTracker {
         : `${one} varieties ${lo} and ${hi} are no longer measured as separate groups (last seen on day ${day(a.lastSeen)}, `
           + `when variety ${a.ids[1]} was ${pct(a.last.share[1])}). They merged back, one was lost, or the difference changed.`,
       caveat: VARIETY_CAVEAT,
-      evidence: { measure: 'Deterministic 2-means on the inherited traits, each on its fixed scale.',
-        threshold: why === 'died out' ? 'The species died out.' : `${VARIETY.releaseDays} consecutive daily samples without a matching split.`,
+      evidence: { measure: 'Deterministic 2-means on the inherited traits, each on its fixed scale',
+        threshold: why === 'died out' ? 'the species died out' : `${VARIETY.releaseDays} consecutive daily samples without a matching split`,
         since: a.since, samples: persisted,
-        values: { share: a.last.share[1], distance: a.last.dist, separation: a.last.sep, days: persisted } } })
+        values: { 'smaller group share': a.last.share[1], 'centroid distance': a.last.dist, separation: a.last.sep, days: persisted } } })
     st.active = null
   }
 

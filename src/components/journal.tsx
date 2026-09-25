@@ -86,7 +86,7 @@ function Evidence({ entry: e }: { entry: JournalEntry }) {
     case 'variety':
       return <div className={box}>
         <p>Measured: {e.evidence.measure}. Rule: {e.evidence.threshold}. Since day {day(e.evidence.since)} ({e.evidence.samples} daily samples).</p>
-        <p className="tabular">{Object.entries(e.evidence.values).map(([k, v]) => `${k}: ${f2(v)}`).join(' · ')}</p>
+        <p className="tabular">{Object.entries(e.evidence.values).map(([k, v]) => `${k}: ${Number.isInteger(v) ? v : f2(v)}`).join(' · ')}</p>
       </div>
     case 'note':
       return <div className={box}>Recorded by an earlier version of the game, which did not store its measurement.</div>

@@ -96,7 +96,7 @@ describe('persistent varieties', () => {
     expect(e.text).toMatch(/^Two observed ecological varieties of rabbits: Rabbit variety 1 \(70%\) and variety 2 \(30%\) have differed .* for 20 daily samples in a row \(since day 1\), mostly in cover seeking \(-0\.30 vs 0\.30\)\.$/)
     expect(e.text).not.toMatch(/subspecies/)
     expect(e.caveat).toMatch(/not subspecies/)
-    expect(e.kind === 'variety' && e.evidence.values).toMatchObject({ days: 20, generations: 4 })
+    expect(e.kind === 'variety' && e.evidence.values).toMatchObject({ days: 20, generations: 4, 'smaller group share': 0.3 })
     expect(new Set(idsOn(h).slice(19))).toEqual(new Set(['1,2']))
   })
 
