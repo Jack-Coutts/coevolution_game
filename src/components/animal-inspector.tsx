@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { X } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { useGame } from '@/hooks/use-game'
@@ -18,12 +18,19 @@ export function AnimalInspector({ selected, onSelect, picker = false }: { select
   const options: number[] = []
   const animals = picker ? (species === 'prey' ? frame?.prey : frame?.preds) : undefined
   if (animals) for (let i = 0; i < animals.length; i += ANIMAL_STRIDE) options.push(animals[i])
+  const card = useRef<HTMLElement>(null)
+  // On phones the side panel sits far below the meadow, so bring a newly clicked animal's card into view.
+  useEffect(() => {
+    if (picker || !selected || window.matchMedia('(min-width: 1024px)').matches) return
+    const smooth = !window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    card.current?.scrollIntoView({ behavior: smooth ? 'smooth' : 'auto', block: 'nearest' })
+  }, [picker, selected])
   const inspected = selected && frame ? (selected.species === 'prey' ? frame.prey : frame.preds) : null
   let animal: Float32Array | null = null
   if (inspected && selected) for (let i = 0; i < inspected.length; i += ANIMAL_STRIDE)
     if (inspected[i] === selected.id) animal = inspected.subarray(i, i + ANIMAL_STRIDE)
   const name = selected && `${selected.species === 'prey' ? 'Rabbit' : 'Fox'} #${selected.id}`
-  return <section className="@container rounded-lg border bg-card p-3" aria-label={picker ? 'Animal inspector' : 'Selected animal'}>
+  return <section ref={card} className="@container rounded-lg border bg-card p-3" aria-label={picker ? 'Animal inspector' : 'Selected animal'}>
     {picker ? <>
       <h3 className="text-sm font-semibold">Animal inspector</h3>
       <p className="mt-1 text-xs text-muted-foreground">Click an animal in the meadow, or choose one below. The meadow pauses for inspection.</p>
