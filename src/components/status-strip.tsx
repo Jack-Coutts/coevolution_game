@@ -3,6 +3,7 @@ import { Button } from '@/components/ui/button'
 import { SPEEDS } from '@/game/controller'
 import { useAnimalIcons } from '@/hooks/use-animal-icons'
 import { useGame } from '@/hooks/use-game'
+import { hrefOf } from '@/hooks/use-view'
 import { calendar, clockLabel } from '@/sim/time'
 
 /** Compact live controls shown on the Evolution and Guide pages, so the run stays in reach away from the meadow. */
@@ -55,7 +56,7 @@ export function StatusStrip({ canStart }: { canStart: boolean }) {
           {SPEEDS[snap.speed].label}
         </Button>
         <Button asChild variant="ghost" size="sm" className="ml-auto">
-          <a href="#/">
+          <a href={hrefOf('meadow')}>
             <ArrowLeft /> Back to meadow
           </a>
         </Button>

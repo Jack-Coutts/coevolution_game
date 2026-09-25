@@ -23,36 +23,17 @@ import { seedOf, type SeedChoice } from '@/game/seed'
 import { useAnimalIcons } from '@/hooks/use-animal-icons'
 import { useGame } from '@/hooks/use-game'
 import { useTheme } from '@/hooks/use-theme'
+import { hrefOf, useView, type View } from '@/hooks/use-view'
 import { ThemeToggle } from '@/components/theme-toggle'
 import { BUDGET, spent, type LeverValues } from '@/sim/levers'
 import { SCENARIO_BY_ID, SCENARIOS, type ScenarioId } from '@/sim/scenarios'
 import { cn } from '@/lib/utils'
-
-type View = 'meadow' | 'evolution' | 'guide'
 
 const NAV: { view: View; label: string; icon: typeof Trees }[] = [
   { view: 'meadow', label: 'Meadow', icon: Trees },
   { view: 'evolution', label: 'Evolution', icon: Dna },
   { view: 'guide', label: 'Guide', icon: BookOpen },
 ]
-
-const hrefOf = (v: View) => (v === 'meadow' ? '#/' : `#/${v}`)
-
-function viewFromHash(): View {
-  const h = window.location.hash.replace(/^#\/?/, '')
-  return h === 'evolution' || h === 'guide' ? h : 'meadow'
-}
-
-/** The current page, kept in the URL hash so browser back and links work without a router. */
-function useView(): [View, (v: View) => void] {
-  const [view, setView] = useState(viewFromHash)
-  useEffect(() => {
-    const on = () => setView(viewFromHash())
-    window.addEventListener('hashchange', on)
-    return () => window.removeEventListener('hashchange', on)
-  }, [])
-  return [view, (v) => { if (v !== viewFromHash()) window.location.hash = hrefOf(v) }]
-}
 
 function useViewport(): { w: number; h: number } {
   const [v, setV] = useState({ w: window.innerWidth, h: window.innerHeight })
@@ -107,7 +88,8 @@ export default function App() {
     if (seedChoice.kind === 'custom') q.set('seed', String(seedChoice.seed))
     const search = q.toString()
     window.history.replaceState(null, '', `${window.location.pathname}${search ? `?${search}` : ''}${window.location.hash}`)
-  }, [scenario, seedChoice])
+    // `view` re-runs this after back/forward, so the entry we land on also carries the current seed and scenario.
+  }, [scenario, seedChoice, view])
 
   const locked = snap.phase === 'running' || snap.phase === 'ended'
   const left = BUDGET - spent(levers, base)
