@@ -361,9 +361,12 @@ export class GameController {
       case 'saved': {
         if (!this.config) break
         this.displayTick = msg.state.tick
+        const at = msg.state.tick
+        const h = this.history
         const save: MeadowSave = { version: 2, savedAt: new Date().toISOString(), config: this.config,
-          state: msg.state, history: this.history.save(), charges: this.chargesAt(Math.floor(this.displayTick)), cooldownUntil: this.cooldownUntil,
-          interventions: this.history.interventions, evolution: this.history.evolution, journal: this.history.journal }
+          state: msg.state, history: h.save(at), charges: this.chargesAt(at), cooldownUntil: this.cooldownUntil,
+          interventions: h.interventions.filter(i => i.tick <= at), evolution: h.evolution.filter(e => e.tick <= at),
+          journal: h.journal.filter(e => e.tick <= at) }
         const id = this.runId
         void writeSave(save).then(() => {
           if (id !== this.runId) return
@@ -476,7 +479,9 @@ export class GameController {
     this.pause()
     this.saving = true
     this.saveStatus = 'Saving meadow…'
-    this.send({ type: 'save', runId: this.runId, at: Math.floor(this.displayTick) })
+    // The latest hour seen, not a replayed one: the world before a later intervention must not be saved with it.
+    const at = Math.min(this.history.head, Math.max(Math.floor(this.displayTick), this.seenTick))
+    this.send({ type: 'save', runId: this.runId, at })
     this.notify(true)
   }
 

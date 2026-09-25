@@ -178,6 +178,22 @@ it('asks the worker to save the displayed hour, not the hours it ran ahead', () 
   game.dispose()
 })
 
+it('saves the latest hour seen, not a replayed one, and keeps no history after it', async () => {
+  const { game, sim, runId, frame } = ready()
+  game.stepBy(12)
+  const frames = Array.from({ length: 20 }, (_, i) => ({ ...frame, tick: i + 1 }))
+  mock.receive({ type: 'frames', runId, frames, stats: new Float64Array(20 * STAT_STRIDE), head: 20, end: null, evolution: [] })
+  game.seek(5)
+  game.save()
+  expect(mock.messages.at(-1)).toMatchObject({ type: 'save', at: 12 })
+  for (let i = 0; i < 12; i++) sim.step()
+  mock.receive({ type: 'saved', runId, state: sim.save() })
+  await Promise.resolve()
+  const saved = mock.save.mock.calls.at(-1)?.[0]
+  expect([saved.state.tick, saved.history.head, Math.max(...saved.history.frames.map(([t]: [number]) => t))]).toEqual([12, 12, 12])
+  game.dispose()
+})
+
 // Endless intervention budget: 1 Dec is hour 2176 and the next 1 Sep is hour 8752.
 type Game = ReturnType<typeof ready>['game']
 type Frame = ReturnType<typeof ready>['frame']
