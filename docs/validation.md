@@ -254,3 +254,143 @@ Vite reports a roughly 507 kB main JavaScript chunk (162 kB gzip), just above it
 500 kB threshold. The reusable browser validation page was also checked through worker
 startup and progress reporting; the recorded full browser batch used the same simulation
 loop and parameters.
+
+## Scenario calibration: Drought, Harsh winter, Fox invasion
+
+Issue #6. The raw reports are in `docs/experiments/scenarios-*.json`, one row per run. The
+scenarios use the open-meadow starting balance (`STABLE_PRESET`), and each adds one
+disturbance. We tuned on seeds **8200–8219** in one pass. Then we froze the settings and
+evaluated on fresh seeds **8300–8319**. Each seed runs four conditions:
+
+- **untouched**: no actions.
+- **keeper**: the scenario-blind policy from the intervention assay (#4). It reads only
+  on-screen signals and uses four charges with a 400-hour cooldown.
+- **informed**: the scenario's intended decision (below), triggered by the warning. The keeper
+  then uses any charges left.
+- **nudge**: a placebo. It moves one rabbit by 0.0001 at hour 240.
+
+These are **20-seed samples**. A 95% interval spans about ±20 points, so every difference
+below is suggestive rather than established. No run in any condition hit a population safety
+ceiling (`ceilingHits` is 0 in every row), so no seed is excluded. All runs used Node 22.22.2
+on linux x64 with two worker processes.
+
+### Intended difficulty and decision
+
+| Scenario | Disturbance | Intended difficulty | Decision the player should read |
+| --- | --- | --- | --- |
+| Drought | Bushes regrow at 35% from 1 May to the end of the year (unchanged) | Hardest. A late endurance test: most meadows that reach May fail without help | Save charges for the dry months. Once bushes are stripped (<25% full) during the drought, use rain |
+| Harsh winter | 1 Dec–28 Feb: regrowth **60%** (was 30%), energy use **+15%** (was +35%) | Hard. Below the open meadow, but a prepared player should do clearly better | Go into winter with fewer foxes: cull on the warning if there are 12+. Rain once bushes are stripped in the cold |
+| Fox invasion | 14 fed foxes arrive on 1 Nov (unchanged) | Moderate. Somewhat below the open meadow | Save charges for the pack. Cull two days after it arrives while 12+ foxes remain (within 30 days) |
+
+The exact rules are in `PLANS` in `scripts/scenario-assay.ts`, and every report records them.
+
+### Survival (all 20 seeds; paired changes against untouched)
+
+| Seeds | Condition | Open meadow | Drought | Harsh winter | Fox invasion |
+| --- | --- | ---: | ---: | ---: | ---: |
+| Tuning 8200–8219 | untouched | 11/20 | 2/20 | 0/20 (old winter) · 3/20 (retuned) | 7/20 |
+| | informed | – | 5/20 (+4 −1) | 1/20 (old winter) · 9/20 (retuned, +7 −1) | 10/20 (+5 −2, final plan) |
+| | keeper | – | 3/20 (+2 −1) | 0/20 (old winter) | 7/20 (+2 −2) |
+| **Final 8300–8319** | untouched | **11/20** | **2/20** | **6/20** | **11/20** |
+| | informed | – | **6/20 (+4 −0)** | **9/20 (+6 −3)** | **11/20 (+3 −3)** |
+| | keeper | – | 4/20 (+2 −0) | 8/20 (+4 −2) | 13/20 (+2 −0) |
+| | nudge (placebo) | – | 2/20 (+1 −1) | 1/20 (+1 −6) | 11/20 (+2 −2) |
+
+What we can and cannot claim from these samples:
+
+- **Drought** behaves as intended. Six of 20 final seeds die before 1 May, from the open
+  meadow's own dynamics. Of the 14 that reach the drought, 2 survive untouched. The informed
+  decision rescued 4 and lost none on the final seeds, and rescued 4 and lost 1 on the
+  tuning seeds (8 rescued vs 1 lost over both sets). The placebo reshuffled only 1 each way.
+  This is the most consistent benefit in the experiment. We made no change.
+- **Harsh winter** was **unwinnable as shipped**: 0/20 untouched, 0/20 keeper and 1/20
+  informed on the tuning seeds, and 18 of 20 runs died during the winter. On the tuning
+  seeds we tried regrowth 50% with energy +20% (2/20 untouched, 4/20 informed) and regrowth 60%
+  with energy +15% (3/20 untouched, 9/20 informed), and adopted the second. On the final
+  seeds it sits below the open meadow (6/20 vs 11/20), and informed play reaches 9/20. The
+  placebo lost 6 of the 6 untouched survivors, though. Survival through this winter is
+  highly sensitive to tiny changes, so the +6 −3 informed result is **not distinguishable
+  from noise** at 20 seeds.
+- **Fox invasion** does **not** measurably change difficulty on the final seeds. The result
+  was 11/20 untouched, the same as the open meadow on those seeds. On tuning seeds it was
+  7/20 vs 11/20. The prompt cull did not help on the final seeds (+3 −3, the same as the
+  placebo's ±2). At onset the meadow already holds a median of 48 foxes, so the 14 newcomers
+  add about 30%. Only 1 of 9 final untouched collapses came within 30 days of the arrival;
+  the rest came 42–246 days later. A second tuning pass (below) found no setting that held
+  up, so the scenario stays as shipped.
+
+### Fox invasion: second tuning pass
+
+This was one pass on tuning seeds 8200–8219, running untouched and informed only, with the
+informed cull following the arrival. On these seeds the open meadow gave 11/20 and the shipped
+invasion gave 7/20.
+
+| Variant (tuning seeds) | Untouched | Informed (paired) | Report |
+| --- | ---: | ---: | --- |
+| 14 foxes on 1 Nov (shipped) | 7/20 | 10/20 (+5 −2) | `scenarios-tuning.json`, `scenarios-tuning-invasion-plan.json` |
+| max(14, 60% of current foxes) on 1 Nov | 9/20 | 12/20 (+5 −2) | `scenarios-tuning-invasion-share60.json` |
+| 14 foxes on 1 Oct | **5/20** | **10/20 (+6 −1)** | `scenarios-tuning-invasion-oct1.json` |
+| max(14, 60% of current foxes) on 1 Oct | 4/20 | 9/20 (+8 −3) | `scenarios-tuning-invasion-oct1-share60.json` |
+
+The 60% variants used a temporary `share` field on arrivals in `src/sim/sim.ts`. That field was
+not adopted and has been removed. The 1 October arrival did best on the tuning seeds, needs no
+simulation change, and was evaluated on final seeds 8300–8319
+(`scenarios-final-invasion-oct1.json`). It gave **11/20 untouched**, the same as the open
+meadow on those seeds. Informed play gave 9/20 (+2 −4), keeper 11/20 (+5 −5) and the placebo
+8/20 (+1 −4). The tuning-seed gap did not generalise; it was within the seed-to-seed noise that
+the placebo shows. We therefore kept the shipped scenario (14 foxes on 1 November) rather than
+adopt an unproven change. A pack large enough to matter probably needs a larger share (at onset
+the meadow already holds a median of about 40–50 foxes) or a pack that arrives hungry, and
+settling that needs more than 20 seeds. The informed cull is a readable decision, but at this
+sample size it is not a demonstrated rescue.
+
+During tuning, two informed plans changed before the freeze. The first winter rule (feed
+foxes when hungry) gave 1/20. The first invasion rule allowed keeper actions from the
+warning, so the keeper spent charges before the pack arrived. The first-pass report
+`scenarios-tuning.json` records the old rules and the old winter. The files
+`scenarios-tuning-{stable,winter-a,winter-c,winter-plan,invasion-plan}.json` record the
+comparisons that led to the frozen settings.
+
+### Warnings and intervention opportunities
+
+- **Warning lead time.** A new field note appears **14 days** before each disturbance, for
+  example "Harsh winter starts in 14 days (1 Dec)." or "Foxes arrive in 3 days (1 Nov).".
+  Every untouched run still alive at that point received it. That was all 14 drought,
+  19 winter and 20 invasion final runs, and the note appeared exactly 336 hours before onset.
+  Before this change, a Challenge player saw the dates only in the almanac and the timeline
+  shading, both visible from hour 0: 242 days ahead for the drought, 91 for the winter and
+  61 for the invasion. Nothing announced the disturbance as it approached. In Endless, the
+  almanac lists the first year's dates, and the timeline shows the next year's span only
+  about 12 days ahead. The field note now repeats every year for weather and appears once for
+  the invasion (see `tests/scenarios.test.ts`).
+- **Useful opportunities.** The 400-hour cooldown allows about seven actions across the
+  4-month drought, six from the winter warning to 1 March, and two within 30 days of the
+  arrival. The four charges, not the cooldown, are the limit. In the final informed runs,
+  rain was the main drought and winter action (30 and 37 uses across 20 seeds), and culls
+  were the invasion action (64 uses).
+- **Failure causes (final, untouched).** Drought: foxes could not catch rabbits (9), rabbits
+  eaten out (8), foxes starved for lack of rabbits (1). Bushes were already only 8% full at
+  onset (median). Winter: rabbits eaten out (6), foxes could not catch (3), old foxes without
+  successors (2), rabbits starved (2), foxes starved for lack of rabbits (1). Invasion:
+  foxes could not catch (5), rabbits eaten out (4). Every collapse after onset had at least
+  one warning field note in its last ten days, such as `fewfox`, `fcfox`, `overhunt` or
+  `foxhungry`.
+- **Explanations after a collapse.** The end screen adds "This happened during the
+  drought/harsh winter period" for a collapse inside a weather span. It adds "...foxes
+  arrive period" for a collapse within 30 days of the arrival. In Endless, weather is
+  matched per year, and the one-time arrival is no longer matched in later years. Most
+  invasion collapses fall outside that 30-day window, so the end screen does not link
+  them to the pack. That matches the finding that the pack has little lasting effect.
+
+### Reproduction
+
+```
+node --import tsx scripts/scenario-assay.ts 8300 20 docs/experiments/scenarios-final.json --jobs 2
+node --import tsx scripts/scenario-assay.ts 8300 20 docs/experiments/scenarios-final-stable.json --jobs 2 --scenarios stable --conditions untouched
+node --import tsx scripts/scenario-summary.ts docs/experiments/scenarios-final.json
+```
+
+The tuning reports record their exact commands. Their output paths pointed at a scratch
+directory, and the files were then copied here. The practice meadow (seed 5007), the open
+meadow and the two-species simulation are unchanged: this work does not touch
+`src/sim/sim.ts`, `src/sim/levers.ts` or `src/game/presets.ts`.

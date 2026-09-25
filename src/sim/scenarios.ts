@@ -59,12 +59,12 @@ export const SCENARIOS: Scenario[] = [
   {
     id: 'winter',
     name: 'Harsh winter',
-    tagline: 'December to February: little food, and cold burns energy.',
+    tagline: 'December to February: slow regrowth, and cold burns energy.',
     description:
-      'From 1 December to 28 February, bushes regrow at 30% speed and every animal burns 35% more energy just staying warm.',
+      'From 1 December to 28 February, bushes regrow at 60% speed and every animal burns 15% more energy just staying warm.',
     disturbance: {
-      regrow: [{ from: DEC_1, to: MAR_1, factor: 0.3 }],
-      metabolism: [{ from: DEC_1, to: MAR_1, factor: 1.35 }],
+      regrow: [{ from: DEC_1, to: MAR_1, factor: 0.6 }],
+      metabolism: [{ from: DEC_1, to: MAR_1, factor: 1.15 }],
       arrivals: [],
     },
     spans: [{ from: DEC_1, to: MAR_1, label: 'Harsh winter', tone: 'winter' }],

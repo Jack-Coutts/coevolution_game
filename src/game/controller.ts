@@ -248,7 +248,7 @@ export class GameController {
   }
 
   private hintsAt(t: number): Hint[] {
-    if (this.hintCache.tick !== t) this.hintCache = { tick: t, hints: hints(this.history, t) }
+    if (this.hintCache.tick !== t) this.hintCache = { tick: t, hints: hints(this.history, t, this.scenario) }
     return this.hintCache.hints
   }
 
@@ -344,7 +344,7 @@ export class GameController {
       case 'frames':
         this.inflight = false
         msg.frames.forEach((f: FrameData, i: number) => this.history.add(f, msg.stats, i * STAT_STRIDE))
-        msg.evolution.forEach(e => this.history.addEvolution(e))
+        msg.evolution.forEach(e => this.history.addEvolution(e, e.tick === msg.end?.tick))
         if (msg.end) this.end = msg.end
         if (this.stepTarget !== null) {
           this.displayTick = Math.min(this.history.head, this.stepTarget)
@@ -397,7 +397,7 @@ export class GameController {
         this.pendingAt = null
         this.history.truncate(msg.from)
         this.history.add(msg.frame, msg.stats, 0)
-        msg.evolution.forEach(e => this.history.addEvolution(e))
+        msg.evolution.forEach(e => this.history.addEvolution(e, e.tick === msg.end?.tick))
         this.end = msg.end
         this.displayTick = this.seenTick = msg.tick
         this.lastFxTick = msg.tick
@@ -487,13 +487,12 @@ export class GameController {
 
   restore(save: MeadowSave): void {
     this.configure(save.config, save.state)
-    this.history.restore(save.history)
+    this.history.restore(save.history, save.journal)
     // Uses are recomputed from the recorded interventions, so a save can neither duplicate nor lose one; the stored
     // `charges` is only for older builds. Saves from before a field existed get its empty default.
     this.cooldownUntil = save.cooldownUntil ?? 0
     this.history.interventions = save.interventions ?? []
     this.history.evolution = save.evolution ?? []
-    this.history.journal = save.journal ?? []
     this.saveStatus = 'Meadow restored and paused. The graph and journal are kept; replay covers the last 15 days before the save.'
   }
 
