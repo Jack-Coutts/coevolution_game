@@ -49,9 +49,11 @@ export class RunHistory {
       this.highestGeneration[s] = Math.max(this.highestGeneration[s], sample[s].generation)
       if (prev && prev[s].lineages > 1 && sample[s].lineages === 1)
         this.journal.push({ tick: sample.tick, text: `One founding ${label.toLowerCase()} lineage remains.` })
+      if (prev && prev[s].count > 0 && sample[s].count === 0)
+        this.journal.push({ tick: sample.tick, text: `${label === 'Rabbit' ? 'Rabbits' : 'Foxes'} died out. The last ones were generation ${prev[s].generation}.` })
     }
     if (prev && sample.prey.count > 0 && sample.pred.count > 0 && Math.floor(sample.tick / 8760) > Math.floor(prev.tick / 8760))
-      this.journal.push({ tick: sample.tick, text: `Both species reached year ${Math.floor(sample.tick / 8760) + 1}.` })
+      this.journal.push({ tick: sample.tick, text: this.endless ? `Both species reached year ${Math.floor(sample.tick / 8760) + 1}.` : 'Both species lasted the full year.' })
     this.journal = this.journal.slice(-80)
     this.evolution.push(sample)
     // Preserve the founder reference, plus the most recent daily observations.

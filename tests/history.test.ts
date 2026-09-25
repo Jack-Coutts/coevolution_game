@@ -11,7 +11,7 @@ const row = (prey: number) => {
 }
 const trait = { mean: 0, low: 0, high: 0 }
 const population = (count: number, generation: number) => ({ count, generation, lineages: 1, neurons: 4, traits: { forage: trait, flee: trait, cruise: trait, hide: trait } })
-const sample = (tick: number, generation: number): EvolutionSample => ({ tick, prey: population(10, generation), pred: population(3, 1) })
+const sample = (tick: number, generation: number, prey = 10): EvolutionSample => ({ tick, prey: population(prey, generation), pred: population(3, 1) })
 
 function history(until: number): RunHistory {
   const h = new RunHistory(8760)
@@ -47,5 +47,17 @@ describe('run history', () => {
     expect(h.frame(81)).toBeUndefined()
     expect(h.evolution.map(e => e.tick)).toEqual([48, 72])
     expect(h.journal.map(e => e.tick)).toEqual([])
+  })
+
+  it('notes an extinction, and the end of a one-year run without calling it year 2', () => {
+    const year = new RunHistory(8760)
+    year.addEvolution(sample(8736, 40))
+    year.addEvolution(sample(8760, 41))
+    expect(year.journal.map(e => e.text)).toEqual(['Both species lasted the full year.'])
+    const endless = new RunHistory(8760, true)
+    endless.addEvolution(sample(8736, 40))
+    endless.addEvolution(sample(8760, 41))
+    endless.addEvolution(sample(8784, 41, 0))
+    expect(endless.journal.map(e => e.text)).toEqual(['Both species reached year 2.', 'Rabbits died out. The last ones were generation 41.'])
   })
 })
