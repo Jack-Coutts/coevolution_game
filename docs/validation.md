@@ -288,8 +288,8 @@ rabbits, or wait. Same seeds in both meadows.
 | 30 days on: highest vole count, cull vs wait | | 149 vs 136 |
 | 30 days on: barest bushes (mean fullness), cull vs wait | 9.1% vs 11.1% | 6.4% vs 8.2% |
 
-Whether the cull or the release lasted longer differed between the meadows on **8 of 20 seeds**
-: with voles the cull compared better on 9302, 9303, 9307 and 9311, and worse on 9300, 9312,
+Whether the cull or the release lasted longer differed between the meadows on **8 of 20 seeds**:
+with voles the cull compared better on 9302, 9303, 9307 and 9311, and worse on 9300, 9312,
 9316 and 9318. On three seeds a cull that kept the Open meadow alive for the year lost the Vole
 meadow: 9300 (Vole: cull ends at hour 4289, waiting survives), 9311 (cull ends at 5899, waiting
 survives) and 9318 (cull ends at 2865 with 3 foxes left a month on; releasing rabbits lasts to
