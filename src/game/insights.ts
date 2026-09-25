@@ -1,3 +1,4 @@
+import type { PopulationEvolution, TraitKey } from '@/sim/evolution'
 import type { Scenario } from '@/sim/scenarios'
 import { dateLabel, formatDuration } from '@/sim/time'
 import type { EndInfo } from '@/worker/protocol'
@@ -292,4 +293,10 @@ export function scoreWords(score: ScoreBreakdown, survived: boolean, endless: bo
   }
   const used = `${interventions} intervention${interventions === 1 ? '' : 's'} used`
   return `Score ${n(score.total)} = ${hours} + ${n(score.budgetBonus)} budget bonus (${BUDGET_POINT_BONUS} per unspent point) + ${n(score.calmBonus)} calm bonus (${CALM_BONUS[0]} with no interventions, 100 less for each; ${used}).`
+}
+
+/** A trait's headline value; a species with no animals has no trait, so do not show the empty mean (0.00). */
+export function traitValue(pop: PopulationEvolution | undefined, trait: TraitKey): string {
+  if (!pop) return '—'
+  return pop.count === 0 ? 'none alive' : pop.traits[trait].mean.toFixed(2)
 }

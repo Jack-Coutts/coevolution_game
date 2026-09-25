@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { scoreWords, usesLeft } from '@/game/insights'
+import { scoreWords, traitValue, usesLeft } from '@/game/insights'
 import { scoreRun } from '@/game/scores'
 
 describe('intervention allowance in words', () => {
@@ -21,5 +21,15 @@ describe('score breakdown in words', () => {
     expect(scoreWords(scoreRun(2622, false, 0, 3), false, true, 3)).toBe('Score 2,622 = 2,622 hours survived (one point per hour). In Endless the score is hours survived only.')
     expect(scoreWords(scoreRun(4000, false, 0, 3), false, false, 3)).toBe(
       'Score 4,000 = 4,000 hours survived (one point per hour). The budget and calm bonuses count only when both species last the full year.')
+  })
+})
+
+describe('trait headline', () => {
+  const trait = (mean: number) => ({ mean, low: mean, high: mean })
+  const pop = (count: number, mean: number) => ({ count, generation: 3, lineages: 1, neurons: 0, traits: { forage: trait(mean), flee: trait(0), cruise: trait(0), hide: trait(0) } })
+  it('shows the mean while animals live and "none alive" after extinction', () => {
+    expect(traitValue(pop(12, 0.617), 'forage')).toBe('0.62')
+    expect(traitValue(pop(0, 0), 'forage')).toBe('none alive')
+    expect(traitValue(undefined, 'forage')).toBe('—')
   })
 })

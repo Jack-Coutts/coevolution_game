@@ -1,6 +1,7 @@
 import { memo } from 'react'
 import type { EvolutionSample, TraitKey } from '@/sim/evolution'
 import type { Species } from '@/sim/sim'
+import { traitValue } from '@/game/insights'
 import { cn } from '@/lib/utils'
 
 const TRAIT_LABELS: Record<TraitKey, string> = { forage: 'Food seeking', flee: 'Threat avoidance', cruise: 'Cruising pace', hide: 'Cover seeking' }
@@ -23,8 +24,10 @@ export interface TraitSeries {
 
 /** One inherited trait of one species over time: mean line, middle-80% band and founder mean (dashed). */
 export const TraitChart = memo(function TraitChart({ series, species, trait }: { series: TraitSeries; species: Species; trait: TraitKey }) {
-  const { plotted, founders, from, end } = series
-  const latest = plotted.at(-1)
+  const { founders, from, end } = series
+  const latest = series.plotted.at(-1)
+  // After a species dies out its samples hold empty means (0.00); leave them off the chart.
+  const plotted = series.plotted.filter(s => s[species].count > 0)
   const x = (tick: number) => (X0 + (tick - from) / (end - from) * (X1 - X0)).toFixed(1)
   const line = plotted.map(s => `${x(s.tick)},${y(s[species].traits[trait].mean)}`).join(' ')
   const band = [...plotted.map(s => `${x(s.tick)},${y(s[species].traits[trait].high)}`),
@@ -34,7 +37,7 @@ export const TraitChart = memo(function TraitChart({ series, species, trait }: {
   return <figure className="rounded-lg border bg-card p-3">
     <figcaption className="flex items-baseline justify-between gap-2 text-sm">
       <span>{TRAIT_LABELS[trait]}</span>
-      <strong className={cn('tabular', tone.text)}>{latest?.[species].traits[trait].mean.toFixed(2) ?? '—'}</strong>
+      <strong className={cn('tabular', latest?.[species].count === 0 ? 'font-normal text-muted-foreground' : tone.text)}>{traitValue(latest?.[species], trait)}</strong>
     </figcaption>
     <svg viewBox="0 0 300 150" className="mt-1 w-full text-muted-foreground" role="img" aria-label={`${TRAIT_LABELS[trait]} of ${who} over time; average and middle 80 percent`}>
       {[-1, 0, 1].map(v => <g key={v}><line x1={X0} x2={X1} y1={y(v)} y2={y(v)} stroke="currentColor" opacity="0.25" /><text x={X0 - 6} y={Number(y(v)) + 3} textAnchor="end" fill="currentColor" fontSize="10">{v}</text></g>)}

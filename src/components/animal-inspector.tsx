@@ -44,12 +44,33 @@ export function AnimalInspector({ selected, onSelect, picker = false, ref }: { s
     {selected && <div className={picker ? 'mt-3 text-sm' : 'mt-1 text-sm'}>
       {picker && <strong>{name}</strong>}
       {animal ? <dl className="mt-2 grid grid-cols-2 gap-x-3 gap-y-1 text-xs @xs:grid-cols-3 @xl:grid-cols-4">
-        {Object.entries({ Generation: animal[9], Age: formatHours(animal[10]), Energy: `${Math.round(animal[5] * 100)}%`,
-          Health: animal[21] > 0 ? `Ill for up to ${formatHours(animal[21])} more` : 'Well', Offspring: animal[13], Parent: animal[11] < 0 ? 'Founder / arrival' : `#${animal[11]}`, Lineage: `#${animal[12]}`,
-          'Sight range': `${Math.round(animal[14] * 100)}% of meadow`, 'Hidden units': animal[16],
-          'Food seeking': animal[17].toFixed(2), 'Threat avoidance': animal[18].toFixed(2), 'Cruising pace': animal[19].toFixed(2), 'Cover seeking': animal[20].toFixed(2),
-        }).map(([k,v]) => <div key={k}><dt className="text-muted-foreground">{k}</dt><dd>{v}</dd></div>)}
+        {facts(animal, selected.species).map(([k, v, tip]) => <div key={k} title={tip}><dt className="text-muted-foreground">{k}</dt><dd>{v}</dd></div>)}
       </dl> : <p className="mt-2 text-xs text-muted-foreground">This animal is no longer present at the displayed time. Scrub back to inspect its earlier life.</p>}
     </div>}
   </section>
+}
+
+/** The inspector's rows: label, value and an optional explanation shown on hover. */
+function facts(animal: Float32Array, species: Species): [string, string | number, string?][] {
+  const rows: [string, string | number, string?][] = [
+    ['Generation', animal[9]],
+    ['Age', formatHours(animal[10])],
+    ['Energy', `${Math.round(animal[5] * 100)}%`, 'Fuel left in the tank. At 0% the animal starves.'],
+    ['Illness', animal[21] > 0 ? `Ill for up to ${formatHours(animal[21])} more` : 'None', 'Illness adds an energy drain; it is separate from hunger.'],
+    ['Offspring', animal[13]],
+    ['Parent', animal[11] < 0 ? 'Founder / arrival' : `#${animal[11]}`],
+    ['Lineage', `#${animal[12]}`, 'The founder this family descends from (its id), not a count.'],
+    ['Sight range', `${Math.round(animal[14] * 100)}% of meadow`, 'How far it sees, as a share of the meadow width. Over 100% means it can see across the whole meadow.'],
+  ]
+  // Brains start with no extra neurons; mutation can add them. Only worth a row once there are some.
+  if (animal[16] > 0) rows.push(['Extra neurons', animal[16], 'Hidden neurons gained by mutation. More of them allow more complex responses.'])
+  rows.push(
+    ['Food seeking', animal[17].toFixed(2), 'Inherited: -1 to 1, higher means it steers to food more strongly.'],
+    ['Threat avoidance', animal[18].toFixed(2), species === 'prey'
+      ? 'Inherited: -1 to 1, higher means it turns away from a nearby fox more strongly.'
+      : 'Inherited, -1 to 1. Nothing hunts foxes here, so this tendency is never used and drifts freely.'],
+    ['Cruising pace', animal[19].toFixed(2), 'Inherited: 0 = resting to 1 = maximum pace.'],
+    ['Cover seeking', animal[20].toFixed(2), 'Inherited: -1 to 1, higher means it heads for tall grass when a threat is in view.'],
+  )
+  return rows
 }
