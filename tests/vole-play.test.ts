@@ -7,7 +7,9 @@ import { displayOrder, framePop, speciesPhrase } from '@/game/species-ui'
 import { deriveParams, LEVER_BY_ID, leversFor, spent } from '@/sim/levers'
 import { SCENARIO_BY_ID } from '@/sim/scenarios'
 import { THREE_SPECIES, TWO_SPECIES } from '@/sim/species'
-import { STAT, STAT_STRIDE, type EndInfo, type FrameData } from '@/worker/protocol'
+import { ANIMAL_STRIDE, STAT, STAT_STRIDE, type EndInfo, type FrameData } from '@/worker/protocol'
+import { Journal } from '@/game/journal'
+import { FamilyHistory } from '@/game/families'
 
 type Row = Partial<Record<keyof typeof STAT, number>>
 
@@ -133,5 +135,33 @@ describe('vole actions, levers and names', () => {
     h.addEvolution({ tick: 24, prey: pop(10), pred: pop(3), vole: pop(5) })
     h.addEvolution({ tick: 48, prey: pop(10), pred: pop(3), vole: pop(0) })
     expect(h.journal.map(e => e.text)).toContain('Voles died out. The last ones were generation 2.')
+  })
+})
+
+describe('journal and families in the Vole meadow', () => {
+  const pop = (count: number, generation = 1) => ({ count, generation, lineages: 2, neurons: 0, traits: { forage: { mean: 0, low: 0, high: 0 }, flee: { mean: 0, low: 0, high: 0 }, cruise: { mean: 0, low: 0, high: 0 }, hide: { mean: 0, low: 0, high: 0 } } })
+
+  it('notes a full year for all three species and a vole generation milestone', () => {
+    const log = new Journal(false, THREE_SPECIES)
+    const a = { tick: 8736, prey: pop(50), pred: pop(8), vole: pop(70, 4) }
+    const b = { tick: 8760, prey: pop(50), pred: pop(8), vole: pop(70, 5) }
+    log.observe([a], undefined)
+    log.observe([a, b], undefined)
+    const texts = log.entries.map(e => e.text)
+    expect(texts).toContain('All three species lasted the full year.')
+    expect(texts).toContain('Vole descendants reached generation 5.')
+    expect(log.entries.find(e => e.kind === 'year')?.evidence).toMatchObject({ vole: 70 })
+  })
+
+  it('counts vole families from frames, and old two-species family saves restore', () => {
+    const fam = new FamilyHistory(THREE_SPECIES)
+    const voles = new Float32Array(2 * ANIMAL_STRIDE)
+    voles.set([101, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 7, 7], 0)
+    voles.set([102, 0, 0, 0, 0, 0, 0, 0, 0, 3, 0, 101, 7], ANIMAL_STRIDE)
+    fam.observe(24, { ...frame(24), voles })
+    expect(fam.summaries('vole', 24)).toEqual([expect.objectContaining({ species: 'vole', founder: 7, living: 2, minGen: 2, maxGen: 3 })])
+    const two = new FamilyHistory()
+    two.restore({ days: [], archive: { prey: [], pred: [] } as never })
+    expect(two.summaries('vole', 0)).toEqual([])
   })
 })

@@ -1,9 +1,10 @@
 import { HISTORY_HOURS, type RunHistory } from './history'
 import type { RunConfig } from './controller'
 import { migrateState, type Intervention, type MeadowState, type MeadowStateV2 } from '@/sim/sim'
-import type { EvolutionSample, JournalEntry, PopulationEvolution } from '@/sim/evolution'
+import type { EvolutionSample, PopulationEvolution } from '@/sim/evolution'
 import { TRAITS } from '@/sim/evolution'
 import { STAT_STRIDE, STAT_STRIDE_V2 } from '@/worker/protocol'
+import type { JournalEntry } from './journal'
 
 export const SAVE_VERSION = 3
 export const INCOMPATIBLE_SAVE = 'This save belongs to another game version.'
@@ -20,14 +21,16 @@ export interface MeadowSave {
   cooldownUntil?: number
   interventions?: { tick: number; action: Intervention }[]
   evolution?: EvolutionSample[]
-  journal?: JournalEntry[]
+  /** Journal entries, also kept (with the journal's state) in `history.journal`; older builds read them from here. */
+  journal?: (JournalEntry | { tick: number; text: string })[]
 }
 
 /** A version-2 save: a two-species meadow with a 23-column stats row. */
 export interface MeadowSaveV2 extends Omit<MeadowSave, 'version' | 'state' | 'history' | 'evolution'> {
   version: 2
   state: MeadowStateV2
-  history: Omit<ReturnType<RunHistory['save']>, 'highestGeneration' | 'replayFrom'> & { highestGeneration: { prey: number; pred: number }; replayFrom?: number }
+  history: Omit<ReturnType<RunHistory['save']>, 'highestGeneration' | 'replayFrom' | 'journal' | 'families'> & { highestGeneration?: { prey: number; pred: number }; replayFrom?: number }
+    & Partial<Pick<ReturnType<RunHistory['save']>, 'journal' | 'families'>>
   evolution?: Omit<EvolutionSample, 'vole'>[]
 }
 
@@ -56,7 +59,7 @@ export function migrateSave(value: MeadowSave | MeadowSaveV2): MeadowSave {
       ...value,
       version: 3,
       state,
-      history: { ...value.history, replayFrom: value.history.replayFrom ?? value.history.start, stats, highestGeneration: { ...value.history.highestGeneration, vole: 0 } },
+      history: { ...value.history, journal: value.history.journal, families: value.history.families, replayFrom: value.history.replayFrom ?? value.history.start, stats, highestGeneration: { prey: 0, pred: 0, ...value.history.highestGeneration, vole: 0 } },
       evolution: (value.evolution ?? []).map(e => ({ ...e, vole: noAnimals() })),
     }
   } catch {
