@@ -25,8 +25,9 @@ import { framePop } from './species-ui'
  *    generations, not held by one cohort). Groups are matched day to day by nearest centroid; each must lie within
  *    `matchTolerance` of the previous distance between the centroids, otherwise it is a different split.
  * 5. The pair is released after `releaseDays` consecutive daily samples without a matching split (the groups merged,
- *    one group was lost, or the difference changed), or at once if the species dies out. Samples with too few animals
- *    neither extend nor end a pair, and break a candidate run.
+ *    one group was lost, or the difference changed), or at once if the species dies out. If a later persistent split
+ *    matches the released pair's last centres, the same groups have returned and keep their names. Samples with too
+ *    few animals neither extend nor end a pair, and break a candidate run.
  * Limits: k = 2 only (a third group, or a variety splitting again, is not detected); a gradual cline without a gap is
  * not a split; only inherited traits are used, not what animals actually do (an observed ecological role, such as
  * where an animal feeds, would be another dimension).
@@ -145,7 +146,8 @@ export function matchGroups(prev: readonly number[][], next: readonly number[][]
 interface Candidate { since: number; sinceGen: number; samples: number; c: number[][] }
 /** A persistent pair: `ids[i]` names the group with centroid `c[i]`. */
 interface Active { ids: [number, number]; since: number; confirmed: number; sinceGen: number; c: number[][]; missing: number; lastSeen: number; last: Split }
-interface SpeciesState { candidate: Candidate | null; active: Active | null; next: number }
+/** `ended`: the last pair that lost its names (not by extinction), so the same groups returning keep them. */
+interface SpeciesState { candidate: Candidate | null; active: Active | null; next: number; ended?: { ids: [number, number]; c: number[][]; tick: number } }
 export interface VarietyState { species: Partial<Record<Species, SpeciesState>> }
 
 /** One species on one daily sample, kept for display and the inspector. */
@@ -229,15 +231,21 @@ export class VarietyTracker {
     if (c && matchGroups(c.c, split.c)) { c.samples++; c.c = split.c } else st.candidate = { since: tick, sinceGen: gen, samples: 1, c: split.c }
     const cand = st.candidate!
     if (!st.active && cand.samples >= VARIETY.persistDays && gen - cand.sinceGen >= VARIETY.persistGenerations) {
-      const ids: [number, number] = [st.next, st.next + 1]
-      st.next += 2
+      // The same two groups returning (matching the last ended pair's centres) keep their names.
+      const back = st.ended && matchGroups(st.ended.c, split.c)
+      const ids: [number, number] = back ? (back.swap ? [st.ended!.ids[1], st.ended!.ids[0]] : st.ended!.ids) : [st.next, st.next + 1]
+      if (!back) st.next += 2
+      st.ended = undefined
       st.active = { ids, since: cand.since, confirmed: tick, sinceGen: cand.sinceGen, c: split.c, missing: 0, lastSeen: tick, last: round(split) }
       st.candidate = null
       out.ids = [...ids]
       const diff = mainDifference(split)
       const [one, many] = NAME[s]
-      log.record({ kind: 'variety', species: s, key: `${s}:${ids[0]}`, tick,
-        text: `Two observed ecological varieties of ${many}: ${one} variety ${ids[0]} (${pct(split.share[0])}) and variety ${ids[1]} (${pct(split.share[1])}) `
+      const key = `${s}:${Math.min(...ids)}`
+      log.release(`${key}:end`, tick)
+      log.record({ kind: 'variety', species: s, key, tick,
+        text: `${back ? `${one} varieties ${ids[0]} and ${ids[1]} are measured as separate groups again` : `Two observed ecological varieties of ${many}`}: `
+          + `${one} variety ${ids[0]} (${pct(split.share[0])}) and variety ${ids[1]} (${pct(split.share[1])}) `
           + `have differed in inherited traits for ${cand.samples} daily samples in a row (since day ${day(cand.since)}), mostly in ${LABEL[diff.trait]} `
           + `(${dimText(diff.trait, diff.a)} vs ${dimText(diff.trait, diff.b)}).`,
         caveat: VARIETY_CAVEAT,
@@ -271,6 +279,7 @@ export class VarietyTracker {
         threshold: why === 'died out' ? 'the species died out' : `${VARIETY.releaseDays} consecutive daily samples without a matching split`,
         since: a.since, samples: persisted,
         values: { 'smaller group share': a.last.share[1], 'centroid distance': a.last.dist, separation: a.last.sep, days: persisted } } })
+    st.ended = why === 'gone' ? { ids: a.ids, c: a.c, tick } : undefined
     st.active = null
   }
 

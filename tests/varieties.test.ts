@@ -120,13 +120,14 @@ describe('persistent varieties', () => {
     expect(entries(run(repeat(40, TWO), undefined, 0, 0.04))).toHaveLength(0)
   })
 
-  it('records the end after 10 days without the split, and later splits get new names', () => {
-    const h = run([...repeat(30, TWO), ...repeat(12, ONE), ...repeat(25, TWO)])
+  it('records the end after 10 days without the split; the same groups returning keep their names', () => {
+    const h = run([...repeat(30, TWO), ...repeat(12, ONE), ...repeat(25, TWO), ...repeat(12, ONE)])
     const recorded = entries(h)
-    expect(recorded.map(e => e.tick / D)).toEqual([19, 39, 41 + 20])
+    expect(recorded.map(e => e.tick / D)).toEqual([19, 39, 41 + 20, 67 + 9])
     expect(recorded[1].text).toMatch(/^Rabbit varieties 1 and 2 are no longer measured as separate groups \(last seen on day 30, when variety 2 was 3\d%\)\. They merged back, one was lost, or the difference changed\.$/)
     expect(recorded[1].kind === 'variety' && recorded[1].evidence.values.days).toBe(30)
-    expect(recorded[2].text).toContain('Rabbit variety 3 (70%) and variety 4 (30%)')
+    expect(recorded[2].text).toMatch(/^Rabbit varieties 1 and 2 are measured as separate groups again: Rabbit variety 1 \(70%\) and variety 2 \(30%\)/)
+    expect(recorded[3].text).toContain('Rabbit varieties 1 and 2 are no longer')
   })
 
   it('ends the varieties at once when the species dies out; too few animals neither extend nor end them', () => {

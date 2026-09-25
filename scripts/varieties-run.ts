@@ -25,6 +25,9 @@ let resumed: RunHistory | null = null
 let simMs = 0
 let trackMs = 0
 let saveBytes = 0
+let varietyMs = 0
+const observe = h.varieties.observe.bind(h.varieties)
+h.varieties.observe = (...args) => { const t0 = performance.now(); observe(...args); varietyMs += performance.now() - t0 }
 const row = new Float64Array(STAT_STRIDE)
 const feed = (hist: RunHistory, f: ReturnType<typeof frame>, e: ReturnType<typeof summarizeEvolution>) => {
   hist.add(f, row, 0)
@@ -64,6 +67,8 @@ const stats = Object.fromEntries(scenario.species.map(s => {
 const result = { scenario: id, seed: Number(seedArg), day: Math.floor(sim.tick / 24),
   generations: Object.fromEntries(scenario.species.map(s => [s, Math.max(0, ...sim.pops[s].map(a => a.gen))])),
   simMs: Math.round(simMs), trackMs: Math.round(trackMs), trackMsPerDay: +(trackMs / Math.max(1, sim.tick / 24)).toFixed(3),
+  varietyMsPerDay: +(varietyMs / Math.max(1, sim.tick / 24)).toFixed(3), simMsPerDay: +(simMs / Math.max(1, sim.tick / 24)).toFixed(2),
+  varietyDaysKept: h.varieties.days.length, varietyStateBytesAtEnd: JSON.stringify(h.varieties.save()).length,
   varietySaveBytes: saveBytes, resumeMatches: same, stats,
   entries: h.journal.filter(j => j.kind === 'variety').map(j => `day ${Math.floor(j.tick / 24) + 1}: ${j.text}`) }
 console.log(JSON.stringify(result, null, 1))
