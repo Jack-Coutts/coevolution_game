@@ -10,16 +10,17 @@ import { framePop } from './species-ui'
  * behaviour, not subspecies, and are separate from founder families (ancestry).
  *
  * Method, per species and daily sample with at least `minCount` animals:
- * 1. Each animal is a point of its inherited traits (DIMS), standardized by the sample's spread per trait
- *    (floored at `sdFloor`, so a near-constant trait does not magnify noise).
+ * 1. Each animal is a point of its inherited traits (DIMS), each divided by a fixed scale. The four behaviour traits
+ *    share one response scale (scale 1). They are deliberately not standardized by the day's spread: that would shrink
+ *    the trait that separates two groups and inflate traits that barely vary, hiding clear groups in noise.
  * 2. Deterministic 2-means (k = 2 only): start from the animal farthest from the mean and the animal farthest from it.
  * 3. The split counts when the gap between the two groups is clear: projected onto the line between the centroids,
- *    the middle band holds under half as many animals as the band around the smaller group's centroid
+ *    the middle third holds under half as many animals as the band around the smaller group's centroid
  *    (separation > `minSeparation`), the smaller group has at least `minShare`, and the centroids are at least
  *    `minDistance` apart in trait units.
  * 4. A split becomes a persistent pair of varieties after `persistDays` consecutive daily samples of matching splits
- *    whose population mean generation has risen by at least `persistGenerations` (the difference is seen in animals
- *    of at least two generations). Groups are matched day to day by nearest centroid; each must lie within
+ *    whose population mean generation has risen by at least `persistGenerations` (the difference is passed on across
+ *    generations, not held by one cohort). Groups are matched day to day by nearest centroid; each must lie within
  *    `matchTolerance` of the previous distance between the centroids, otherwise it is a different split.
  * 5. The pair is released after `releaseDays` consecutive daily samples without a matching split (the groups merged,
  *    one group was lost, or the difference changed), or at once if the species dies out. Samples with too few animals
@@ -28,8 +29,8 @@ import { framePop } from './species-ui'
  * not a split; only inherited behaviour is used, not what animals actually do.
  */
 export const VARIETY = {
-  minCount: 20, minShare: 0.15, minSeparation: 0.5, minDistance: 0.1, sdFloor: 0.05,
-  persistDays: 20, persistGenerations: 1, matchTolerance: 0.5, releaseDays: 10,
+  minCount: 20, minShare: 0.15, minSeparation: 0.5, minDistance: 0.1,
+  persistDays: 20, persistGenerations: 2, matchTolerance: 0.5, releaseDays: 10,
   /** At most this many animals are clustered per sample (an even stride through the population). */
   maxAnimals: 400,
   /** Daily records kept for display (about a year); state does not depend on them. */
@@ -37,21 +38,21 @@ export const VARIETY = {
 } as const
 
 /**
- * The inherited traits clustered, as frame columns. Another inherited dimension (e.g. body size, issue #10) is one more
- * entry here; stored centroids then gain a column, so a save from before the change has its varieties reset.
+ * The inherited traits clustered: frame column and the scale that makes one unit comparable to the behaviour traits'
+ * response scale. Another inherited dimension is one more entry; stored centroids then gain a column, so a save from
+ * before the change has its varieties reset.
  */
-export const DIMS: readonly { key: TraitKey; col: number }[] = TRAITS.map((key, i) => ({ key, col: 17 + i }))
+export type DimKey = TraitKey
+export const DIMS: readonly { key: DimKey; col: number; scale: number }[] = TRAITS.map((key, i) => ({ key, col: 17 + i, scale: 1 }))
 
 export interface Split {
   /** Whether the split met the thresholds on this day. */
   ok: boolean
   /** Share of each group, largest first. */
   share: [number, number]
-  /** Group centroids in trait units, same order as `share`. */
+  /** Group centroids in scaled units (trait units for behaviour), same order as `share`. */
   c: [number[], number[]]
-  /** The per-trait spread used to standardize. */
-  sd: number[]
-  /** Distance between the centroids in trait units, and the gap score. */
+  /** Distance between the centroids in scaled units, and the gap score. */
   dist: number
   sep: number
 }
@@ -63,26 +64,44 @@ export function detectSplit(points: readonly number[][]): Split | null {
   if (n < 4 || d === 0) return null
   const mean = Array<number>(d).fill(0)
   for (const p of points) for (let j = 0; j < d; j++) mean[j] += p[j] / n
-  const sd = mean.map((m, j) => Math.max(VARIETY.sdFloor, Math.sqrt(points.reduce((a, p) => a + (p[j] - m) ** 2, 0) / n)))
-  const z = points.map(p => p.map((v, j) => (v - mean[j]) / sd[j]))
+  const z = points.map(p => p.map((v, j) => v - mean[j]))
   const dist2 = (a: readonly number[], b: readonly number[]) => { let s = 0; for (let j = 0; j < d; j++) s += (a[j] - b[j]) ** 2; return s }
   const farthest = (from: readonly number[]) => z.reduce((best, p, i) => (dist2(p, from) > dist2(z[best], from) ? i : best), 0)
-  const a0 = farthest(Array<number>(d).fill(0))
-  let cents = [z[a0].slice(), z[farthest(z[a0])].slice()]
-  let assign = new Uint8Array(n)
-  for (let iter = 0; iter < 50; iter++) {
-    let changed = iter === 0
-    for (let i = 0; i < n; i++) {
-      const g = dist2(z[i], cents[1]) < dist2(z[i], cents[0]) ? 1 : 0
-      if (g !== assign[i]) { assign[i] = g; changed = true }
+  // Lloyd's iterations from a start, returning the assignment and its within-group sum of squares.
+  const lloyd = (start: number[][]) => {
+    let cents = start
+    const assign = new Uint8Array(n)
+    for (let iter = 0; iter < 50; iter++) {
+      let changed = iter === 0
+      for (let i = 0; i < n; i++) {
+        const g = dist2(z[i], cents[1]) < dist2(z[i], cents[0]) ? 1 : 0
+        if (g !== assign[i]) { assign[i] = g; changed = true }
+      }
+      const next = [Array<number>(d).fill(0), Array<number>(d).fill(0)]
+      const counts = [0, 0]
+      for (let i = 0; i < n; i++) { counts[assign[i]]++; for (let j = 0; j < d; j++) next[assign[i]][j] += z[i][j] }
+      if (counts[0] === 0 || counts[1] === 0) return null
+      cents = next.map((c, g) => c.map(v => v / counts[g]))
+      if (!changed) break
     }
-    const next = [Array<number>(d).fill(0), Array<number>(d).fill(0)]
-    const counts = [0, 0]
-    for (let i = 0; i < n; i++) { counts[assign[i]]++; for (let j = 0; j < d; j++) next[assign[i]][j] += z[i][j] }
-    if (counts[0] === 0 || counts[1] === 0) return { ok: false, share: [1, 0], c: [mean, mean], sd, dist: 0, sep: 0 }
-    cents = next.map((c, g) => c.map(v => v / counts[g]))
-    if (!changed) break
+    return { cents, assign, sse: z.reduce((a, p, i) => a + dist2(p, cents[assign[i]]), 0) }
   }
+  // Deterministic starts: the animal farthest from the mean and the animal farthest from it; and, per trait, the
+  // centroids of the animals below and above the mean. The start ending with the smallest within-group spread wins.
+  const halves = (j: number) => [0, 1].map(side => {
+    const members = z.filter(p => (p[j] > 0 ? 1 : 0) === side)
+    return members.length ? Array.from({ length: d }, (_, k) => members.reduce((a, p) => a + p[k], 0) / members.length) : null
+  })
+  const a0 = farthest(Array<number>(d).fill(0))
+  const starts = [[z[a0].slice(), z[farthest(z[a0])].slice()], ...Array.from({ length: d }, (_, j) => halves(j))]
+  let best: ReturnType<typeof lloyd> = null
+  for (const start of starts) {
+    if (start.some(c => !c)) continue
+    const r = lloyd(start as number[][])
+    if (r && (!best || r.sse < best.sse - 1e-9)) best = r
+  }
+  if (!best) return { ok: false, share: [1, 0], c: [mean, mean], dist: 0, sep: 0 }
+  const { cents, assign } = best
   const counts = [0, 0]
   for (let i = 0; i < n; i++) counts[assign[i]]++
   // Gap score: animals near the midpoint versus near the smaller group's centroid, along the line between the centroids.
@@ -91,17 +110,17 @@ export function detectSplit(points: readonly number[][]): Split | null {
   const bands = [0, 0, 0]
   for (const p of z) {
     const t = p.reduce((a, v, j) => a + (v - cents[0][j]) * axis[j], 0) / len2
-    for (const [b, at] of [0, 0.5, 1].entries()) if (Math.abs(t - at) < 0.25) bands[b]++
+    for (const [b, at] of [0, 0.5, 1].entries()) if (Math.abs(t - at) < 1 / 6) bands[b]++
   }
   const small = counts[0] <= counts[1] ? 0 : 1
   const peak = bands[small === 0 ? 0 : 2]
   const sep = peak > 0 ? 1 - bands[1] / peak : 0
-  const raw = cents.map(c => c.map((v, j) => mean[j] + v * sd[j]))
+  const raw = cents.map(c => c.map((v, j) => mean[j] + v))
   const dist = Math.sqrt(dist2(raw[0], raw[1]))
   const big = 1 - small
   const share: [number, number] = [counts[big] / n, counts[small] / n]
   const ok = share[1] >= VARIETY.minShare && sep > VARIETY.minSeparation && dist >= VARIETY.minDistance
-  return { ok, share, c: [raw[big], raw[small]], sd, dist, sep }
+  return { ok, share, c: [raw[big], raw[small]], dist, sep }
 }
 
 /** Which of the previous centroids each new group matches (`swap` = group 0 matches previous 1), or null for a different split. */
@@ -138,16 +157,16 @@ const LABEL: Record<TraitKey, string> = { forage: 'food seeking', flee: 'threat 
 const day = (tick: number) => Math.floor(tick / 24) + 1
 const pct = (v: number) => `${Math.round(v * 100)}%`
 const r3 = (v: number) => Math.round(v * 1000) / 1000
-const round = (s: Split): Split => ({ ...s, share: [r3(s.share[0]), r3(s.share[1])], c: [s.c[0].map(r3), s.c[1].map(r3)], sd: s.sd.map(r3), dist: r3(s.dist), sep: r3(s.sep) })
+const round = (s: Split): Split => ({ ...s, share: [r3(s.share[0]), r3(s.share[1])], c: [s.c[0].map(r3), s.c[1].map(r3)], dist: r3(s.dist), sep: r3(s.sep) })
 
 export const VARIETY_CAVEAT = 'Observed ecological varieties: groups found by clustering the four inherited behaviour traits once a day. '
   + 'They are not subspecies and are separate from founder families; they can merge back or vanish, and this does not show why they differ.'
 
 /** The trait whose centroids differ most in units of its spread, described for a sentence. */
-export function mainDifference(s: Pick<Split, 'c' | 'sd'>): { trait: TraitKey; a: number; b: number } {
+export function mainDifference(s: Pick<Split, 'c'>): { trait: DimKey; a: number; b: number } {
   let best = 0
-  DIMS.forEach((_, j) => { if (Math.abs(s.c[0][j] - s.c[1][j]) / s.sd[j] > Math.abs(s.c[0][best] - s.c[1][best]) / s.sd[best]) best = j })
-  return { trait: DIMS[best].key, a: s.c[0][best], b: s.c[1][best] }
+  DIMS.forEach((_, j) => { if (Math.abs(s.c[0][j] - s.c[1][j]) > Math.abs(s.c[0][best] - s.c[1][best])) best = j })
+  return { trait: DIMS[best].key, a: s.c[0][best] * DIMS[best].scale, b: s.c[1][best] * DIMS[best].scale }
 }
 export const traitLabel = (t: TraitKey) => LABEL[t]
 
@@ -182,7 +201,7 @@ export class VarietyTracker {
     const points: number[][] = []
     for (let k = 0; k < n && points.length < VARIETY.maxAnimals; k += step) {
       const o = Math.floor(k) * ANIMAL_STRIDE
-      points.push(DIMS.map(dim => rows[o + dim.col]))
+      points.push(DIMS.map(dim => rows[o + dim.col] / dim.scale))
     }
     const split = detectSplit(points)
     if (!split) { st.candidate = null; return this.finish(st, out, gen) }
@@ -214,7 +233,7 @@ export class VarietyTracker {
           + `have differed in inherited behaviour for ${cand.samples} daily samples in a row (since day ${day(cand.since)}), mostly in ${LABEL[diff.trait]} `
           + `(${diff.a.toFixed(2)} vs ${diff.b.toFixed(2)}).`,
         caveat: VARIETY_CAVEAT,
-        evidence: { measure: 'Deterministic 2-means on the inherited traits (food seeking, threat avoidance, cruising pace, cover seeking), standardized per daily sample.',
+        evidence: { measure: 'Deterministic 2-means on the inherited traits (food seeking, threat avoidance, cruising pace, cover seeking), each on its fixed scale.',
           threshold: `A clear gap (separation above ${VARIETY.minSeparation}), the smaller group at least ${pct(VARIETY.minShare)}, centroids at least ${VARIETY.minDistance} apart, `
             + `in ${VARIETY.persistDays} consecutive daily samples while the mean generation rose by at least ${VARIETY.persistGenerations}.`,
           since: cand.since, samples: cand.samples,
@@ -233,13 +252,14 @@ export class VarietyTracker {
     const a = st.active!
     const [one, many] = NAME[s]
     const persisted = Math.round((a.lastSeen - a.since) / 24) + 1
-    log.release(`${s}:${a.ids[0]}`, tick)
-    log.record({ kind: 'variety', species: s, key: `${s}:${a.ids[0]}:end`, tick,
-      text: why === 'died out' ? `${one} varieties ${a.ids[0]} and ${a.ids[1]} ended: ${many} died out.`
-        : `${one} varieties ${a.ids[0]} and ${a.ids[1]} are no longer measured as separate groups (last seen on day ${day(a.lastSeen)}, `
+    const [lo, hi] = [...a.ids].sort((x, y) => x - y)
+    log.release(`${s}:${lo}`, tick)
+    log.record({ kind: 'variety', species: s, key: `${s}:${lo}:end`, tick,
+      text: why === 'died out' ? `${one} varieties ${lo} and ${hi} ended: ${many} died out.`
+        : `${one} varieties ${lo} and ${hi} are no longer measured as separate groups (last seen on day ${day(a.lastSeen)}, `
           + `when variety ${a.ids[1]} was ${pct(a.last.share[1])}). They merged back, one was lost, or the difference changed.`,
       caveat: VARIETY_CAVEAT,
-      evidence: { measure: 'Deterministic 2-means on the inherited traits, standardized per daily sample.',
+      evidence: { measure: 'Deterministic 2-means on the inherited traits, each on its fixed scale.',
         threshold: why === 'died out' ? 'The species died out.' : `${VARIETY.releaseDays} consecutive daily samples without a matching split.`,
         since: a.since, samples: persisted,
         values: { share: a.last.share[1], distance: a.last.dist, separation: a.last.sep, days: persisted } } })
@@ -252,12 +272,12 @@ export class VarietyTracker {
     return undefined
   }
 
-  /** The persistent variety of an animal (its frame row) at `tick`: the nearest group centroid in standardized traits. */
+  /** The persistent variety of an animal (its frame row) at `tick`: the nearest group centroid. */
   varietyOf(species: Species, row: Float32Array, tick: number): { id: number; day: VarietyDay } | null {
     const d = this.at(tick)?.[species]
     const split = d?.split
     if (!d?.ids || !split?.ok) return null
-    const dist = (c: number[]) => DIMS.reduce((a, dim, j) => a + ((row[dim.col] - c[j]) / split.sd[j]) ** 2, 0)
+    const dist = (c: number[]) => DIMS.reduce((a, dim, j) => a + (row[dim.col] / dim.scale - c[j]) ** 2, 0)
     return { id: d.ids[dist(split.c[1]) < dist(split.c[0]) ? 1 : 0], day: d }
   }
 
