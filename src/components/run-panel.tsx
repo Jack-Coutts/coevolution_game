@@ -7,7 +7,7 @@ import { Progress } from '@/components/ui/progress'
 import { Switch } from '@/components/ui/switch'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
 import { useAnimalIcons } from '@/hooks/use-animal-icons'
-import { CHARGES, COOLDOWN } from '@/game/controller'
+import { CHARGES, COOLDOWN, renewalNote } from '@/game/budget'
 import { CALM_BONUS } from '@/game/scores'
 import { forecast, usesLeft, type Tone } from '@/game/insights'
 import { useGame } from '@/hooks/use-game'
@@ -154,8 +154,13 @@ export function Interventions({ preview = false }: { preview?: boolean }) {
       </div>
       {preview && (
         <p className="mb-2 text-xs text-muted-foreground">
-          You get {CHARGES} uses per run, shared across all eight options, with a {formatDuration(COOLDOWN)} cooldown after each.
+          {snap.endless
+            ? `You start with ${CHARGES} uses, shared across all eight options, with a ${formatDuration(COOLDOWN)} cooldown after each. One use comes back at the start of each season (1 Dec, 1 Mar, 1 Jun, 1 Sep), up to ${CHARGES} held.`
+            : `You get ${CHARGES} uses per run, shared across all eight options, with a ${formatDuration(COOLDOWN)} cooldown after each.`}
         </p>
+      )}
+      {!preview && snap.phase === 'running' && snap.nextRenewal !== null && (
+        <p className="mb-2 text-xs font-medium tabular" data-testid="renewal">{renewalNote(snap.charges, snap.tick)}</p>
       )}
       {preview ? (
         <ul className="flex flex-col gap-1.5 text-xs">
@@ -195,7 +200,7 @@ export function Interventions({ preview = false }: { preview?: boolean }) {
           : snap.phase !== 'running'
           ? 'Available once the run starts.'
           : snap.charges === 0
-            ? `All ${CHARGES} uses spent. No more interventions this run.`
+            ? snap.endless ? 'No uses left until the next season starts.' : `All ${CHARGES} uses spent. No more interventions this run.`
             : !snap.atLive
               ? 'You are replaying the past. Return to live to intervene.'
               : cooling
@@ -205,7 +210,7 @@ export function Interventions({ preview = false }: { preview?: boolean }) {
       {cooling && <Progress value={100 - (coolLeft / COOLDOWN) * 100} className="mt-1 h-1" />}
       <p className="mt-2 text-[11px] text-muted-foreground">Illness spreads locally and drains energy; it can overshoot. Planting supports future food. Feeding foxes gives relief but may encourage births.</p>
       <p className="mt-2 text-[11px] text-muted-foreground">
-        {snap.endless ? 'These four charges last the whole Endless run. Score is hours survived, with no year-end bonus.' : `A full year with no interventions earns +${CALM_BONUS[0]}, and each one used lowers that bonus by 100.`}
+        {snap.endless ? `One use comes back at the start of each season, up to ${CHARGES} held. Score is hours survived, with no year-end bonus.` : `A full year with no interventions earns +${CALM_BONUS[0]}, and each one used lowers that bonus by 100.`}
       </p>
     </section>
   )
