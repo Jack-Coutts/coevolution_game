@@ -9,12 +9,19 @@ function viewFromHash(): View {
   return h === 'evolution' || h === 'guide' ? h : 'meadow'
 }
 
-/** The current page, kept in the URL hash so browser back and links work without a router. */
-export function useView(): [View, (v: View) => void] {
+/**
+ * The current page, kept in the URL hash so browser back and links work without a router.
+ * `visit` changes on every history navigation, even back to the same view, so callers can re-sync the URL.
+ */
+export function useView(): [View, (v: View) => void, number] {
   const [view, setView] = useState(viewFromHash)
+  const [visit, setVisit] = useState(0)
   useEffect(() => {
     // Back/forward to an entry whose query also differs fires popstate but not hashchange.
-    const on = () => setView(viewFromHash())
+    const on = () => {
+      setView(viewFromHash())
+      setVisit((n) => n + 1)
+    }
     window.addEventListener('hashchange', on)
     window.addEventListener('popstate', on)
     return () => {
@@ -22,5 +29,5 @@ export function useView(): [View, (v: View) => void] {
       window.removeEventListener('popstate', on)
     }
   }, [])
-  return [view, (v) => { if (v !== viewFromHash()) window.location.hash = hrefOf(v) }]
+  return [view, (v) => { if (v !== viewFromHash()) window.location.hash = hrefOf(v) }, visit]
 }

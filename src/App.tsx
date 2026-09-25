@@ -69,7 +69,7 @@ export default function App() {
   const [levers, setLevers] = useState<LeverValues>(STABLE_PRESET)
   const [scenario, setScenario] = useState<ScenarioId>(initial.scenario)
   const [seedChoice, setSeedChoice] = useState<SeedChoice>(initial.seed)
-  const [view, go] = useView()
+  const [view, go, visit] = useView()
   const [dismissed, setDismissed] = useState(-1)
   const [resetKey, setResetKey] = useState(0)
   const seed = seedOf(seedChoice)
@@ -88,8 +88,8 @@ export default function App() {
     if (seedChoice.kind === 'custom') q.set('seed', String(seedChoice.seed))
     const search = q.toString()
     window.history.replaceState(null, '', `${window.location.pathname}${search ? `?${search}` : ''}${window.location.hash}`)
-    // `view` re-runs this after back/forward, so the entry we land on also carries the current seed and scenario.
-  }, [scenario, seedChoice, view])
+    // `visit` re-runs this after back/forward, so the entry we land on also carries the current seed and scenario.
+  }, [scenario, seedChoice, visit])
 
   const locked = snap.phase === 'running' || snap.phase === 'ended'
   const left = BUDGET - spent(levers, base)
@@ -187,6 +187,7 @@ export default function App() {
                 key={v}
                 href={hrefOf(v)}
                 aria-current={view === v ? 'page' : undefined}
+                onClick={(e) => view === v && e.preventDefault()}
                 className={cn(
                   'flex flex-1 items-center justify-center gap-1.5 rounded-md px-3 py-1 text-sm font-medium transition-colors lg:flex-none',
                   view === v ? 'bg-background text-foreground shadow-sm' : 'text-muted-foreground hover:text-foreground',
