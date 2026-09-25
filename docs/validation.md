@@ -580,3 +580,32 @@ max energy, metabolism and top speed. Older saves load at ×1, and their replay 
 widened from 22 to 23 floats per animal. Frames carry the size in slot 22
 (`ANIMAL_SIZE`). The energy fraction in frames is now a share of the animal's own maximum.
 The stats row's mean energy still divides by the species maximum.
+
+## Observed ecological varieties (#11)
+
+Specification: `game-design.md`, "Observed ecological varieties". Tests:
+`tests/varieties.test.ts`. Long run: `npx tsx scripts/varieties-run.ts stable 3 3` (Open meadow,
+default levers, seed 3, Endless, 3 years, one process).
+
+**Known populations (tests).** A single group, with or without correlated traits: no split in 200
+samples. Two groups 6 spreads apart (70/30): found, shares and centres recovered. Groups 2
+spreads apart, or a 10% minority: not found (the detector's limits). A single drifting group is
+never named; two drifting groups keep the same names for 150 days. Temporary splits (15 days; 15
++ 15 with a break; 40 days within one generation) are never named. The end is recorded after 10
+days without the split; the same groups returning keep their names; a split in another trait gets
+new names. Extinction ends a pair at once. Body-size-only groups are found. Save and resume
+reproduce the state exactly; a save cut hours before the naming day forgets it.
+
+**Long run (seed 3, 1,095 days).** Tracking costs 0.91 ms per daily sample against 30.5 ms of
+simulation per day (about 3%). Daily records are capped at 366 days (134 KB of state for two
+species). A copy restored from a save at day 547 and fed the same frames ended with identical
+variety state and journal entries.
+
+**Visible example.** Open meadow, custom seed 3, Endless, default levers: foxes split from day
+72 and are named on day 91 (Fox variety 1 53%, variety 2 47%), differing mostly in cruising pace
+(0.87 vs 0.23). The pair persists to day 792 (about 45 fox generations); on day 731, variety 2
+(72%) against variety 1 (28%): cruising pace 0.17 vs 0.89, threat avoidance -0.02 vs -0.55,
+cover seeking 0.31 vs 0.06, body size ×1.21 vs ×1.14. It ends on day 802 when variety 1 falls under 15%, and the
+same groups return under the same names on day 831. Rabbits in the same run form and lose three
+pairs (named days 53, 284, 1,018), most lasting 1 to 7 months.
+

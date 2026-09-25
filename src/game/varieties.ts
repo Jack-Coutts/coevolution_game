@@ -244,7 +244,7 @@ export class VarietyTracker {
       const key = `${s}:${Math.min(...ids)}`
       log.release(`${key}:end`, tick)
       log.record({ kind: 'variety', species: s, key, tick,
-        text: `${back ? `${one} varieties ${ids[0]} and ${ids[1]} are measured as separate groups again` : `Two observed ecological varieties of ${many}`}: `
+        text: `${back ? `${one} varieties ${Math.min(...ids)} and ${Math.max(...ids)} are measured as separate groups again` : `Two observed ecological varieties of ${many}`}: `
           + `${one} variety ${ids[0]} (${pct(split.share[0])}) and variety ${ids[1]} (${pct(split.share[1])}) `
           + `have differed in inherited traits for ${cand.samples} daily samples in a row (since day ${day(cand.since)}), mostly in ${LABEL[diff.trait]} `
           + `(${dimText(diff.trait, diff.a)} vs ${dimText(diff.trait, diff.b)}).`,
