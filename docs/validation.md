@@ -141,8 +141,8 @@ within the design's limit of 32. Replay frames are about 40% larger with voles; 
 of in-memory replay (about 3,160 kept frames) is roughly 60 MB in the Open meadow and 84 MB
 with voles. The paired step-time median of 1.43 is inside the design budget of 1.6, but
 single seeds reached 2.3, where foxes grew to 200 on a vole diet; cost follows the number
-of animals. Voles boom and starve as in the prototype: 85% of vole deaths were starvation,
-8% predation and 5% old age. Survival here is not a balance claim; #9 tunes the scenario.
+of animals. Voles boom and starve as in the prototype: 89% of vole deaths were starvation,
+8% predation and 3% old age. Survival here is not a balance claim; #9 tunes the scenario.
 
 Implementation notes and deviations from the design record:
 
