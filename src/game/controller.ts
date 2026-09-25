@@ -248,7 +248,7 @@ export class GameController {
   }
 
   private hintsAt(t: number): Hint[] {
-    if (this.hintCache.tick !== t) this.hintCache = { tick: t, hints: hints(this.history, t) }
+    if (this.hintCache.tick !== t) this.hintCache = { tick: t, hints: hints(this.history, t, this.scenario) }
     return this.hintCache.hints
   }
 

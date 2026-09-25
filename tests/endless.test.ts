@@ -27,8 +27,8 @@ describe('persistent worlds', () => {
     expect(s.tick).toBe(10)
     expect(s.ended).toBe(false)
     expect(s.survived).toBe(false)
-    expect(s.metabolismFactor(2400)).toBe(1.35)
-    expect(s.metabolismFactor(8760 + 2400)).toBe(1.35)
+    expect(s.metabolismFactor(2400)).toBe(1.15)
+    expect(s.metabolismFactor(8760 + 2400)).toBe(1.15)
     expect(s.metabolismFactor(8760)).toBe(1)
   })
   it('bounds history while preserving accurate recent statistics and replay', () => {

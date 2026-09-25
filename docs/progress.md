@@ -2,7 +2,7 @@
 
 This page tracks the work on the open issues in [roadmap #2](https://github.com/Jack-Coutts/coevolution_game/issues/2) and the UI update. A box is ticked when its pull request has merged into `main`. Every pull request updates its own line.
 
-Last updated: 25 September 2026, 17:10 UTC.
+Last updated: 25 September 2026, 17:25 UTC.
 
 ## How the work runs
 
@@ -27,7 +27,7 @@ Last updated: 25 September 2026, 17:10 UTC.
 - [x] #3 Playtest and clarity fixes. [#19](https://github.com/Jack-Coutts/coevolution_game/pull/19)
 - [x] #4 Balance all eight interventions: each action's useful situation and failure mode is documented; on 20 held-out seeds no single action beat the placebo. [#23](https://github.com/Jack-Coutts/coevolution_game/pull/23)
 - [x] #5 Intervention budget for Endless mode: one use renews each season, up to four held. [#21](https://github.com/Jack-Coutts/coevolution_game/pull/21)
-- [ ] #6 Calibrate Drought, Harsh winter and Fox invasion. In progress.
+- [x] #6 Calibrate Drought, Harsh winter and Fox invasion: Harsh winter retuned from unwinnable, 14-day warnings added, Fox invasion left as is after two tuning passes found no change that beat placebo noise. [#25](https://github.com/Jack-Coutts/coevolution_game/pull/25)
 
 ### A third species
 

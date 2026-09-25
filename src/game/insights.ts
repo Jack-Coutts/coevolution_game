@@ -53,6 +53,28 @@ export function forecast(h: RunHistory, tick: number): Forecast | null {
   return { prey: project('prey'), pred: project('pred'), ahead }
 }
 
+/** Field notes announce a scenario's weather or arrival this many days ahead. */
+export const NOTICE_DAYS = 14
+
+/** "Harsh winter starts in 5 days (1 Dec)." Weather recurs each year in Endless; an arrival happens once. */
+export function upcoming(scenario: Scenario, tick: number, endless: boolean): Hint | null {
+  const soon = (start: number, label: string, id: string): Hint | null => {
+    const days = Math.ceil((start - tick) / 24)
+    if (start <= tick || days > NOTICE_DAYS) return null
+    return { id, tone: 'warn', text: `${label} in ${days} day${days === 1 ? '' : 's'} (${dateLabel(start)}).` }
+  }
+  for (const s of scenario.spans) {
+    const start = endless ? s.from + Math.ceil((tick - s.from + 1) / 8760) * 8760 : s.from
+    const hint = soon(start, `${s.label} starts`, 'upcoming')
+    if (hint) return hint
+  }
+  for (const m of scenario.markers) {
+    const hint = soon(m.tick, m.label, 'upcoming')
+    if (hint) return hint
+  }
+  return null
+}
+
 const RANK: Record<Tone, number> = { danger: 0, warn: 1, info: 2, good: 3 }
 /** A danger note stays this many hours after its condition last held, so a one-hour blip does not hide it. */
 export const DANGER_HOLD = 48
@@ -61,7 +83,7 @@ export const DANGER_HOLD = 48
  * Field notes at `tick`, most urgent first. A danger note that held within the last DANGER_HOLD hours stays,
  * marked with how long ago it was last true.
  */
-export function hints(h: RunHistory, tick: number): Hint[] {
+export function hints(h: RunHistory, tick: number, scenario?: Scenario): Hint[] {
   const out = notesAt(h, tick)
   // Once a species is gone there is nothing left to warn about, so old danger notes are not carried.
   const alive = h.stat(tick, 'prey') > 0 && h.stat(tick, 'pred') > 0
@@ -72,7 +94,10 @@ export function hints(h: RunHistory, tick: number): Hint[] {
     }
   }
   const alarms = out.filter(n => n.id !== 'steady' && n.id !== 'trend')
-  return (alarms.length ? alarms : out).sort((a, b) => RANK[a.tone] - RANK[b.tone])
+  const sorted = (alarms.length ? alarms : out).sort((a, b) => RANK[a.tone] - RANK[b.tone])
+  // A calendar notice is not an alarm about the meadow's state, so it leads without hiding the other notes.
+  const notice = scenario && tick - h.firstTick >= 24 ? upcoming(scenario, tick, h.endless) : null
+  return notice ? [notice, ...sorted] : sorted
 }
 
 /** Red notes in `next` that were not in `prev`: what should stop the clock for a player who wants time to react. */
@@ -217,8 +242,10 @@ function lastBirthTick(h: RunHistory, key: 'preyBorn' | 'predBorn', end: number)
   return null
 }
 
-function inSpan(scenario: Scenario, tick: number): string | null {
-  for (const s of scenario.spans) if (tick >= s.from && tick <= s.to) return s.label
+/** Weather spans repeat each year in Endless; arrival markers happen once. */
+function inSpan(scenario: Scenario, tick: number, endless: boolean): string | null {
+  const t = endless ? tick % 8760 : tick
+  for (const s of scenario.spans) if (t >= s.from && t <= s.to) return s.label
   for (const m of scenario.markers) if (tick >= m.tick && tick - m.tick < 30 * 24) return m.label
   return null
 }
@@ -234,7 +261,7 @@ export function explain(h: RunHistory, end: EndInfo, scenario: Scenario): Explan
     }
   }
   const from = Math.max(h.firstTick, T - 300)
-  const context = inSpan(scenario, h.endless ? T % 8760 : T)
+  const context = inSpan(scenario, T, h.endless)
   const ctx = context ? ` This happened during the ${context.toLowerCase()} period.` : ''
   const species = end.predEnd === 0 ? 'pred' : 'prey'
   const illness = delta(h, species === 'pred' ? 'predIllness' : 'preyIllness', from, T)
