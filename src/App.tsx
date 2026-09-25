@@ -100,6 +100,17 @@ export default function App() {
 
   const reset = () => setResetKey((k) => k + 1)
 
+  // On phones the side panel sits far below the meadow, so bring the card of an animal clicked in the meadow into view.
+  const inspectorCard = useRef<HTMLElement>(null)
+  const reveal = useRef(false)
+  useEffect(() => {
+    if (!reveal.current) return
+    reveal.current = false
+    if (window.matchMedia('(min-width: 1024px)').matches) return
+    const smooth = !window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    inspectorCard.current?.scrollIntoView({ behavior: smooth ? 'smooth' : 'auto', block: 'nearest' })
+  }, [selected])
+
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       if (e.defaultPrevented) return
@@ -164,7 +175,7 @@ export default function App() {
     } catch { toast.error('Could not load this meadow. Device storage may be unavailable, or the save is incompatible.', { id: 'save' }) }
   }
   const sc = SCENARIO_BY_ID[scenario]
-  const inspector = selected && <AnimalInspector selected={selected} onSelect={setSelected} />
+  const inspector = selected && <AnimalInspector ref={inspectorCard} selected={selected} onSelect={setSelected} />
 
   return (
     <TooltipProvider delayDuration={250}>
@@ -252,7 +263,7 @@ export default function App() {
                   {seedChoice.kind === 'daily' ? "Today's meadow" : 'Seed'} {seed}
                 </span>
               </div>
-              <WorldView maxSize={worldMax} selected={selected} onSelect={setSelected} />
+              <WorldView maxSize={worldMax} selected={selected} onSelect={(a) => { reveal.current = true; setSelected(a) }} />
               <Card className="gap-2 p-3">
                 <Transport onReset={reset} />
                 <Timeline />
