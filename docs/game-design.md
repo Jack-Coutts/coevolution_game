@@ -44,7 +44,7 @@ it is not a guaranteed precisely sized cull. There are no spontaneous outbreaks 
 ## Observation and learning
 
 Field notes show risks, recent trends, current illness, and cumulative deaths by cause.
-Population history can be scrubbed. The Evolution tab probes inherited controllers in
+Population history can be scrubbed. The Evolution page probes inherited controllers in
 standardised situations and plots mean and middle-80% variation; founders are a dashed
 reference. Probed inherited tendencies are distinct from current animal movement.
 

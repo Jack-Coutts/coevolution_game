@@ -11,7 +11,7 @@ const KEYS: [string, string][] = [
 export function Guide() {
   const icons = useAnimalIcons()
   return (
-    <div className="flex flex-col gap-4 text-sm leading-relaxed">
+    <div className="gap-10 text-sm leading-relaxed lg:columns-2 [&>section]:mb-5 [&>section]:max-w-[70ch] [&>section]:break-inside-avoid">
       <section>
         <h3 className="mb-1 font-semibold">Goal</h3>
         <p className="text-muted-foreground">
@@ -67,7 +67,7 @@ export function Guide() {
       </section>
       <section>
         <h3 className="mb-1 font-semibold">Watch evolution</h3>
-        <p className="text-muted-foreground">The Evolution tab compares inherited responses in standard situations, with a band showing variation. Click an animal to pause and inspect its family, energy and traits. The journal records generation and lineage milestones. Stronger hunters can still destabilise a meadow.</p>
+        <p className="text-muted-foreground">The Evolution page compares inherited responses in standard situations, with a band showing variation. Click an animal in the meadow to pause and inspect its family, energy and traits beside the interventions. The journal records generation and lineage milestones. Stronger hunters can still destabilise a meadow.</p>
       </section>
       <section>
         <h3 className="mb-1 font-semibold">Keep a world</h3>

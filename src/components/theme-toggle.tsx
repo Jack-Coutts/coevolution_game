@@ -8,7 +8,7 @@ const OPTIONS = [
   { value: 'system', label: 'System theme', icon: Monitor },
 ] as const
 
-export function ThemeToggle({ theme, onChange }: { theme: Theme; onChange: (t: Theme) => void }) {
+export function ThemeToggle({ theme, onChange, className }: { theme: Theme; onChange: (t: Theme) => void; className?: string }) {
   return (
     <ToggleGroup
       type="single"
@@ -17,6 +17,7 @@ export function ThemeToggle({ theme, onChange }: { theme: Theme; onChange: (t: T
       value={theme}
       onValueChange={(v) => v && onChange(v as Theme)}
       aria-label="Colour theme"
+      className={className}
     >
       {OPTIONS.map(({ value, label, icon: Icon }) => (
         <ToggleGroupItem key={value} value={value} aria-label={label} title={label} className="px-2">

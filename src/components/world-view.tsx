@@ -1,4 +1,4 @@
-import type { AnimalSelection } from './evolution-panel'
+import type { AnimalSelection } from './animal-inspector'
 import { ANIMAL_STRIDE } from '@/worker/protocol'
 import { useEffect, useRef } from 'react'
 import { Flower2, Leaf, Moon, Play, Snowflake, Sun, SunDim } from 'lucide-react'

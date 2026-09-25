@@ -1,18 +1,21 @@
-import { EvolutionPanel, type AnimalSelection } from '@/components/evolution-panel'
+import { AnimalInspector, type AnimalSelection } from '@/components/animal-inspector'
+import { EvolutionView } from '@/components/evolution-view'
 import { Button } from '@/components/ui/button'
 import { readSave, type MeadowSave } from '@/game/saves'
 import { useEffect, useRef, useState } from 'react'
+import { BookOpen, Dna, FolderOpen, Save, Trees } from 'lucide-react'
+import { toast, Toaster } from 'sonner'
 import { Guide } from '@/components/guide'
 import { MeadowSettings } from '@/components/meadow-settings'
-import { LeverPanel } from '@/components/lever-panel'
+import { LeverPanel, LockedSetup } from '@/components/lever-panel'
 import { ResultDialog } from '@/components/result-dialog'
 import { RunPanel } from '@/components/run-panel'
+import { StatusStrip } from '@/components/status-strip'
 import { Timeline } from '@/components/timeline'
 import { Transport } from '@/components/transport'
 import { Card } from '@/components/ui/card'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { TooltipProvider } from '@/components/ui/tooltip'
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
 import { WorldView } from '@/components/world-view'
 import { SPEEDS } from '@/game/controller'
 import { STABLE_PRESET } from '@/game/presets'
@@ -23,8 +26,33 @@ import { useTheme } from '@/hooks/use-theme'
 import { ThemeToggle } from '@/components/theme-toggle'
 import { BUDGET, spent, type LeverValues } from '@/sim/levers'
 import { SCENARIO_BY_ID, SCENARIOS, type ScenarioId } from '@/sim/scenarios'
+import { cn } from '@/lib/utils'
 
-type Tab = 'levers' | 'run' | 'evolution' | 'guide'
+type View = 'meadow' | 'evolution' | 'guide'
+
+const NAV: { view: View; label: string; icon: typeof Trees }[] = [
+  { view: 'meadow', label: 'Meadow', icon: Trees },
+  { view: 'evolution', label: 'Evolution', icon: Dna },
+  { view: 'guide', label: 'Guide', icon: BookOpen },
+]
+
+const hrefOf = (v: View) => (v === 'meadow' ? '#/' : `#/${v}`)
+
+function viewFromHash(): View {
+  const h = window.location.hash.replace(/^#\/?/, '')
+  return h === 'evolution' || h === 'guide' ? h : 'meadow'
+}
+
+/** The current page, kept in the URL hash so browser back and links work without a router. */
+function useView(): [View, (v: View) => void] {
+  const [view, setView] = useState(viewFromHash)
+  useEffect(() => {
+    const on = () => setView(viewFromHash())
+    window.addEventListener('hashchange', on)
+    return () => window.removeEventListener('hashchange', on)
+  }, [])
+  return [view, (v) => { if (v !== viewFromHash()) window.location.hash = hrefOf(v) }]
+}
 
 function useViewport(): { w: number; h: number } {
   const [v, setV] = useState({ w: window.innerWidth, h: window.innerHeight })
@@ -55,13 +83,12 @@ export default function App() {
   const [theme, setTheme] = useTheme()
   const [endless, setEndless] = useState(false)
   const [selected, setSelected] = useState<AnimalSelection | null>(null)
-  const [loadStatus, setLoadStatus] = useState('')
   const pendingSave = useRef<MeadowSave | null>(null)
   const base = STABLE_PRESET
   const [levers, setLevers] = useState<LeverValues>(STABLE_PRESET)
   const [scenario, setScenario] = useState<ScenarioId>(initial.scenario)
   const [seedChoice, setSeedChoice] = useState<SeedChoice>(initial.seed)
-  const [tab, setTab] = useState<Tab>('levers')
+  const [view, go] = useView()
   const [dismissed, setDismissed] = useState(-1)
   const [resetKey, setResetKey] = useState(0)
   const seed = seedOf(seedChoice)
@@ -79,17 +106,15 @@ export default function App() {
     if (scenario !== 'stable') q.set('scenario', scenario)
     if (seedChoice.kind === 'custom') q.set('seed', String(seedChoice.seed))
     const search = q.toString()
-    window.history.replaceState(null, '', `${window.location.pathname}${search ? `?${search}` : ''}`)
+    window.history.replaceState(null, '', `${window.location.pathname}${search ? `?${search}` : ''}${window.location.hash}`)
   }, [scenario, seedChoice])
 
   const locked = snap.phase === 'running' || snap.phase === 'ended'
   const left = BUDGET - spent(levers, base)
 
-  const prevPhase = useRef(snap.phase)
   useEffect(() => {
-    if (prevPhase.current === 'planning' && snap.phase === 'running' && tab === 'levers') setTab('run')
-    prevPhase.current = snap.phase
-  }, [snap.phase, tab])
+    if (snap.saveStatus) toast(snap.saveStatus, { id: 'save' })
+  }, [snap.saveStatus])
 
   const reset = () => { setSelected(null); setResetKey((k) => k + 1) }
 
@@ -143,7 +168,7 @@ export default function App() {
   const resume = async () => {
     try {
       const saved = await readSave()
-      if (!saved) { setLoadStatus('No saved meadow on this device yet.'); return }
+      if (!saved) { toast('No saved meadow on this device yet.', { id: 'save' }); return }
       setSelected(null)
       pendingSave.current = saved
       setLevers(saved.config.levers)
@@ -151,9 +176,9 @@ export default function App() {
       setSeedChoice({ kind: 'custom', seed: saved.config.seed })
       setEndless(saved.config.endless)
       setResetKey(k => k + 1)
-      setTab('evolution')
-      setLoadStatus('')
-    } catch { setLoadStatus('Could not load this meadow. Device storage may be unavailable, or the save is incompatible.') }
+      go('meadow')
+      toast.dismiss('save')
+    } catch { toast.error('Could not load this meadow. Device storage may be unavailable, or the save is incompatible.', { id: 'save' }) }
   }
   const sc = SCENARIO_BY_ID[scenario]
 
@@ -172,9 +197,27 @@ export default function App() {
             </div>
           </div>
 
-          <div className="ml-auto flex items-center gap-2">
+          <nav aria-label="Views" className="order-last flex w-full rounded-lg bg-muted p-[3px] lg:order-1 lg:w-auto">
+            {NAV.map(({ view: v, label, icon: Icon }) => (
+              <a
+                key={v}
+                href={hrefOf(v)}
+                aria-current={view === v ? 'page' : undefined}
+                className={cn(
+                  'flex flex-1 items-center justify-center gap-1.5 rounded-md px-3 py-1 text-sm font-medium transition-colors lg:flex-none',
+                  view === v ? 'bg-background text-foreground shadow-sm' : 'text-muted-foreground hover:text-foreground',
+                )}
+              >
+                <Icon className="size-4" /> {label}
+              </a>
+            ))}
+          </nav>
+
+          <ThemeToggle theme={theme} onChange={setTheme} className="order-1 ml-auto lg:order-3 lg:ml-0" />
+
+          <div className="order-2 flex flex-wrap items-center gap-2 sm:ml-auto">
             <Select value={scenario} onValueChange={(v) => setScenario(v as ScenarioId)}>
-              <SelectTrigger disabled={locked} className="w-[150px] sm:w-[170px]" aria-label="Scenario">
+              <SelectTrigger disabled={locked} className="w-[140px] sm:w-[170px]" aria-label="Scenario">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent align="end">
@@ -185,82 +228,97 @@ export default function App() {
                 ))}
               </SelectContent>
             </Select>
-            <select aria-label="Run duration" className="rounded-md border bg-background px-2 py-2 text-xs" value={endless ? 'endless' : 'year'} disabled={locked} onChange={e => setEndless(e.target.value === 'endless')}>
+            <select aria-label="Run duration" className="h-8 rounded-md border bg-background px-2 text-xs" value={endless ? 'endless' : 'year'} disabled={locked} onChange={e => setEndless(e.target.value === 'endless')}>
               <option value="year">One year</option><option value="endless">Endless</option>
             </select>
-            <ThemeToggle theme={theme} onChange={setTheme} />
             <MeadowSettings onPractice={() => { setSelected(null); setLevers(STABLE_PRESET); setScenario('stable'); setSeedChoice({ kind: 'custom', seed: 5007 }); setEndless(false); reset() }} locked={locked} choice={seedChoice} onChange={setSeedChoice} />
+            <div className="flex items-center gap-1">
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button variant="outline" size="icon" aria-label="Save meadow" disabled={snap.phase === 'loading'} onClick={() => game.save()}>
+                    <Save />
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>Save meadow on this device</TooltipContent>
+              </Tooltip>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button variant="outline" size="icon" aria-label="Resume saved meadow" onClick={() => void resume()}>
+                    <FolderOpen />
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>Resume saved meadow</TooltipContent>
+              </Tooltip>
+            </div>
           </div>
         </header>
 
-        <main className="grid flex-1 grid-cols-1 gap-3 lg:grid-cols-[minmax(0,1fr)_400px]">
-          <section className="flex min-w-0 flex-col gap-3">
-            <div className="flex items-baseline justify-between gap-2 px-1">
-              <p className="text-sm">
-                <span className="font-medium">{sc.name}</span>
-                <span className="text-muted-foreground"> · {sc.tagline}</span>
-              </p>
-              <span className="hidden text-xs text-muted-foreground tabular sm:inline">
-                {seedChoice.kind === 'daily' ? "Today's meadow" : 'Seed'} {seed}
-              </span>
-            </div>
-            <WorldView maxSize={worldMax} selected={selected} onSelect={a => { setSelected(a); setTab('evolution') }} />
-            <div className="flex flex-wrap items-center justify-center gap-2 text-xs">
-              <Button size="xs" variant="outline" disabled={snap.phase === 'loading'} onClick={() => { setLoadStatus(''); game.save() }}>Save meadow</Button>
-              <Button size="xs" variant="outline" onClick={() => void resume()}>Resume saved meadow</Button>
-              <span role="status" className="text-muted-foreground">{loadStatus || snap.saveStatus}</span>
-            </div>
-            <Card className="gap-2 p-3">
-              <Transport onReset={reset} />
-              <Timeline />
-              <div className="flex flex-wrap items-center gap-x-4 gap-y-1 px-1 text-[11px] text-muted-foreground">
-                <Legend color="bg-rabbit" label="Rabbits (left scale)" />
-                <Legend color="bg-fox" label="Foxes (right scale)" />
-                <Legend color="bg-berry/40" label="Berries on bushes" />
-                <span className="flex items-center gap-1.5">
-                  <span className="inline-block w-4 border-t border-dashed border-rabbit" /> Forecast
-                </span>
-                <span className="ml-auto">Click or drag the graph to replay · {SPEEDS[snap.speed].label}</span>
-              </div>
-            </Card>
-          </section>
+        {view !== 'meadow' && <StatusStrip canStart={left >= 0} />}
 
-          <aside className="min-w-0">
-            <Card className="gap-0 p-0 lg:sticky lg:top-4 lg:max-h-[calc(100vh-2rem)] lg:overflow-hidden">
-              <Tabs value={tab} onValueChange={(v) => setTab(v as Tab)} className="flex h-full min-h-0 flex-col gap-0">
-                <div className="border-b p-2">
-                  <TabsList className="w-full">
-                    <TabsTrigger value="levers">Levers</TabsTrigger>
-                    <TabsTrigger value="run">Field notes</TabsTrigger>
-                    <TabsTrigger value="evolution">Evolution</TabsTrigger>
-                    <TabsTrigger value="guide">Guide</TabsTrigger>
-                  </TabsList>
+        {view === 'meadow' && (
+          <main className="grid flex-1 grid-cols-1 gap-3 lg:grid-cols-[minmax(0,1fr)_400px]">
+            <section className="flex min-w-0 flex-col gap-3">
+              <div className="flex items-baseline justify-between gap-2 px-1">
+                <p className="text-sm">
+                  <span className="font-medium">{sc.name}</span>
+                  <span className="text-muted-foreground"> · {sc.tagline}</span>
+                </p>
+                <span className="hidden text-xs text-muted-foreground tabular sm:inline">
+                  {seedChoice.kind === 'daily' ? "Today's meadow" : 'Seed'} {seed}
+                </span>
+              </div>
+              <WorldView maxSize={worldMax} selected={selected} onSelect={setSelected} />
+              <Card className="gap-2 p-3">
+                <Transport onReset={reset} />
+                <Timeline />
+                <div className="flex flex-wrap items-center gap-x-4 gap-y-1 px-1 text-[11px] text-muted-foreground">
+                  <Legend color="bg-rabbit" label="Rabbits (left scale)" />
+                  <Legend color="bg-fox" label="Foxes (right scale)" />
+                  <Legend color="bg-berry/40" label="Berries on bushes" />
+                  <span className="flex items-center gap-1.5">
+                    <span className="inline-block w-4 border-t border-dashed border-rabbit" /> Forecast
+                  </span>
+                  <span className="ml-auto">Click or drag the graph to replay · {SPEEDS[snap.speed].label}</span>
                 </div>
-                <div className="min-h-0 flex-1 overflow-y-auto p-3 lg:max-h-[calc(100vh-7rem)]">
-                  <TabsContent value="levers" className="mt-0">
+              </Card>
+            </section>
+
+            <aside className="min-w-0" aria-label={locked ? 'Run' : 'Setup'}>
+              <Card className="gap-0 p-0 lg:sticky lg:top-4 lg:max-h-[calc(100vh-2rem)]">
+                <div className="min-h-0 flex-1 p-3 lg:overflow-y-auto">
+                  {locked ? (
+                    <RunPanel
+                      inspector={selected && <AnimalInspector selected={selected} onSelect={setSelected} />}
+                      setup={<LockedSetup levers={levers} base={base} onUnlock={reset} />}
+                    />
+                  ) : (
                     <LeverPanel
                       levers={levers}
                       base={base}
-                      locked={locked}
                       onChange={(id, v) => setLevers((prev) => ({ ...prev, [id]: v }))}
                       onResetLevers={() => setLevers(STABLE_PRESET)}
-                      onUnlock={reset}
                     />
-                  </TabsContent>
-                  <TabsContent value="run" className="mt-0">
-                    <RunPanel />
-                  </TabsContent>
-                  <TabsContent value="evolution" className="mt-0">
-                    <EvolutionPanel selected={selected} onSelect={setSelected} />
-                  </TabsContent>
-                  <TabsContent value="guide" className="mt-0">
-                    <Guide />
-                  </TabsContent>
+                  )}
                 </div>
-              </Tabs>
+              </Card>
+            </aside>
+          </main>
+        )}
+
+        {view === 'evolution' && (
+          <main className="flex-1">
+            <EvolutionView selected={selected} onSelect={setSelected} />
+          </main>
+        )}
+
+        {view === 'guide' && (
+          <main className="flex-1">
+            <Card className="mx-auto w-full max-w-6xl gap-4 p-5 sm:p-8">
+              <h2 className="text-lg font-semibold">How to keep the meadow</h2>
+              <Guide />
             </Card>
-          </aside>
-        </main>
+          </main>
+        )}
 
         <footer className="px-1 pb-1 text-[11px] text-muted-foreground">
           One hour of meadow time is one simulation step. Every animal moves once per hour, and its genes steer it.
@@ -273,7 +331,7 @@ export default function App() {
         onOpenChange={(o) => !o && setDismissed(snap.runId)}
         onRetune={() => {
           setDismissed(snap.runId)
-          setTab('levers')
+          go('meadow')
           reset()
         }}
         onReplay={() => {
@@ -281,6 +339,12 @@ export default function App() {
           game.seek(0)
           game.play()
         }}
+      />
+      <Toaster
+        theme={theme}
+        position="bottom-center"
+        toastOptions={{ className: 'font-sans' }}
+        style={{ '--normal-bg': 'var(--popover)', '--normal-text': 'var(--popover-foreground)', '--normal-border': 'var(--border)' } as React.CSSProperties}
       />
     </TooltipProvider>
   )

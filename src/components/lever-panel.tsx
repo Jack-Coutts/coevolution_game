@@ -26,19 +26,15 @@ import { cn } from '@/lib/utils'
 interface Props {
   levers: LeverValues
   base: LeverValues
-  locked: boolean
   onChange: (id: string, value: number) => void
   onResetLevers: () => void
-  onUnlock: () => void
 }
 
-export function LeverPanel({ levers, base, locked, onChange, onResetLevers, onUnlock }: Props) {
+export function LeverPanel({ levers, base, onChange, onResetLevers }: Props) {
   const used = spent(levers, base)
   const left = Math.round((BUDGET - used) * 10) / 10
   const over = left < 0
-  const params = deriveParams(levers)
-  const defs = LEVERS
-  const changed = defs.filter((d) => Math.abs(levers[d.id] - base[d.id]) > 1e-9).length
+  const changed = LEVERS.filter((d) => Math.abs(levers[d.id] - base[d.id]) > 1e-9).length
 
   return (
     <div className="flex flex-col gap-3">
@@ -65,51 +61,73 @@ export function LeverPanel({ levers, base, locked, onChange, onResetLevers, onUn
           <span className="text-xs text-muted-foreground">
             {changed === 0 ? 'Starting balance' : `${changed} lever${changed === 1 ? '' : 's'} changed`}
           </span>
-          <Button variant="ghost" size="xs" onClick={onResetLevers} disabled={locked || changed === 0}>
+          <Button variant="ghost" size="xs" onClick={onResetLevers} disabled={changed === 0}>
             <RotateCcw /> Reset levers
           </Button>
         </div>
       </div>
 
-      {locked && (
-        <div className="flex items-center gap-2 rounded-lg border border-tone-warn-border bg-tone-warn p-2.5 text-xs text-tone-warn-foreground">
-          <Lock className="size-4 shrink-0" />
-          <span className="flex-1">Levers are locked while the meadow is running.</span>
-          <Button size="xs" variant="outline" onClick={onUnlock}>
-            Reset to retune
-          </Button>
-        </div>
-      )}
-
-      <Accordion type="multiple" defaultValue={['populations', 'food']} className="rounded-lg border">
-        {GROUPS.map((g) => {
-          const gdefs = defs.filter((d) => d.group === g.id)
-          if (gdefs.length === 0) return null
-          return (
-            <AccordionItem key={g.id} value={g.id} className="px-3">
-              <AccordionTrigger className="py-3 hover:no-underline">
-                <div className="flex flex-1 items-center justify-between pr-2">
-                  <span className="text-sm font-medium">{g.label}</span>
-                  <GroupCost defs={gdefs} levers={levers} base={base} />
-                </div>
-              </AccordionTrigger>
-              <AccordionContent className="flex flex-col gap-1 pb-4">
-                <p className="mb-1 text-xs text-muted-foreground">{g.blurb}</p>
-                <GroupBody
-                  group={g.id}
-                  defs={gdefs}
-                  levers={levers}
-                  base={base}
-                  locked={locked}
-                  onChange={onChange}
-                  params={params}
-                />
-              </AccordionContent>
-            </AccordionItem>
-          )
-        })}
-      </Accordion>
+      <LeverGroups levers={levers} base={base} locked={false} onChange={onChange} />
     </div>
+  )
+}
+
+/** The run's settings, read-only while the meadow is running. */
+export function LockedSetup({ levers, base, onUnlock }: { levers: LeverValues; base: LeverValues; onUnlock: () => void }) {
+  const left = Math.round((BUDGET - spent(levers, base)) * 10) / 10
+  return (
+    <Accordion type="single" collapsible className="rounded-lg border">
+      <div className="flex items-center gap-2 px-3 pt-2.5 text-xs">
+        <Lock className="size-4 shrink-0 text-muted-foreground" />
+        <span className="flex-1">
+          Setup locked <span className="text-muted-foreground tabular">· {left} pts unspent</span>
+        </span>
+        <Button size="xs" variant="outline" onClick={onUnlock}>
+          Reset to retune
+        </Button>
+      </div>
+      <AccordionItem value="settings" className="border-b-0 px-3">
+        <AccordionTrigger className="py-2 text-xs text-muted-foreground hover:no-underline">View this run's settings</AccordionTrigger>
+        <AccordionContent>
+          <LeverGroups levers={levers} base={base} locked onChange={() => {}} />
+        </AccordionContent>
+      </AccordionItem>
+    </Accordion>
+  )
+}
+
+function LeverGroups({ levers, base, locked, onChange }: { levers: LeverValues; base: LeverValues; locked: boolean; onChange: (id: string, v: number) => void }) {
+  const params = deriveParams(levers)
+  const defs = LEVERS
+  return (
+    <Accordion type="multiple" defaultValue={['populations', 'food']} className="rounded-lg border">
+      {GROUPS.map((g) => {
+        const gdefs = defs.filter((d) => d.group === g.id)
+        if (gdefs.length === 0) return null
+        return (
+          <AccordionItem key={g.id} value={g.id} className="px-3">
+            <AccordionTrigger className="py-3 hover:no-underline">
+              <div className="flex flex-1 items-center justify-between pr-2">
+                <span className="text-sm font-medium">{g.label}</span>
+                <GroupCost defs={gdefs} levers={levers} base={base} />
+              </div>
+            </AccordionTrigger>
+            <AccordionContent className="flex flex-col gap-1 pb-4">
+              <p className="mb-1 text-xs text-muted-foreground">{g.blurb}</p>
+              <GroupBody
+                group={g.id}
+                defs={gdefs}
+                levers={levers}
+                base={base}
+                locked={locked}
+                onChange={onChange}
+                params={params}
+              />
+            </AccordionContent>
+          </AccordionItem>
+        )
+      })}
+    </Accordion>
   )
 }
 
