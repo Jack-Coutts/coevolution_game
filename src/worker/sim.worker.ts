@@ -1,11 +1,14 @@
 /// <reference lib="webworker" />
 import { inheritedTraits, summarizeEvolution, type EvolutionSample } from '@/sim/evolution'
 import { Sim } from '@/sim/sim'
+import type { Species } from '@/sim/species'
 import {
   ANIMAL_STRIDE,
   BUSH_STRIDE,
   EVENT_KIND,
+  EVENT_SPECIES,
   EVENT_STRIDE,
+  PLANT_EVENT,
   STAT,
   STAT_STRIDE,
   type EndInfo,
@@ -21,9 +24,9 @@ let runId = 0
 /** Wall-clock budget per advance chunk so the worker stays responsive to new messages. */
 const CHUNK_MS = 24
 
-function packAnimals(s: Sim, species: 'prey' | 'pred'): Float32Array {
-  const pop = species === 'prey' ? s.prey : s.preds
-  const sp = species === 'prey' ? s.p.prey : s.p.pred
+function packAnimals(s: Sim, species: Species): Float32Array {
+  const pop = s.pops[species]
+  const sp = s.defs[species].body
   const out = new Float32Array(pop.length * ANIMAL_STRIDE)
   for (let i = 0; i < pop.length; i++) {
     const a = pop[i]
@@ -76,7 +79,7 @@ function frame(s: Sim): FrameData {
   s.events.forEach((e, i) => {
     const o = i * EVENT_STRIDE
     events[o] = EVENT_KIND.indexOf(e.kind)
-    events[o + 1] = e.species === 'prey' ? 0 : 1
+    events[o + 1] = e.species === null ? PLANT_EVENT : EVENT_SPECIES.indexOf(e.species)
     events[o + 2] = e.x
     events[o + 3] = e.y
   })
@@ -84,6 +87,7 @@ function frame(s: Sim): FrameData {
     tick: s.tick,
     prey: packAnimals(s, 'prey'),
     preds: packAnimals(s, 'pred'),
+    voles: packAnimals(s, 'vole'),
     bushes: packBushes(s),
     events,
   }
@@ -124,11 +128,22 @@ function writeStats(s: Sim, out: Float64Array, row: number): void {
   }
   out[o + STAT.preySpread] = s.prey.length ? spread / s.prey.length : 0
   out[o + STAT.predView] = s.preds.length ? s.preds.reduce((t, a) => t + a.view, 0) / s.preds.length : 0
+  const v = s.tally.vole
+  out[o + STAT.vole] = s.voles.length
+  out[o + STAT.voleEnergy] = mean(s.voles, 'energy', s.defs.vole.body.maxEnergy)
+  out[o + STAT.voleBorn] = v.born
+  out[o + STAT.voleStarved] = v.starved
+  out[o + STAT.voleEaten] = v.eaten
+  out[o + STAT.voleOld] = v.old
+  out[o + STAT.voleIllness] = v.illness
+  out[o + STAT.voleSick] = s.voles.filter(a => a.illUntil > s.tick).length
+  out[o + STAT.seed] = s.p.vole && s.grassSeed.length
+    ? s.grassSeed.reduce((t, n) => t + n, 0) / (s.p.vole.seedStock * s.grassSeed.length) : 0
 }
 
 function endInfo(s: Sim): EndInfo | null {
   if (!s.ended) return null
-  return { tick: s.tick, survived: s.survived, preyEnd: s.prey.length, predEnd: s.preds.length }
+  return { tick: s.tick, survived: s.survived, preyEnd: s.prey.length, predEnd: s.preds.length, voleEnd: s.voles.length, species: s.species }
 }
 
 function post(msg: FromWorker, transfer: Transferable[]): void {

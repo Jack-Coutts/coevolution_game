@@ -186,6 +186,14 @@ function inSpan(scenario: Scenario, tick: number): string | null {
 export function explain(h: RunHistory, end: EndInfo, scenario: Scenario): Explanation {
   const T = end.tick
   const when = `${dateLabel(T)} (day ${Math.floor(T / 24) + 1})`
+  const voles = end.species?.includes('vole') ?? false
+  if (end.survived && voles) {
+    return {
+      headline: `All three species made it through ${formatDuration(T)}.`,
+      detail: `The meadow ended with ${end.preyEnd} rabbits, ${end.voleEnd} voles and ${end.predEnd} foxes.`,
+      suggestions: ['Win with more of the budget unspent for a higher score.'],
+    }
+  }
   if (end.survived) {
     return {
       headline: `Both species made it through ${formatDuration(T)}.`,
@@ -196,6 +204,18 @@ export function explain(h: RunHistory, end: EndInfo, scenario: Scenario): Explan
   const from = Math.max(h.firstTick, T - 300)
   const context = inSpan(scenario, h.endless ? T % 8760 : T)
   const ctx = context ? ` This happened during the ${context.toLowerCase()} period.` : ''
+  // Vole meadow (hidden until #9): a plain account by cause; #9 adds the full vole explanations.
+  if (voles && end.voleEnd === 0 && end.preyEnd > 0 && end.predEnd > 0) {
+    const eaten = delta(h, 'voleEaten', from, T)
+    const starved = delta(h, 'voleStarved', from, T)
+    const ill = delta(h, 'voleIllness', from, T)
+    const old = delta(h, 'voleOld', from, T)
+    return {
+      headline: `Voles died out on ${when}.`,
+      detail: `In their last 12 days ${starved} voles starved, ${eaten} were eaten by foxes, ${ill} ran out of energy while ill and ${old} died of old age.${ctx}`,
+      suggestions: ['Keep enough tall grass for vole seed', 'Watch for foxes turning to voles when rabbits are scarce'],
+    }
+  }
   const species = end.predEnd === 0 ? 'pred' : 'prey'
   const illness = delta(h, species === 'pred' ? 'predIllness' : 'preyIllness', from, T)
   const other = delta(h, species === 'pred' ? 'predStarved' : 'preyStarved', from, T) +

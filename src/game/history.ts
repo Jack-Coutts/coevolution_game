@@ -1,5 +1,6 @@
 import type { Intervention } from '@/sim/sim'
 import type { EvolutionSample, JournalEntry } from '@/sim/evolution'
+import { FOOD_WEB, perSpecies, TWO_SPECIES, type Species } from '@/sim/species'
 import { STAT, STAT_STRIDE, type FrameData } from '@/worker/protocol'
 
 export const HISTORY_HOURS = 8760
@@ -11,16 +12,22 @@ const KEY_EVERY = 3
 export class RunHistory {
   readonly limit: number
   readonly endless: boolean
+  /** The species in this meadow. */
+  readonly species: readonly Species[]
   readonly stats = new Float64Array(CAPACITY * STAT_STRIDE)
   head = 0
   start = 0
   interventions: { tick: number; action: Intervention }[] = []
   evolution: EvolutionSample[] = []
   journal: JournalEntry[] = []
-  private highestGeneration = { prey: 0, pred: 0 }
+  private highestGeneration: Record<Species, number> = perSpecies(() => 0)
   private frames = new Map<number, FrameData>()
 
-  constructor(horizon: number, endless = false) { this.limit = horizon; this.endless = endless }
+  constructor(horizon: number, endless = false, species: readonly Species[] = TWO_SPECIES) {
+    this.limit = horizon
+    this.endless = endless
+    this.species = species
+  }
   get horizon(): number { return this.endless ? Math.max(this.limit, this.head + 300) : this.limit }
   get firstTick(): number { return Math.max(this.start, this.head - HISTORY_HOURS) }
 
@@ -38,16 +45,17 @@ export class RunHistory {
   addEvolution(sample: EvolutionSample): void {
     const prev = this.evolution.at(-1)
     if (prev?.tick === sample.tick) return
-    for (const s of ['prey', 'pred'] as const) {
-      const label = s === 'prey' ? 'Rabbit' : 'Fox'
+    for (const s of this.species) {
+      const name = FOOD_WEB[s].name
+      const label = name.charAt(0).toUpperCase() + name.slice(1)
       if (prev && Math.floor(sample[s].generation / 5) > Math.floor(this.highestGeneration[s] / 5))
         this.journal.push({ tick: sample.tick, text: `${label} descendants reached generation ${sample[s].generation}.` })
       this.highestGeneration[s] = Math.max(this.highestGeneration[s], sample[s].generation)
       if (prev && prev[s].lineages > 1 && sample[s].lineages === 1)
         this.journal.push({ tick: sample.tick, text: `One founding ${label.toLowerCase()} lineage remains.` })
     }
-    if (prev && sample.prey.count > 0 && sample.pred.count > 0 && Math.floor(sample.tick / 8760) > Math.floor(prev.tick / 8760))
-      this.journal.push({ tick: sample.tick, text: `Both species reached year ${Math.floor(sample.tick / 8760) + 1}.` })
+    if (prev && this.species.every(s => sample[s].count > 0) && Math.floor(sample.tick / 8760) > Math.floor(prev.tick / 8760))
+      this.journal.push({ tick: sample.tick, text: `${this.species.length === 2 ? 'Both' : 'All'} species reached year ${Math.floor(sample.tick / 8760) + 1}.` })
     this.journal = this.journal.slice(-80)
     this.evolution.push(sample)
     // Preserve the founder reference, plus the most recent daily observations.
