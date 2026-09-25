@@ -1,0 +1,972 @@
+{
+ "start": 9100,
+ "count": 10,
+ "node": "v22.22.2",
+ "platform": "linux x64",
+ "rows": [
+  {
+   "scenario": "stable",
+   "seed": 9100,
+   "survived": true,
+   "tick": 8760,
+   "firstExtinct": [],
+   "end": {
+    "prey": 154,
+    "pred": 14
+   },
+   "peak": {
+    "prey": 335,
+    "pred": 21
+   },
+   "safetyLimitHits": 0,
+   "tally": {
+    "prey": {
+     "born": 7401,
+     "starved": 6934,
+     "eaten": 409,
+     "old": 64,
+     "illness": 0,
+     "culled": 0
+    },
+    "pred": {
+     "born": 109,
+     "starved": 16,
+     "eaten": 0,
+     "old": 85,
+     "illness": 0,
+     "culled": 0
+    }
+   },
+   "stepMsPerYear": 7406.688842000017,
+   "packMsPerYear": 1623.3423059999448,
+   "meanFrameBytes": 17949.24292237443,
+   "maxFrameBytes": 31296,
+   "statsRowValues": 32,
+   "historyStatsBytes": 2242816,
+   "savedHistoryBytes": 8175608,
+   "grassSeedLeft": null
+  },
+  {
+   "scenario": "voles",
+   "seed": 9100,
+   "survived": true,
+   "tick": 8760,
+   "firstExtinct": [],
+   "end": {
+    "prey": 117,
+    "pred": 49,
+    "vole": 114
+   },
+   "peak": {
+    "prey": 291,
+    "pred": 65,
+    "vole": 317
+   },
+   "safetyLimitHits": 0,
+   "tally": {
+    "prey": {
+     "born": 6658,
+     "starved": 5083,
+     "eaten": 1591,
+     "old": 27,
+     "illness": 0,
+     "culled": 0
+    },
+    "pred": {
+     "born": 344,
+     "starved": 171,
+     "eaten": 0,
+     "old": 130,
+     "illness": 0,
+     "culled": 0
+    },
+    "vole": {
+     "born": 14019,
+     "starved": 12251,
+     "eaten": 1226,
+     "old": 488,
+     "illness": 0,
+     "culled": 0
+    }
+   },
+   "stepMsPerYear": 15287.852278999808,
+   "packMsPerYear": 2119.3698149999927,
+   "meanFrameBytes": 26439.008219178082,
+   "maxFrameBytes": 51480,
+   "statsRowValues": 32,
+   "historyStatsBytes": 2242816,
+   "savedHistoryBytes": 12094904,
+   "grassSeedLeft": 3.4999999999999996
+  },
+  {
+   "scenario": "stable",
+   "seed": 9101,
+   "survived": false,
+   "tick": 3453,
+   "firstExtinct": [
+    "pred"
+   ],
+   "end": {
+    "prey": 91,
+    "pred": 0
+   },
+   "peak": {
+    "prey": 378,
+    "pred": 17
+   },
+   "safetyLimitHits": 0,
+   "tally": {
+    "prey": {
+     "born": 3261,
+     "starved": 3210,
+     "eaten": 99,
+     "old": 21,
+     "illness": 0,
+     "culled": 0
+    },
+    "pred": {
+     "born": 23,
+     "starved": 11,
+     "eaten": 0,
+     "old": 18,
+     "illness": 0,
+     "culled": 0
+    }
+   },
+   "stepMsPerYear": 11691.475988149836,
+   "packMsPerYear": 2467.179181025348,
+   "meanFrameBytes": 20227.836663770635,
+   "maxFrameBytes": 34928,
+   "statsRowValues": 32,
+   "historyStatsBytes": 2242816,
+   "savedHistoryBytes": 5669416,
+   "grassSeedLeft": null
+  },
+  {
+   "scenario": "voles",
+   "seed": 9101,
+   "survived": true,
+   "tick": 8760,
+   "firstExtinct": [],
+   "end": {
+    "prey": 176,
+    "pred": 22,
+    "vole": 115
+   },
+   "peak": {
+    "prey": 391,
+    "pred": 50,
+    "vole": 309
+   },
+   "safetyLimitHits": 0,
+   "tally": {
+    "prey": {
+     "born": 8047,
+     "starved": 7507,
+     "eaten": 462,
+     "old": 62,
+     "illness": 0,
+     "culled": 0
+    },
+    "pred": {
+     "born": 194,
+     "starved": 20,
+     "eaten": 0,
+     "old": 158,
+     "illness": 0,
+     "culled": 0
+    },
+    "vole": {
+     "born": 15639,
+     "starved": 14387,
+     "eaten": 826,
+     "old": 371,
+     "illness": 0,
+     "culled": 0
+    }
+   },
+   "stepMsPerYear": 19905.429626000187,
+   "packMsPerYear": 3113.5243549998995,
+   "meanFrameBytes": 32206.41369863014,
+   "maxFrameBytes": 50312,
+   "statsRowValues": 32,
+   "historyStatsBytes": 2242816,
+   "savedHistoryBytes": 12368288,
+   "grassSeedLeft": 3.4499999999999997
+  },
+  {
+   "scenario": "stable",
+   "seed": 9102,
+   "survived": false,
+   "tick": 3026,
+   "firstExtinct": [
+    "pred"
+   ],
+   "end": {
+    "prey": 151,
+    "pred": 0
+   },
+   "peak": {
+    "prey": 386,
+    "pred": 27
+   },
+   "safetyLimitHits": 0,
+   "tally": {
+    "prey": {
+     "born": 2208,
+     "starved": 1964,
+     "eaten": 245,
+     "old": 8,
+     "illness": 0,
+     "culled": 0
+    },
+    "pred": {
+     "born": 50,
+     "starved": 26,
+     "eaten": 0,
+     "old": 30,
+     "illness": 0,
+     "culled": 0
+    }
+   },
+   "stepMsPerYear": 6545.23750064826,
+   "packMsPerYear": 1476.2163193920542,
+   "meanFrameBytes": 14331.05353602115,
+   "maxFrameBytes": 36384,
+   "statsRowValues": 32,
+   "historyStatsBytes": 2242816,
+   "savedHistoryBytes": 5897096,
+   "grassSeedLeft": null
+  },
+  {
+   "scenario": "voles",
+   "seed": 9102,
+   "survived": true,
+   "tick": 8760,
+   "firstExtinct": [],
+   "end": {
+    "prey": 108,
+    "pred": 7,
+    "vole": 140
+   },
+   "peak": {
+    "prey": 233,
+    "pred": 32,
+    "vole": 289
+   },
+   "safetyLimitHits": 0,
+   "tally": {
+    "prey": {
+     "born": 3997,
+     "starved": 3433,
+     "eaten": 603,
+     "old": 13,
+     "illness": 0,
+     "culled": 0
+    },
+    "pred": {
+     "born": 158,
+     "starved": 51,
+     "eaten": 0,
+     "old": 106,
+     "illness": 0,
+     "culled": 0
+    },
+    "vole": {
+     "born": 18708,
+     "starved": 17726,
+     "eaten": 306,
+     "old": 596,
+     "illness": 0,
+     "culled": 0
+    }
+   },
+   "stepMsPerYear": 9187.200541999555,
+   "packMsPerYear": 1478.2221750001627,
+   "meanFrameBytes": 24198.03105022831,
+   "maxFrameBytes": 47344,
+   "statsRowValues": 32,
+   "historyStatsBytes": 2242816,
+   "savedHistoryBytes": 11809464,
+   "grassSeedLeft": 1.175
+  },
+  {
+   "scenario": "stable",
+   "seed": 9103,
+   "survived": false,
+   "tick": 2019,
+   "firstExtinct": [
+    "prey"
+   ],
+   "end": {
+    "prey": 0,
+    "pred": 90
+   },
+   "peak": {
+    "prey": 351,
+    "pred": 102
+   },
+   "safetyLimitHits": 0,
+   "tally": {
+    "prey": {
+     "born": 1932,
+     "starved": 1344,
+     "eaten": 743,
+     "old": 5,
+     "illness": 0,
+     "culled": 0
+    },
+    "pred": {
+     "born": 147,
+     "starved": 32,
+     "eaten": 0,
+     "old": 31,
+     "illness": 0,
+     "culled": 0
+    }
+   },
+   "stepMsPerYear": 11407.921619730583,
+   "packMsPerYear": 2114.387975395581,
+   "meanFrameBytes": 22068.881624566617,
+   "maxFrameBytes": 33152,
+   "statsRowValues": 32,
+   "historyStatsBytes": 2242816,
+   "savedHistoryBytes": 6203968,
+   "grassSeedLeft": null
+  },
+  {
+   "scenario": "voles",
+   "seed": 9103,
+   "survived": false,
+   "tick": 1975,
+   "firstExtinct": [
+    "prey"
+   ],
+   "end": {
+    "prey": 0,
+    "pred": 93,
+    "vole": 41
+   },
+   "peak": {
+    "prey": 305,
+    "pred": 93,
+    "vole": 264
+   },
+   "safetyLimitHits": 0,
+   "tally": {
+    "prey": {
+     "born": 1722,
+     "starved": 1359,
+     "eaten": 513,
+     "old": 10,
+     "illness": 0,
+     "culled": 0
+    },
+    "pred": {
+     "born": 142,
+     "starved": 24,
+     "eaten": 0,
+     "old": 31,
+     "illness": 0,
+     "culled": 0
+    },
+    "vole": {
+     "born": 2853,
+     "starved": 2252,
+     "eaten": 556,
+     "old": 64,
+     "illness": 0,
+     "culled": 0
+    }
+   },
+   "stepMsPerYear": 16693.543264467567,
+   "packMsPerYear": 2409.414740536407,
+   "meanFrameBytes": 30395.24860759494,
+   "maxFrameBytes": 45328,
+   "statsRowValues": 32,
+   "historyStatsBytes": 2242816,
+   "savedHistoryBytes": 8867904,
+   "grassSeedLeft": 8.274999999999999
+  },
+  {
+   "scenario": "stable",
+   "seed": 9104,
+   "survived": false,
+   "tick": 8149,
+   "firstExtinct": [
+    "prey"
+   ],
+   "end": {
+    "prey": 0,
+    "pred": 26
+   },
+   "peak": {
+    "prey": 323,
+    "pred": 81
+   },
+   "safetyLimitHits": 0,
+   "tally": {
+    "prey": {
+     "born": 6609,
+     "starved": 4654,
+     "eaten": 2095,
+     "old": 20,
+     "illness": 0,
+     "culled": 0
+    },
+    "pred": {
+     "born": 350,
+     "starved": 239,
+     "eaten": 0,
+     "old": 91,
+     "illness": 0,
+     "culled": 0
+    }
+   },
+   "stepMsPerYear": 10333.249416880411,
+   "packMsPerYear": 2977.332170083047,
+   "meanFrameBytes": 15405.143207755553,
+   "maxFrameBytes": 33728,
+   "statsRowValues": 32,
+   "historyStatsBytes": 2242816,
+   "savedHistoryBytes": 4361536,
+   "grassSeedLeft": null
+  },
+  {
+   "scenario": "voles",
+   "seed": 9104,
+   "survived": true,
+   "tick": 8760,
+   "firstExtinct": [],
+   "end": {
+    "prey": 122,
+    "pred": 6,
+    "vole": 112
+   },
+   "peak": {
+    "prey": 292,
+    "pred": 23,
+    "vole": 282
+   },
+   "safetyLimitHits": 0,
+   "tally": {
+    "prey": {
+     "born": 6676,
+     "starved": 6407,
+     "eaten": 234,
+     "old": 73,
+     "illness": 0,
+     "culled": 0
+    },
+    "pred": {
+     "born": 115,
+     "starved": 26,
+     "eaten": 0,
+     "old": 89,
+     "illness": 0,
+     "culled": 0
+    },
+    "vole": {
+     "born": 15120,
+     "starved": 13576,
+     "eaten": 741,
+     "old": 751,
+     "illness": 0,
+     "culled": 0
+    }
+   },
+   "stepMsPerYear": 10812.521511999963,
+   "packMsPerYear": 1817.1770600002783,
+   "meanFrameBytes": 26880.55799086758,
+   "maxFrameBytes": 47920,
+   "statsRowValues": 32,
+   "historyStatsBytes": 2242816,
+   "savedHistoryBytes": 11010912,
+   "grassSeedLeft": 1.2
+  },
+  {
+   "scenario": "stable",
+   "seed": 9105,
+   "survived": false,
+   "tick": 1258,
+   "firstExtinct": [
+    "prey"
+   ],
+   "end": {
+    "prey": 0,
+    "pred": 22
+   },
+   "peak": {
+    "prey": 354,
+    "pred": 38
+   },
+   "safetyLimitHits": 0,
+   "tally": {
+    "prey": {
+     "born": 946,
+     "starved": 893,
+     "eaten": 212,
+     "old": 1,
+     "illness": 0,
+     "culled": 0
+    },
+    "pred": {
+     "born": 41,
+     "starved": 16,
+     "eaten": 0,
+     "old": 9,
+     "illness": 0,
+     "culled": 0
+    }
+   },
+   "stepMsPerYear": 6360.790086871562,
+   "packMsPerYear": 1224.6345118271736,
+   "meanFrameBytes": 16315.154213036565,
+   "maxFrameBytes": 33680,
+   "statsRowValues": 32,
+   "historyStatsBytes": 2242816,
+   "savedHistoryBytes": 3844480,
+   "grassSeedLeft": null
+  },
+  {
+   "scenario": "voles",
+   "seed": 9105,
+   "survived": false,
+   "tick": 2724,
+   "firstExtinct": [
+    "prey"
+   ],
+   "end": {
+    "prey": 0,
+    "pred": 107,
+    "vole": 4
+   },
+   "peak": {
+    "prey": 303,
+    "pred": 109,
+    "vole": 294
+   },
+   "safetyLimitHits": 0,
+   "tally": {
+    "prey": {
+     "born": 1910,
+     "starved": 1409,
+     "eaten": 660,
+     "old": 1,
+     "illness": 0,
+     "culled": 0
+    },
+    "pred": {
+     "born": 186,
+     "starved": 37,
+     "eaten": 0,
+     "old": 48,
+     "illness": 0,
+     "culled": 0
+    },
+    "vole": {
+     "born": 3045,
+     "starved": 2468,
+     "eaten": 581,
+     "old": 52,
+     "illness": 0,
+     "culled": 0
+    }
+   },
+   "stepMsPerYear": 9894.508629074387,
+   "packMsPerYear": 1349.8953992077986,
+   "meanFrameBytes": 21122.246696035243,
+   "maxFrameBytes": 48280,
+   "statsRowValues": 32,
+   "historyStatsBytes": 2242816,
+   "savedHistoryBytes": 9065408,
+   "grassSeedLeft": 13.9
+  },
+  {
+   "scenario": "stable",
+   "seed": 9106,
+   "survived": false,
+   "tick": 4540,
+   "firstExtinct": [
+    "prey"
+   ],
+   "end": {
+    "prey": 0,
+    "pred": 2
+   },
+   "peak": {
+    "prey": 410,
+    "pred": 73
+   },
+   "safetyLimitHits": 0,
+   "tally": {
+    "prey": {
+     "born": 3891,
+     "starved": 2728,
+     "eaten": 1317,
+     "old": 6,
+     "illness": 0,
+     "culled": 0
+    },
+    "pred": {
+     "born": 206,
+     "starved": 153,
+     "eaten": 0,
+     "old": 57,
+     "illness": 0,
+     "culled": 0
+    }
+   },
+   "stepMsPerYear": 7774.222331153515,
+   "packMsPerYear": 1501.54067508428,
+   "meanFrameBytes": 16439.62114537445,
+   "maxFrameBytes": 38776,
+   "statsRowValues": 32,
+   "historyStatsBytes": 2242816,
+   "savedHistoryBytes": 2929056,
+   "grassSeedLeft": null
+  },
+  {
+   "scenario": "voles",
+   "seed": 9106,
+   "survived": false,
+   "tick": 8284,
+   "firstExtinct": [
+    "prey"
+   ],
+   "end": {
+    "prey": 0,
+    "pred": 151,
+    "vole": 58
+   },
+   "peak": {
+    "prey": 346,
+    "pred": 209,
+    "vole": 286
+   },
+   "safetyLimitHits": 0,
+   "tally": {
+    "prey": {
+     "born": 7583,
+     "starved": 4388,
+     "eaten": 3326,
+     "old": 29,
+     "illness": 0,
+     "culled": 0
+    },
+    "pred": {
+     "born": 800,
+     "starved": 226,
+     "eaten": 0,
+     "old": 429,
+     "illness": 0,
+     "culled": 0
+    },
+    "vole": {
+     "born": 6249,
+     "starved": 5372,
+     "eaten": 678,
+     "old": 201,
+     "illness": 0,
+     "culled": 0
+    }
+   },
+   "stepMsPerYear": 17852.8645145535,
+   "packMsPerYear": 2340.363393998047,
+   "meanFrameBytes": 26945.042974408498,
+   "maxFrameBytes": 47168,
+   "statsRowValues": 32,
+   "historyStatsBytes": 2242816,
+   "savedHistoryBytes": 10822976,
+   "grassSeedLeft": 13.05
+  },
+  {
+   "scenario": "stable",
+   "seed": 9107,
+   "survived": true,
+   "tick": 8760,
+   "firstExtinct": [],
+   "end": {
+    "prey": 87,
+    "pred": 79
+   },
+   "peak": {
+    "prey": 365,
+    "pred": 180
+   },
+   "safetyLimitHits": 0,
+   "tally": {
+    "prey": {
+     "born": 9194,
+     "starved": 5953,
+     "eaten": 3299,
+     "old": 15,
+     "illness": 0,
+     "culled": 0
+    },
+    "pred": {
+     "born": 835,
+     "starved": 219,
+     "eaten": 0,
+     "old": 543,
+     "illness": 0,
+     "culled": 0
+    }
+   },
+   "stepMsPerYear": 14780.246007000576,
+   "packMsPerYear": 2671.586299998773,
+   "meanFrameBytes": 22960.44200913242,
+   "maxFrameBytes": 42608,
+   "statsRowValues": 32,
+   "historyStatsBytes": 2242816,
+   "savedHistoryBytes": 9656592,
+   "grassSeedLeft": null
+  },
+  {
+   "scenario": "voles",
+   "seed": 9107,
+   "survived": false,
+   "tick": 4342,
+   "firstExtinct": [
+    "vole"
+   ],
+   "end": {
+    "prey": 179,
+    "pred": 48,
+    "vole": 0
+   },
+   "peak": {
+    "prey": 310,
+    "pred": 56,
+    "vole": 340
+   },
+   "safetyLimitHits": 0,
+   "tally": {
+    "prey": {
+     "born": 3775,
+     "starved": 3085,
+     "eaten": 655,
+     "old": 16,
+     "illness": 0,
+     "culled": 0
+    },
+    "pred": {
+     "born": 206,
+     "starved": 55,
+     "eaten": 0,
+     "old": 109,
+     "illness": 0,
+     "culled": 0
+    },
+    "vole": {
+     "born": 4299,
+     "starved": 3636,
+     "eaten": 611,
+     "old": 112,
+     "illness": 0,
+     "culled": 0
+    }
+   },
+   "stepMsPerYear": 17736.635155079784,
+   "packMsPerYear": 2711.662315439508,
+   "meanFrameBytes": 25738.336250575772,
+   "maxFrameBytes": 50216,
+   "statsRowValues": 32,
+   "historyStatsBytes": 2242816,
+   "savedHistoryBytes": 9861960,
+   "grassSeedLeft": 18.175
+  },
+  {
+   "scenario": "stable",
+   "seed": 9108,
+   "survived": true,
+   "tick": 8760,
+   "firstExtinct": [],
+   "end": {
+    "prey": 152,
+    "pred": 84
+   },
+   "peak": {
+    "prey": 405,
+    "pred": 172
+   },
+   "safetyLimitHits": 0,
+   "tally": {
+    "prey": {
+     "born": 10239,
+     "starved": 7185,
+     "eaten": 3024,
+     "old": 38,
+     "illness": 0,
+     "culled": 0
+    },
+    "pred": {
+     "born": 663,
+     "starved": 267,
+     "eaten": 0,
+     "old": 318,
+     "illness": 0,
+     "culled": 0
+    }
+   },
+   "stepMsPerYear": 16663.365422999108,
+   "packMsPerYear": 2905.9225500000757,
+   "meanFrameBytes": 25612.02100456621,
+   "maxFrameBytes": 39384,
+   "statsRowValues": 32,
+   "historyStatsBytes": 2242816,
+   "savedHistoryBytes": 13265496,
+   "grassSeedLeft": null
+  },
+  {
+   "scenario": "voles",
+   "seed": 9108,
+   "survived": true,
+   "tick": 8760,
+   "firstExtinct": [],
+   "end": {
+    "prey": 285,
+    "pred": 115,
+    "vole": 81
+   },
+   "peak": {
+    "prey": 370,
+    "pred": 186,
+    "vole": 355
+   },
+   "safetyLimitHits": 0,
+   "tally": {
+    "prey": {
+     "born": 8072,
+     "starved": 4472,
+     "eaten": 3449,
+     "old": 26,
+     "illness": 0,
+     "culled": 0
+    },
+    "pred": {
+     "born": 856,
+     "starved": 351,
+     "eaten": 0,
+     "old": 396,
+     "illness": 0,
+     "culled": 0
+    },
+    "vole": {
+     "born": 11688,
+     "starved": 9964,
+     "eaten": 1338,
+     "old": 365,
+     "illness": 0,
+     "culled": 0
+    }
+   },
+   "stepMsPerYear": 22066.776885000698,
+   "packMsPerYear": 2777.863792000775,
+   "meanFrameBytes": 30954.720547945206,
+   "maxFrameBytes": 53944,
+   "statsRowValues": 32,
+   "historyStatsBytes": 2242816,
+   "savedHistoryBytes": 16184368,
+   "grassSeedLeft": 10.475000000000001
+  },
+  {
+   "scenario": "stable",
+   "seed": 9109,
+   "survived": false,
+   "tick": 1784,
+   "firstExtinct": [
+    "prey"
+   ],
+   "end": {
+    "prey": 0,
+    "pred": 62
+   },
+   "peak": {
+    "prey": 365,
+    "pred": 64
+   },
+   "safetyLimitHits": 0,
+   "tally": {
+    "prey": {
+     "born": 1569,
+     "starved": 1239,
+     "eaten": 486,
+     "old": 4,
+     "illness": 0,
+     "culled": 0
+    },
+    "pred": {
+     "born": 98,
+     "starved": 23,
+     "eaten": 0,
+     "old": 19,
+     "illness": 0,
+     "culled": 0
+    }
+   },
+   "stepMsPerYear": 11637.142526572325,
+   "packMsPerYear": 2261.81301181864,
+   "meanFrameBytes": 20226.381165919283,
+   "maxFrameBytes": 34248,
+   "statsRowValues": 32,
+   "historyStatsBytes": 2242816,
+   "savedHistoryBytes": 5290000,
+   "grassSeedLeft": null
+  },
+  {
+   "scenario": "voles",
+   "seed": 9109,
+   "survived": false,
+   "tick": 2633,
+   "firstExtinct": [
+    "prey"
+   ],
+   "end": {
+    "prey": 0,
+    "pred": 124,
+    "vole": 3
+   },
+   "peak": {
+    "prey": 349,
+    "pred": 139,
+    "vole": 280
+   },
+   "safetyLimitHits": 0,
+   "tally": {
+    "prey": {
+     "born": 1852,
+     "starved": 1214,
+     "eaten": 792,
+     "old": 6,
+     "illness": 0,
+     "culled": 0
+    },
+    "pred": {
+     "born": 218,
+     "starved": 47,
+     "eaten": 0,
+     "old": 53,
+     "illness": 0,
+     "culled": 0
+    },
+    "vole": {
+     "born": 3852,
+     "starved": 3100,
+     "eaten": 730,
+     "old": 79,
+     "illness": 0,
+     "culled": 0
+    }
+   },
+   "stepMsPerYear": 12793.76631655199,
+   "packMsPerYear": 1857.9514813700387,
+   "meanFrameBytes": 25841.115077857958,
+   "maxFrameBytes": 47912,
+   "statsRowValues": 32,
+   "historyStatsBytes": 2242816,
+   "savedHistoryBytes": 8296912,
+   "grassSeedLeft": 17.725
+  }
+ ]
+}
