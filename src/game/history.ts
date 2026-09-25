@@ -1,7 +1,7 @@
 import type { Intervention } from '@/sim/sim'
 import type { EvolutionSample, JournalEntry } from '@/sim/evolution'
 import { FOOD_WEB, perSpecies, TWO_SPECIES, type Species } from '@/sim/species'
-import { STAT, STAT_STRIDE, type FrameData } from '@/worker/protocol'
+import { ANIMAL_STRIDE, STAT, STAT_STRIDE, type FrameData } from '@/worker/protocol'
 
 export const HISTORY_HOURS = 8760
 const CAPACITY = HISTORY_HOURS + 1
@@ -64,7 +64,9 @@ export class RunHistory {
 
   save() {
     return { stats: this.stats, highestGeneration: this.highestGeneration, head: this.head, start: Math.max(this.firstTick, this.head - RECENT),
-      frames: [...this.frames.entries()].filter(([t]) => t >= this.head - RECENT) }
+      frames: [...this.frames.entries()].filter(([t]) => t >= this.head - RECENT),
+      /** Floats per animal in `frames`; saves without it used the pre-body-size stride. */
+      animalStride: ANIMAL_STRIDE as number | undefined }
   }
 
   restore(data: ReturnType<RunHistory['save']>): void {

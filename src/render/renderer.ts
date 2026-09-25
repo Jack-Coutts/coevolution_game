@@ -1,4 +1,4 @@
-import { ANIMAL_STRIDE, BUSH_STRIDE, EVENT_KIND, EVENT_STRIDE, type FrameData } from '@/worker/protocol'
+import { ANIMAL_SIZE, ANIMAL_STRIDE, BUSH_STRIDE, EVENT_KIND, EVENT_STRIDE, type FrameData } from '@/worker/protocol'
 import { foxSheet, GAIT_FRAMES, rabbitSheet, type SpriteSheet } from './sprites'
 import { paintBush, paintEarth, paintTerrain, type BushSprite, type TerrainLayers } from './terrain'
 
@@ -261,7 +261,9 @@ export class WorldRenderer {
       }
       const maturity = b[i + 6]
       const pace = b[i + 7]
-      const scale = 0.55 + 0.45 * maturity
+      // Young animals are drawn smaller; inherited body size (×0.8–1.25) scales every age alike.
+      // Hunger and illness are rings, never size, so they cannot be mistaken for inherited change.
+      const scale = (0.55 + 0.45 * maturity) * (b[i + ANIMAL_SIZE] || 1)
       const phase = pace > 0.04 ? (now / 1000) * gaitHz * (0.4 + pace) + id * 0.618 : id * 0.618
       const frame = sheet.frames[Math.floor((phase % 1) * GAIT_FRAMES) % GAIT_FRAMES]
       const [cx, cy] = this.toCanvas(x, y, S)

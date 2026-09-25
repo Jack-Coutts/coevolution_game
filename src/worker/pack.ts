@@ -28,7 +28,8 @@ function packAnimals(s: Sim, species: Species): Float32Array {
     out[o + 2] = a.y
     out[o + 3] = a.hx
     out[o + 4] = a.hy
-    out[o + 5] = a.energy / sp.maxEnergy
+    // Energy as a share of this animal's own maximum, so a small body is not shown as hungry.
+    out[o + 5] = a.energy / a.maxEnergy
     out[o + 6] = Math.min(1, a.age / sp.adultAge)
     out[o + 7] = a.pace
     out[o + 8] = a.inCover ? 1 : 0
@@ -46,6 +47,7 @@ function packAnimals(s: Sim, species: Species): Float32Array {
     out[o + 19] = t.cruise
     out[o + 20] = t.hide
     out[o + 21] = Math.max(0, a.illUntil - s.tick)
+    out[o + 22] = a.size
   }
   return out
 }

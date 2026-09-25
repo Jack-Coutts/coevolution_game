@@ -3,10 +3,10 @@ import { useGame } from '@/hooks/use-game'
 import { TRAITS, type TraitKey } from '@/sim/evolution'
 import type { Species } from '@/sim/sim'
 import { formatHours } from '@/sim/time'
-import { ANIMAL_STRIDE } from '@/worker/protocol'
+import { ANIMAL_SIZE, ANIMAL_STRIDE } from '@/worker/protocol'
 
 export interface AnimalSelection { species: Species; id: number }
-const LABELS: Record<TraitKey, string> = { forage: 'Food seeking', flee: 'Threat avoidance', cruise: 'Cruising pace', hide: 'Cover seeking' }
+const LABELS: Record<TraitKey, string> = { forage: 'Food seeking', flee: 'Threat avoidance', cruise: 'Cruising pace', hide: 'Cover seeking', size: 'Body size' }
 export function EvolutionPanel({ selected, onSelect }: { selected: AnimalSelection | null; onSelect: (a: AnimalSelection | null) => void }) {
   const [game, snap] = useGame()
   const [species, setSpecies] = useState<Species>('prey')
@@ -53,7 +53,7 @@ export function EvolutionPanel({ selected, onSelect }: { selected: AnimalSelecti
         <text x="30" y="147" fill="currentColor" fontSize="10">Day {Math.floor(from / 24) + 1}</text>
         <text x="320" y="147" textAnchor="end" fill="currentColor" fontSize="10">Day {Math.floor(end / 24) + 1}</text>
       </svg>
-      <p className="text-[11px] text-muted-foreground">Line: mean · band: middle 80% · dashed: founders. {trait === 'cruise' ? '0 = resting, 1 = maximum pace.' : 'Positive = stronger response; negative = the opposite.'}</p>
+      <p className="text-[11px] text-muted-foreground">Line: mean · band: middle 80% · dashed: founders. {trait === 'cruise' ? '0 = resting, 1 = maximum pace.' : trait === 'size' ? 'Inherited body size: 1 = the usual body, 0.8 small to 1.25 large (only with body evolution on).' : 'Positive = stronger response; negative = the opposite.'}</p>
       <div className="mt-3 grid grid-cols-3 gap-2 text-center text-xs">
         <div><strong className="block text-lg">{pop?.generation ?? 0}</strong>Highest living generation</div>
         <div><strong className="block text-lg">{pop?.lineages ?? 0}</strong>Founder lineages</div>
@@ -74,6 +74,7 @@ export function EvolutionPanel({ selected, onSelect }: { selected: AnimalSelecti
           {Object.entries({ Generation: animal[9], Age: formatHours(animal[10]), Energy: `${Math.round(animal[5] * 100)}%`,
             Health: animal[21] > 0 ? `Ill for up to ${formatHours(animal[21])} more` : 'Well', Offspring: animal[13], Parent: animal[11] < 0 ? 'Founder / arrival' : `#${animal[11]}`, Lineage: `#${animal[12]}`,
             'Sight range': `${Math.round(animal[14] * 100)}% of meadow`, 'Hidden units': animal[16],
+            'Body size (inherited)': `×${(animal[ANIMAL_SIZE] || 1).toFixed(2)}`,
             'Food seeking': animal[17].toFixed(2), 'Threat avoidance': animal[18].toFixed(2), 'Cruising pace': animal[19].toFixed(2), 'Cover seeking': animal[20].toFixed(2),
           }).map(([k,v]) => <div key={k}><dt className="text-muted-foreground">{k}</dt><dd>{v}</dd></div>)}
         </dl></> : <p className="mt-2 text-xs text-muted-foreground">This animal is no longer present at the displayed time. Scrub back to inspect its earlier life.</p>}

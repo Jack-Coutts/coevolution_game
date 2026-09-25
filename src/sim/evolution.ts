@@ -2,7 +2,8 @@ import { traits, type Genome } from './brain'
 import type { Sim } from './sim'
 import { ALL_SPECIES, eatsPlants, type Species } from './species'
 
-export const TRAITS = ['forage', 'flee', 'cruise', 'hide'] as const
+/** Charted inherited traits: four probed controller responses, then body size (a multiplier, 1 = the species' base body). */
+export const TRAITS = ['forage', 'flee', 'cruise', 'hide', 'size'] as const
 export type TraitKey = typeof TRAITS[number]
 const cache = new WeakMap<Genome, ReturnType<typeof traits>>()
 export function inheritedTraits(brain: Genome, species: Species) {
@@ -25,7 +26,7 @@ export interface JournalEntry { tick: number; text: string }
 export function summarizeEvolution(sim: Sim): EvolutionSample {
   const population = (species: Species): PopulationEvolution => {
     const pop = sim.pops[species]
-    const values = pop.map(a => inheritedTraits(a.brain, species))
+    const values = pop.map(a => ({ ...inheritedTraits(a.brain, species), size: a.size }))
     const distribution = (key: TraitKey): Distribution => {
       const xs = values.map(t => t[key]).sort((a, b) => a - b)
       return { mean: xs.reduce((a, b) => a + b, 0) / (xs.length || 1),
