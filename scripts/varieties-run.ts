@@ -29,7 +29,7 @@ const row = new Float64Array(STAT_STRIDE)
 const feed = (hist: RunHistory, f: ReturnType<typeof frame>, e: ReturnType<typeof summarizeEvolution>) => {
   hist.add(f, row, 0)
   const t0 = performance.now()
-  hist.addEvolution(e)
+  hist.addEvolution(e, sim.ended)
   return performance.now() - t0
 }
 feed(h, frame(sim), summarizeEvolution(sim))

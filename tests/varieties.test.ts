@@ -120,6 +120,19 @@ describe('persistent varieties', () => {
     expect(recorded[2].text).toContain('Rabbit variety 3 (70%) and variety 4 (30%)')
   })
 
+  it('ends the varieties at once when the species dies out; too few animals neither extend nor end them', () => {
+    const few: Group[] = [{ share: 1, mean: [0, 0, 0, 0] }]
+    const h = new RunHistory(8760, true)
+    run(repeat(25, TWO), h)
+    const rng = new Rng(9)
+    for (const [i, n] of [[25, 10], [26, 10], [27, 0]] as const) {
+      h.add(frame(i * D, few, rng, 9, n), new Float64Array(STAT_STRIDE), 0)
+      h.addEvolution(sample(i * D))
+      if (n > 0) expect(entries(h)).toHaveLength(1)
+    }
+    expect(entries(h).at(-1)!.text).toBe('Rabbit varieties 1 and 2 ended: rabbits died out.')
+  })
+
   it('treats a different split (another trait) as new, not as the same varieties', () => {
     const other: Group[] = [{ share: 0.6, mean: [-0.3, 0.2, 0.5, 0] }, { share: 0.4, mean: [0.3, 0.2, 0.5, 0] }]
     const h = run([...repeat(25, TWO), ...repeat(35, other)])

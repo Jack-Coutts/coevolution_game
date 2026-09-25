@@ -29,7 +29,7 @@ import { framePop } from './species-ui'
  * not a split; only inherited behaviour is used, not what animals actually do.
  */
 export const VARIETY = {
-  minCount: 20, minShare: 0.15, minSeparation: 0.5, minDistance: 0.1,
+  minCount: 20, minShare: 0.15, minSeparation: 0.5, minDistance: 0.2,
   persistDays: 20, persistGenerations: 2, matchTolerance: 0.5, releaseDays: 10,
   /** At most this many animals are clustered per sample (an even stride through the population). */
   maxAnimals: 400,
@@ -180,7 +180,7 @@ export class VarietyTracker {
   constructor(species: readonly Species[] = TWO_SPECIES) { this.species = species }
 
   observe(tick: number, frame: FrameData | undefined, log: Journal): void {
-    if (!frame || tick % 24 !== 0 || (this.days.at(-1)?.tick ?? -1) >= tick) return
+    if (!frame || (this.days.at(-1)?.tick ?? -1) >= tick) return
     this.undo.push({ tick, state: structuredClone(this.state) })
     if (this.undo.length > 8) this.undo.shift()
     const record: VarietyDays = { tick }
