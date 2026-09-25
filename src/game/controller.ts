@@ -3,7 +3,7 @@ import { chargesAt, COOLDOWN, nextRenewal } from './budget'
 import { BUDGET, deriveParams, spent, type LeverValues } from '@/sim/levers'
 import type { SimParams } from '@/sim/params'
 import { SCENARIO_BY_ID, type Scenario, type ScenarioId } from '@/sim/scenarios'
-import type { Intervention, Sim } from '@/sim/sim'
+import type { Intervention, MeadowState } from '@/sim/sim'
 import { tickAt } from '@/sim/time'
 import { WorldRenderer, type Weather } from '@/render/renderer'
 import { STAT_STRIDE, type EndInfo, type FrameData, type FromWorker, type ToWorker } from '@/worker/protocol'
@@ -58,6 +58,8 @@ export interface Snapshot {
   speed: number
   prey: number
   pred: number
+  /** 0 outside the Vole meadow. */
+  vole: number
   stock: number
   bushes: number
   preyEnergy: number
@@ -205,6 +207,7 @@ export class GameController {
       speed: this.speed,
       prey: h.stat(t, 'prey'),
       pred: h.stat(t, 'pred'),
+      vole: h.stat(t, 'vole'),
       stock: h.stat(t, 'stock'),
       bushes: h.stat(t, 'bushes'),
       preyEnergy: h.stat(t, 'preyEnergy'),
@@ -282,13 +285,13 @@ export class GameController {
   }
 
   /** Start a fresh run at tick 0 (planning phase). */
-  configure(config: RunConfig, state?: ReturnType<Sim['save']>): void {
+  configure(config: RunConfig, state?: MeadowState): void {
     this.config = config
-    this.params = deriveParams(config.levers)
-    this.params.endless = config.endless
     this.scenario = SCENARIO_BY_ID[config.scenario]
+    this.params = deriveParams(config.levers, this.scenario.species)
+    this.params.endless = config.endless
     this.runId += 1
-    this.history = new RunHistory(this.params.horizon, config.endless)
+    this.history = new RunHistory(this.params.horizon, config.endless, this.scenario.species)
     this.saveStatus = ''
     this.saving = false
     this.hintCache = { tick: -1, hints: [] }
@@ -363,7 +366,7 @@ export class GameController {
         this.displayTick = msg.state.tick
         const at = msg.state.tick
         const h = this.history
-        const save: MeadowSave = { version: 2, savedAt: new Date().toISOString(), config: this.config,
+        const save: MeadowSave = { version: 3, savedAt: new Date().toISOString(), config: this.config,
           state: msg.state, history: h.save(at), charges: this.chargesAt(at), cooldownUntil: this.cooldownUntil,
           interventions: h.interventions.filter(i => i.tick <= at), evolution: h.evolution.filter(e => e.tick <= at),
           journal: h.journal.filter(e => e.tick <= at) }
@@ -536,7 +539,7 @@ export class GameController {
 
   budgetLeft(): number {
     if (!this.config) return BUDGET
-    return BUDGET - spent(this.config.levers, this.config.base)
+    return BUDGET - spent(this.config.levers, this.config.base, this.scenario.species)
   }
 
   weather(tick: number): Weather {
@@ -557,7 +560,7 @@ export class GameController {
     this.phase = 'ended'
     this.playing = false
     this.explanation = explain(this.history, this.end, this.scenario)
-    const used = spent(this.config.levers, this.config.base)
+    const used = spent(this.config.levers, this.config.base, this.scenario.species)
     this.score = scoreRun(this.end.tick, this.end.survived, used, this.history.interventions.length)
     const prev = this.best
     this.best = recordScore(this.config, this.score.total, this.end.tick)

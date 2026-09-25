@@ -1,9 +1,10 @@
-import { defaultParams, type SimParams, type SpeciesParams } from './params'
+import { defaultParams, defaultVole, type SimParams, type SpeciesParams } from './params'
+import { ALL_SPECIES, TWO_SPECIES, type Species } from './species'
 import { formatHours } from './time'
 
 export type LeverGroup = 'populations' | 'lifecycle' | 'energy' | 'movement' | 'food' | 'evolution'
 export type LeverUnit = 'count' | 'hours' | 'energy' | 'perHour' | 'perDay' | 'mult' | 'percent'
-export type LeverSpecies = 'prey' | 'pred' | null
+export type LeverSpecies = Species | null
 
 export interface LeverDef {
   id: string
@@ -232,6 +233,19 @@ export const LEVERS: LeverDef[] = [
     boost: 1,
     cost: 1,
   },
+  {
+    id: 'vole.initial',
+    group: 'populations',
+    species: 'vole',
+    label: 'Starting voles',
+    hint: 'Founding field voles, in the Vole meadow only. More voles feed the foxes but eat grass seed and, when it runs short, berries.',
+    min: 20,
+    max: 150,
+    step: 10,
+    unit: 'count',
+    boost: 1,
+    cost: 1,
+  },
   ...species('prey', 'rabbit'),
   ...species('pred', 'fox'),
   {
@@ -322,7 +336,7 @@ export const GROUPS: { id: LeverGroup; label: string; blurb: string }[] = [
   { id: 'energy', label: 'Energy', blurb: 'The fuel tank: what living, moving and eating are worth.' },
   { id: 'movement', label: 'Senses & movement', blurb: 'How fast they run, how far they see, how sharply they turn.' },
   { id: 'food', label: 'Food & habitat', blurb: 'Berry bushes that come and go, and tall grass to hide in.' },
-  { id: 'evolution', label: 'Evolution', blurb: 'How quickly genes change between parent and child.' },
+  { id: 'evolution', label: 'Inheritance', blurb: 'How quickly genes change between parent and child.' },
 ]
 
 
@@ -357,6 +371,7 @@ export function defaultLevers(): LeverValues {
     'food.sprout': p.sproutPerDay,
     'habitat.cover': p.eco.cover,
     'evo.mutation': p.mutationRate,
+    'vole.initial': defaultVole().body.initial,
   }
 }
 
@@ -386,8 +401,17 @@ export function litterGap(gap: number, litter: number): number {
   return Math.round(gap * (1 + 0.5 * (litter - 1)))
 }
 
-export function deriveParams(v: LeverValues): SimParams {
+/**
+ * Parameters for a meadow. The species set comes from the scenario, not the levers: voles
+ * bring their fixed provisional body (docs/third-species.md section 5); an optional
+ * `vole.initial` value sets how many start.
+ */
+export function deriveParams(v: LeverValues, species: readonly Species[] = TWO_SPECIES): SimParams {
   const p = defaultParams()
+  if (species.includes('vole')) {
+    p.vole = defaultVole()
+    if (v['vole.initial'] !== undefined) p.vole.body.initial = v['vole.initial']
+  }
   applySpecies(p.prey, v, 'prey')
   applySpecies(p.pred, v, 'pred')
   p.patches = v['food.patches']
@@ -406,9 +430,19 @@ export function leverCost(def: LeverDef, value: number, base: number): number {
   return steps >= 0 ? steps * def.cost : steps * def.cost * 0.5
 }
 
-export function spent(v: LeverValues, base: LeverValues): number {
+/** The levers that apply in a meadow with these species (Starting voles only where voles live). */
+export function leversFor(species: readonly Species[]): LeverDef[] {
+  return LEVERS.filter((d) => d.species === null || species.includes(d.species))
+}
+
+/** Points spent in a meadow with these species. A lever missing from an older save costs nothing. */
+export function spent(v: LeverValues, base: LeverValues, species: readonly Species[] = ALL_SPECIES): number {
   let total = 0
-  for (const def of LEVERS) total += leverCost(def, v[def.id], base[def.id])
+  for (const def of leversFor(species)) {
+    const b = base[def.id]
+    if (b === undefined) continue
+    total += leverCost(def, v[def.id] ?? b, b)
+  }
   return Math.round(total * 10) / 10
 }
 

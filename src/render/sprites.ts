@@ -197,6 +197,71 @@ function drawFox(ctx: CanvasRenderingContext2D, L: number, phase: number): void 
   }
 }
 
+/** Field vole, body length L (px). Rounded slate grey-brown body, blunt nose, tiny round ears, short thin tail. */
+function drawVole(ctx: CanvasRenderingContext2D, L: number, phase: number): void {
+  const swing = Math.sin(phase * Math.PI * 2)
+
+  ctx.fillStyle = 'rgba(20, 30, 10, 0.28)'
+  ellipse(ctx, 0.03 * L, 0.07 * L, 0.5 * L, 0.3 * L)
+  ctx.fill()
+
+  // short thin tail
+  ctx.strokeStyle = '#4d4b52'
+  ctx.lineWidth = Math.max(0.8, 0.045 * L)
+  ctx.lineCap = 'round'
+  ctx.beginPath()
+  ctx.moveTo(-0.38 * L, 0)
+  ctx.quadraticCurveTo(-0.5 * L, 0.05 * L * swing, -0.6 * L, 0.02 * L * swing)
+  ctx.stroke()
+
+  // feet, scurrying
+  ctx.fillStyle = '#3e3c42'
+  for (const [x, s, w] of [[0.18, -1, swing], [0.18, 1, -swing], [-0.2, -1, -swing], [-0.2, 1, swing]] as const) {
+    ellipse(ctx, x * L + 0.05 * L * w, s * 0.24 * L, 0.06 * L, 0.04 * L)
+    ctx.fill()
+  }
+
+  // body: an egg, widest behind the middle
+  const body = ctx.createRadialGradient(-0.02 * L, -0.06 * L, 0.02 * L, -0.02 * L, 0, 0.45 * L)
+  body.addColorStop(0, '#8a8890')
+  body.addColorStop(0.6, '#6b6a70')
+  body.addColorStop(1, '#4f4d55')
+  ctx.fillStyle = body
+  ellipse(ctx, -0.04 * L, 0, 0.38 * L, 0.27 * L)
+  ctx.fill()
+  // darker back stripe
+  ctx.fillStyle = 'rgba(58, 56, 64, 0.7)'
+  ellipse(ctx, -0.06 * L, 0, 0.26 * L, 0.07 * L)
+  ctx.fill()
+
+  // head, merged into the body, with a blunt nose
+  ctx.fillStyle = '#727078'
+  ellipse(ctx, 0.3 * L, 0, 0.17 * L, 0.18 * L)
+  ctx.fill()
+  ctx.fillStyle = '#5c5a62'
+  ellipse(ctx, 0.44 * L, 0, 0.06 * L, 0.08 * L)
+  ctx.fill()
+  ctx.fillStyle = '#2a2328'
+  ellipse(ctx, 0.49 * L, 0, 0.025 * L, 0.03 * L)
+  ctx.fill()
+
+  // tiny round ears, barely past the head
+  for (const s of [-1, 1]) {
+    ctx.fillStyle = '#4d4b52'
+    ellipse(ctx, 0.22 * L, s * 0.16 * L, 0.055 * L, 0.05 * L)
+    ctx.fill()
+    ctx.fillStyle = 'rgba(190, 150, 150, 0.6)'
+    ellipse(ctx, 0.225 * L, s * 0.16 * L, 0.03 * L, 0.025 * L)
+    ctx.fill()
+  }
+  // eyes
+  ctx.fillStyle = '#111013'
+  for (const s of [-1, 1]) {
+    ellipse(ctx, 0.35 * L, s * 0.1 * L, 0.028 * L, 0.024 * L)
+    ctx.fill()
+  }
+}
+
 function sheet(draw: typeof drawRabbit, length: number, dpr: number): SpriteSheet {
   const size = length * 1.8
   const frames: HTMLCanvasElement[] = []
@@ -218,8 +283,12 @@ export function foxSheet(length: number, dpr: number): SpriteSheet {
   return sheet(drawFox, length, dpr)
 }
 
+export function voleSheet(length: number, dpr: number): SpriteSheet {
+  return sheet(drawVole, length, dpr)
+}
+
 /** Standalone icons for the UI (HUD, legend). */
-export function animalIcon(kind: 'prey' | 'pred', px: number): string {
+export function animalIcon(kind: 'prey' | 'pred' | 'vole', px: number): string {
   const [c, ctx] = makeCanvas(px * 2)
   ctx.scale(2, 2)
   ctx.translate(px / 2, px / 2)
@@ -227,6 +296,9 @@ export function animalIcon(kind: 'prey' | 'pred', px: number): string {
   if (kind === 'prey') {
     ctx.translate(px * 0.04, 0)
     drawRabbit(ctx, px * 0.9, 0.1)
+  } else if (kind === 'vole') {
+    ctx.translate(px * 0.06, 0)
+    drawVole(ctx, px * 0.72, 0.1)
   } else {
     ctx.translate(px * 0.14, 0)
     drawFox(ctx, px * 0.78, 0.1)

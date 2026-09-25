@@ -5,6 +5,7 @@ import { useGame } from '@/hooks/use-game'
 import type { Species } from '@/sim/sim'
 import { clockLabel, dateLabel, formatHours } from '@/sim/time'
 import { ANIMAL_STRIDE } from '@/worker/protocol'
+import { displayOrder, framePop, SPECIES_UI } from '@/game/species-ui'
 
 export interface AnimalSelection { species: Species; id: number }
 
@@ -27,7 +28,7 @@ export function AnimalInspector({ selected, onSelect, onFamily, picker = false, 
   const [species, setSpecies] = useState<Species>(selected?.species ?? 'prey')
   const [order, setOrder] = useState<Order>('generation')
   const frame = game.history.frameAt(snap.tick)?.a
-  const rowsOf = (s: Species) => (s === 'prey' ? frame?.prey : frame?.preds)
+  const rowsOf = (s: Species) => (frame ? framePop(frame, s) : undefined)
   const options: { id: number; gen: number; family: number }[] = []
   const animals = picker ? rowsOf(species) : undefined
   if (animals) for (let i = 0; i < animals.length; i += ANIMAL_STRIDE) options.push({ id: animals[i], gen: animals[i + 9], family: animals[i + 12] })
@@ -43,19 +44,19 @@ export function AnimalInspector({ selected, onSelect, onFamily, picker = false, 
       <p className="mt-1 text-xs text-muted-foreground">Click an animal in the meadow, or choose one below. The meadow pauses for inspection.</p>
       <div className="mt-2 flex flex-wrap gap-2">
         <select className={cls} aria-label="Inspector species" value={species} onChange={e => setSpecies(e.target.value as Species)}>
-          <option value="prey">Rabbits</option><option value="pred">Foxes</option>
+          {displayOrder(game.scenario.species).map(s => <option key={s} value={s}>{SPECIES_UI[s].Plural}</option>)}
         </select>
         <select className={cls} aria-label="Order animals by" value={order} onChange={e => setOrder(e.target.value as Order)}>
           <option value="generation">Newest generation first</option><option value="family">By family</option><option value="id">By id</option>
         </select>
         <select className={cls + ' min-w-0 flex-1'} aria-label="Inspect an animal" value={selected?.species === species && options.some(o => o.id === selected.id) ? selected.id : ''}
           onChange={e => { if (e.target.value) choose({ species, id: Number(e.target.value) }); else onSelect(null) }}>
-          <option value="">Choose {species === 'prey' ? 'a rabbit' : 'a fox'} ({options.length} alive)…</option>
+          <option value="">Choose {SPECIES_UI[species].one} ({options.length} alive)…</option>
           {options.map(o => <option key={o.id} value={o.id}>{one(species)} #{o.id} · gen {o.gen} · family #{o.family}</option>)}
         </select>
       </div>
     </> : <div className="flex items-center justify-between gap-2">
-      <h3 className="text-sm font-semibold"><span className={selected?.species === 'prey' ? 'text-rabbit' : 'text-fox'}>{name}</span></h3>
+      <h3 className="text-sm font-semibold"><span className={selected ? SPECIES_UI[selected.species].text : undefined}>{name}</span></h3>
       <Button variant="ghost" size="icon-xs" aria-label="Close inspector" onClick={() => onSelect(null)}><X /></Button>
     </div>}
     {selected && <div className={picker ? 'mt-3 text-sm' : 'mt-1 text-sm'}>
@@ -70,7 +71,7 @@ export function AnimalInspector({ selected, onSelect, onFamily, picker = false, 
   </section>
 }
 
-const one = (s: Species) => (s === 'prey' ? 'Rabbit' : 'Fox')
+const one = (s: Species) => SPECIES_UI[s].name
 
 /** The selected animal is not alive at the displayed hour: say when it was last seen, or that the kept replay does not show it. */
 function Absent({ selected, tick, onShow }: { selected: AnimalSelection; tick: number; onShow: (at: number) => void }) {
@@ -131,8 +132,8 @@ function facts(animal: Float32Array, species: Species): [string, string | number
   // Brains start with no extra neurons; mutation can add them. Only worth a row once there are some.
   if (animal[16] > 0) rows.push(['Extra neurons', animal[16], 'Hidden neurons gained by mutation. More of them allow more complex responses.'])
   rows.push(
-    ['Food seeking', animal[17].toFixed(2), 'Inherited: -1 to 1, higher means it steers to food more strongly.'],
-    ['Threat avoidance', animal[18].toFixed(2), species === 'prey'
+    ['Food seeking', animal[17].toFixed(2), `Inherited: -1 to 1, higher means it steers to food more strongly.${species === 'vole' ? ' For a vole, food is grass seed first, then berries.' : ''}`],
+    ['Threat avoidance', animal[18].toFixed(2), species !== 'pred'
       ? 'Inherited: -1 to 1, higher means it turns away from a nearby fox more strongly.'
       : 'Inherited, -1 to 1. Nothing hunts foxes here, so this tendency is never used and drifts freely.'],
     ['Cruising pace', animal[19].toFixed(2), 'Inherited: 0 = resting to 1 = maximum pace.'],

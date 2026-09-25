@@ -17,13 +17,15 @@ export interface Forecast {
   /** Projected counts HORIZON ticks ahead (from the log-linear trend of the recent window). */
   prey: number
   pred: number
+  /** 0 outside the Vole meadow. */
+  vole: number
   ahead: number
 }
 
 const WINDOW = 240
 const AHEAD = 300
 
-function trend(h: RunHistory, key: 'prey' | 'pred', tick: number): number {
+function trend(h: RunHistory, key: 'prey' | 'pred' | 'vole', tick: number): number {
   const from = Math.max(h.firstTick, tick - WINDOW)
   const n = tick - from
   if (n < 24) return 0
@@ -46,11 +48,11 @@ function trend(h: RunHistory, key: 'prey' | 'pred', tick: number): number {
 export function forecast(h: RunHistory, tick: number): Forecast | null {
   if (tick - h.firstTick < 48) return null
   const ahead = Math.min(AHEAD, h.horizon - tick)
-  const project = (key: 'prey' | 'pred') => {
+  const project = (key: 'prey' | 'pred' | 'vole') => {
     const now = h.stat(tick, key)
     return Math.max(0, (now + 1) * Math.exp(trend(h, key, tick) * ahead) - 1)
   }
-  return { prey: project('prey'), pred: project('pred'), ahead }
+  return { prey: project('prey'), pred: project('pred'), vole: h.species.includes('vole') ? project('vole') : 0, ahead }
 }
 
 /** Field notes announce a scenario's weather or arrival this many days ahead. */
@@ -86,7 +88,7 @@ export const DANGER_HOLD = 48
 export function hints(h: RunHistory, tick: number, scenario?: Scenario): Hint[] {
   const out = notesAt(h, tick)
   // Once a species is gone there is nothing left to warn about, so old danger notes are not carried.
-  const alive = h.stat(tick, 'prey') > 0 && h.stat(tick, 'pred') > 0
+  const alive = h.stat(tick, 'prey') > 0 && h.stat(tick, 'pred') > 0 && (!h.species.includes('vole') || h.stat(tick, 'vole') > 0)
   for (let lag = 1; alive && lag <= DANGER_HOLD && tick - lag - h.firstTick >= 24; lag++) {
     for (const n of notesAt(h, tick - lag)) {
       if (n.tone !== 'danger' || out.some(o => o.id === n.id)) continue
@@ -119,6 +121,11 @@ function notesAt(h: RunHistory, tick: number): Hint[] {
   const preyE = h.stat(tick, 'preyEnergy')
   const preyGrowth = prey0 > 0 ? prey / prey0 - 1 : 0
   const predGrowth = pred0 > 0 ? pred / pred0 - 1 : 0
+  const voles = h.species.includes('vole')
+  const vole = voles ? h.stat(tick, 'vole') : 0
+  const vole0 = voles ? h.stat(past, 'vole') : 0
+  const voleGrowth = vole0 > 0 ? vole / vole0 - 1 : 0
+  if (voles) out.push(...voleNotes(h, tick, { vole, voleGrowth, pred, stock }))
 
   if (preyGrowth > 0.4 && stock < 0.35) {
     out.push({
@@ -131,7 +138,8 @@ function notesAt(h: RunHistory, tick: number): Hint[] {
     out.push({
       id: 'overhunt',
       tone: 'danger',
-      text: `Only ${(prey / pred).toFixed(1)} rabbits per fox, and rabbits are falling. The foxes may eat the warren out.`,
+      text: `Only ${(prey / pred).toFixed(1)} rabbits per fox, and rabbits are falling. The foxes may eat the warren out.${
+        voles && vole >= 100 ? ` Foxes also keep the ${vole} voles in check: fewer foxes can mean a vole boom that strips the bushes.` : ''}`,
     })
   }
   if (pred > 0 && predE < 0.3) {
@@ -182,7 +190,13 @@ function notesAt(h: RunHistory, tick: number): Hint[] {
   }
   const f = forecast(h, tick)
   if (f && tick + f.ahead < h.horizon) {
-    if (pred > 0 && f.pred < 1) {
+    if (voles && vole > 0 && f.vole < 1 && pred > 0 && f.pred >= 1 && prey > 0 && f.prey >= 1) {
+      out.push({
+        id: 'fcvole',
+        tone: 'danger',
+        text: `At the current trend, voles die out by about ${dateLabel(tick + f.ahead)}.`,
+      })
+    } else if (pred > 0 && f.pred < 1) {
       out.push({
         id: 'fcfox',
         tone: 'danger',
@@ -199,19 +213,58 @@ function notesAt(h: RunHistory, tick: number): Hint[] {
   if (out.length === 0) {
     // Only call it steady when the trend agrees; a forecast that halves or grows by half is not steady.
     const moving = (now: number, next: number) => (next + 1) / (now + 1) > 1.5 || (now + 1) / (next + 1) > 1.5
-    if (f && f.ahead > 0 && (moving(prey, f.prey) || moving(pred, f.pred))) {
+    if (f && f.ahead > 0 && (moving(prey, f.prey) || moving(pred, f.pred) || (voles && moving(vole, f.vole)))) {
       out.push({
         id: 'trend',
         tone: 'info',
-        text: `No warnings yet, but the meadow is changing: at the current trend, about ${Math.round(f.prey)} rabbits and ${Math.round(f.pred)} foxes by ${dateLabel(tick + f.ahead)} (now ${prey} and ${pred}).`,
+        text: voles
+          ? `No warnings yet, but the meadow is changing: at the current trend, about ${Math.round(f.prey)} rabbits, ${Math.round(f.vole)} voles and ${Math.round(f.pred)} foxes by ${dateLabel(tick + f.ahead)} (now ${prey}, ${vole} and ${pred}).`
+          : `No warnings yet, but the meadow is changing: at the current trend, about ${Math.round(f.prey)} rabbits and ${Math.round(f.pred)} foxes by ${dateLabel(tick + f.ahead)} (now ${prey} and ${pred}).`,
       })
     } else {
       out.push({
         id: 'steady',
         tone: 'good',
-        text: `Holding steady: ${prey} rabbits and ${pred} foxes, with bushes ${Math.round(stock * 100)}% full.`,
+        text: voles
+          ? `Holding steady: ${prey} rabbits, ${vole} voles and ${pred} foxes, with bushes ${Math.round(stock * 100)}% full and grass seed ${Math.round(h.stat(tick, 'seed') * 100)}%.`
+          : `Holding steady: ${prey} rabbits and ${pred} foxes, with bushes ${Math.round(stock * 100)}% full.`,
       })
     }
+  }
+  return out
+}
+
+/**
+ * Vole meadow notes (docs/third-species.md section 8): grass seed running out, a vole plague,
+ * a vole crash that will turn well-fed foxes onto rabbits, and few voles left.
+ */
+function voleNotes(h: RunHistory, tick: number, x: { vole: number; voleGrowth: number; pred: number; stock: number }): Hint[] {
+  const out: Hint[] = []
+  const { vole, voleGrowth, pred, stock } = x
+  const seed = h.stat(tick, 'seed')
+  if (vole > 0 && vole <= 15) {
+    out.push({ id: 'fewvole', tone: 'danger', text: `Only ${vole} vole${vole === 1 ? '' : 's'} left. Voles recover fast from a few, but none means the run ends.` })
+  }
+  if (vole >= 30 && voleGrowth <= -0.4 && pred >= 10) {
+    out.push({
+      id: 'volecrash',
+      tone: 'warn',
+      text: `Voles are down ${Math.round(-voleGrowth * 100)}% in 10 days. The ${pred} foxes that lived on them will turn to rabbits.`,
+    })
+  }
+  if (vole >= 120 && voleGrowth > 0.6) {
+    out.push({
+      id: 'voleboom',
+      tone: 'warn',
+      text: `Voles are up ${Math.round(voleGrowth * 100)}% in 10 days (${vole} now). When the grass seed runs out they will strip the bushes the rabbits need.`,
+    })
+  }
+  if (vole > 0 && seed < 0.15) {
+    out.push({
+      id: 'seedlow',
+      tone: stock < 0.3 ? 'warn' : 'info',
+      text: `Grass seed is nearly gone (${Math.round(seed * 100)}%). Voles are moving to the berry bushes, where the rabbits feed.`,
+    })
   }
   return out
 }
@@ -253,6 +306,14 @@ function inSpan(scenario: Scenario, tick: number, endless: boolean): string | nu
 export function explain(h: RunHistory, end: EndInfo, scenario: Scenario): Explanation {
   const T = end.tick
   const when = `${dateLabel(T)} (day ${Math.floor(T / 24) + 1})`
+  const voles = end.species?.includes('vole') ?? false
+  if (end.survived && voles) {
+    return {
+      headline: `All three species made it through ${formatDuration(T)}.`,
+      detail: `The meadow ended with ${end.preyEnd} rabbits, ${end.voleEnd} voles and ${end.predEnd} foxes.`,
+      suggestions: ['Win with more of the budget unspent for a higher score.'],
+    }
+  }
   if (end.survived) {
     return {
       headline: `Both species made it through ${formatDuration(T)}.`,
@@ -263,6 +324,7 @@ export function explain(h: RunHistory, end: EndInfo, scenario: Scenario): Explan
   const from = Math.max(h.firstTick, T - 300)
   const context = inSpan(scenario, T, h.endless)
   const ctx = context ? ` This happened during the ${context.toLowerCase()} period.` : ''
+  if (voles && end.voleEnd === 0 && end.preyEnd > 0 && end.predEnd > 0) return explainVoles(h, T, when, ctx, from)
   const species = end.predEnd === 0 ? 'pred' : 'prey'
   const illness = delta(h, species === 'pred' ? 'predIllness' : 'preyIllness', from, T)
   const other = delta(h, species === 'pred' ? 'predStarved' : 'preyStarved', from, T) +
@@ -274,6 +336,8 @@ export function explain(h: RunHistory, end: EndInfo, scenario: Scenario): Explan
   }
   if (end.predEnd === 0) {
     const starved = delta(h, 'predStarved', from, T)
+    const volesEaten = voles ? delta(h, 'voleEaten', from, T) : 0
+    const rabbitsEaten = delta(h, 'preyEaten', from, T)
     const old = delta(h, 'predOld', from, T)
     const preyAvg = avg(h, 'prey', from, T)
     const spread = avg(h, 'preySpread', from, T)
@@ -287,6 +351,13 @@ export function explain(h: RunHistory, end: EndInfo, scenario: Scenario): Explan
           'Bring the fox first-birth age earlier',
           'Give foxes a longer lifespan',
         ],
+      }
+    }
+    if (voles && starved >= old && avg(h, 'vole', from, T) < 40 && volesEaten + rabbitsEaten > 0 && volesEaten >= rabbitsEaten) {
+      return {
+        headline: `Foxes starved on ${when}, after the voles they lived on ran short.`,
+        detail: `In their last 12 days foxes caught ${volesEaten} voles and ${rabbitsEaten} rabbits, about ${Math.round(preyAvg)} rabbits were around, and ${starved} foxes starved. A vole is a small meal, so a fox population built on voles collapses when they crash.${ctx}`,
+        suggestions: ['Release voles before they crash', 'Keep rabbits numerous so foxes have a second food', 'Cull some foxes early when the voles start to fall, so the rest can live on rabbits'],
       }
     }
     const reason =
@@ -340,6 +411,42 @@ export function explain(h: RunHistory, end: EndInfo, scenario: Scenario): Explan
   }
 }
 
+/** Voles died out while rabbits and foxes lived: name the main cause, as for rabbits. */
+function explainVoles(h: RunHistory, T: number, when: string, ctx: string, from: number): Explanation {
+  const eaten = delta(h, 'voleEaten', from, T)
+  const starved = delta(h, 'voleStarved', from, T)
+  const ill = delta(h, 'voleIllness', from, T)
+  const old = delta(h, 'voleOld', from, T)
+  const counts = `In their last 12 days ${starved} voles starved, ${eaten} were eaten by foxes, ${ill} ran out of energy while ill and ${old} died of old age.`
+  if (ill > 0 && ill >= starved + eaten + old) return {
+    headline: `Voles died out during illness on ${when}.`,
+    detail: `${counts} Illness adds energy costs and spreads among nearby voles.${ctx}`,
+    suggestions: ['Use vole illness only when voles are plentiful', 'Release voles to rebuild the population after illness'],
+  }
+  if (eaten >= starved && eaten >= old) {
+    const ratio = avg(h, 'pred', from, T)
+    return {
+      headline: `Voles were eaten out on ${when}.`,
+      detail: `${counts} About ${Math.round(ratio)} foxes were hunting them, with about ${Math.round(avg(h, 'prey', from, T))} rabbits as other food.${ctx}`,
+      suggestions: ['Cull foxes when voles fall steeply', 'Release voles into the tall grass', 'Start with fewer foxes or more voles'],
+    }
+  }
+  if (starved >= old) {
+    const seed = avg(h, 'seed', from, T)
+    const stock = avg(h, 'stock', from, T)
+    return {
+      headline: `Voles starved on ${when}. Grass seed was ${seed < 0.2 ? 'eaten bare' : 'not enough'}.`,
+      detail: `${counts} Grass seed averaged ${Math.round(seed * 100)}% and bushes ${Math.round(stock * 100)}% full. Voles boom on seed, then starve when it runs out.${ctx}`,
+      suggestions: ['More tall grass gives voles more seed (and rabbits more cover)', 'Rain refills the bushes voles fall back on', 'Release voles after a crash, when the seed has regrown'],
+    }
+  }
+  return {
+    headline: `The last voles died of old age on ${when}.`,
+    detail: `${counts} Too few young were born to replace them.${ctx}`,
+    suggestions: ['Release voles into the tall grass', 'Start with more voles'],
+  }
+}
+
 /** The intervention allowance in words, shown next to the dots. */
 export function usesLeft(charges: number, total: number, planning: boolean): string {
   if (planning) return `${total} uses per run`
@@ -349,12 +456,12 @@ export function usesLeft(charges: number, total: number, planning: boolean): str
 const n = (v: number) => v.toLocaleString('en-US')
 
 /** The score as a sum in words, so a player can see what earned each part. */
-export function scoreWords(score: ScoreBreakdown, survived: boolean, endless: boolean, interventions: number): string {
+export function scoreWords(score: ScoreBreakdown, survived: boolean, endless: boolean, interventions: number, speciesCount = 2): string {
   const hours = `${n(score.hours)} hours survived (one point per hour)`
   if (!survived) {
     return endless
       ? `Score ${n(score.total)} = ${hours}. In Endless the score is hours survived only.`
-      : `Score ${n(score.total)} = ${hours}. The budget and calm bonuses count only when both species last the full year.`
+      : `Score ${n(score.total)} = ${hours}. The budget and calm bonuses count only when ${speciesCount === 2 ? 'both species last' : 'all species last'} the full year.`
   }
   const used = `${interventions} intervention${interventions === 1 ? '' : 's'} used`
   return `Score ${n(score.total)} = ${hours} + ${n(score.budgetBonus)} budget bonus (${BUDGET_POINT_BONUS} per unspent point) + ${n(score.calmBonus)} calm bonus (${CALM_BONUS[0]} with no interventions, 100 less for each; ${used}).`

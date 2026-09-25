@@ -1,5 +1,7 @@
 import type { Intervention } from '@/sim/sim'
 import type { EvolutionSample } from '@/sim/evolution'
+import { TWO_SPECIES, type Species } from '@/sim/species'
+import { framePop } from './species-ui'
 import { FamilyHistory } from './families'
 import { Journal, type JournalEntry } from './journal'
 import { ANIMAL_STRIDE, STAT, STAT_STRIDE, type FrameData } from '@/worker/protocol'
@@ -7,6 +9,8 @@ import { ANIMAL_STRIDE, STAT, STAT_STRIDE, type FrameData } from '@/worker/proto
 export interface Sighting { tick: number; row: Float32Array }
 
 export const HISTORY_HOURS = 8760
+/** A column of the statistics row. */
+export type StatKey = keyof typeof STAT
 const CAPACITY = HISTORY_HOURS + 1
 const RECENT = 360
 const KEY_EVERY = 3
@@ -15,6 +19,8 @@ const KEY_EVERY = 3
 export class RunHistory {
   readonly limit: number
   readonly endless: boolean
+  /** The species in this meadow. */
+  readonly species: readonly Species[]
   readonly stats = new Float64Array(CAPACITY * STAT_STRIDE)
   head = 0
   start = 0
@@ -23,12 +29,18 @@ export class RunHistory {
   interventions: { tick: number; action: Intervention }[] = []
   evolution: EvolutionSample[] = []
   readonly log: Journal
-  readonly families = new FamilyHistory()
+  readonly families: FamilyHistory
   private frames = new Map<number, FrameData>()
   /** lastSeen answers by animal, valid until a rewind or restore. */
   private seen = new Map<string, { before: number; result: Sighting | null }>()
 
-  constructor(horizon: number, endless = false) { this.limit = horizon; this.endless = endless; this.log = new Journal(endless) }
+  constructor(horizon: number, endless = false, species: readonly Species[] = TWO_SPECIES) {
+    this.limit = horizon
+    this.endless = endless
+    this.species = species
+    this.log = new Journal(endless, species)
+    this.families = new FamilyHistory(species)
+  }
   get journal(): JournalEntry[] { return this.log.entries }
   get horizon(): number { return this.endless ? Math.max(this.limit, this.head + 300) : this.limit }
   get firstTick(): number { return Math.max(this.start, this.head - HISTORY_HOURS) }
@@ -81,9 +93,9 @@ export class RunHistory {
   save(upTo = this.head) {
     const head = Math.min(this.head, upTo)
     const replayFrom = Math.max(this.replayStart, head - RECENT)
-    const log = new Journal(this.endless)
+    const log = new Journal(this.endless, this.species)
     log.restore(this.log.save())
-    const families = new FamilyHistory()
+    const families = new FamilyHistory(this.species)
     families.restore(this.families.save())
     if (head < this.head) {
       log.truncate(head, this.evolution.filter(e => e.tick <= head))
@@ -93,7 +105,7 @@ export class RunHistory {
     return { stats: this.stats, head, start: this.firstTick, replayFrom,
       journal: journal as ReturnType<Journal['save']> | undefined, families: families.save() as ReturnType<FamilyHistory['save']> | undefined,
       /** For older builds; this build reads `journal.highest`. */
-      highestGeneration: journal.highest as { prey: number; pred: number } | undefined,
+      highestGeneration: journal.highest as Record<Species, number> | undefined,
       frames: [...this.frames.entries()].filter(([t]) => t >= replayFrom && t <= head) }
   }
 
@@ -139,10 +151,10 @@ export class RunHistory {
    * The last kept hour at or before `before` when an animal was alive, with its frame row; null if the kept replay never
    * shows it. Answers are cached per animal: asked again for a later hour, only the hours since are read.
    */
-  lastSeen(species: 'prey' | 'pred', id: number, before: number): Sighting | null {
+  lastSeen(species: Species, id: number, before: number): Sighting | null {
     const find = (tick: number) => {
       const f = this.frames.get(tick)
-      const rows = species === 'prey' ? f?.prey : f?.preds
+      const rows = f && framePop(f, species)
       if (rows) for (let i = 0; i < rows.length; i += ANIMAL_STRIDE) if (rows[i] === id) return rows.subarray(i, i + ANIMAL_STRIDE)
       return f ? null : undefined
     }

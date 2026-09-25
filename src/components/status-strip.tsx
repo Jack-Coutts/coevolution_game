@@ -50,6 +50,13 @@ export function StatusStrip({ canStart }: { canStart: boolean }) {
             <span className="font-semibold text-rabbit">{snap.prey}</span>
             <span className="sr-only">rabbits</span>
           </span>
+          {game.scenario.species.includes('vole') && (
+            <span className="flex items-center gap-1" title="Voles">
+              <img src={icons.vole} alt="" className="size-5" />
+              <span className="font-semibold text-vole">{snap.vole}</span>
+              <span className="sr-only">voles</span>
+            </span>
+          )}
           <span className="flex items-center gap-1" title="Foxes">
             <img src={icons.fox} alt="" className="size-5" />
             <span className="font-semibold text-fox">{snap.pred}</span>

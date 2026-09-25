@@ -32,8 +32,8 @@ Last updated: 25 September 2026, 17:35 UTC.
 ### A third species
 
 - [x] #7 Choose the third species: the field vole, alternative prey with its own seed food. [#24](https://github.com/Jack-Coutts/coevolution_game/pull/24)
-- [ ] #8 Add the vole to the simulation and saves. Built; merges after #4 and #7.
-- [ ] #9 Make the three-species meadow playable. In progress.
+- [x] #8 Add the vole to the simulation and saves. [#27](https://github.com/Jack-Coutts/coevolution_game/pull/27)
+- [x] #9 Make the three-species meadow playable: the Vole meadow. [#27](https://github.com/Jack-Coutts/coevolution_game/pull/27)
 
 ### Bodies and ecological varieties
 

@@ -1,12 +1,13 @@
 import { traits, type Genome } from './brain'
-import type { Sim, Species } from './sim'
+import type { Sim } from './sim'
+import { ALL_SPECIES, eatsPlants, type Species } from './species'
 
 export const TRAITS = ['forage', 'flee', 'cruise', 'hide'] as const
 export type TraitKey = typeof TRAITS[number]
 const cache = new WeakMap<Genome, ReturnType<typeof traits>>()
 export function inheritedTraits(brain: Genome, species: Species) {
   let value = cache.get(brain)
-  if (!value) { value = traits(brain, species === 'prey'); cache.set(brain, value) }
+  if (!value) { value = traits(brain, eatsPlants(species)); cache.set(brain, value) }
   return value
 }
 export interface Distribution { mean: number; low: number; high: number }
@@ -17,7 +18,8 @@ export interface PopulationEvolution {
   neurons: number
   traits: Record<TraitKey, Distribution>
 }
-export interface EvolutionSample { tick: number; prey: PopulationEvolution; pred: PopulationEvolution }
+/** One population summary per species; species absent from the meadow have count 0. */
+export type EvolutionSample = { tick: number } & Record<Species, PopulationEvolution>
 export interface JournalEntry { tick: number; text: string }
 
 export function summarizeEvolution(sim: Sim): EvolutionSample {
@@ -34,5 +36,7 @@ export function summarizeEvolution(sim: Sim): EvolutionSample {
       neurons: pop.reduce((n, a) => n + a.brain.nHid, 0) / (pop.length || 1),
       traits: Object.fromEntries(TRAITS.map(k => [k, distribution(k)])) as Record<TraitKey, Distribution> }
   }
-  return { tick: sim.tick, prey: population('prey'), pred: population('pred') }
+  const sample = { tick: sim.tick } as EvolutionSample
+  for (const s of ALL_SPECIES) sample[s] = population(s)
+  return sample
 }

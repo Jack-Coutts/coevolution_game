@@ -27,7 +27,7 @@ function distance(v: LeverValues): number {
 cands.forEach((v, i) => {
   const p = deriveParams(v)
   const row: string[] = [`#${i}`, `dist=${distance(v).toFixed(2)}`]
-  for (const sc of SCENARIOS) {
+  for (const sc of SCENARIOS.filter(s => s.species.length === 2)) {
     let ok = 0
     const ticks: number[] = []
     for (let s = from; s < from + n; s++) {

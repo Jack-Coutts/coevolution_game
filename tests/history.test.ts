@@ -11,7 +11,7 @@ const row = (prey: number) => {
 }
 const trait = { mean: 0, low: 0, high: 0 }
 const population = (count: number, generation: number) => ({ count, generation, lineages: 1, neurons: 4, traits: { forage: trait, flee: trait, cruise: trait, hide: trait } })
-const sample = (tick: number, generation: number, prey = 10): EvolutionSample => ({ tick, prey: population(prey, generation), pred: population(3, 1) })
+const sample = (tick: number, generation: number, prey = 10): EvolutionSample => ({ tick, prey: population(prey, generation), pred: population(3, 1), vole: population(0, 0) })
 
 function history(until: number): RunHistory {
   const h = new RunHistory(8760)

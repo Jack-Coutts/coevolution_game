@@ -1,6 +1,7 @@
 import { TRAITS, type Distribution, type EvolutionSample, type TraitKey } from '@/sim/evolution'
-import type { Species } from '@/sim/sim'
+import { perSpecies, TWO_SPECIES, type Species } from '@/sim/species'
 import { ANIMAL_STRIDE, type FrameData } from '@/worker/protocol'
+import { framePop } from './species-ui'
 
 /**
  * The evolution journal: observed events, each with the measurement it came from. Entries state what was measured;
@@ -33,8 +34,8 @@ export type JournalEntry =
   | Base & { kind: 'traitShift'; species: Species; evidence: TraitShiftEvidence }
   /** Evidence: the living count in consecutive daily samples. Threshold: from above 0 to 0. */
   | Base & { kind: 'extinction'; species: Species; evidence: { lastCount: number; lastGeneration: number; lastSeen: number } }
-  /** Evidence: both counts above 0 at the first daily sample of a new year. */
-  | Base & { kind: 'year'; evidence: { year: number; prey: number; pred: number } }
+  /** Evidence: every species' count above 0 at the first daily sample of a new year (`vole` only in the Vole meadow). */
+  | Base & { kind: 'year'; evidence: { year: number; prey: number; pred: number; vole?: number } }
   /**
    * Reserved for persistent ecological varieties (issue #11). The detector supplies its own measurement, a threshold in
    * words and a `key` that identifies the variety; `record` keeps one entry per key until `release(key)`.
@@ -84,7 +85,7 @@ export const JOURNAL_LIMIT = 80
 const GENERATION_STEP = 5
 
 export const TRAIT_LABEL: Record<TraitKey, string> = { forage: 'food seeking', flee: 'threat avoidance', cruise: 'cruising pace', hide: 'cover seeking' }
-const NAME: Record<Species, [string, string]> = { prey: ['Rabbit', 'Rabbits'], pred: ['Fox', 'Foxes'] }
+const NAME: Record<Species, [string, string]> = { prey: ['Rabbit', 'Rabbits'], pred: ['Fox', 'Foxes'], vole: ['Vole', 'Voles'] }
 const day = (tick: number) => Math.floor(tick / 24) + 1
 const f2 = (v: number) => v.toFixed(2)
 
@@ -115,7 +116,7 @@ export function normalize(entries: readonly (JournalEntry | { tick: number; text
 
 /** The highest-generation animal in a frame (lowest id on ties); the lineage of the only remaining family. */
 function eldest(frame: FrameData | undefined, species: Species): { id: number; lineage: number } | null {
-  const rows = species === 'prey' ? frame?.prey : frame?.preds
+  const rows = frame && framePop(frame, species)
   if (!rows) return null
   let best = -1
   for (let i = 0; i < rows.length; i += ANIMAL_STRIDE)
@@ -129,10 +130,12 @@ export class Journal {
   dropped = 0
   private latches: Record<string, Latch> = {}
   private baselines: Partial<Record<Species, Baseline>> = {}
-  private highest: Record<Species, number> = { prey: 0, pred: 0 }
+  private highest: Record<Species, number> = perSpecies(() => 0)
 
   private readonly endless: boolean
-  constructor(endless = false) { this.endless = endless }
+  /** The species in this meadow. */
+  private readonly species: readonly Species[]
+  constructor(endless = false, species: readonly Species[] = TWO_SPECIES) { this.endless = endless; this.species = species }
 
   /** Add an entry, dropping the oldest beyond the limit. */
   private push(entry: JournalEntry): void {
@@ -164,7 +167,7 @@ export class Journal {
     const sample = samples.at(-1)
     if (!sample) return
     const prev = samples.at(-2)
-    for (const s of ['prey', 'pred'] as const) {
+    for (const s of this.species) {
       const [one, many] = NAME[s]
       const now = sample[s]
       if (prev && Math.floor(now.generation / GENERATION_STEP) > Math.floor(this.highest[s] / GENERATION_STEP)) {
@@ -185,10 +188,11 @@ export class Journal {
           evidence: { lastCount: prev[s].count, lastGeneration: prev[s].generation, lastSeen: prev.tick } })
       this.traitShifts(samples, s)
     }
-    if (prev && sample.prey.count > 0 && sample.pred.count > 0 && Math.floor(sample.tick / 8760) > Math.floor(prev.tick / 8760)) {
+    if (prev && this.species.every(s => sample[s].count > 0) && Math.floor(sample.tick / 8760) > Math.floor(prev.tick / 8760)) {
       const year = Math.floor(sample.tick / 8760) + 1
-      this.push({ kind: 'year', tick: sample.tick, text: this.endless ? `Both species reached year ${year}.` : 'Both species lasted the full year.',
-        evidence: { year, prey: sample.prey.count, pred: sample.pred.count } })
+      const all = this.species.length === 2 ? 'Both' : 'All three'
+      this.push({ kind: 'year', tick: sample.tick, text: this.endless ? `${all} species reached year ${year}.` : `${all} species lasted the full year.`,
+        evidence: { year, prey: sample.prey.count, pred: sample.pred.count, ...(this.species.includes('vole') && { vole: sample.vole.count }) } })
     }
   }
 
@@ -246,7 +250,7 @@ export class Journal {
       if (!latch) { delete this.latches[key]; continue }
       this.latches[key] = latch.released !== undefined && latch.released > tick ? { ...latch, released: undefined } : latch
     }
-    for (const s of ['prey', 'pred'] as const) {
+    for (const s of this.species) {
       if ((this.baselines[s]?.tick ?? -1) > tick) delete this.baselines[s]
       this.highest[s] = Math.max(0, ...samples.map(e => e[s].generation))
     }
@@ -257,11 +261,12 @@ export class Journal {
   }
 
   /** Restore a saved journal. Older saves stored only the entries (and the generation high-water mark). */
-  restore(state: Partial<JournalState> & { entries?: JournalState['entries'] }, highest?: Record<Species, number>): void {
+  restore(state: Partial<JournalState> & { entries?: JournalState['entries'] }, highest?: Partial<Record<Species, number>>): void {
     this.entries = normalize(state.entries)
     this.dropped = state.dropped ?? 0
     this.latches = structuredClone(state.latches ?? {})
     this.baselines = structuredClone(state.baselines ?? {})
-    this.highest = { ...(state.highest ?? highest ?? { prey: 0, pred: 0 }) }
+    // Two-species saves have no vole entry.
+    this.highest = { ...perSpecies(() => 0), ...(state.highest ?? highest) }
   }
 }

@@ -3,6 +3,7 @@ import type { EvolutionSample, TraitKey } from '@/sim/evolution'
 import type { Species } from '@/sim/sim'
 import { traitValue } from '@/game/insights'
 import { cn } from '@/lib/utils'
+import { SPECIES_UI } from '@/game/species-ui'
 
 const TRAIT_LABELS: Record<TraitKey, string> = { forage: 'Food seeking', flee: 'Threat avoidance', cruise: 'Cruising pace', hide: 'Cover seeking' }
 
@@ -12,6 +13,7 @@ const y = (value: number) => (118 - (value + 1) * 48).toFixed(1)
 const TONE: Record<Species, { text: string; stroke: string; fill: string }> = {
   prey: { text: 'text-rabbit', stroke: 'stroke-rabbit', fill: 'fill-rabbit' },
   pred: { text: 'text-fox', stroke: 'stroke-fox', fill: 'fill-fox' },
+  vole: { text: 'text-vole', stroke: 'stroke-vole', fill: 'fill-vole' },
 }
 
 /** The samples to plot, shared by every chart on the page. */
@@ -33,7 +35,7 @@ export const TraitChart = memo(function TraitChart({ series, species, trait }: {
   const band = [...plotted.map(s => `${x(s.tick)},${y(s[species].traits[trait].high)}`),
     ...[...plotted].reverse().map(s => `${x(s.tick)},${y(s[species].traits[trait].low)}`)].join(' ')
   const tone = TONE[species]
-  const who = species === 'prey' ? 'rabbits' : 'foxes'
+  const who = SPECIES_UI[species].plural
   return <figure className="rounded-lg border bg-card p-3">
     <figcaption className="flex items-baseline justify-between gap-2 text-sm">
       <span>{TRAIT_LABELS[trait]}</span>

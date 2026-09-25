@@ -67,7 +67,7 @@ export function ResultDialog({ snap, open, onOpenChange, onRetune, onReplay }: P
           </div>
         </div>
 
-        <p className="text-xs text-muted-foreground">{scoreWords(snap.score, end.survived, snap.endless, snap.interventions.length)}</p>
+        <p className="text-xs text-muted-foreground">{scoreWords(snap.score, end.survived, snap.endless, snap.interventions.length, end.species?.length ?? 2)}</p>
 
         {snap.best && (
           <div className="flex items-center gap-2 text-sm">

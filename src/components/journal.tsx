@@ -8,11 +8,12 @@ import { CATEGORY, JOURNAL_LIMIT, TRAIT_LABEL, TRAIT_SHIFT, type JournalCategory
 import type { Species } from '@/sim/sim'
 import { ANIMAL_STRIDE } from '@/worker/protocol'
 import { cn } from '@/lib/utils'
+import { displayOrder, framePop, SPECIES_UI } from '@/game/species-ui'
 
 const link = 'font-medium text-primary underline-offset-2 hover:underline'
 const day = (tick: number) => Math.floor(tick / 24) + 1
 const f2 = (v: number) => v.toFixed(2)
-const NAME: Record<Species, [string, string]> = { prey: ['Rabbit', 'rabbits'], pred: ['Fox', 'foxes'] }
+const NAME: Record<Species, [string, string]> = { prey: ['Rabbit', 'rabbits'], pred: ['Fox', 'foxes'], vole: ['Vole', 'voles'] }
 const TAG: Record<JournalCategory, [string, string]> = {
   family: ['Family', 'Who is descended from whom: counted, not explained.'],
   inherited: ['Measured change', 'A change in inherited tendencies, measured the same way every day. It is not evidence of an advantage.'],
@@ -68,7 +69,7 @@ function Evidence({ entry: e }: { entry: JournalEntry }) {
     case 'extinction':
       return <div className={box}>Source: living {NAME[e.species][1]} in the daily samples: {e.evidence.lastCount} on day {day(e.evidence.lastSeen)}, none on day {day(e.tick)}.</div>
     case 'year':
-      return <div className={box}>Source: living animals at the first daily sample of year {e.evidence.year}: {e.evidence.prey} rabbits, {e.evidence.pred} foxes.</div>
+      return <div className={box}>Source: living animals at the first daily sample of year {e.evidence.year}: {e.evidence.prey} rabbits, {e.evidence.vole !== undefined && `${e.evidence.vole} voles, `}{e.evidence.pred} foxes.</div>
     case 'traitShift': {
       const v = e.evidence
       return <div className={box}>
@@ -100,7 +101,10 @@ export function FamiliesCard({ family, onFamily, onInspect, endless }: { family:
   const upto = Math.floor(snap.tick / 24)
   // Rebuild when a daily count is added or the displayed day changes.
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  const all = useMemo(() => ({ prey: families.summaries('prey', snap.tick), pred: families.summaries('pred', snap.tick) }), [families, counted, upto])
+  const species = displayOrder(game.scenario.species)
+  const all = useMemo(() => Object.fromEntries(species.map(s => [s, families.summaries(s, snap.tick)])) as Record<Species, LineageSummary[]>,
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [families, counted, upto, species.length])
   const from = families.countedFrom
   return <Card id="families" className="gap-3 p-4">
     <div>
@@ -110,10 +114,10 @@ export function FamiliesCard({ family, onFamily, onInspect, endless }: { family:
         {endless && ` Daily counts cover the last ${FAMILY_DAYS} days${from !== null && from > 0 ? ` (from day ${day(from)})` : ''}; older days keep only each family’s first count and largest size, and only the ${FAMILY_ARCHIVE} most recently seen extinct families per species are kept.`}
       </p>
     </div>
-    <div className="grid gap-3 md:grid-cols-2">
-      {(['prey', 'pred'] as const).map(s => <Shares key={s} species={s} list={all[s]} focus={family} onFamily={onFamily} />)}
+    <div className={species.length > 2 ? 'grid gap-3 md:grid-cols-3' : 'grid gap-3 md:grid-cols-2'}>
+      {species.map(s => <Shares key={s} species={s} list={all[s]} focus={family} onFamily={onFamily} />)}
     </div>
-    {family && <FamilyDetail family={family} summary={all[family.species].find(l => l.founder === family.id)} onInspect={onInspect} />}
+    {family && <FamilyDetail family={family} summary={all[family.species]?.find(l => l.founder === family.id)} onInspect={onInspect} />}
   </Card>
 }
 
@@ -122,10 +126,10 @@ function Shares({ species, list, focus, onFamily }: { species: Species; list: Li
   const total = living.reduce((n, l) => n + l.living, 0)
   const top = living.slice(0, 5)
   const rest = total - top.reduce((n, l) => n + l.living, 0)
-  const tone = species === 'prey' ? 'bg-rabbit' : 'bg-fox'
+  const tone = SPECIES_UI[species].bg
   const pct = (n: number) => `${Math.round(n / total * 100)}%`
   return <section aria-label={`${NAME[species][0]} families`} className="rounded-lg border bg-muted/30 p-3 text-xs">
-    <h4 className={cn('text-xs font-semibold tracking-wide uppercase', species === 'prey' ? 'text-rabbit' : 'text-fox')}>{NAME[species][1]}: {living.length} {living.length === 1 ? 'family' : 'families'} alive</h4>
+    <h4 className={cn('text-xs font-semibold tracking-wide uppercase', SPECIES_UI[species].text)}>{NAME[species][1]}: {living.length} {living.length === 1 ? 'family' : 'families'} alive</h4>
     {total > 0 ? <>
       <div className="mt-2 flex h-3 overflow-hidden rounded-sm bg-muted" role="img" aria-label={`Share of living ${NAME[species][1]} by family`}>
         {top.map((l, i) => <div key={l.founder} className={tone} style={{ width: pct(l.living), opacity: 1 - i * 0.16 }} title={`Founder #${l.founder}: ${l.living} (${pct(l.living)})`} />)}
@@ -144,7 +148,7 @@ function Shares({ species, list, focus, onFamily }: { species: Species; list: Li
 function FamilyDetail({ family, summary, onInspect }: { family: AnimalSelection; summary: LineageSummary | undefined; onInspect: (a: AnimalSelection) => void }) {
   const [game, snap] = useGame()
   const frame = game.history.frameAt(snap.tick)?.a
-  const rows = family.species === 'prey' ? frame?.prey : frame?.preds
+  const rows = frame && framePop(frame, family.species)
   const members: [number, number][] = []
   if (rows) for (let i = 0; i < rows.length; i += ANIMAL_STRIDE) if (rows[i + 12] === family.id) members.push([rows[i], rows[i + 9]])
   members.sort((a, b) => b[1] - a[1] || a[0] - b[0])

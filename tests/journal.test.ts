@@ -10,7 +10,7 @@ const flat = { mean: 0, low: -0.4, high: 0.4 }
 const pop = (count: number, forage = 0, generation = 1, lineages = 3) => ({ count, generation, lineages, neurons: 0,
   traits: { forage: { mean: forage, low: forage - 0.3, high: forage + 0.3 }, flee: flat, cruise: flat, hide: flat } })
 const sample = (day: number, forage: number, count = 40, generation = 1): EvolutionSample =>
-  ({ tick: day * D, prey: pop(count, forage, generation), pred: pop(12) })
+  ({ tick: day * D, prey: pop(count, forage, generation), pred: pop(12), vole: pop(0) })
 
 /** Animals as frame rows: [id, generation, parent, lineage]. */
 function frame(tick: number, prey: [number, number, number, number][] = []): FrameData {

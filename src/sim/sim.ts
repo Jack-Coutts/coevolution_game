@@ -15,9 +15,21 @@ import {
 import type { SimParams, SpeciesParams } from './params'
 import { Rng } from './rng'
 import { calendar, type Season } from './time'
+import {
+  emptyTally,
+  perSpecies,
+  speciesDefs,
+  speciesList,
+  type Diet,
+  type Species,
+  type SpeciesDef,
+  type Tally,
+} from './species'
 
-export type Species = 'prey' | 'pred'
+export { speciesDefs, type Species, type SpeciesDef }
+/** The eight Open meadow actions, plus two vole actions for the Vole meadow (docs/third-species.md section 9). */
 export type Intervention = 'rain' | 'releasePrey' | 'cullPred' | 'releasePred' | 'plantBushes' | 'feedFoxes' | 'illnessPrey' | 'illnessPred'
+  | 'releaseVole' | 'illnessVole'
 
 export interface Window {
   from: number
@@ -44,7 +56,8 @@ export type DeathCause = 'starved' | 'eaten' | 'old' | 'illness'
 
 export interface TickEvent {
   kind: 'eaten' | 'born' | 'starved' | 'old' | 'arrived' | 'released' | 'culled' | 'sprouted' | 'withered' | 'illness'
-  species: Species
+  /** null for plant events (bushes sprouting or withering). */
+  species: Species | null
   x: number
   y: number
 }
@@ -84,6 +97,8 @@ export const EFFECTS = {
   plant: { count: 4, stockShare: 0.5 },
   releasePrey: 8,
   releasePred: 3,
+  /** Voles released into tall grass, descended from living voles. */
+  releaseVole: 12,
   /** A cull removes floor(foxes / cullDivisor), always leaving one. */
   cullDivisor: 3,
 }
@@ -97,6 +112,8 @@ export interface World {
   patches: [number, number][]
   prey: [number, number][]
   preds: [number, number][]
+  /** Empty without voles. Placed after foxes so two-species worlds draw the same numbers. */
+  voles: [number, number][]
 }
 
 export function placeWorld(seed: number, p: SimParams): World {
@@ -124,9 +141,12 @@ export function placeWorld(seed: number, p: SimParams): World {
   for (let i = 0; i < p.prey.initial; i++) prey.push([rng.random(), rng.random()])
   const preds: [number, number][] = []
   for (let i = 0; i < p.pred.initial; i++) preds.push([rng.random(), rng.random()])
-  return { patches, prey, preds }
+  const voles: [number, number][] = []
+  if (p.vole) for (let i = 0; i < p.vole.body.initial; i++) voles.push([rng.random(), rng.random()])
+  return { patches, prey, preds, voles }
 }
 
+/** Rabbit and fox counts under their original names, as scripts, statistics and old saves read them. */
 export interface Counters {
   preyBorn: number
   predBorn: number
@@ -140,23 +160,13 @@ export interface Counters {
   predOld: number
 }
 
-/** A species as data: what it eats, its body, and its population ceiling. */
-export interface SpeciesDef {
-  key: Species
-  eatsPlants: boolean
-  eats: Species[]
-  body: SpeciesParams
-  ceiling: number
-}
-
-export function speciesDefs(p: SimParams): Record<Species, SpeciesDef> {
+export function legacyCounters(t: Record<Species, Tally>): Counters {
   return {
-    prey: { key: 'prey', eatsPlants: true, eats: [], body: p.prey, ceiling: p.eco.ceilingPrey },
-    pred: { key: 'pred', eatsPlants: false, eats: ['prey'], body: p.pred, ceiling: p.eco.ceilingPred },
+    preyBorn: t.prey.born, predBorn: t.pred.born, preyStarved: t.prey.starved, preyEaten: t.prey.eaten,
+    preyOld: t.prey.old, predStarved: t.pred.starved, predOld: t.pred.old, predCulled: t.pred.culled,
+    preyIllness: t.prey.illness, predIllness: t.pred.illness,
   }
 }
-
-const SPECIES: Species[] = ['prey', 'pred']
 
 export class Creature {
   readonly id: number
@@ -275,26 +285,32 @@ export class Sim {
   readonly seed: number
   bushes: Bush[] = []
   readonly cover: [number, number][]
+  /** Seed heads left in each tall-grass patch (same order as `cover`). Empty without voles. */
+  grassSeed: number[] = []
   readonly dist: Disturbance
+  /** The species living here, in simulation order. */
+  readonly species: Species[]
   readonly defs: Record<Species, SpeciesDef>
   pops: Record<Species, Creature[]>
   tick = 0
   ended = false
-  counters: Counters = { preyBorn: 0, predBorn: 0, preyStarved: 0, preyEaten: 0, preyOld: 0, predStarved: 0, predOld: 0, predCulled: 0, preyIllness: 0, predIllness: 0 }
+  /** Births and deaths by species and cause. */
+  tally: Record<Species, Tally> = perSpecies(emptyTally)
   evo: EvoCounters = { encounters: 0, escapes: 0, caught: 0, preyHours: 0, preyIntake: 0, predHours: 0, predHungryHours: 0 }
-  lastBirth = { prey: 0, pred: 0 }
+  lastBirth: Record<Species, number> = perSpecies(() => 0)
   events: TickEvent[] = []
-  private founders: Record<Species, Genome[]> = { prey: [], pred: [] }
+  private founders: Record<Species, Genome[]> = perSpecies(() => [])
   ceilingHits = 0
   private rng: Rng
   private evRng: Rng
-  private nextId = { prey: 0, pred: 0 }
+  private nextId: Record<Species, number> = perSpecies(() => 0)
   private regrowAcc = 0
   private sproutAcc = 0
+  private seedAcc = 0
   private nextBush = 0
   private foodRng: Rng
   private pending: Intervention[] = []
-  private grids: Record<Species, Grid> = { prey: new Grid(), pred: new Grid() }
+  private grids: Record<Species, Grid> = perSpecies(() => new Grid())
   private opts: EcoOptions
   private x = new Float64Array(N_IN)
   private hid = new Float64Array(64)
@@ -305,16 +321,18 @@ export class Sim {
     this.seed = seed
     this.dist = dist
     this.opts = opts
+    this.species = speciesList(p)
     this.defs = speciesDefs(p)
     const world = placeWorld(seed, p)
     this.cover = placeCover(seed, p, world.patches)
+    if (p.vole) this.grassSeed = this.cover.map(() => p.vole!.seedStock)
     this.foodRng = new Rng(seed + 40000)
     for (const [x, y] of world.patches) this.bushes.push({ id: this.nextBush++, x, y, stock: p.patchStock, grazedFor: 0, age: 9999 })
     this.rng = new Rng(seed + 10000)
     this.evRng = new Rng(seed + 20000)
-    const starts: Record<Species, [number, number][]> = { prey: world.prey, pred: world.preds }
-    this.pops = { prey: [], pred: [] }
-    for (const s of SPECIES) {
+    const starts: Record<Species, [number, number][]> = { prey: world.prey, pred: world.preds, vole: world.voles }
+    this.pops = perSpecies(() => [])
+    for (const s of this.species) {
       const given = opts.genomes?.[s]
       const n = opts.counts?.[s] ?? starts[s].length
       for (let i = 0; i < n; i++) {
@@ -324,34 +342,45 @@ export class Sim {
         this.pops[s].push(a)
       }
     }
-    for (const s of SPECIES) this.founders[s] = this.pops[s].map(a => a.brain)
-    for (const s of SPECIES) for (const a of this.pops[s]) a.inCover = this.inCover(a.x, a.y)
+    for (const s of this.species) this.founders[s] = this.pops[s].map(a => a.brain)
+    for (const s of this.species) for (const a of this.pops[s]) a.inCover = this.inCover(a.x, a.y)
   }
 
   /** Structured-cloneable checkpoint, including every random stream and pending action. */
-  save() {
+  save(): MeadowState {
     return {
-      version: 2 as const, p: this.p, seed: this.seed, dist: this.dist, opts: this.opts,
-      pops: this.pops, founders: this.founders, bushes: this.bushes,
-      tick: this.tick, ended: this.ended, counters: this.counters, evo: this.evo,
+      version: 3, species: this.species, p: this.p, seed: this.seed, dist: this.dist, opts: this.opts,
+      pops: this.pops, founders: this.founders, bushes: this.bushes, grassSeed: this.grassSeed,
+      tick: this.tick, ended: this.ended, tally: this.tally, evo: this.evo,
       lastBirth: this.lastBirth, nextId: this.nextId, nextBush: this.nextBush,
-      regrowAcc: this.regrowAcc, sproutAcc: this.sproutAcc, pending: this.pending,
+      regrowAcc: this.regrowAcc, sproutAcc: this.sproutAcc, seedAcc: this.seedAcc, pending: this.pending,
       ceilingHits: this.ceilingHits,
       rng: this.rng.save(), evRng: this.evRng.save(), foodRng: this.foodRng.save(),
     }
   }
 
-  static restore(data: ReturnType<Sim['save']>): Sim {
-    if (data.version !== 2) throw new Error('Unsupported meadow save version')
-    const s = new Sim(data.p, data.seed, data.dist, data.opts)
-    for (const key of ['pops', 'founders', 'bushes', 'tick', 'ended', 'counters', 'evo', 'lastBirth',
-      'nextId', 'nextBush', 'regrowAcc', 'sproutAcc', 'pending', 'ceilingHits'] as const) {
-      Object.assign(s, { [key]: structuredClone(data[key]) })
+  /** Resume a checkpoint. Version-2 states (two-species saves) are migrated first. */
+  static restore(data: MeadowState | MeadowStateV2): Sim {
+    const state = migrateState(data)
+    const s = new Sim(state.p, state.seed, state.dist, state.opts)
+    if (state.species.join() !== s.species.join()) throw new Error('Meadow save species do not match its parameters')
+    for (const key of ['pops', 'founders', 'bushes', 'grassSeed', 'tick', 'ended', 'tally', 'evo', 'lastBirth',
+      'nextId', 'nextBush', 'regrowAcc', 'sproutAcc', 'seedAcc', 'pending', 'ceilingHits'] as const) {
+      Object.assign(s, { [key]: structuredClone(state[key]) })
     }
-    s.rng.restore(data.rng)
-    s.evRng.restore(data.evRng)
-    s.foodRng.restore(data.foodRng)
+    s.rng.restore(state.rng)
+    s.evRng.restore(state.evRng)
+    s.foodRng.restore(state.foodRng)
     return s
+  }
+
+  /** Rabbit and fox counts under their original flat names (a read-only view of `tally`). */
+  get counters(): Counters {
+    return legacyCounters(this.tally)
+  }
+
+  get voles(): Creature[] {
+    return this.pops.vole
   }
 
   get prey(): Creature[] {
@@ -362,8 +391,9 @@ export class Sim {
     return this.pops.pred
   }
 
+  /** A year survived with every species still alive. */
   get survived(): boolean {
-    return !this.p.endless && this.tick >= this.p.horizon && this.prey.length > 0 && this.preds.length > 0
+    return !this.p.endless && this.tick >= this.p.horizon && this.species.every((s) => this.pops[s].length > 0)
   }
 
   queue(action: Intervention): void {
@@ -411,7 +441,7 @@ export class Sim {
     return new Creature(id, s, x, y, this.rng.uniform(0, 2 * Math.PI), brain, this.defs[s].body, energy, gen, lineage, parent)
   }
 
-  private emit(kind: TickEvent['kind'], species: Species, a: { x: number; y: number }): void {
+  private emit(kind: TickEvent['kind'], species: Species | null, a: { x: number; y: number }): void {
     if (this.opts.record) this.events.push({ kind, species, x: a.x, y: a.y })
   }
 
@@ -432,7 +462,8 @@ export class Sim {
     for (const action of this.pending) this.intervene(action)
     this.pending.length = 0
 
-    for (const s of SPECIES) {
+    const species = this.species
+    for (const s of species) {
       for (const a of this.pops[s]) {
         if (!this.opts.noAging) a.age += 1
         a.hunger += 1
@@ -442,21 +473,22 @@ export class Sim {
 
     this.spreadIllness()
     const met = this.metabolismFactor(tick)
-    for (const s of SPECIES) for (const a of this.pops[s]) this.move(a, met)
-    for (const s of SPECIES) this.grids[s].build(this.pops[s])
+    for (const s of species) for (const a of this.pops[s]) this.move(a, met)
+    for (const s of species) this.grids[s].build(this.pops[s])
 
     this.graze()
     this.hunt(tick)
 
-    for (const s of SPECIES) this.pops[s] = this.cull(s)
+    for (const s of species) this.pops[s] = this.cull(s)
 
-    if (!this.opts.noBirths) for (const s of SPECIES) for (const parent of this.pops[s].slice()) this.giveBirth(parent)
+    if (!this.opts.noBirths) for (const s of species) for (const parent of this.pops[s].slice()) this.giveBirth(parent)
 
     this.growFood(tick)
 
     this.evo.preyHours += this.prey.length
     this.evo.predHours += this.preds.length
-    if (this.prey.length === 0 || this.preds.length === 0 || (!p.endless && tick >= p.horizon)) {
+    // The run ends at the first extinction of any species.
+    if (species.some((s) => this.pops[s].length === 0) || (!p.endless && tick >= p.horizon)) {
       this.ended = true
       return false
     }
@@ -477,12 +509,21 @@ export class Sim {
       if (regrow && b.stock < p.patchStock) b.stock += 1
       b.grazedFor = b.stock < low ? b.grazedFor + 1 : 0
       if (b.grazedFor >= p.witherHours) {
-        this.emit('withered', 'prey', b)
+        this.emit('withered', null, b)
         continue
       }
       kept.push(b)
     }
     this.bushes = kept
+    if (p.vole) {
+      // Grass seed regrows on the same weather as berries; rain does not refill it.
+      this.seedAcc += f
+      if (this.seedAcc >= p.vole.seedEvery) {
+        this.seedAcc -= p.vole.seedEvery
+        const max = p.vole.seedStock
+        for (let k = 0; k < this.grassSeed.length; k++) this.grassSeed[k] = Math.min(max, this.grassSeed[k] + 1)
+      }
+    }
     this.sproutAcc += (p.sproutPerDay / 24) * f * SPROUT_SEASON[calendar(tick).season]
     const rng = this.foodRng
     while (this.sproutAcc >= 1) {
@@ -504,7 +545,7 @@ export class Sim {
       if (this.bushes.some((b) => (b.x - x) ** 2 + (b.y - y) ** 2 < SPROUT_GAP * SPROUT_GAP)) continue
       const b: Bush = { id: this.nextBush++, x, y, stock: SPROUT_STOCK, grazedFor: 0, age: 0 }
       this.bushes.push(b)
-      this.emit('sprouted', 'prey', b)
+      this.emit('sprouted', null, b)
     }
   }
 
@@ -520,7 +561,7 @@ export class Sim {
     let d1 = Infinity
     let d2 = Infinity
     let count = 0
-    for (const s of SPECIES) {
+    for (const s of this.species) {
       if (!this.defs[s].eats.includes(a.species)) continue
       const r = a.view
       this.grids[s].each(a.x, a.y, r, (o) => {
@@ -550,30 +591,63 @@ export class Sim {
     }
 
     if (def.eatsPlants) {
+      // The two nearest food items over every plant food this species eats. Items are
+      // numbered bushes first, then grass patches, so a berry-only diet sees exactly the bushes.
       let k1 = -1
       let k2 = -1
       let e1 = Infinity
       let e2 = Infinity
       const bushes = this.bushes
-      for (let k = 0; k < bushes.length; k++) {
-        const b = bushes[k]
-        if (b.stock < 1) continue
-        const d = (b.x - a.x) ** 2 + (b.y - a.y) ** 2
-        if (d < e1) {
-          k2 = k1
-          e2 = e1
-          k1 = k
-          e1 = d
-        } else if (d < e2) {
-          k2 = k
-          e2 = d
+      const nb = bushes.length
+      for (let i = 0; i < def.diet.length; i++) {
+        const bite = def.diet[i].bite
+        if (def.diet[i].food === 'berries') {
+          for (let k = 0; k < nb; k++) {
+            const b = bushes[k]
+            if (b.stock < bite) continue
+            const d = (b.x - a.x) ** 2 + (b.y - a.y) ** 2
+            if (d < e1) {
+              k2 = k1
+              e2 = e1
+              k1 = k
+              e1 = d
+            } else if (d < e2) {
+              k2 = k
+              e2 = d
+            }
+          }
+        } else {
+          const seed = this.grassSeed
+          const cover = this.cover
+          for (let g = 0; g < seed.length; g++) {
+            if (seed[g] < bite) continue
+            const d = (cover[g][0] - a.x) ** 2 + (cover[g][1] - a.y) ** 2
+            if (d < e1) {
+              k2 = k1
+              e2 = e1
+              k1 = nb + g
+              e1 = d
+            } else if (d < e2) {
+              k2 = nb + g
+              e2 = d
+            }
+          }
         }
       }
       if (k1 >= 0) {
-        relative(a, bushes[k1].x, bushes[k1].y, p.foodScent, x, SENSE.food1)
-        x[SENSE.foodAmount] = bushes[k1].stock / p.patchStock
+        if (k1 < nb) {
+          relative(a, bushes[k1].x, bushes[k1].y, p.foodScent, x, SENSE.food1)
+          x[SENSE.foodAmount] = bushes[k1].stock / p.patchStock
+        } else {
+          const g = k1 - nb
+          relative(a, this.cover[g][0], this.cover[g][1], p.foodScent, x, SENSE.food1)
+          x[SENSE.foodAmount] = this.grassSeed[g] / p.vole!.seedStock
+        }
       }
-      if (k2 >= 0) relative(a, bushes[k2].x, bushes[k2].y, p.foodScent, x, SENSE.food2)
+      if (k2 >= 0) {
+        if (k2 < nb) relative(a, bushes[k2].x, bushes[k2].y, p.foodScent, x, SENSE.food2)
+        else relative(a, this.cover[k2 - nb][0], this.cover[k2 - nb][1], p.foodScent, x, SENSE.food2)
+      }
     } else {
       let f1: Creature | null = null
       let f2: Creature | null = null
@@ -644,7 +718,8 @@ export class Sim {
   }
 
   private move(a: Creature, met: number): void {
-    const body = this.defs[a.species].body
+    const def = this.defs[a.species]
+    const body = def.body
     const eco = this.p.eco
     this.sense(a)
     think(a.brain, this.x, this.hid, this.out)
@@ -659,7 +734,7 @@ export class Sim {
     const n = Math.sqrt(hx * hx + hy * hy)
     a.hx = hx / n
     a.hy = hy / n
-    const step = body.step * pace * (a.inCover ? eco.coverSlow : 1) * (a.illUntil > this.tick ? EFFECTS.illness.slow : 1)
+    const step = body.step * pace * (a.inCover && def.coverSlows ? eco.coverSlow : 1) * (a.illUntil > this.tick ? EFFECTS.illness.slow : 1)
     a.x = Math.min(1, Math.max(0, a.x + a.hx * step))
     a.y = Math.min(1, Math.max(0, a.y + a.hy * step))
     a.pace = step / body.step
@@ -669,46 +744,69 @@ export class Sim {
       (body.metabolism + body.visionUpkeep * a.view + eco.brainUpkeep * a.brain.nHid) * met + body.speedCost * r * r + (a.illUntil > this.tick ? EFFECTS.illness.drain : 0)
   }
 
+  /** Hungry plant eaters take one bite of the first food in their diet that is within reach. */
   private graze(): void {
-    const p = this.p
-    const body = p.prey
-    const feed2 = p.feedR * p.feedR
-    const full = body.maxEnergy - 0.5 * body.mealEnergy
-    for (const s of SPECIES) {
-      if (!this.defs[s].eatsPlants) continue
+    const feed2 = this.p.feedR * this.p.feedR
+    for (const s of this.species) {
+      const def = this.defs[s]
+      if (!def.eatsPlants) continue
+      // Each species' own body sets when it is full (the census bug: this used the rabbit's).
+      const full = def.body.maxEnergy - 0.5 * def.body.mealEnergy
       for (const a of this.pops[s]) {
         if (a.energy > full) continue
-        let best = feed2
-        let bk = -1
-        for (let k = 0; k < this.bushes.length; k++) {
-          const b = this.bushes[k]
-          if (b.stock < 1) continue
-          const d2 = (b.x - a.x) ** 2 + (b.y - a.y) ** 2
-          if (d2 <= best) {
-            best = d2
-            bk = k
-          }
-        }
-        if (bk >= 0) {
-          this.bushes[bk].stock -= 1
-          a.hunger = 0
-          a.meals += 1
-          const gain = Math.min(this.defs[s].body.maxEnergy - a.energy, this.defs[s].body.mealEnergy)
-          a.energy += gain
-          this.evo.preyIntake += gain
-        }
+        for (let i = 0; i < def.diet.length; i++) if (this.bite(a, def, def.diet[i], feed2)) break
       }
     }
   }
 
+  /** One bite of one plant food: seed in the tall-grass patch the animal stands in, or the nearest bush in reach. */
+  private bite(a: Creature, def: SpeciesDef, diet: Diet, feed2: number): boolean {
+    if (diet.food === 'seed') {
+      if (!a.inCover) return false
+      const r2 = this.p.eco.coverR * this.p.eco.coverR
+      let g = -1
+      for (let k = 0; k < this.cover.length; k++) {
+        const [cx, cy] = this.cover[k]
+        if (this.grassSeed[k] >= diet.bite && (cx - a.x) ** 2 + (cy - a.y) ** 2 <= r2) {
+          g = k
+          break
+        }
+      }
+      if (g < 0) return false
+      this.grassSeed[g] = trimStock(this.grassSeed[g] - diet.bite)
+    } else {
+      let best = feed2
+      let bk = -1
+      for (let k = 0; k < this.bushes.length; k++) {
+        const b = this.bushes[k]
+        if (b.stock < diet.bite) continue
+        const d2 = (b.x - a.x) ** 2 + (b.y - a.y) ** 2
+        if (d2 <= best) {
+          best = d2
+          bk = k
+        }
+      }
+      if (bk < 0) return false
+      this.bushes[bk].stock = trimStock(this.bushes[bk].stock - diet.bite)
+    }
+    a.hunger = 0
+    a.meals += 1
+    const gain = Math.min(def.body.maxEnergy - a.energy, def.body.mealEnergy * diet.value)
+    a.energy += gain
+    if (def.key === 'prey') this.evo.preyIntake += gain
+    return true
+  }
+
   private hunt(tick: number): void {
     const eat2 = this.p.eatR * this.p.eatR
-    for (const s of SPECIES) {
+    for (const s of this.species) {
       const def = this.defs[s]
       if (def.eats.length === 0) continue
       const full = def.body.maxEnergy - 0.5 * def.body.mealEnergy
-      for (const a of this.pops[s]) if (a.energy <= full) this.evo.predHungryHours++
+      if (s === 'pred') for (const a of this.pops[s]) if (a.energy <= full) this.evo.predHungryHours++
       for (const victim of def.eats) {
+        // A small victim is a small meal: its worth is a share of the hunter's meal energy.
+        const worth = def.body.mealEnergy * this.defs[victim].mealValue
         const survivors: Creature[] = []
         for (const a of this.pops[victim]) {
           let best = eat2
@@ -732,9 +830,9 @@ export class Sim {
           const h = hunter as Creature
           h.hunger = 0
           h.meals += 1
-          h.energy = Math.min(def.body.maxEnergy, h.energy + def.body.mealEnergy)
+          h.energy = Math.min(def.body.maxEnergy, h.energy + worth)
           if (a.threatSince >= 0) this.evo.caught++
-          this.counters.preyEaten += 1
+          this.tally[victim].eaten += 1
           this.emit('eaten', victim, a)
         }
         this.pops[victim] = survivors
@@ -745,7 +843,7 @@ export class Sim {
   private cull(s: Species): Creature[] {
     const body = this.defs[s].body
     const alive: Creature[] = []
-    const c = this.counters
+    const t = this.tally[s]
     for (const a of this.pops[s]) {
       const starved = a.energy <= 0
       const old = a.age >= body.lifespan
@@ -755,16 +853,13 @@ export class Sim {
       }
       if (s === 'prey' && a.threatSince >= 0) a.threatSince = -1
       if (starved && a.illUntil > this.tick) {
-        if (s === 'prey') c.preyIllness++
-        else c.predIllness++
+        t.illness += 1
         this.emit('illness', s, a)
       } else if (starved) {
-        if (s === 'prey') c.preyStarved += 1
-        else c.predStarved += 1
+        t.starved += 1
         this.emit('starved', s, a)
       } else {
-        if (s === 'prey') c.preyOld += 1
-        else c.predOld += 1
+        t.old += 1
         this.emit('old', s, a)
       }
     }
@@ -820,8 +915,7 @@ export class Sim {
       parent.energy -= childCost
       parent.kits += 1
       pop.push(child)
-      if (s === 'prey') this.counters.preyBorn += 1
-      else this.counters.predBorn += 1
+      this.tally[s].born += 1
       this.emit('born', s, child)
     }
     parent.meals = 0
@@ -883,7 +977,7 @@ export class Sim {
   private spreadIllness(): void {
     const { every, radius, chance } = EFFECTS.illness
     if (this.tick % every !== 0) return
-    for (const s of SPECIES) {
+    for (const s of this.species) {
       const sick = this.pops[s].filter(a => a.illUntil > this.tick)
       const exposed = new Set<Creature>()
       for (const a of sick) this.grids[s].each(a.x, a.y, radius, b => {
@@ -898,8 +992,9 @@ export class Sim {
     const ev = this.evRng
     switch (action) {
       case 'illnessPrey':
-      case 'illnessPred': {
-        const species = action === 'illnessPrey' ? 'prey' : 'pred'
+      case 'illnessPred':
+      case 'illnessVole': {
+        const species = ILLNESS_TARGET[action]
         const available = this.pops[species].filter(a => a.immuneUntil <= this.tick)
         const n = Math.min(EFFECTS.illness.seedMax, Math.max(1, Math.ceil(available.length * EFFECTS.illness.seedShare)))
         for (let i = 0; i < n && available.length; i++) {
@@ -913,7 +1008,7 @@ export class Sim {
           const bush = { id: this.nextBush++, x: ev.uniform(0.05, 0.95), y: ev.uniform(0.05, 0.95),
             stock: this.p.patchStock * EFFECTS.plant.stockShare, grazedFor: 0, age: 0 }
           this.bushes.push(bush)
-          this.emit('sprouted', 'prey', bush)
+          this.emit('sprouted', null, bush)
         }
         break
       case 'feedFoxes':
@@ -949,11 +1044,30 @@ export class Sim {
         }
         break
       }
+      case 'releaseVole': {
+        // Only where voles live; into tall grass, where their seed is.
+        if (!this.species.includes('vole')) break
+        const want = EFFECTS.releaseVole
+        const room = Math.max(0, this.cap('vole') - this.voles.length)
+        if (room < want) this.ceilingHits += want - room
+        const r = this.p.eco.coverR
+        for (let i = 0; i < Math.min(want, room); i++) {
+          const [cx, cy] = this.cover.length ? this.cover[Math.floor(ev.random() * this.cover.length)] : [0.5, 0.5]
+          const d = r * Math.sqrt(ev.random())
+          const angle = ev.uniform(0, 2 * Math.PI)
+          const x = Math.min(1, Math.max(0, cx + d * Math.cos(angle)))
+          const y = Math.min(1, Math.max(0, cy + d * Math.sin(angle)))
+          const a = this.newcomer('vole', x, y)
+          this.voles.push(a)
+          this.emit('released', 'vole', a)
+        }
+        break
+      }
       case 'cullPred': {
         const n = Math.floor(this.preds.length / EFFECTS.cullDivisor)
         for (let i = 0; i < n && this.preds.length > 1; i++) {
           const k = Math.floor(ev.random() * this.preds.length)
-          this.counters.predCulled++
+          this.tally.pred.culled++
           this.emit('culled', 'pred', this.preds[k])
           this.preds.splice(k, 1)
         }
@@ -965,6 +1079,100 @@ export class Sim {
       }
     }
   }
+}
+
+type RngState = ReturnType<Rng['save']>
+
+/** A meadow checkpoint, save version 3. It records its species list. */
+export interface MeadowState {
+  version: 3
+  species: Species[]
+  p: SimParams
+  seed: number
+  dist: Disturbance
+  opts: EcoOptions
+  pops: Record<Species, Creature[]>
+  founders: Record<Species, Genome[]>
+  bushes: Bush[]
+  grassSeed: number[]
+  tick: number
+  ended: boolean
+  tally: Record<Species, Tally>
+  evo: EvoCounters
+  lastBirth: Record<Species, number>
+  nextId: Record<Species, number>
+  nextBush: number
+  regrowAcc: number
+  sproutAcc: number
+  seedAcc: number
+  pending: Intervention[]
+  ceilingHits: number
+  rng: RngState
+  evRng: RngState
+  foodRng: RngState
+}
+
+type TwoSpecies<T> = { prey: T; pred: T }
+
+/** A checkpoint from save version 2: always a two-species meadow, with flat rabbit and fox counters. */
+export interface MeadowStateV2 {
+  version: 2
+  p: SimParams
+  seed: number
+  dist: Disturbance
+  opts: EcoOptions
+  pops: TwoSpecies<Creature[]>
+  founders: TwoSpecies<Genome[]>
+  bushes: Bush[]
+  tick: number
+  ended: boolean
+  counters: Counters
+  evo: EvoCounters
+  lastBirth: TwoSpecies<number>
+  nextId: TwoSpecies<number>
+  nextBush: number
+  regrowAcc: number
+  sproutAcc: number
+  pending: Intervention[]
+  ceilingHits: number
+  rng: RngState
+  evRng: RngState
+  foodRng: RngState
+}
+
+/**
+ * Bring a checkpoint to version 3. A version-2 state becomes a two-species meadow with no
+ * voles, no grass seed and zeroed vole counts, and then continues exactly as it would have
+ * in the version-2 engine. Anything else is refused, never partly loaded.
+ */
+export function migrateState(data: MeadowState | MeadowStateV2): MeadowState {
+  if (data?.version === 3) return data
+  if (data?.version !== 2 || !data.counters || !data.pops?.prey || !data.pops?.pred || data.p?.vole)
+    throw new Error('Unsupported meadow save version')
+  const c = data.counters
+  return {
+    version: 3, species: ['prey', 'pred'], p: data.p, seed: data.seed, dist: data.dist, opts: data.opts,
+    pops: { prey: data.pops.prey, pred: data.pops.pred, vole: [] },
+    founders: { prey: data.founders.prey, pred: data.founders.pred, vole: [] },
+    bushes: data.bushes, grassSeed: [], tick: data.tick, ended: data.ended,
+    tally: {
+      prey: { born: c.preyBorn, starved: c.preyStarved, eaten: c.preyEaten, old: c.preyOld, illness: c.preyIllness, culled: 0 },
+      pred: { born: c.predBorn, starved: c.predStarved, eaten: 0, old: c.predOld, illness: c.predIllness, culled: c.predCulled },
+      vole: emptyTally(),
+    },
+    evo: data.evo,
+    lastBirth: { prey: data.lastBirth.prey, pred: data.lastBirth.pred, vole: 0 },
+    nextId: { prey: data.nextId.prey, pred: data.nextId.pred, vole: 0 },
+    nextBush: data.nextBush, regrowAcc: data.regrowAcc, sproutAcc: data.sproutAcc, seedAcc: 0,
+    pending: data.pending, ceilingHits: data.ceilingHits, rng: data.rng, evRng: data.evRng, foodRng: data.foodRng,
+  }
+}
+
+const ILLNESS_TARGET = { illnessPrey: 'prey', illnessPred: 'pred', illnessVole: 'vole' } as const satisfies Record<string, Species>
+
+/** Round away float dust from fractional bites, so repeated 0.4 bites leave whole numbers whole. Integers are unchanged. */
+function trimStock(x: number): number {
+  return Math.round(x * 1e6) / 1e6
 }
 
 function relative(a: Creature, tx: number, ty: number, reach: number, x: Float64Array, at: number): void {
@@ -1015,6 +1223,8 @@ export interface RunResult {
   survived: boolean
   prey_end: number
   predator_end: number
+  /** Present only in meadows with voles. */
+  vole_end?: number
 }
 
 export function runHeadless(p: SimParams, seed: number, dist: Disturbance = NO_DISTURBANCE): RunResult {
@@ -1028,5 +1238,6 @@ export function runHeadless(p: SimParams, seed: number, dist: Disturbance = NO_D
     survived: sim.survived,
     prey_end: sim.prey.length,
     predator_end: sim.preds.length,
+    ...(sim.species.includes('vole') ? { vole_end: sim.voles.length } : {}),
   }
 }

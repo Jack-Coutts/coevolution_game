@@ -1,5 +1,6 @@
-import type { Species } from '@/sim/sim'
+import { perSpecies, TWO_SPECIES, type Species } from '@/sim/species'
 import { ANIMAL_STRIDE, type FrameData } from '@/worker/protocol'
+import { framePop } from './species-ui'
 
 /** One founder's family: everyone who shares its lineage id (the founder's own id). */
 export interface LineageSummary {
@@ -15,17 +16,16 @@ export interface LineageSummary {
   maxGen: number
 }
 
-/** Daily counts per family, flattened as [lineage, count, minGen, maxGen, ...]. */
-interface DayCount { tick: number; prey: number[]; pred: number[] }
+/** Daily counts per family, flattened as [lineage, count, minGen, maxGen, ...]. `vole` only in the Vole meadow. */
+interface DayCount { tick: number; prey: number[]; pred: number[]; vole?: number[] }
 
 /** Daily family counts kept in full (about a year); older days are folded into the summaries. */
 export const FAMILY_DAYS = 366
 /** Families kept per species once they have died out and their days have been folded away. */
 export const FAMILY_ARCHIVE = 40
-const SPECIES = ['prey', 'pred'] as const
 
 function count(frame: FrameData, species: Species): number[] {
-  const rows = species === 'prey' ? frame.prey : frame.preds
+  const rows = framePop(frame, species)
   const by = new Map<number, [number, number, number]>()
   for (let i = 0; i < rows.length; i += ANIMAL_STRIDE) {
     const lineage = rows[i + 12]
@@ -38,7 +38,7 @@ function count(frame: FrameData, species: Species): number[] {
 
 function fold(into: Map<number, LineageSummary>, species: Species, day: DayCount): void {
   for (const s of into.values()) s.living = 0
-  const row = day[species]
+  const row = day[species] ?? []
   for (let i = 0; i < row.length; i += 4) {
     const [founder, n, lo, hi] = row.slice(i, i + 4)
     const s = into.get(founder)
@@ -55,14 +55,19 @@ function fold(into: Map<number, LineageSummary>, species: Species, day: DayCount
 export class FamilyHistory {
   days: DayCount[] = []
   /** Summaries of days that no longer have their own counts. */
-  private archive: Record<Species, LineageSummary[]> = { prey: [], pred: [] }
+  private archive: Record<Species, LineageSummary[]> = perSpecies(() => [])
+  /** The species in this meadow. */
+  private readonly species: readonly Species[]
+  constructor(species: readonly Species[] = TWO_SPECIES) { this.species = species }
 
   observe(tick: number, frame: FrameData | undefined): void {
     if (!frame || (this.days.at(-1)?.tick ?? -1) >= tick) return
-    this.days.push({ tick, prey: count(frame, 'prey'), pred: count(frame, 'pred') })
+    const day: DayCount = { tick, prey: count(frame, 'prey'), pred: count(frame, 'pred') }
+    if (this.species.includes('vole')) day.vole = count(frame, 'vole')
+    this.days.push(day)
     if (this.days.length <= FAMILY_DAYS) return
     const old = this.days.shift()!
-    for (const s of SPECIES) {
+    for (const s of this.species) {
       const into = new Map(this.archive[s].map(l => [l.founder, { ...l }]))
       fold(into, s, old)
       // Keep every family still alive on the folded day, then the most recently seen of the rest.
@@ -88,6 +93,6 @@ export class FamilyHistory {
   save() { return { days: this.days, archive: this.archive } }
   restore(data: ReturnType<FamilyHistory['save']> | undefined): void {
     this.days = structuredClone(data?.days ?? [])
-    this.archive = structuredClone(data?.archive ?? { prey: [], pred: [] })
+    this.archive = { ...perSpecies((): LineageSummary[] => []), ...structuredClone(data?.archive ?? {}) }
   }
 }

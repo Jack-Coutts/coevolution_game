@@ -26,7 +26,7 @@ import { deriveParams } from '../src/sim/levers'
 import { SCENARIO_BY_ID, SCENARIOS, type Scenario, type ScenarioId } from '../src/sim/scenarios'
 import { Sim, type Counters, type Intervention } from '../src/sim/sim'
 import { STAT_STRIDE, type FrameData } from '../src/worker/protocol'
-import { writeStats } from '../src/worker/stats'
+import { writeStats } from '../src/worker/pack'
 import { CHARGES, COOLDOWN, EMERGENCIES, KEEPER_ORDER, KEEPER_RESERVE, PROBES, type Signals, Watch } from './action-probes'
 
 const FIRST_HOUR = 240
@@ -56,7 +56,7 @@ interface Plan {
  * The intended player decision for each scenario, written as a fixed rule that reads only the
  * warning and on-screen counts. Chosen on tuning seeds 8200-8219, frozen before 8300-8319.
  */
-export const PLANS: Record<Exclude<ScenarioId, 'stable'>, Plan> = {
+export const PLANS: Record<Exclude<ScenarioId, 'stable' | 'voles'>, Plan> = {
   drought: {
     decision: 'Save charges for the dry months; refill bushes with rain once they are stripped during the drought.',
     from: -NOTICE,
@@ -124,7 +124,7 @@ export function runOne(seed: number, scenario: ScenarioId, condition: Condition)
   }
   record()
   const watch = new Watch()
-  const plan = scenario === 'stable' ? null : PLANS[scenario]
+  const plan = scenario === 'stable' ? null : PLANS[scenario as keyof typeof PLANS]
   const start = onset(sc), stop = offset(sc)
   const actions: Row['actions'] = []
   const notes: { tick: number; ids: string[] }[] = []
@@ -162,7 +162,7 @@ export function runOne(seed: number, scenario: ScenarioId, condition: Condition)
   }
   if (s.tick >= start) lowDuring ??= { rabbits: s.prey.length, foxes: s.preds.length }
   if (s.tick === start && !atOnset) atOnset = { rabbits: s.prey.length, foxes: s.preds.length, bushes: s.bushes.length, stock: 0 }
-  const end = { tick: s.tick, survived: s.survived, preyEnd: s.prey.length, predEnd: s.preds.length }
+  const end = { tick: s.tick, survived: s.survived, preyEnd: s.prey.length, predEnd: s.preds.length, voleEnd: 0, species: s.species }
   const headline = explain(h, end, sc).headline
   const extinct = s.survived ? null : s.prey.length === 0 && s.preds.length === 0 ? 'both' : s.prey.length === 0 ? 'rabbits' : 'foxes'
   return {
@@ -229,8 +229,8 @@ if (process.argv[2] === '--child') {
     noticeDays: NOTICE_DAYS,
     scenarios: SCENARIOS.filter(s => scenarios.includes(s.id)).map(s => ({
       id: s.id, disturbance: s.disturbance, onset: onset(s), end: offset(s),
-      decision: s.id === 'stable' ? null : PLANS[s.id].decision, from: s.id === 'stable' ? null : PLANS[s.id].from,
-      move: s.id === 'stable' ? null : PLANS[s.id].move.toString(),
+      decision: s.id === 'stable' ? null : PLANS[s.id as keyof typeof PLANS].decision, from: s.id === 'stable' ? null : PLANS[s.id as keyof typeof PLANS].from,
+      move: s.id === 'stable' ? null : PLANS[s.id as keyof typeof PLANS].move.toString(),
     })),
     parameters: deriveParams(STABLE_PRESET),
     rows,

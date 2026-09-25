@@ -255,6 +255,120 @@ Vite reports a roughly 507 kB main JavaScript chunk (162 kB gzip), just above it
 startup and progress reporting; the recorded full browser batch used the same simulation
 loop and parameters.
 
+## Three-species engine (#8)
+
+The field vole ([design](third-species.md)) is implemented in the engine, worker, history and
+saves, with the provisional section 5 values. The Vole meadow (`SCENARIO_BY_ID.voles`) is not
+in the scenario picker yet; it is for scripts and tests until #9. Measured with Node 22.22.2
+on Linux x64, in a shared cloud container under heavy load (load average 12 to 14 on 4
+cores), so absolute times are noisy; ratios and paired figures are the useful part.
+
+**Two-species regression.** `node --import tsx scripts/validate-balance.ts 5000 50` gives
+rows identical to the base branch (`547bf81`) in the same runtime: 50/50 rows equal in tick,
+final counts, peaks, ceiling hits and every death counter; **19/50** survived on both
+(`experiments/vole-sim-regression.json`). A version-2 `Sim.save()` fixture made by the base
+engine loads as a two-species world and matches that engine's state digest 500 hours later
+(`tests/vole-persistence.test.ts`). Open meadow step time against the base engine, same
+process, interleaved, seed 9100 and 9107 for 1,500 hours: fastest runs +1.5% and +2.4%,
+median paired ratio 1.05, within the noise of this machine.
+
+**Vole meadow, untouched, fresh seeds 9100 to 9109**, against the Open meadow on the same
+seeds, one run at a time, game rules (a run ends at the first extinction).
+`node --import tsx scripts/vole-batch.ts 9100 10`, raw rows in `experiments/vole-sim.json`.
+
+| Measure | Open meadow | Vole meadow |
+| --- | ---: | ---: |
+| All species alive at a year | 3/10 | 5/10 |
+| First species lost (rabbit / fox / vole) | 5 / 2 / n/a | 4 / 0 / 1 |
+| Median `sim.step` time per simulated year | 10.9 s | 16.0 s |
+| Paired Vole / Open step time, median (range) | | 1.43 (1.05 to 2.30) |
+| Median worker packing (frames, stats, evolution) per simulated year | 2.2 s | 2.2 s |
+| Safety-ceiling hits | 0 | 0 |
+| Peak voles (range over runs) | | 264 to 355 (ceiling 800) |
+| Stats row | 32 values, 256 bytes | 32 values, 256 bytes |
+| History stats buffer (one year) | 2.24 MB | 2.24 MB |
+| Mean frame per hour, median of runs (largest frame) | 19.1 kB (42.6 kB) | 26.7 kB (53.9 kB) |
+| Saved history (stats plus the last 360 frames), median (largest) | 5.8 MB (13.3 MB) | 10.9 MB (16.2 MB) |
+
+The stats row grew from 23 to 32 values in both meadows (the version-2 buffer was 1.61 MB),
+within the design's limit of 32. Replay frames are about 40% larger with voles; a full year
+of in-memory replay (about 3,160 kept frames) is roughly 60 MB in the Open meadow and 84 MB
+with voles. The paired step-time median of 1.43 is inside the design budget of 1.6, but
+single seeds reached 2.3, where foxes grew to 200 on a vole diet; cost follows the number
+of animals. Voles boom and starve as in the prototype: 89% of vole deaths were starvation,
+8% predation and 3% old age. Survival here is not a balance claim; #9 tunes the scenario.
+
+Implementation notes and deviations from the design record:
+
+- Species and feeding are data: `FOOD_WEB` in `src/sim/species.ts` says who hunts whom, the
+  plant foods in order of preference and whether tall grass slows a species; `speciesDefs`
+  adds the numbers (bite, energy share per food, meal value as a victim, body, ceiling).
+- Vole numbers live in one optional `SimParams.vole` block (body, ceiling, bite, berry
+  value, meal value, seed stock and regrowth), not split across `EcoParams`. Two-species
+  parameters are therefore unchanged and version-2 parameters stay valid.
+- Death counts are per species (`Sim.tally`); `Sim.counters` remains as a read-only rabbit
+  and fox view with the old names, so scripts and the stats row are unchanged.
+- Plant events carry no species (encoded -1 in frames); `graze` now uses each species' own
+  body for fullness (the census bug).
+- Bush regrowth still adds one berry without clamping, as in version 2, so a vole-bitten
+  bush can briefly hold up to 0.6 above its stock; clamping would change two-species runs
+  with odd stock levers and planted bushes.
+- Deferred to #9: vole levers (only an optional `vole.initial` value is read), hints and
+  forecasts, full vole explanations (a plain cause summary stands in), rendering, the run
+  panel's vole actions (`VOLE_ACTIONS` exists but is not shown) and picker visibility.
+
+## Playable Vole meadow (#9)
+
+Measured with Node 22.22.2 on Linux x64 (shared container), `scripts/vole-play.ts`, raw rows in
+`experiments/vole-play-untouched.json` and `experiments/vole-play-decision.json`. Engine and
+parameters are the #8 ones: no tuning pass was made, because the #8 batch (5/10) was already
+inside the 30 to 50% guide.
+
+**Untouched, fresh seeds 9300 to 9319**, default settings (60 starting voles), game rules:
+
+| Measure | Result |
+| --- | ---: |
+| All three alive at a year | **6/20 (30%)**, Wilson 95% interval 15 to 52% |
+| First species lost (rabbit / vole / fox) | 11 / 2 / 1 |
+| Safety-ceiling hits | 0 in every run |
+| Peak voles (range) | 223 to 353 (ceiling 800) |
+
+Survival sits at the lower edge of the band. Rabbits are 79% of first losses, above the
+design's 70% guide for "no single fragile species": a flag for a later calibration on a larger
+batch, not tuned here.
+
+**Decision 1: cull foxes when they overhunt, with voles present.** Each run was branched at the
+first overhunting warning (10 or more foxes, under 5 rabbits per fox, rabbits down 15% in ten
+days; in the Vole meadow there were 82 to 147 voles at that moment) into cull foxes, release
+rabbits, or wait. Same seeds in both meadows.
+
+| | Open meadow | Vole meadow |
+| --- | ---: | ---: |
+| Year survival: cull / release rabbits / wait | 9 / 7 / 10 | 6 / 3 / 6 |
+| Cull lasted longer / shorter than waiting | 7 / 6 | 11 / 5 |
+| Cull lasted longer / shorter than releasing | 12 / 4 | 12 / 5 |
+| 30 days on, after a cull vs after waiting: voles | | 95 vs 84 |
+| 30 days on: highest vole count, cull vs wait | | 149 vs 136 |
+| 30 days on: barest bushes (mean fullness), cull vs wait | 9.1% vs 11.1% | 6.4% vs 8.2% |
+
+Whether the cull or the release lasted longer differed between the meadows on **8 of 20 seeds**:
+with voles the cull compared better on 9302, 9303, 9307 and 9311, and worse on 9300, 9312,
+9316 and 9318. On three seeds a cull that kept the Open meadow alive for the year lost the Vole
+meadow: 9300 (Vole: cull ends at hour 4289, waiting survives), 9311 (cull ends at 5899, waiting
+survives) and 9318 (cull ends at 2865 with 3 foxes left a month on; releasing rabbits lasts to
+5619). So the vole link makes
+the familiar fix a real trade-off: the cull still helps more often than it hurts, but it frees
+the voles and strips berries, and it can backfire. The new overhunting note says so.
+
+Not measured here (left for a later pass): decision 2 (culling when voles crash), mistimed
+actions, the browser worker batch and playback speed, the 50-seed batch the design asks for,
+and Starting voles values other than the default.
+
+**Browser check.** A production build (`vite build`, `vite preview`) was driven with Playwright
+in light and dark themes through planning, running, inspecting a vole, the Evolution page, the
+Guide and the result dialog, in the Vole meadow (seed 9302) and the Open meadow (seed 9305).
+The Open meadow shows no vole lever, action, count, row or legend entry.
+
 ## Scenario calibration: Drought, Harsh winter, Fox invasion
 
 Issue #6. The raw reports are in `docs/experiments/scenarios-*.json`, one row per run. The

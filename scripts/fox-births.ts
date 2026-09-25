@@ -14,7 +14,7 @@ const n = Number(process.argv[3] ?? 5)
 const p = deriveParams(STABLE_PRESET)
 const dp = p.pred
 
-for (const sc of SCENARIOS) {
+for (const sc of SCENARIOS.filter(s => s.species.length === 2)) {
   const gate = { cap: 0, age: 0, gap: 0, energy: 0, ready: 0 }
   let births = 0
   let ticks = 0

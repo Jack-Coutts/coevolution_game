@@ -1,12 +1,15 @@
 import type { ReactNode } from 'react'
-import { ACTIONS } from '@/game/interventions'
+import { actionsFor, optionCount } from '@/game/interventions'
 import { AlertTriangle, CheckCircle2, CloudRain, Crosshair, Info, OctagonAlert, TrendingUp, Trophy } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Progress } from '@/components/ui/progress'
 import { Switch } from '@/components/ui/switch'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
-import { useAnimalIcons } from '@/hooks/use-animal-icons'
+import { iconFor, useAnimalIcons } from '@/hooks/use-animal-icons'
+import { displayOrder, SPECIES_UI } from '@/game/species-ui'
+import type { Species } from '@/sim/species'
+import type { StatKey } from '@/game/history'
 import { CHARGES, COOLDOWN, renewalNote } from '@/game/budget'
 import { CALM_BONUS } from '@/game/scores'
 import { forecast, usesLeft, type Tone } from '@/game/insights'
@@ -28,6 +31,8 @@ export function RunPanel({ inspector, setup, onShowResult }: { inspector: ReactN
   const [game, snap] = useGame()
   const icons = useAnimalIcons()
   const f = snap.tick > 48 && !snap.end && snap.atLive ? forecast(game.history, snap.tick) : null
+  const species = game.scenario.species
+  const stat = (key: StatKey) => game.history.stat(snap.tick, key)
 
   return (
     <div className="flex flex-col gap-4">
@@ -79,25 +84,21 @@ export function RunPanel({ inspector, setup, onShowResult }: { inspector: ReactN
         )}
       </section>
 
-      {(game.history.stat(snap.tick, 'preySick') + game.history.stat(snap.tick, 'predSick')) > 0 && <section className="rounded-lg border border-tone-illness-border bg-tone-illness p-3 text-xs text-tone-illness-foreground">
-        <strong>Illness in the meadow</strong>
-        <p className="mt-1">{game.history.stat(snap.tick, 'preySick')} rabbits and {game.history.stat(snap.tick, 'predSick')} foxes are ill. Purple rings mark affected animals. Food can help them survive the added energy cost.</p>
-      </section>}
+      <IllnessNote />
 
       {f && (
         <section className="rounded-lg border bg-muted/30 p-3">
           <div className="mb-1 flex items-center gap-1.5 text-xs font-semibold tracking-wide text-muted-foreground uppercase">
             <TrendingUp className="size-3.5" /> Forecast · {formatDuration(f.ahead)} ahead
           </div>
-          <div className="flex items-center gap-4 text-sm tabular">
-            <span className="flex items-center gap-1">
-              <img src={icons.rabbit} alt="" className="size-5" />
-              <span className="text-rabbit">~{Math.round(f.prey)}</span>
-            </span>
-            <span className="flex items-center gap-1">
-              <img src={icons.fox} alt="" className="size-5" />
-              <span className="text-fox">~{Math.round(f.pred)}</span>
-            </span>
+          <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-sm tabular">
+            {displayOrder(species).map(s => (
+              <span key={s} className="flex items-center gap-1" title={SPECIES_UI[s].Plural}>
+                <img src={iconFor(icons, s)} alt="" className="size-5" />
+                <span className={SPECIES_UI[s].text}>~{Math.round(f[s])}</span>
+                <span className="sr-only">{SPECIES_UI[s].plural}</span>
+              </span>
+            ))}
             <span className="text-xs text-muted-foreground">from the trend of the last 10 days</span>
           </div>
         </section>
@@ -106,8 +107,9 @@ export function RunPanel({ inspector, setup, onShowResult }: { inspector: ReactN
       <section className="rounded-lg border p-3">
         <h3 className="text-sm font-semibold">Deaths by cause</h3>
         <table className="mt-2 w-full text-left text-xs tabular"><thead><tr><th>Species</th><th>Starved</th><th>Eaten</th><th>Old age</th><th>Illness</th><th>Culled</th></tr></thead>
-          <tbody><tr><td>Rabbits</td><td>{game.history.stat(snap.tick, 'preyStarved')}</td><td>{game.history.stat(snap.tick, 'preyEaten')}</td><td>{game.history.stat(snap.tick, 'preyOld')}</td><td>{game.history.stat(snap.tick, 'preyIllness')}</td><td>—</td></tr>
-          <tr><td>Foxes</td><td>{game.history.stat(snap.tick, 'predStarved')}</td><td>—</td><td>{game.history.stat(snap.tick, 'predOld')}</td><td>{game.history.stat(snap.tick, 'predIllness')}</td><td>{game.history.stat(snap.tick, 'predCulled')}</td></tr></tbody></table>
+          <tbody><tr><td className="text-rabbit">Rabbits</td><td>{stat('preyStarved')}</td><td>{stat('preyEaten')}</td><td>{stat('preyOld')}</td><td>{stat('preyIllness')}</td><td>—</td></tr>
+          {species.includes('vole') && <tr><td className="text-vole">Voles</td><td>{stat('voleStarved')}</td><td>{stat('voleEaten')}</td><td>{stat('voleOld')}</td><td>{stat('voleIllness')}</td><td>—</td></tr>}
+          <tr><td className="text-fox">Foxes</td><td>{stat('predStarved')}</td><td>—</td><td>{stat('predOld')}</td><td>{stat('predIllness')}</td><td>{stat('predCulled')}</td></tr></tbody></table>
         <p className="mt-2 text-[11px] text-muted-foreground">Totals up to the displayed time. Illness deaths are energy exhaustion during illness.</p>
         {game.history.stat(snap.tick, 'ceilingHits') > 0 && <p className="mt-2 text-xs text-tone-warn-foreground">The performance safety limit has restricted births. This run is not valid for balance comparisons.</p>}
       </section>
@@ -119,6 +121,20 @@ export function RunPanel({ inspector, setup, onShowResult }: { inspector: ReactN
       {setup}
     </div>
   )
+}
+
+const SICK: Record<Species, StatKey> = { prey: 'preySick', pred: 'predSick', vole: 'voleSick' }
+
+function IllnessNote() {
+  const [game, snap] = useGame()
+  const sick = displayOrder(game.scenario.species).map(s => ({ s, n: game.history.stat(snap.tick, SICK[s]) }))
+  if (sick.every(x => x.n === 0)) return null
+  const words = sick.map(x => `${x.n} ${SPECIES_UI[x.s].plural}`)
+  const list = words.length <= 2 ? words.join(' and ') : `${words.slice(0, -1).join(', ')} and ${words.at(-1)}`
+  return <section className="rounded-lg border border-tone-illness-border bg-tone-illness p-3 text-xs text-tone-illness-foreground">
+    <strong>Illness in the meadow</strong>
+    <p className="mt-1">{list} are ill. Purple rings mark affected animals. Food can help them survive the added energy cost.</p>
+  </section>
 }
 
 export function BestScore() {
@@ -139,6 +155,8 @@ export function Interventions({ preview = false }: { preview?: boolean }) {
   const cooling = snap.tick < snap.cooldownUntil
   const coolLeft = Math.max(0, snap.cooldownUntil - snap.tick)
   const canAct = game.canIntervene()
+  const actions = actionsFor(game.scenario.species)
+  const options = optionCount(game.scenario.species)
   return (
     <section aria-labelledby="interventions-heading">
       <div className="mb-2 flex items-center justify-between">
@@ -155,8 +173,8 @@ export function Interventions({ preview = false }: { preview?: boolean }) {
       {preview && (
         <p className="mb-2 text-xs text-muted-foreground">
           {snap.endless
-            ? `You start with ${CHARGES} uses, shared across all eight options, with a ${formatDuration(COOLDOWN)} cooldown after each. One use comes back at the start of each season (1 Dec, 1 Mar, 1 Jun, 1 Sep), up to ${CHARGES} held.`
-            : `You get ${CHARGES} uses per run, shared across all eight options, with a ${formatDuration(COOLDOWN)} cooldown after each.`}
+            ? `You start with ${CHARGES} uses, shared across all ${options} options, with a ${formatDuration(COOLDOWN)} cooldown after each. One use comes back at the start of each season (1 Dec, 1 Mar, 1 Jun, 1 Sep), up to ${CHARGES} held.`
+            : `You get ${CHARGES} uses per run, shared across all ${options} options, with a ${formatDuration(COOLDOWN)} cooldown after each.`}
         </p>
       )}
       {!preview && snap.phase === 'running' && snap.nextRenewal !== null && (
@@ -164,7 +182,7 @@ export function Interventions({ preview = false }: { preview?: boolean }) {
       )}
       {preview ? (
         <ul className="flex flex-col gap-1.5 text-xs">
-          {ACTIONS.map((a) => (
+          {actions.map((a) => (
             <li key={a.id} className="flex items-start gap-2">
               <ActionIcon id={a.id} />
               <span>
@@ -176,7 +194,7 @@ export function Interventions({ preview = false }: { preview?: boolean }) {
         </ul>
       ) : (
         <div className="grid grid-cols-2 gap-2">
-          {ACTIONS.map((a) => (
+          {actions.map((a) => (
             <Tooltip key={a.id}>
               <TooltipTrigger asChild>
                 <Button
@@ -231,6 +249,9 @@ function ActionIcon({ id }: { id: Intervention }) {
     case 'illnessPred':
     case 'releasePred':
       return <img src={icons.fox} alt="" className="size-5 shrink-0" />
+    case 'illnessVole':
+    case 'releaseVole':
+      return <img src={icons.vole} alt="" className="size-5 shrink-0" />
     default: {
       const never: never = id
       return never
@@ -265,7 +286,7 @@ export function Almanac() {
               <Badge variant="secondary" className="px-1.5">
                 You
               </Badge>
-              {ACTIONS.find((a) => a.id === iv.action)?.label}
+              {actionsFor(game.scenario.species).find((a) => a.id === iv.action)?.label}
             </span>
             <span className="text-muted-foreground tabular">{dateLabel(iv.tick)} · {clockLabel(iv.tick)}</span>
           </li>
