@@ -16,7 +16,7 @@ export interface Scenario {
 }
 
 const HORIZON = 8760
-const NOV_1 = tickAt(2)
+const OCT_1 = tickAt(1)
 const DEC_1 = tickAt(3)
 const MAR_1 = tickAt(6)
 const MAY_1 = tickAt(8)
@@ -45,16 +45,16 @@ export const SCENARIOS: Scenario[] = [
   {
     id: 'invasion',
     name: 'Fox invasion',
-    tagline: 'A pack of 14 moves in on 1 November.',
+    tagline: 'A pack of 14 moves in on 1 October.',
     description:
-      'On 1 November, 14 well-fed foxes arrive from the edge of the meadow. Can the rabbits absorb the pressure without being eaten out?',
+      'On 1 October, 14 well-fed foxes arrive from the edge of the meadow. Can the rabbits absorb the pressure without being eaten out?',
     disturbance: {
       regrow: [],
       metabolism: [],
-      arrivals: [{ tick: NOV_1, species: 'pred', count: 14 }],
+      arrivals: [{ tick: OCT_1, species: 'pred', count: 14 }],
     },
     spans: [],
-    markers: [{ tick: NOV_1, label: 'Foxes arrive' }],
+    markers: [{ tick: OCT_1, label: 'Foxes arrive' }],
   },
   {
     id: 'winter',

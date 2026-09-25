@@ -8,7 +8,7 @@ import { Sim } from '@/sim/sim'
 import { tickAt } from '@/sim/time'
 import { STAT, STAT_STRIDE, type FrameData } from '@/worker/protocol'
 
-const NOV_1 = tickAt(2)
+const OCT_1 = tickAt(1)
 const DEC_1 = tickAt(3)
 const MAY_1 = tickAt(8)
 const { winter, drought, invasion, stable } = SCENARIO_BY_ID
@@ -20,14 +20,14 @@ describe('scenario warnings', () => {
     expect(upcoming(winter, DEC_1 - NOTICE_DAYS * 24 - 1, false)).toBeNull()
     expect(upcoming(winter, DEC_1, false)).toBeNull()
     expect(upcoming(drought, MAY_1 - 1, false)?.text).toBe('Drought starts in 1 day (1 May).')
-    expect(upcoming(invasion, NOV_1 - 30, false)?.text).toBe('Foxes arrive in 2 days (1 Nov).')
+    expect(upcoming(invasion, OCT_1 - 30, false)?.text).toBe('Foxes arrive in 2 days (1 Oct).')
     expect(upcoming(stable, 100, false)).toBeNull()
   })
   it('repeats weather warnings each Endless year, but the fox invasion happens once', () => {
     expect(upcoming(winter, 8760 + DEC_1 - 3 * 24, true)?.text).toBe('Harsh winter starts in 3 days (1 Dec).')
     expect(upcoming(drought, 2 * 8760 + MAY_1 - 24, true)?.text).toBe('Drought starts in 1 day (1 May).')
     expect(upcoming(winter, 8760 + DEC_1 - 3 * 24, false)).toBeNull()
-    expect(upcoming(invasion, 8760 + NOV_1 - 24, true)).toBeNull()
+    expect(upcoming(invasion, 8760 + OCT_1 - 24, true)).toBeNull()
   })
   it('puts the warning first among the field notes', () => {
     const h = new RunHistory(8760)

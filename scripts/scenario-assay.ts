@@ -179,7 +179,12 @@ export function runOne(seed: number, scenario: ScenarioId, condition: Condition)
 /** Exploration only: replace the disturbance of the scenarios being run (the report records what was used). */
 function applyDisturbance(json: string | undefined, ids: ScenarioId[]): void {
   if (!json) return
-  for (const id of ids) Object.assign(SCENARIO_BY_ID[id].disturbance, JSON.parse(json))
+  for (const id of ids) {
+    const sc = SCENARIO_BY_ID[id]
+    Object.assign(sc.disturbance, JSON.parse(json))
+    // Keep the warning, the marker and the informed plan on the overridden arrival.
+    if (sc.markers[0] && sc.disturbance.arrivals[0]) sc.markers[0].tick = sc.disturbance.arrivals[0].tick
+  }
 }
 
 if (process.argv[2] === '--child') {
