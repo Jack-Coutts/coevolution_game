@@ -51,7 +51,7 @@ export interface FrameData {
 
 export type ToWorker =
   | { type: 'init'; runId: number; params: SimParams; seed: number; disturbance: Disturbance }
-  | { type: 'save'; runId: number }
+  | { type: 'save'; runId: number; at?: number }
   | { type: 'restore'; runId: number; state: ReturnType<Sim['save']> }
   | { type: 'advance'; runId: number; target: number }
   /** `at` is the hour on screen when the player acted; the worker rewinds to it if it has run ahead. */

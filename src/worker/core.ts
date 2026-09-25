@@ -161,7 +161,8 @@ export class SimCore {
         break
       }
       case 'save': {
-        if (this.sim && msg.runId === this.runId) this.post({ type: 'saved', runId: this.runId, state: this.sim.save() }, [])
+        // Save the hour the player is looking at, not the hours the worker has run ahead (a copy, so the lead stays valid).
+        if (this.sim && msg.runId === this.runId) this.post({ type: 'saved', runId: this.runId, state: this.rewound(msg.at ?? this.sim.tick).save() }, [])
         break
       }
       case 'restore': {
@@ -212,15 +213,10 @@ export class SimCore {
    * discarded. Same seed, settings and action hours therefore give the same run.
    */
   private intervene(action: Intervention, at: number): void {
-    let s = this.sim as Sim
-    if (at < s.tick) {
-      const cp = this.checkpoints.findLast(c => c.tick <= at)
-      if (cp) {
-        s = Sim.restore(cp)
-        while (s.tick < at && s.step()) { /* replay the hours the display has already shown */ }
-        this.sim = s
-        this.checkpoints = this.checkpoints.filter(c => c.tick <= at)
-      }
+    const s = this.rewound(at)
+    if (s !== this.sim) {
+      this.sim = s
+      this.checkpoints = this.checkpoints.filter(c => c.tick <= at)
     }
     const from = s.tick
     if (!s.ended) {
@@ -230,6 +226,16 @@ export class SimCore {
     const evolution = s.tick % 24 === 0 || s.ended ? [summarizeEvolution(s)] : []
     const stats = statsRow(s)
     this.post({ type: 'intervened', runId: this.runId, action, tick: s.tick, from, frame: frame(s), stats, evolution, end: endInfo(s) }, [stats.buffer])
+  }
+
+  /** The simulation at hour `at`, re-stepped from the newest checkpoint at or before it; the live one when `at` is not behind it. */
+  private rewound(at: number): Sim {
+    const live = this.sim as Sim
+    const cp = at < live.tick ? this.checkpoints.findLast(c => c.tick <= at) : undefined
+    if (!cp) return live
+    const s = Sim.restore(structuredClone(cp))
+    while (s.tick < at && s.step()) { /* replay the hours the display has already shown */ }
+    return s
   }
 
   private checkpoint(): void {

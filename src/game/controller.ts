@@ -469,7 +469,7 @@ export class GameController {
     this.pause()
     this.saving = true
     this.saveStatus = 'Saving meadow…'
-    this.send({ type: 'save', runId: this.runId })
+    this.send({ type: 'save', runId: this.runId, at: Math.floor(this.displayTick) })
     this.notify(true)
   }
 

@@ -92,3 +92,28 @@ describe('interventions apply at the displayed hour', () => {
     expect(reply.stats[STAT.stock]).toBeGreaterThan(0.99)
   })
 })
+
+describe('saving captures the displayed hour', () => {
+  it('saves the hour the player sees while the worker has run ahead, and keeps its lead', () => {
+    const posts: FromWorker[] = []
+    const core = new SimCore(m => posts.push(m))
+    core.handle({ type: 'init', runId: 1, params, seed: 7, disturbance: dist })
+    for (let head = 0; head < 100;) {
+      core.handle({ type: 'advance', runId: 1, target: 100 })
+      const m = posts.findLast(p => p.type === 'frames')
+      if (m?.type === 'frames') head = m.head
+    }
+    core.handle({ type: 'save', runId: 1, at: 57 })
+    const saved = posts.at(-1)
+    if (saved?.type !== 'saved') throw new Error('no save')
+    expect(saved.state.tick).toBe(57)
+    const ref = new Sim(params, 7, dist, { record: true })
+    while (ref.tick < 57) ref.step()
+    const resumed = Sim.restore(structuredClone(saved.state))
+    expect(resumed.tick).toBe(57)
+    expect(resumed.save()).toEqual(ref.save())
+    core.handle({ type: 'advance', runId: 1, target: 101 })
+    const next = posts.at(-1)
+    expect(next?.type === 'frames' ? next.frames.map(f => f.tick) : null).toEqual([101])
+  })
+})

@@ -167,3 +167,13 @@ it('reports the real playback rate when the worker cannot keep up with the chose
   expect(game.getSnapshot().effectiveTps).toBeNull()
   game.dispose()
 })
+
+it('asks the worker to save the displayed hour, not the hours it ran ahead', () => {
+  const { game, runId, frame } = ready()
+  game.stepBy(5)
+  const frames = Array.from({ length: 12 }, (_, i) => ({ ...frame, tick: i + 1 }))
+  mock.receive({ type: 'frames', runId, frames, stats: new Float64Array(12 * STAT_STRIDE), head: 12, end: null, evolution: [] })
+  game.save()
+  expect(mock.messages.at(-1)).toMatchObject({ type: 'save', at: 5 })
+  game.dispose()
+})
