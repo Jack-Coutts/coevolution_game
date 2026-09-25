@@ -1,0 +1,3894 @@
+{
+ "experiment": "action-explore",
+ "note": "Tuning seeds only. Each branch applies one action at a checkpoint and runs 60 days; prevented/caused count extinctions within 60 days against the untouched run. Log values are medians of ln((treated+1)/(untouched+1)); positive means more animals.",
+ "windowHours": 1440,
+ "variants": [
+  {
+   "label": "game",
+   "effects": {
+    "illness": {
+     "seedMax": 6,
+     "seedShare": 0.2,
+     "every": 6,
+     "radius": 0.045,
+     "chance": 0.15,
+     "drain": 0.65,
+     "hours": 240,
+     "immunity": 720
+    },
+    "plant": {
+     "count": 4,
+     "stockShare": 0.5
+    },
+    "releasePrey": 8,
+    "releasePred": 3,
+    "cullDivisor": 3
+   },
+   "seeds": {
+    "start": 8000,
+    "count": 40
+   },
+   "every": 480,
+   "runtime": {
+    "node": "v22.22.2",
+    "wallSeconds": 1386.446
+   },
+   "branches": 3792,
+   "summary": {
+    "rain": {
+     "probe: timely": {
+      "branches": 58,
+      "untouchedLost": 9,
+      "prevented": 3,
+      "caused": 1,
+      "logMinRabbits": 0.02,
+      "logMinFoxes": 0.08,
+      "logRabbits30d": -0.07,
+      "logFoxes30d": 0.37
+     },
+     "probe: mistimed": {
+      "branches": 63,
+      "untouchedLost": 5,
+      "prevented": 1,
+      "caused": 11,
+      "logMinRabbits": -0.21,
+      "logMinFoxes": 0,
+      "logRabbits30d": -0.09,
+      "logFoxes30d": 0.29
+     },
+     "any": {
+      "branches": 465,
+      "untouchedLost": 71,
+      "prevented": 16,
+      "caused": 35,
+      "logMinRabbits": 0,
+      "logMinFoxes": 0,
+      "logRabbits30d": -0.07,
+      "logFoxes30d": 0.26
+     },
+     "foxes <= 5": {
+      "branches": 23,
+      "untouchedLost": 11,
+      "prevented": 2,
+      "caused": 0,
+      "logMinRabbits": 0,
+      "logMinFoxes": 0,
+      "logRabbits30d": -0.06,
+      "logFoxes30d": 0.13
+     },
+     "foxes <= 6": {
+      "branches": 26,
+      "untouchedLost": 12,
+      "prevented": 2,
+      "caused": 0,
+      "logMinRabbits": 0,
+      "logMinFoxes": 0,
+      "logRabbits30d": -0.07,
+      "logFoxes30d": 0.13
+     },
+     "foxes <= 8": {
+      "branches": 35,
+      "untouchedLost": 14,
+      "prevented": 3,
+      "caused": 0,
+      "logMinRabbits": 0,
+      "logMinFoxes": 0,
+      "logRabbits30d": -0.07,
+      "logFoxes30d": 0.18
+     },
+     "foxes <= 6, energy < 40%": {
+      "branches": 7,
+      "untouchedLost": 5,
+      "prevented": 0,
+      "caused": 0,
+      "logMinRabbits": 0,
+      "logMinFoxes": 0,
+      "logRabbits30d": -0.19,
+      "logFoxes30d": 0.18
+     },
+     "foxes <= 8, bushes < 30% full": {
+      "branches": 24,
+      "untouchedLost": 11,
+      "prevented": 2,
+      "caused": 0,
+      "logMinRabbits": 0,
+      "logMinFoxes": 0,
+      "logRabbits30d": -0.06,
+      "logFoxes30d": 0.27
+     },
+     "overhunt (10+ foxes, < 5 rabbits/fox, rabbits -15%/10 d)": {
+      "branches": 132,
+      "untouchedLost": 31,
+      "prevented": 6,
+      "caused": 8,
+      "logMinRabbits": 0,
+      "logMinFoxes": 0.02,
+      "logRabbits30d": -0.13,
+      "logFoxes30d": 0.34
+     },
+     "fox-heavy (20+ foxes, < 8 rabbits/fox)": {
+      "branches": 287,
+      "untouchedLost": 47,
+      "prevented": 11,
+      "caused": 26,
+      "logMinRabbits": 0,
+      "logMinFoxes": 0.02,
+      "logRabbits30d": -0.1,
+      "logFoxes30d": 0.28
+     },
+     "fox boom (+50%/10 d, 6+ foxes)": {
+      "branches": 68,
+      "untouchedLost": 8,
+      "prevented": 1,
+      "caused": 9,
+      "logMinRabbits": -0.06,
+      "logMinFoxes": 0,
+      "logRabbits30d": 0,
+      "logFoxes30d": 0.19
+     },
+     "rabbits <= 30": {
+      "branches": 33,
+      "untouchedLost": 17,
+      "prevented": 2,
+      "caused": 1,
+      "logMinRabbits": 0,
+      "logMinFoxes": 0.12,
+      "logRabbits30d": -0.08,
+      "logFoxes30d": 0.19
+     },
+     "rabbits <= 60": {
+      "branches": 69,
+      "untouchedLost": 26,
+      "prevented": 4,
+      "caused": 4,
+      "logMinRabbits": 0,
+      "logMinFoxes": 0.07,
+      "logRabbits30d": 0.11,
+      "logFoxes30d": 0.18
+     },
+     "rabbits >= 300, bushes < 20% full": {
+      "branches": 23,
+      "untouchedLost": 1,
+      "prevented": 0,
+      "caused": 6,
+      "logMinRabbits": -0.03,
+      "logMinFoxes": 0,
+      "logRabbits30d": -0.15,
+      "logFoxes30d": 0.32
+     },
+     "rabbits >= 250, foxes >= 20": {
+      "branches": 63,
+      "untouchedLost": 5,
+      "prevented": 1,
+      "caused": 11,
+      "logMinRabbits": -0.21,
+      "logMinFoxes": 0,
+      "logRabbits30d": -0.09,
+      "logFoxes30d": 0.29
+     },
+     "rabbits >= 250, foxes <= 10": {
+      "branches": 22,
+      "untouchedLost": 2,
+      "prevented": 0,
+      "caused": 0,
+      "logMinRabbits": -0.17,
+      "logMinFoxes": 0,
+      "logRabbits30d": -0.07,
+      "logFoxes30d": 0.15
+     },
+     "rabbit boom (+40%/10 d, bushes < 35%)": {
+      "branches": 26,
+      "untouchedLost": 5,
+      "prevented": 1,
+      "caused": 2,
+      "logMinRabbits": -0.05,
+      "logMinFoxes": 0,
+      "logRabbits30d": -0.3,
+      "logFoxes30d": 0.37
+     },
+     "bushes <= 16": {
+      "branches": 47,
+      "untouchedLost": 13,
+      "prevented": 5,
+      "caused": 2,
+      "logMinRabbits": 0.02,
+      "logMinFoxes": 0.05,
+      "logRabbits30d": -0.13,
+      "logFoxes30d": 0.48
+     },
+     "bushes <= 20": {
+      "branches": 94,
+      "untouchedLost": 21,
+      "prevented": 7,
+      "caused": 3,
+      "logMinRabbits": 0.02,
+      "logMinFoxes": 0,
+      "logRabbits30d": -0.06,
+      "logFoxes30d": 0.35
+     },
+     "bushes <= 20, < 20% full": {
+      "branches": 58,
+      "untouchedLost": 9,
+      "prevented": 3,
+      "caused": 1,
+      "logMinRabbits": 0.02,
+      "logMinFoxes": 0.08,
+      "logRabbits30d": -0.07,
+      "logFoxes30d": 0.37
+     },
+     "bushes >= 40": {
+      "branches": 92,
+      "untouchedLost": 12,
+      "prevented": 2,
+      "caused": 8,
+      "logMinRabbits": 0,
+      "logMinFoxes": 0.02,
+      "logRabbits30d": -0.06,
+      "logFoxes30d": 0.19
+     },
+     "bushes < 15% full, rabbits < 35% energy": {
+      "branches": 11,
+      "untouchedLost": 2,
+      "prevented": 2,
+      "caused": 1,
+      "logMinRabbits": 0.05,
+      "logMinFoxes": 0.08,
+      "logRabbits30d": -0.13,
+      "logFoxes30d": 0.41
+     },
+     "bushes >= 60% full": {
+      "branches": 73,
+      "untouchedLost": 21,
+      "prevented": 2,
+      "caused": 5,
+      "logMinRabbits": 0,
+      "logMinFoxes": 0.04,
+      "logRabbits30d": -0.06,
+      "logFoxes30d": 0.13
+     }
+    },
+    "plantBushes": {
+     "probe: timely": {
+      "branches": 94,
+      "untouchedLost": 21,
+      "prevented": 8,
+      "caused": 3,
+      "logMinRabbits": 0.06,
+      "logMinFoxes": 0,
+      "logRabbits30d": -0.01,
+      "logFoxes30d": 0.18
+     },
+     "probe: mistimed": {
+      "branches": 100,
+      "untouchedLost": 13,
+      "prevented": 3,
+      "caused": 3,
+      "logMinRabbits": 0,
+      "logMinFoxes": 0,
+      "logRabbits30d": 0,
+      "logFoxes30d": 0
+     },
+     "any": {
+      "branches": 474,
+      "untouchedLost": 72,
+      "prevented": 21,
+      "caused": 13,
+      "logMinRabbits": 0,
+      "logMinFoxes": 0,
+      "logRabbits30d": 0,
+      "logFoxes30d": 0.07
+     },
+     "foxes <= 5": {
+      "branches": 24,
+      "untouchedLost": 11,
+      "prevented": 3,
+      "caused": 0,
+      "logMinRabbits": 0,
+      "logMinFoxes": 0,
+      "logRabbits30d": 0.01,
+      "logFoxes30d": -0.12
+     },
+     "foxes <= 6": {
+      "branches": 27,
+      "untouchedLost": 12,
+      "prevented": 3,
+      "caused": 0,
+      "logMinRabbits": 0,
+      "logMinFoxes": 0,
+      "logRabbits30d": 0,
+      "logFoxes30d": -0.12
+     },
+     "foxes <= 8": {
+      "branches": 37,
+      "untouchedLost": 14,
+      "prevented": 3,
+      "caused": 0,
+      "logMinRabbits": 0,
+      "logMinFoxes": 0,
+      "logRabbits30d": 0,
+      "logFoxes30d": 0
+     },
+     "foxes <= 6, energy < 40%": {
+      "branches": 7,
+      "untouchedLost": 5,
+      "prevented": 0,
+      "caused": 0,
+      "logMinRabbits": 0,
+      "logMinFoxes": 0,
+      "logRabbits30d": 0,
+      "logFoxes30d": -0.29
+     },
+     "foxes <= 8, bushes < 30% full": {
+      "branches": 26,
+      "untouchedLost": 11,
+      "prevented": 2,
+      "caused": 0,
+      "logMinRabbits": 0.02,
+      "logMinFoxes": 0,
+      "logRabbits30d": 0.01,
+      "logFoxes30d": 0
+     },
+     "overhunt (10+ foxes, < 5 rabbits/fox, rabbits -15%/10 d)": {
+      "branches": 132,
+      "untouchedLost": 31,
+      "prevented": 9,
+      "caused": 8,
+      "logMinRabbits": 0,
+      "logMinFoxes": 0.02,
+      "logRabbits30d": 0,
+      "logFoxes30d": 0.2
+     },
+     "fox-heavy (20+ foxes, < 8 rabbits/fox)": {
+      "branches": 288,
+      "untouchedLost": 47,
+      "prevented": 15,
+      "caused": 12,
+      "logMinRabbits": 0,
+      "logMinFoxes": 0,
+      "logRabbits30d": 0,
+      "logFoxes30d": 0.09
+     },
+     "fox boom (+50%/10 d, 6+ foxes)": {
+      "branches": 70,
+      "untouchedLost": 8,
+      "prevented": 1,
+      "caused": 2,
+      "logMinRabbits": 0,
+      "logMinFoxes": 0,
+      "logRabbits30d": 0.01,
+      "logFoxes30d": 0.1
+     },
+     "rabbits <= 30": {
+      "branches": 33,
+      "untouchedLost": 17,
+      "prevented": 3,
+      "caused": 2,
+      "logMinRabbits": 0,
+      "logMinFoxes": 0,
+      "logRabbits30d": 0,
+      "logFoxes30d": 0
+     },
+     "rabbits <= 60": {
+      "branches": 69,
+      "untouchedLost": 26,
+      "prevented": 5,
+      "caused": 3,
+      "logMinRabbits": 0,
+      "logMinFoxes": 0,
+      "logRabbits30d": 0,
+      "logFoxes30d": 0
+     },
+     "rabbits >= 300, bushes < 20% full": {
+      "branches": 29,
+      "untouchedLost": 2,
+      "prevented": 1,
+      "caused": 1,
+      "logMinRabbits": 0,
+      "logMinFoxes": 0,
+      "logRabbits30d": 0.02,
+      "logFoxes30d": 0.13
+     },
+     "rabbits >= 250, foxes >= 20": {
+      "branches": 68,
+      "untouchedLost": 6,
+      "prevented": 2,
+      "caused": 1,
+      "logMinRabbits": 0,
+      "logMinFoxes": 0,
+      "logRabbits30d": 0,
+      "logFoxes30d": 0.06
+     },
+     "rabbits >= 250, foxes <= 10": {
+      "branches": 24,
+      "untouchedLost": 2,
+      "prevented": 0,
+      "caused": 0,
+      "logMinRabbits": -0.04,
+      "logMinFoxes": 0,
+      "logRabbits30d": -0.05,
+      "logFoxes30d": 0.13
+     },
+     "rabbit boom (+40%/10 d, bushes < 35%)": {
+      "branches": 35,
+      "untouchedLost": 6,
+      "prevented": 1,
+      "caused": 0,
+      "logMinRabbits": 0,
+      "logMinFoxes": 0,
+      "logRabbits30d": -0.03,
+      "logFoxes30d": 0.11
+     },
+     "bushes <= 16": {
+      "branches": 47,
+      "untouchedLost": 13,
+      "prevented": 4,
+      "caused": 1,
+      "logMinRabbits": 0.08,
+      "logMinFoxes": 0,
+      "logRabbits30d": -0.08,
+      "logFoxes30d": 0.32
+     },
+     "bushes <= 20": {
+      "branches": 94,
+      "untouchedLost": 21,
+      "prevented": 8,
+      "caused": 3,
+      "logMinRabbits": 0.06,
+      "logMinFoxes": 0,
+      "logRabbits30d": -0.01,
+      "logFoxes30d": 0.18
+     },
+     "bushes <= 20, < 20% full": {
+      "branches": 58,
+      "untouchedLost": 9,
+      "prevented": 3,
+      "caused": 1,
+      "logMinRabbits": 0.04,
+      "logMinFoxes": 0,
+      "logRabbits30d": -0.01,
+      "logFoxes30d": 0.16
+     },
+     "bushes >= 40": {
+      "branches": 100,
+      "untouchedLost": 13,
+      "prevented": 3,
+      "caused": 3,
+      "logMinRabbits": 0,
+      "logMinFoxes": 0,
+      "logRabbits30d": 0,
+      "logFoxes30d": 0
+     },
+     "bushes < 15% full, rabbits < 35% energy": {
+      "branches": 12,
+      "untouchedLost": 2,
+      "prevented": 1,
+      "caused": 0,
+      "logMinRabbits": 0.29,
+      "logMinFoxes": 0,
+      "logRabbits30d": 0.06,
+      "logFoxes30d": 0.19
+     },
+     "bushes >= 60% full": {
+      "branches": 73,
+      "untouchedLost": 21,
+      "prevented": 3,
+      "caused": 1,
+      "logMinRabbits": 0,
+      "logMinFoxes": 0,
+      "logRabbits30d": 0,
+      "logFoxes30d": 0
+     }
+    },
+    "releasePrey": {
+     "probe: timely": {
+      "branches": 68,
+      "untouchedLost": 26,
+      "prevented": 12,
+      "caused": 1,
+      "logMinRabbits": 0.25,
+      "logMinFoxes": 0.13,
+      "logRabbits30d": -0.16,
+      "logFoxes30d": 0.23
+     },
+     "probe: mistimed": {
+      "branches": 68,
+      "untouchedLost": 6,
+      "prevented": 1,
+      "caused": 5,
+      "logMinRabbits": -0.04,
+      "logMinFoxes": 0,
+      "logRabbits30d": 0.04,
+      "logFoxes30d": 0.06
+     },
+     "any": {
+      "branches": 473,
+      "untouchedLost": 72,
+      "prevented": 27,
+      "caused": 23,
+      "logMinRabbits": 0.01,
+      "logMinFoxes": 0,
+      "logRabbits30d": -0.08,
+      "logFoxes30d": 0.05
+     },
+     "foxes <= 5": {
+      "branches": 24,
+      "untouchedLost": 11,
+      "prevented": 1,
+      "caused": 1,
+      "logMinRabbits": 0.07,
+      "logMinFoxes": 0,
+      "logRabbits30d": -0.06,
+      "logFoxes30d": 0
+     },
+     "foxes <= 6": {
+      "branches": 27,
+      "untouchedLost": 12,
+      "prevented": 2,
+      "caused": 1,
+      "logMinRabbits": 0.06,
+      "logMinFoxes": 0,
+      "logRabbits30d": -0.06,
+      "logFoxes30d": 0
+     },
+     "foxes <= 8": {
+      "branches": 37,
+      "untouchedLost": 14,
+      "prevented": 3,
+      "caused": 1,
+      "logMinRabbits": 0.06,
+      "logMinFoxes": 0,
+      "logRabbits30d": -0.06,
+      "logFoxes30d": 0
+     },
+     "foxes <= 6, energy < 40%": {
+      "branches": 7,
+      "untouchedLost": 5,
+      "prevented": 1,
+      "caused": 0,
+      "logMinRabbits": 0.12,
+      "logMinFoxes": 0,
+      "logRabbits30d": -0.16,
+      "logFoxes30d": 0.34
+     },
+     "foxes <= 8, bushes < 30% full": {
+      "branches": 26,
+      "untouchedLost": 11,
+      "prevented": 2,
+      "caused": 1,
+      "logMinRabbits": 0.02,
+      "logMinFoxes": 0,
+      "logRabbits30d": -0.08,
+      "logFoxes30d": 0
+     },
+     "overhunt (10+ foxes, < 5 rabbits/fox, rabbits -15%/10 d)": {
+      "branches": 131,
+      "untouchedLost": 31,
+      "prevented": 14,
+      "caused": 3,
+      "logMinRabbits": 0.06,
+      "logMinFoxes": 0,
+      "logRabbits30d": -0.13,
+      "logFoxes30d": 0.14
+     },
+     "fox-heavy (20+ foxes, < 8 rabbits/fox)": {
+      "branches": 287,
+      "untouchedLost": 47,
+      "prevented": 20,
+      "caused": 12,
+      "logMinRabbits": 0,
+      "logMinFoxes": 0,
+      "logRabbits30d": -0.15,
+      "logFoxes30d": 0.07
+     },
+     "fox boom (+50%/10 d, 6+ foxes)": {
+      "branches": 70,
+      "untouchedLost": 8,
+      "prevented": 1,
+      "caused": 4,
+      "logMinRabbits": 0,
+      "logMinFoxes": 0,
+      "logRabbits30d": -0.07,
+      "logFoxes30d": 0
+     },
+     "rabbits <= 30": {
+      "branches": 32,
+      "untouchedLost": 17,
+      "prevented": 8,
+      "caused": 1,
+      "logMinRabbits": 0.31,
+      "logMinFoxes": 0.31,
+      "logRabbits30d": -0.26,
+      "logFoxes30d": 0.67
+     },
+     "rabbits <= 60": {
+      "branches": 68,
+      "untouchedLost": 26,
+      "prevented": 12,
+      "caused": 1,
+      "logMinRabbits": 0.25,
+      "logMinFoxes": 0.13,
+      "logRabbits30d": -0.16,
+      "logFoxes30d": 0.23
+     },
+     "rabbits >= 300, bushes < 20% full": {
+      "branches": 29,
+      "untouchedLost": 2,
+      "prevented": 0,
+      "caused": 2,
+      "logMinRabbits": 0,
+      "logMinFoxes": 0,
+      "logRabbits30d": 0.06,
+      "logFoxes30d": 0.07
+     },
+     "rabbits >= 250, foxes >= 20": {
+      "branches": 68,
+      "untouchedLost": 6,
+      "prevented": 1,
+      "caused": 5,
+      "logMinRabbits": -0.04,
+      "logMinFoxes": 0,
+      "logRabbits30d": 0.04,
+      "logFoxes30d": 0.06
+     },
+     "rabbits >= 250, foxes <= 10": {
+      "branches": 24,
+      "untouchedLost": 2,
+      "prevented": 0,
+      "caused": 0,
+      "logMinRabbits": -0.03,
+      "logMinFoxes": 0,
+      "logRabbits30d": -0.08,
+      "logFoxes30d": 0
+     },
+     "rabbit boom (+40%/10 d, bushes < 35%)": {
+      "branches": 35,
+      "untouchedLost": 6,
+      "prevented": 1,
+      "caused": 0,
+      "logMinRabbits": 0,
+      "logMinFoxes": 0,
+      "logRabbits30d": -0.01,
+      "logFoxes30d": 0.03
+     },
+     "bushes <= 16": {
+      "branches": 47,
+      "untouchedLost": 13,
+      "prevented": 5,
+      "caused": 4,
+      "logMinRabbits": 0.07,
+      "logMinFoxes": 0,
+      "logRabbits30d": -0.13,
+      "logFoxes30d": 0.1
+     },
+     "bushes <= 20": {
+      "branches": 94,
+      "untouchedLost": 21,
+      "prevented": 9,
+      "caused": 6,
+      "logMinRabbits": 0.06,
+      "logMinFoxes": 0,
+      "logRabbits30d": -0.11,
+      "logFoxes30d": 0.06
+     },
+     "bushes <= 20, < 20% full": {
+      "branches": 58,
+      "untouchedLost": 9,
+      "prevented": 4,
+      "caused": 4,
+      "logMinRabbits": 0.03,
+      "logMinFoxes": 0,
+      "logRabbits30d": -0.09,
+      "logFoxes30d": 0
+     },
+     "bushes >= 40": {
+      "branches": 100,
+      "untouchedLost": 13,
+      "prevented": 2,
+      "caused": 6,
+      "logMinRabbits": 0,
+      "logMinFoxes": 0,
+      "logRabbits30d": -0.08,
+      "logFoxes30d": 0.09
+     },
+     "bushes < 15% full, rabbits < 35% energy": {
+      "branches": 12,
+      "untouchedLost": 2,
+      "prevented": 1,
+      "caused": 1,
+      "logMinRabbits": 0.05,
+      "logMinFoxes": 0,
+      "logRabbits30d": 0.15,
+      "logFoxes30d": 0.06
+     },
+     "bushes >= 60% full": {
+      "branches": 73,
+      "untouchedLost": 21,
+      "prevented": 8,
+      "caused": 4,
+      "logMinRabbits": 0.15,
+      "logMinFoxes": 0.08,
+      "logRabbits30d": -0.1,
+      "logFoxes30d": 0.18
+     }
+    },
+    "releasePred": {
+     "probe: timely": {
+      "branches": 24,
+      "untouchedLost": 11,
+      "prevented": 7,
+      "caused": 0,
+      "logMinRabbits": -0.01,
+      "logMinFoxes": 0.69,
+      "logRabbits30d": 0,
+      "logFoxes30d": 0.8
+     },
+     "probe: mistimed": {
+      "branches": 288,
+      "untouchedLost": 47,
+      "prevented": 9,
+      "caused": 14,
+      "logMinRabbits": 0,
+      "logMinFoxes": 0.08,
+      "logRabbits30d": -0.04,
+      "logFoxes30d": 0.07
+     },
+     "any": {
+      "branches": 473,
+      "untouchedLost": 72,
+      "prevented": 23,
+      "caused": 17,
+      "logMinRabbits": 0,
+      "logMinFoxes": 0.15,
+      "logRabbits30d": -0.04,
+      "logFoxes30d": 0.13
+     },
+     "foxes <= 5": {
+      "branches": 24,
+      "untouchedLost": 11,
+      "prevented": 7,
+      "caused": 0,
+      "logMinRabbits": -0.01,
+      "logMinFoxes": 0.69,
+      "logRabbits30d": 0,
+      "logFoxes30d": 0.8
+     },
+     "foxes <= 6": {
+      "branches": 27,
+      "untouchedLost": 12,
+      "prevented": 8,
+      "caused": 0,
+      "logMinRabbits": -0.03,
+      "logMinFoxes": 0.69,
+      "logRabbits30d": -0.01,
+      "logFoxes30d": 0.69
+     },
+     "foxes <= 8": {
+      "branches": 36,
+      "untouchedLost": 14,
+      "prevented": 10,
+      "caused": 0,
+      "logMinRabbits": -0.01,
+      "logMinFoxes": 0.69,
+      "logRabbits30d": -0.04,
+      "logFoxes30d": 0.61
+     },
+     "foxes <= 6, energy < 40%": {
+      "branches": 7,
+      "untouchedLost": 5,
+      "prevented": 3,
+      "caused": 0,
+      "logMinRabbits": 0,
+      "logMinFoxes": 0.92,
+      "logRabbits30d": 0.02,
+      "logFoxes30d": 1.16
+     },
+     "foxes <= 8, bushes < 30% full": {
+      "branches": 26,
+      "untouchedLost": 11,
+      "prevented": 7,
+      "caused": 0,
+      "logMinRabbits": -0.04,
+      "logMinFoxes": 0.69,
+      "logRabbits30d": -0.04,
+      "logFoxes30d": 0.56
+     },
+     "overhunt (10+ foxes, < 5 rabbits/fox, rabbits -15%/10 d)": {
+      "branches": 132,
+      "untouchedLost": 31,
+      "prevented": 5,
+      "caused": 4,
+      "logMinRabbits": 0,
+      "logMinFoxes": 0.05,
+      "logRabbits30d": -0.02,
+      "logFoxes30d": 0.06
+     },
+     "fox-heavy (20+ foxes, < 8 rabbits/fox)": {
+      "branches": 288,
+      "untouchedLost": 47,
+      "prevented": 9,
+      "caused": 14,
+      "logMinRabbits": 0,
+      "logMinFoxes": 0.08,
+      "logRabbits30d": -0.04,
+      "logFoxes30d": 0.07
+     },
+     "fox boom (+50%/10 d, 6+ foxes)": {
+      "branches": 70,
+      "untouchedLost": 8,
+      "prevented": 3,
+      "caused": 3,
+      "logMinRabbits": 0,
+      "logMinFoxes": 0.22,
+      "logRabbits30d": -0.07,
+      "logFoxes30d": 0.16
+     },
+     "rabbits <= 30": {
+      "branches": 32,
+      "untouchedLost": 17,
+      "prevented": 2,
+      "caused": 0,
+      "logMinRabbits": 0,
+      "logMinFoxes": 0.43,
+      "logRabbits30d": -0.14,
+      "logFoxes30d": 0.43
+     },
+     "rabbits <= 60": {
+      "branches": 68,
+      "untouchedLost": 26,
+      "prevented": 4,
+      "caused": 2,
+      "logMinRabbits": 0,
+      "logMinFoxes": 0.23,
+      "logRabbits30d": -0.11,
+      "logFoxes30d": 0.17
+     },
+     "rabbits >= 300, bushes < 20% full": {
+      "branches": 29,
+      "untouchedLost": 2,
+      "prevented": 1,
+      "caused": 2,
+      "logMinRabbits": 0.09,
+      "logMinFoxes": 0.11,
+      "logRabbits30d": -0.11,
+      "logFoxes30d": 0.14
+     },
+     "rabbits >= 250, foxes >= 20": {
+      "branches": 68,
+      "untouchedLost": 6,
+      "prevented": 2,
+      "caused": 4,
+      "logMinRabbits": 0,
+      "logMinFoxes": 0.1,
+      "logRabbits30d": 0.01,
+      "logFoxes30d": 0.09
+     },
+     "rabbits >= 250, foxes <= 10": {
+      "branches": 24,
+      "untouchedLost": 2,
+      "prevented": 0,
+      "caused": 0,
+      "logMinRabbits": -0.02,
+      "logMinFoxes": 0.26,
+      "logRabbits30d": -0.07,
+      "logFoxes30d": 0.33
+     },
+     "rabbit boom (+40%/10 d, bushes < 35%)": {
+      "branches": 35,
+      "untouchedLost": 6,
+      "prevented": 2,
+      "caused": 0,
+      "logMinRabbits": -0.08,
+      "logMinFoxes": 0.1,
+      "logRabbits30d": -0.18,
+      "logFoxes30d": 0.2
+     },
+     "bushes <= 16": {
+      "branches": 47,
+      "untouchedLost": 13,
+      "prevented": 7,
+      "caused": 2,
+      "logMinRabbits": -0.02,
+      "logMinFoxes": 0.29,
+      "logRabbits30d": -0.11,
+      "logFoxes30d": 0.29
+     },
+     "bushes <= 20": {
+      "branches": 94,
+      "untouchedLost": 21,
+      "prevented": 8,
+      "caused": 3,
+      "logMinRabbits": -0.01,
+      "logMinFoxes": 0.19,
+      "logRabbits30d": 0.01,
+      "logFoxes30d": 0.25
+     },
+     "bushes <= 20, < 20% full": {
+      "branches": 58,
+      "untouchedLost": 9,
+      "prevented": 5,
+      "caused": 2,
+      "logMinRabbits": -0.04,
+      "logMinFoxes": 0.19,
+      "logRabbits30d": 0.03,
+      "logFoxes30d": 0.29
+     },
+     "bushes >= 40": {
+      "branches": 99,
+      "untouchedLost": 13,
+      "prevented": 3,
+      "caused": 4,
+      "logMinRabbits": -0.02,
+      "logMinFoxes": 0.1,
+      "logRabbits30d": -0.02,
+      "logFoxes30d": 0.08
+     },
+     "bushes < 15% full, rabbits < 35% energy": {
+      "branches": 12,
+      "untouchedLost": 2,
+      "prevented": 2,
+      "caused": 1,
+      "logMinRabbits": 0.07,
+      "logMinFoxes": 0.07,
+      "logRabbits30d": 0.07,
+      "logFoxes30d": 0.13
+     },
+     "bushes >= 60% full": {
+      "branches": 72,
+      "untouchedLost": 21,
+      "prevented": 5,
+      "caused": 4,
+      "logMinRabbits": 0,
+      "logMinFoxes": 0.17,
+      "logRabbits30d": -0.11,
+      "logFoxes30d": 0.15
+     }
+    },
+    "cullPred": {
+     "probe: timely": {
+      "branches": 132,
+      "untouchedLost": 31,
+      "prevented": 14,
+      "caused": 5,
+      "logMinRabbits": 0,
+      "logMinFoxes": -0.21,
+      "logRabbits30d": 0.12,
+      "logFoxes30d": 0.06
+     },
+     "probe: mistimed": {
+      "branches": 36,
+      "untouchedLost": 14,
+      "prevented": 1,
+      "caused": 4,
+      "logMinRabbits": 0,
+      "logMinFoxes": 0,
+      "logRabbits30d": 0,
+      "logFoxes30d": 0
+     },
+     "any": {
+      "branches": 473,
+      "untouchedLost": 72,
+      "prevented": 24,
+      "caused": 19,
+      "logMinRabbits": 0.01,
+      "logMinFoxes": -0.3,
+      "logRabbits30d": 0.02,
+      "logFoxes30d": -0.12
+     },
+     "foxes <= 5": {
+      "branches": 24,
+      "untouchedLost": 11,
+      "prevented": 1,
+      "caused": 3,
+      "logMinRabbits": 0,
+      "logMinFoxes": 0,
+      "logRabbits30d": 0,
+      "logFoxes30d": 0
+     },
+     "foxes <= 6": {
+      "branches": 27,
+      "untouchedLost": 12,
+      "prevented": 1,
+      "caused": 3,
+      "logMinRabbits": 0,
+      "logMinFoxes": 0,
+      "logRabbits30d": 0,
+      "logFoxes30d": 0
+     },
+     "foxes <= 8": {
+      "branches": 36,
+      "untouchedLost": 14,
+      "prevented": 1,
+      "caused": 4,
+      "logMinRabbits": 0,
+      "logMinFoxes": 0,
+      "logRabbits30d": 0,
+      "logFoxes30d": 0
+     },
+     "foxes <= 6, energy < 40%": {
+      "branches": 7,
+      "untouchedLost": 5,
+      "prevented": 1,
+      "caused": 2,
+      "logMinRabbits": 0,
+      "logMinFoxes": 0,
+      "logRabbits30d": 0.06,
+      "logFoxes30d": 0.56
+     },
+     "foxes <= 8, bushes < 30% full": {
+      "branches": 26,
+      "untouchedLost": 11,
+      "prevented": 0,
+      "caused": 3,
+      "logMinRabbits": 0,
+      "logMinFoxes": 0,
+      "logRabbits30d": 0,
+      "logFoxes30d": 0
+     },
+     "overhunt (10+ foxes, < 5 rabbits/fox, rabbits -15%/10 d)": {
+      "branches": 132,
+      "untouchedLost": 31,
+      "prevented": 14,
+      "caused": 5,
+      "logMinRabbits": 0,
+      "logMinFoxes": -0.21,
+      "logRabbits30d": 0.12,
+      "logFoxes30d": 0.06
+     },
+     "fox-heavy (20+ foxes, < 8 rabbits/fox)": {
+      "branches": 288,
+      "untouchedLost": 47,
+      "prevented": 20,
+      "caused": 11,
+      "logMinRabbits": 0.02,
+      "logMinFoxes": -0.29,
+      "logRabbits30d": 0.09,
+      "logFoxes30d": -0.1
+     },
+     "fox boom (+50%/10 d, 6+ foxes)": {
+      "branches": 70,
+      "untouchedLost": 8,
+      "prevented": 2,
+      "caused": 0,
+      "logMinRabbits": 0.05,
+      "logMinFoxes": -0.32,
+      "logRabbits30d": -0.05,
+      "logFoxes30d": -0.22
+     },
+     "rabbits <= 30": {
+      "branches": 32,
+      "untouchedLost": 17,
+      "prevented": 4,
+      "caused": 1,
+      "logMinRabbits": 0,
+      "logMinFoxes": -0.07,
+      "logRabbits30d": 0.2,
+      "logFoxes30d": 0.22
+     },
+     "rabbits <= 60": {
+      "branches": 68,
+      "untouchedLost": 26,
+      "prevented": 8,
+      "caused": 2,
+      "logMinRabbits": 0,
+      "logMinFoxes": -0.16,
+      "logRabbits30d": 0.12,
+      "logFoxes30d": 0
+     },
+     "rabbits >= 300, bushes < 20% full": {
+      "branches": 29,
+      "untouchedLost": 2,
+      "prevented": 1,
+      "caused": 0,
+      "logMinRabbits": 0.09,
+      "logMinFoxes": -0.34,
+      "logRabbits30d": 0.1,
+      "logFoxes30d": -0.2
+     },
+     "rabbits >= 250, foxes >= 20": {
+      "branches": 68,
+      "untouchedLost": 6,
+      "prevented": 4,
+      "caused": 0,
+      "logMinRabbits": 0.05,
+      "logMinFoxes": -0.38,
+      "logRabbits30d": 0.07,
+      "logFoxes30d": -0.18
+     },
+     "rabbits >= 250, foxes <= 10": {
+      "branches": 24,
+      "untouchedLost": 2,
+      "prevented": 0,
+      "caused": 1,
+      "logMinRabbits": 0.01,
+      "logMinFoxes": -0.32,
+      "logRabbits30d": -0.06,
+      "logFoxes30d": -0.23
+     },
+     "rabbit boom (+40%/10 d, bushes < 35%)": {
+      "branches": 35,
+      "untouchedLost": 6,
+      "prevented": 1,
+      "caused": 0,
+      "logMinRabbits": 0.04,
+      "logMinFoxes": -0.29,
+      "logRabbits30d": 0.01,
+      "logFoxes30d": -0.21
+     },
+     "bushes <= 16": {
+      "branches": 47,
+      "untouchedLost": 13,
+      "prevented": 2,
+      "caused": 2,
+      "logMinRabbits": 0,
+      "logMinFoxes": 0,
+      "logRabbits30d": -0.06,
+      "logFoxes30d": 0.16
+     },
+     "bushes <= 20": {
+      "branches": 94,
+      "untouchedLost": 21,
+      "prevented": 4,
+      "caused": 7,
+      "logMinRabbits": 0,
+      "logMinFoxes": -0.18,
+      "logRabbits30d": -0.03,
+      "logFoxes30d": 0
+     },
+     "bushes <= 20, < 20% full": {
+      "branches": 58,
+      "untouchedLost": 9,
+      "prevented": 1,
+      "caused": 5,
+      "logMinRabbits": 0,
+      "logMinFoxes": -0.22,
+      "logRabbits30d": -0.05,
+      "logFoxes30d": 0.04
+     },
+     "bushes >= 40": {
+      "branches": 99,
+      "untouchedLost": 13,
+      "prevented": 3,
+      "caused": 6,
+      "logMinRabbits": 0.01,
+      "logMinFoxes": -0.29,
+      "logRabbits30d": 0.09,
+      "logFoxes30d": -0.13
+     },
+     "bushes < 15% full, rabbits < 35% energy": {
+      "branches": 12,
+      "untouchedLost": 2,
+      "prevented": 0,
+      "caused": 0,
+      "logMinRabbits": 0.05,
+      "logMinFoxes": -0.15,
+      "logRabbits30d": 0.09,
+      "logFoxes30d": -0.28
+     },
+     "bushes >= 60% full": {
+      "branches": 72,
+      "untouchedLost": 21,
+      "prevented": 7,
+      "caused": 4,
+      "logMinRabbits": 0,
+      "logMinFoxes": -0.27,
+      "logRabbits30d": 0.04,
+      "logFoxes30d": -0.09
+     }
+    },
+    "feedFoxes": {
+     "probe: timely": {
+      "branches": 27,
+      "untouchedLost": 12,
+      "prevented": 5,
+      "caused": 0,
+      "logMinRabbits": 0,
+      "logMinFoxes": 0,
+      "logRabbits30d": -0.06,
+      "logFoxes30d": 0.22
+     },
+     "probe: mistimed": {
+      "branches": 132,
+      "untouchedLost": 31,
+      "prevented": 7,
+      "caused": 15,
+      "logMinRabbits": 0,
+      "logMinFoxes": 0.26,
+      "logRabbits30d": -0.24,
+      "logFoxes30d": 0.18
+     },
+     "any": {
+      "branches": 474,
+      "untouchedLost": 72,
+      "prevented": 23,
+      "caused": 33,
+      "logMinRabbits": 0,
+      "logMinFoxes": 0.22,
+      "logRabbits30d": -0.11,
+      "logFoxes30d": 0.2
+     },
+     "foxes <= 5": {
+      "branches": 24,
+      "untouchedLost": 11,
+      "prevented": 4,
+      "caused": 0,
+      "logMinRabbits": 0,
+      "logMinFoxes": 0,
+      "logRabbits30d": -0.06,
+      "logFoxes30d": 0.36
+     },
+     "foxes <= 6": {
+      "branches": 27,
+      "untouchedLost": 12,
+      "prevented": 5,
+      "caused": 0,
+      "logMinRabbits": 0,
+      "logMinFoxes": 0,
+      "logRabbits30d": -0.06,
+      "logFoxes30d": 0.22
+     },
+     "foxes <= 8": {
+      "branches": 37,
+      "untouchedLost": 14,
+      "prevented": 6,
+      "caused": 1,
+      "logMinRabbits": 0,
+      "logMinFoxes": 0,
+      "logRabbits30d": -0.06,
+      "logFoxes30d": 0.34
+     },
+     "foxes <= 6, energy < 40%": {
+      "branches": 7,
+      "untouchedLost": 5,
+      "prevented": 2,
+      "caused": 0,
+      "logMinRabbits": 0,
+      "logMinFoxes": 0.15,
+      "logRabbits30d": -0.18,
+      "logFoxes30d": 0.69
+     },
+     "foxes <= 8, bushes < 30% full": {
+      "branches": 26,
+      "untouchedLost": 11,
+      "prevented": 5,
+      "caused": 0,
+      "logMinRabbits": 0.05,
+      "logMinFoxes": 0,
+      "logRabbits30d": -0.04,
+      "logFoxes30d": 0.36
+     },
+     "overhunt (10+ foxes, < 5 rabbits/fox, rabbits -15%/10 d)": {
+      "branches": 132,
+      "untouchedLost": 31,
+      "prevented": 7,
+      "caused": 15,
+      "logMinRabbits": 0,
+      "logMinFoxes": 0.26,
+      "logRabbits30d": -0.24,
+      "logFoxes30d": 0.18
+     },
+     "fox-heavy (20+ foxes, < 8 rabbits/fox)": {
+      "branches": 288,
+      "untouchedLost": 47,
+      "prevented": 12,
+      "caused": 28,
+      "logMinRabbits": -0.03,
+      "logMinFoxes": 0.26,
+      "logRabbits30d": -0.21,
+      "logFoxes30d": 0.2
+     },
+     "fox boom (+50%/10 d, 6+ foxes)": {
+      "branches": 70,
+      "untouchedLost": 8,
+      "prevented": 2,
+      "caused": 4,
+      "logMinRabbits": 0,
+      "logMinFoxes": 0.09,
+      "logRabbits30d": 0.03,
+      "logFoxes30d": 0.03
+     },
+     "rabbits <= 30": {
+      "branches": 33,
+      "untouchedLost": 17,
+      "prevented": 2,
+      "caused": 4,
+      "logMinRabbits": 0,
+      "logMinFoxes": 0.53,
+      "logRabbits30d": -0.27,
+      "logFoxes30d": 0.88
+     },
+     "rabbits <= 60": {
+      "branches": 69,
+      "untouchedLost": 26,
+      "prevented": 4,
+      "caused": 9,
+      "logMinRabbits": 0,
+      "logMinFoxes": 0.5,
+      "logRabbits30d": -0.32,
+      "logFoxes30d": 0.33
+     },
+     "rabbits >= 300, bushes < 20% full": {
+      "branches": 29,
+      "untouchedLost": 2,
+      "prevented": 0,
+      "caused": 1,
+      "logMinRabbits": 0,
+      "logMinFoxes": 0.21,
+      "logRabbits30d": -0.06,
+      "logFoxes30d": 0.17
+     },
+     "rabbits >= 250, foxes >= 20": {
+      "branches": 68,
+      "untouchedLost": 6,
+      "prevented": 2,
+      "caused": 2,
+      "logMinRabbits": -0.14,
+      "logMinFoxes": 0.19,
+      "logRabbits30d": -0.13,
+      "logFoxes30d": 0.18
+     },
+     "rabbits >= 250, foxes <= 10": {
+      "branches": 24,
+      "untouchedLost": 2,
+      "prevented": 0,
+      "caused": 0,
+      "logMinRabbits": 0.07,
+      "logMinFoxes": 0.26,
+      "logRabbits30d": -0.13,
+      "logFoxes30d": 0.15
+     },
+     "rabbit boom (+40%/10 d, bushes < 35%)": {
+      "branches": 35,
+      "untouchedLost": 6,
+      "prevented": 1,
+      "caused": 1,
+      "logMinRabbits": 0,
+      "logMinFoxes": 0.18,
+      "logRabbits30d": -0.06,
+      "logFoxes30d": 0.21
+     },
+     "bushes <= 16": {
+      "branches": 47,
+      "untouchedLost": 13,
+      "prevented": 6,
+      "caused": 4,
+      "logMinRabbits": 0,
+      "logMinFoxes": 0.24,
+      "logRabbits30d": -0.11,
+      "logFoxes30d": 0.33
+     },
+     "bushes <= 20": {
+      "branches": 94,
+      "untouchedLost": 21,
+      "prevented": 9,
+      "caused": 7,
+      "logMinRabbits": 0,
+      "logMinFoxes": 0.21,
+      "logRabbits30d": -0.1,
+      "logFoxes30d": 0.31
+     },
+     "bushes <= 20, < 20% full": {
+      "branches": 58,
+      "untouchedLost": 9,
+      "prevented": 5,
+      "caused": 3,
+      "logMinRabbits": 0,
+      "logMinFoxes": 0.15,
+      "logRabbits30d": -0.04,
+      "logFoxes30d": 0.29
+     },
+     "bushes >= 40": {
+      "branches": 100,
+      "untouchedLost": 13,
+      "prevented": 2,
+      "caused": 11,
+      "logMinRabbits": -0.15,
+      "logMinFoxes": 0.21,
+      "logRabbits30d": -0.21,
+      "logFoxes30d": 0.15
+     },
+     "bushes < 15% full, rabbits < 35% energy": {
+      "branches": 12,
+      "untouchedLost": 2,
+      "prevented": 2,
+      "caused": 2,
+      "logMinRabbits": 0.12,
+      "logMinFoxes": 0.13,
+      "logRabbits30d": 0.19,
+      "logFoxes30d": 0.19
+     },
+     "bushes >= 60% full": {
+      "branches": 73,
+      "untouchedLost": 21,
+      "prevented": 4,
+      "caused": 10,
+      "logMinRabbits": 0,
+      "logMinFoxes": 0.47,
+      "logRabbits30d": -0.37,
+      "logFoxes30d": 0.29
+     }
+    },
+    "illnessPrey": {
+     "probe: timely": {
+      "branches": 29,
+      "untouchedLost": 2,
+      "prevented": 0,
+      "caused": 4,
+      "logMinRabbits": -0.43,
+      "logMinFoxes": 0,
+      "logRabbits30d": -0.23,
+      "logFoxes30d": -0.21
+     },
+     "probe: mistimed": {
+      "branches": 68,
+      "untouchedLost": 26,
+      "prevented": 5,
+      "caused": 5,
+      "logMinRabbits": 0,
+      "logMinFoxes": 0,
+      "logRabbits30d": -0.4,
+      "logFoxes30d": -0.06
+     },
+     "any": {
+      "branches": 473,
+      "untouchedLost": 72,
+      "prevented": 18,
+      "caused": 24,
+      "logMinRabbits": -0.21,
+      "logMinFoxes": 0,
+      "logRabbits30d": -0.34,
+      "logFoxes30d": -0.24
+     },
+     "foxes <= 5": {
+      "branches": 24,
+      "untouchedLost": 11,
+      "prevented": 2,
+      "caused": 2,
+      "logMinRabbits": -0.16,
+      "logMinFoxes": 0,
+      "logRabbits30d": -0.27,
+      "logFoxes30d": -0.22
+     },
+     "foxes <= 6": {
+      "branches": 27,
+      "untouchedLost": 12,
+      "prevented": 2,
+      "caused": 2,
+      "logMinRabbits": -0.2,
+      "logMinFoxes": 0,
+      "logRabbits30d": -0.27,
+      "logFoxes30d": -0.22
+     },
+     "foxes <= 8": {
+      "branches": 37,
+      "untouchedLost": 14,
+      "prevented": 3,
+      "caused": 2,
+      "logMinRabbits": -0.26,
+      "logMinFoxes": 0,
+      "logRabbits30d": -0.33,
+      "logFoxes30d": -0.22
+     },
+     "foxes <= 6, energy < 40%": {
+      "branches": 7,
+      "untouchedLost": 5,
+      "prevented": 1,
+      "caused": 0,
+      "logMinRabbits": -0.1,
+      "logMinFoxes": 0,
+      "logRabbits30d": -0.15,
+      "logFoxes30d": -0.22
+     },
+     "foxes <= 8, bushes < 30% full": {
+      "branches": 26,
+      "untouchedLost": 11,
+      "prevented": 1,
+      "caused": 2,
+      "logMinRabbits": -0.4,
+      "logMinFoxes": 0,
+      "logRabbits30d": -0.27,
+      "logFoxes30d": -0.22
+     },
+     "overhunt (10+ foxes, < 5 rabbits/fox, rabbits -15%/10 d)": {
+      "branches": 131,
+      "untouchedLost": 31,
+      "prevented": 6,
+      "caused": 9,
+      "logMinRabbits": -0.06,
+      "logMinFoxes": -0.2,
+      "logRabbits30d": -0.3,
+      "logFoxes30d": -0.28
+     },
+     "fox-heavy (20+ foxes, < 8 rabbits/fox)": {
+      "branches": 287,
+      "untouchedLost": 47,
+      "prevented": 12,
+      "caused": 17,
+      "logMinRabbits": -0.15,
+      "logMinFoxes": -0.14,
+      "logRabbits30d": -0.36,
+      "logFoxes30d": -0.29
+     },
+     "fox boom (+50%/10 d, 6+ foxes)": {
+      "branches": 70,
+      "untouchedLost": 8,
+      "prevented": 2,
+      "caused": 4,
+      "logMinRabbits": -0.05,
+      "logMinFoxes": 0,
+      "logRabbits30d": -0.35,
+      "logFoxes30d": -0.24
+     },
+     "rabbits <= 30": {
+      "branches": 32,
+      "untouchedLost": 17,
+      "prevented": 4,
+      "caused": 2,
+      "logMinRabbits": 0,
+      "logMinFoxes": 0,
+      "logRabbits30d": -0.2,
+      "logFoxes30d": 0
+     },
+     "rabbits <= 60": {
+      "branches": 68,
+      "untouchedLost": 26,
+      "prevented": 5,
+      "caused": 5,
+      "logMinRabbits": 0,
+      "logMinFoxes": 0,
+      "logRabbits30d": -0.4,
+      "logFoxes30d": -0.06
+     },
+     "rabbits >= 300, bushes < 20% full": {
+      "branches": 29,
+      "untouchedLost": 2,
+      "prevented": 0,
+      "caused": 4,
+      "logMinRabbits": -0.43,
+      "logMinFoxes": 0,
+      "logRabbits30d": -0.23,
+      "logFoxes30d": -0.21
+     },
+     "rabbits >= 250, foxes >= 20": {
+      "branches": 68,
+      "untouchedLost": 6,
+      "prevented": 1,
+      "caused": 4,
+      "logMinRabbits": -0.48,
+      "logMinFoxes": 0,
+      "logRabbits30d": -0.28,
+      "logFoxes30d": -0.28
+     },
+     "rabbits >= 250, foxes <= 10": {
+      "branches": 24,
+      "untouchedLost": 2,
+      "prevented": 0,
+      "caused": 0,
+      "logMinRabbits": -0.38,
+      "logMinFoxes": 0,
+      "logRabbits30d": -0.33,
+      "logFoxes30d": -0.18
+     },
+     "rabbit boom (+40%/10 d, bushes < 35%)": {
+      "branches": 35,
+      "untouchedLost": 6,
+      "prevented": 1,
+      "caused": 2,
+      "logMinRabbits": -0.38,
+      "logMinFoxes": 0,
+      "logRabbits30d": -0.32,
+      "logFoxes30d": -0.21
+     },
+     "bushes <= 16": {
+      "branches": 47,
+      "untouchedLost": 13,
+      "prevented": 3,
+      "caused": 2,
+      "logMinRabbits": -0.32,
+      "logMinFoxes": 0,
+      "logRabbits30d": -0.22,
+      "logFoxes30d": -0.1
+     },
+     "bushes <= 20": {
+      "branches": 94,
+      "untouchedLost": 21,
+      "prevented": 4,
+      "caused": 6,
+      "logMinRabbits": -0.21,
+      "logMinFoxes": 0,
+      "logRabbits30d": -0.17,
+      "logFoxes30d": -0.14
+     },
+     "bushes <= 20, < 20% full": {
+      "branches": 58,
+      "untouchedLost": 9,
+      "prevented": 2,
+      "caused": 3,
+      "logMinRabbits": -0.23,
+      "logMinFoxes": -0.06,
+      "logRabbits30d": -0.15,
+      "logFoxes30d": -0.11
+     },
+     "bushes >= 40": {
+      "branches": 100,
+      "untouchedLost": 13,
+      "prevented": 2,
+      "caused": 8,
+      "logMinRabbits": -0.24,
+      "logMinFoxes": 0,
+      "logRabbits30d": -0.44,
+      "logFoxes30d": -0.33
+     },
+     "bushes < 15% full, rabbits < 35% energy": {
+      "branches": 12,
+      "untouchedLost": 2,
+      "prevented": 1,
+      "caused": 0,
+      "logMinRabbits": -0.24,
+      "logMinFoxes": 0,
+      "logRabbits30d": -0.13,
+      "logFoxes30d": -0.15
+     },
+     "bushes >= 60% full": {
+      "branches": 73,
+      "untouchedLost": 21,
+      "prevented": 5,
+      "caused": 8,
+      "logMinRabbits": 0,
+      "logMinFoxes": 0,
+      "logRabbits30d": -0.47,
+      "logFoxes30d": -0.17
+     }
+    },
+    "illnessPred": {
+     "probe: timely": {
+      "branches": 288,
+      "untouchedLost": 47,
+      "prevented": 15,
+      "caused": 8,
+      "logMinRabbits": 0.02,
+      "logMinFoxes": -0.27,
+      "logRabbits30d": 0.19,
+      "logFoxes30d": -0.33
+     },
+     "probe: mistimed": {
+      "branches": 37,
+      "untouchedLost": 14,
+      "prevented": 1,
+      "caused": 4,
+      "logMinRabbits": 0,
+      "logMinFoxes": 0,
+      "logRabbits30d": -0.05,
+      "logFoxes30d": -0.12
+     },
+     "any": {
+      "branches": 474,
+      "untouchedLost": 72,
+      "prevented": 19,
+      "caused": 18,
+      "logMinRabbits": 0.01,
+      "logMinFoxes": -0.14,
+      "logRabbits30d": 0.11,
+      "logFoxes30d": -0.27
+     },
+     "foxes <= 5": {
+      "branches": 24,
+      "untouchedLost": 11,
+      "prevented": 1,
+      "caused": 4,
+      "logMinRabbits": 0,
+      "logMinFoxes": 0,
+      "logRabbits30d": -0.02,
+      "logFoxes30d": -0.12
+     },
+     "foxes <= 6": {
+      "branches": 27,
+      "untouchedLost": 12,
+      "prevented": 1,
+      "caused": 4,
+      "logMinRabbits": 0,
+      "logMinFoxes": 0,
+      "logRabbits30d": -0.02,
+      "logFoxes30d": -0.12
+     },
+     "foxes <= 8": {
+      "branches": 37,
+      "untouchedLost": 14,
+      "prevented": 1,
+      "caused": 4,
+      "logMinRabbits": 0,
+      "logMinFoxes": 0,
+      "logRabbits30d": -0.05,
+      "logFoxes30d": -0.12
+     },
+     "foxes <= 6, energy < 40%": {
+      "branches": 7,
+      "untouchedLost": 5,
+      "prevented": 0,
+      "caused": 2,
+      "logMinRabbits": 0,
+      "logMinFoxes": 0,
+      "logRabbits30d": 0.26,
+      "logFoxes30d": 0
+     },
+     "foxes <= 8, bushes < 30% full": {
+      "branches": 26,
+      "untouchedLost": 11,
+      "prevented": 0,
+      "caused": 3,
+      "logMinRabbits": 0,
+      "logMinFoxes": 0,
+      "logRabbits30d": -0.04,
+      "logFoxes30d": -0.18
+     },
+     "overhunt (10+ foxes, < 5 rabbits/fox, rabbits -15%/10 d)": {
+      "branches": 132,
+      "untouchedLost": 31,
+      "prevented": 8,
+      "caused": 7,
+      "logMinRabbits": 0,
+      "logMinFoxes": -0.32,
+      "logRabbits30d": 0.27,
+      "logFoxes30d": -0.34
+     },
+     "fox-heavy (20+ foxes, < 8 rabbits/fox)": {
+      "branches": 288,
+      "untouchedLost": 47,
+      "prevented": 15,
+      "caused": 8,
+      "logMinRabbits": 0.02,
+      "logMinFoxes": -0.27,
+      "logRabbits30d": 0.19,
+      "logFoxes30d": -0.33
+     },
+     "fox boom (+50%/10 d, 6+ foxes)": {
+      "branches": 70,
+      "untouchedLost": 8,
+      "prevented": 2,
+      "caused": 2,
+      "logMinRabbits": 0.07,
+      "logMinFoxes": 0,
+      "logRabbits30d": 0.11,
+      "logFoxes30d": -0.1
+     },
+     "rabbits <= 30": {
+      "branches": 33,
+      "untouchedLost": 17,
+      "prevented": 1,
+      "caused": 4,
+      "logMinRabbits": 0,
+      "logMinFoxes": -0.2,
+      "logRabbits30d": 0.05,
+      "logFoxes30d": -0.29
+     },
+     "rabbits <= 60": {
+      "branches": 69,
+      "untouchedLost": 26,
+      "prevented": 4,
+      "caused": 7,
+      "logMinRabbits": 0,
+      "logMinFoxes": -0.37,
+      "logRabbits30d": 0.18,
+      "logFoxes30d": -0.37
+     },
+     "rabbits >= 300, bushes < 20% full": {
+      "branches": 29,
+      "untouchedLost": 2,
+      "prevented": 0,
+      "caused": 1,
+      "logMinRabbits": 0.13,
+      "logMinFoxes": -0.05,
+      "logRabbits30d": 0.11,
+      "logFoxes30d": -0.29
+     },
+     "rabbits >= 250, foxes >= 20": {
+      "branches": 68,
+      "untouchedLost": 6,
+      "prevented": 2,
+      "caused": 1,
+      "logMinRabbits": 0.05,
+      "logMinFoxes": -0.19,
+      "logRabbits30d": 0.14,
+      "logFoxes30d": -0.32
+     },
+     "rabbits >= 250, foxes <= 10": {
+      "branches": 24,
+      "untouchedLost": 2,
+      "prevented": 1,
+      "caused": 0,
+      "logMinRabbits": 0.1,
+      "logMinFoxes": 0,
+      "logRabbits30d": -0.01,
+      "logFoxes30d": 0
+     },
+     "rabbit boom (+40%/10 d, bushes < 35%)": {
+      "branches": 35,
+      "untouchedLost": 6,
+      "prevented": 0,
+      "caused": 0,
+      "logMinRabbits": 0.01,
+      "logMinFoxes": 0,
+      "logRabbits30d": 0,
+      "logFoxes30d": -0.19
+     },
+     "bushes <= 16": {
+      "branches": 47,
+      "untouchedLost": 13,
+      "prevented": 2,
+      "caused": 5,
+      "logMinRabbits": 0.01,
+      "logMinFoxes": -0.27,
+      "logRabbits30d": -0.01,
+      "logFoxes30d": -0.29
+     },
+     "bushes <= 20": {
+      "branches": 94,
+      "untouchedLost": 21,
+      "prevented": 4,
+      "caused": 8,
+      "logMinRabbits": 0,
+      "logMinFoxes": -0.27,
+      "logRabbits30d": 0.05,
+      "logFoxes30d": -0.31
+     },
+     "bushes <= 20, < 20% full": {
+      "branches": 58,
+      "untouchedLost": 9,
+      "prevented": 2,
+      "caused": 6,
+      "logMinRabbits": 0.02,
+      "logMinFoxes": -0.29,
+      "logRabbits30d": 0.02,
+      "logFoxes30d": -0.26
+     },
+     "bushes >= 40": {
+      "branches": 100,
+      "untouchedLost": 13,
+      "prevented": 3,
+      "caused": 4,
+      "logMinRabbits": 0.03,
+      "logMinFoxes": -0.18,
+      "logRabbits30d": 0.24,
+      "logFoxes30d": -0.35
+     },
+     "bushes < 15% full, rabbits < 35% energy": {
+      "branches": 12,
+      "untouchedLost": 2,
+      "prevented": 1,
+      "caused": 1,
+      "logMinRabbits": 0.13,
+      "logMinFoxes": -0.5,
+      "logRabbits30d": 0.05,
+      "logFoxes30d": -0.24
+     },
+     "bushes >= 60% full": {
+      "branches": 73,
+      "untouchedLost": 21,
+      "prevented": 3,
+      "caused": 3,
+      "logMinRabbits": 0,
+      "logMinFoxes": -0.25,
+      "logRabbits30d": 0.18,
+      "logFoxes30d": -0.35
+     }
+    }
+   }
+  },
+  {
+   "label": "drain0.35",
+   "effects": {
+    "illness": {
+     "seedMax": 6,
+     "seedShare": 0.2,
+     "every": 6,
+     "radius": 0.045,
+     "chance": 0.15,
+     "drain": 0.35,
+     "hours": 240,
+     "immunity": 720
+    },
+    "plant": {
+     "count": 4,
+     "stockShare": 0.5
+    },
+    "releasePrey": 8,
+    "releasePred": 3,
+    "cullDivisor": 3
+   },
+   "seeds": {
+    "start": 8000,
+    "count": 40
+   },
+   "every": 480,
+   "runtime": {
+    "node": "v22.22.2",
+    "wallSeconds": 453.48
+   },
+   "branches": 948,
+   "summary": {
+    "illnessPrey": {
+     "probe: timely": {
+      "branches": 29,
+      "untouchedLost": 2,
+      "prevented": 0,
+      "caused": 2,
+      "logMinRabbits": -0.41,
+      "logMinFoxes": 0,
+      "logRabbits30d": -0.27,
+      "logFoxes30d": -0.11
+     },
+     "probe: mistimed": {
+      "branches": 69,
+      "untouchedLost": 26,
+      "prevented": 4,
+      "caused": 3,
+      "logMinRabbits": 0,
+      "logMinFoxes": 0,
+      "logRabbits30d": -0.29,
+      "logFoxes30d": -0.15
+     },
+     "any": {
+      "branches": 474,
+      "untouchedLost": 72,
+      "prevented": 19,
+      "caused": 18,
+      "logMinRabbits": -0.12,
+      "logMinFoxes": 0,
+      "logRabbits30d": -0.25,
+      "logFoxes30d": -0.14
+     },
+     "foxes <= 5": {
+      "branches": 24,
+      "untouchedLost": 11,
+      "prevented": 3,
+      "caused": 2,
+      "logMinRabbits": -0.09,
+      "logMinFoxes": 0,
+      "logRabbits30d": -0.14,
+      "logFoxes30d": 0
+     },
+     "foxes <= 6": {
+      "branches": 27,
+      "untouchedLost": 12,
+      "prevented": 3,
+      "caused": 2,
+      "logMinRabbits": -0.11,
+      "logMinFoxes": 0,
+      "logRabbits30d": -0.14,
+      "logFoxes30d": 0
+     },
+     "foxes <= 8": {
+      "branches": 37,
+      "untouchedLost": 14,
+      "prevented": 3,
+      "caused": 2,
+      "logMinRabbits": -0.11,
+      "logMinFoxes": 0,
+      "logRabbits30d": -0.19,
+      "logFoxes30d": -0.09
+     },
+     "foxes <= 6, energy < 40%": {
+      "branches": 7,
+      "untouchedLost": 5,
+      "prevented": 1,
+      "caused": 0,
+      "logMinRabbits": -0.01,
+      "logMinFoxes": 0,
+      "logRabbits30d": -0.34,
+      "logFoxes30d": 0
+     },
+     "foxes <= 8, bushes < 30% full": {
+      "branches": 26,
+      "untouchedLost": 11,
+      "prevented": 1,
+      "caused": 2,
+      "logMinRabbits": -0.12,
+      "logMinFoxes": 0,
+      "logRabbits30d": -0.14,
+      "logFoxes30d": -0.13
+     },
+     "overhunt (10+ foxes, < 5 rabbits/fox, rabbits -15%/10 d)": {
+      "branches": 132,
+      "untouchedLost": 31,
+      "prevented": 8,
+      "caused": 8,
+      "logMinRabbits": 0,
+      "logMinFoxes": -0.07,
+      "logRabbits30d": -0.31,
+      "logFoxes30d": -0.17
+     },
+     "fox-heavy (20+ foxes, < 8 rabbits/fox)": {
+      "branches": 288,
+      "untouchedLost": 47,
+      "prevented": 14,
+      "caused": 13,
+      "logMinRabbits": -0.07,
+      "logMinFoxes": -0.05,
+      "logRabbits30d": -0.29,
+      "logFoxes30d": -0.16
+     },
+     "fox boom (+50%/10 d, 6+ foxes)": {
+      "branches": 70,
+      "untouchedLost": 8,
+      "prevented": 3,
+      "caused": 3,
+      "logMinRabbits": -0.15,
+      "logMinFoxes": 0,
+      "logRabbits30d": -0.24,
+      "logFoxes30d": -0.14
+     },
+     "rabbits <= 30": {
+      "branches": 33,
+      "untouchedLost": 17,
+      "prevented": 3,
+      "caused": 1,
+      "logMinRabbits": 0,
+      "logMinFoxes": 0,
+      "logRabbits30d": -0.17,
+      "logFoxes30d": 0.06
+     },
+     "rabbits <= 60": {
+      "branches": 69,
+      "untouchedLost": 26,
+      "prevented": 4,
+      "caused": 3,
+      "logMinRabbits": 0,
+      "logMinFoxes": 0,
+      "logRabbits30d": -0.29,
+      "logFoxes30d": -0.15
+     },
+     "rabbits >= 300, bushes < 20% full": {
+      "branches": 29,
+      "untouchedLost": 2,
+      "prevented": 0,
+      "caused": 2,
+      "logMinRabbits": -0.41,
+      "logMinFoxes": 0,
+      "logRabbits30d": -0.27,
+      "logFoxes30d": -0.11
+     },
+     "rabbits >= 250, foxes >= 20": {
+      "branches": 68,
+      "untouchedLost": 6,
+      "prevented": 1,
+      "caused": 3,
+      "logMinRabbits": -0.36,
+      "logMinFoxes": 0,
+      "logRabbits30d": -0.28,
+      "logFoxes30d": -0.09
+     },
+     "rabbits >= 250, foxes <= 10": {
+      "branches": 24,
+      "untouchedLost": 2,
+      "prevented": 0,
+      "caused": 0,
+      "logMinRabbits": -0.26,
+      "logMinFoxes": 0,
+      "logRabbits30d": -0.19,
+      "logFoxes30d": -0.08
+     },
+     "rabbit boom (+40%/10 d, bushes < 35%)": {
+      "branches": 35,
+      "untouchedLost": 6,
+      "prevented": 0,
+      "caused": 2,
+      "logMinRabbits": -0.24,
+      "logMinFoxes": 0,
+      "logRabbits30d": -0.23,
+      "logFoxes30d": -0.18
+     },
+     "bushes <= 16": {
+      "branches": 47,
+      "untouchedLost": 13,
+      "prevented": 2,
+      "caused": 1,
+      "logMinRabbits": -0.13,
+      "logMinFoxes": 0,
+      "logRabbits30d": -0.18,
+      "logFoxes30d": -0.08
+     },
+     "bushes <= 20": {
+      "branches": 94,
+      "untouchedLost": 21,
+      "prevented": 5,
+      "caused": 2,
+      "logMinRabbits": -0.13,
+      "logMinFoxes": 0,
+      "logRabbits30d": -0.15,
+      "logFoxes30d": -0.12
+     },
+     "bushes <= 20, < 20% full": {
+      "branches": 58,
+      "untouchedLost": 9,
+      "prevented": 3,
+      "caused": 1,
+      "logMinRabbits": -0.21,
+      "logMinFoxes": -0.03,
+      "logRabbits30d": -0.07,
+      "logFoxes30d": -0.11
+     },
+     "bushes >= 40": {
+      "branches": 100,
+      "untouchedLost": 13,
+      "prevented": 1,
+      "caused": 3,
+      "logMinRabbits": -0.12,
+      "logMinFoxes": 0,
+      "logRabbits30d": -0.23,
+      "logFoxes30d": -0.14
+     },
+     "bushes < 15% full, rabbits < 35% energy": {
+      "branches": 12,
+      "untouchedLost": 2,
+      "prevented": 2,
+      "caused": 0,
+      "logMinRabbits": -0.24,
+      "logMinFoxes": 0,
+      "logRabbits30d": -0.02,
+      "logFoxes30d": -0.03
+     },
+     "bushes >= 60% full": {
+      "branches": 73,
+      "untouchedLost": 21,
+      "prevented": 4,
+      "caused": 3,
+      "logMinRabbits": 0,
+      "logMinFoxes": 0,
+      "logRabbits30d": -0.29,
+      "logFoxes30d": -0.21
+     }
+    },
+    "illnessPred": {
+     "probe: timely": {
+      "branches": 287,
+      "untouchedLost": 47,
+      "prevented": 21,
+      "caused": 12,
+      "logMinRabbits": 0.04,
+      "logMinFoxes": -0.15,
+      "logRabbits30d": 0.12,
+      "logFoxes30d": -0.21
+     },
+     "probe: mistimed": {
+      "branches": 36,
+      "untouchedLost": 14,
+      "prevented": 1,
+      "caused": 3,
+      "logMinRabbits": 0,
+      "logMinFoxes": 0,
+      "logRabbits30d": -0.02,
+      "logFoxes30d": 0
+     },
+     "any": {
+      "branches": 472,
+      "untouchedLost": 72,
+      "prevented": 26,
+      "caused": 18,
+      "logMinRabbits": 0.01,
+      "logMinFoxes": 0,
+      "logRabbits30d": 0.06,
+      "logFoxes30d": -0.15
+     },
+     "foxes <= 5": {
+      "branches": 24,
+      "untouchedLost": 11,
+      "prevented": 1,
+      "caused": 3,
+      "logMinRabbits": 0,
+      "logMinFoxes": 0,
+      "logRabbits30d": 0.04,
+      "logFoxes30d": 0
+     },
+     "foxes <= 6": {
+      "branches": 27,
+      "untouchedLost": 12,
+      "prevented": 1,
+      "caused": 3,
+      "logMinRabbits": 0,
+      "logMinFoxes": 0,
+      "logRabbits30d": 0.02,
+      "logFoxes30d": 0
+     },
+     "foxes <= 8": {
+      "branches": 36,
+      "untouchedLost": 14,
+      "prevented": 1,
+      "caused": 3,
+      "logMinRabbits": 0,
+      "logMinFoxes": 0,
+      "logRabbits30d": -0.02,
+      "logFoxes30d": 0
+     },
+     "foxes <= 6, energy < 40%": {
+      "branches": 7,
+      "untouchedLost": 5,
+      "prevented": 1,
+      "caused": 0,
+      "logMinRabbits": 0,
+      "logMinFoxes": 0,
+      "logRabbits30d": 0.07,
+      "logFoxes30d": -0.22
+     },
+     "foxes <= 8, bushes < 30% full": {
+      "branches": 26,
+      "untouchedLost": 11,
+      "prevented": 0,
+      "caused": 3,
+      "logMinRabbits": 0,
+      "logMinFoxes": 0,
+      "logRabbits30d": -0.02,
+      "logFoxes30d": 0
+     },
+     "overhunt (10+ foxes, < 5 rabbits/fox, rabbits -15%/10 d)": {
+      "branches": 131,
+      "untouchedLost": 31,
+      "prevented": 10,
+      "caused": 6,
+      "logMinRabbits": 0,
+      "logMinFoxes": -0.16,
+      "logRabbits30d": 0.15,
+      "logFoxes30d": -0.21
+     },
+     "fox-heavy (20+ foxes, < 8 rabbits/fox)": {
+      "branches": 287,
+      "untouchedLost": 47,
+      "prevented": 21,
+      "caused": 12,
+      "logMinRabbits": 0.04,
+      "logMinFoxes": -0.15,
+      "logRabbits30d": 0.12,
+      "logFoxes30d": -0.21
+     },
+     "fox boom (+50%/10 d, 6+ foxes)": {
+      "branches": 70,
+      "untouchedLost": 8,
+      "prevented": 3,
+      "caused": 2,
+      "logMinRabbits": 0,
+      "logMinFoxes": 0,
+      "logRabbits30d": -0.01,
+      "logFoxes30d": -0.11
+     },
+     "rabbits <= 30": {
+      "branches": 31,
+      "untouchedLost": 17,
+      "prevented": 2,
+      "caused": 2,
+      "logMinRabbits": 0,
+      "logMinFoxes": -0.12,
+      "logRabbits30d": -0.19,
+      "logFoxes30d": -0.22
+     },
+     "rabbits <= 60": {
+      "branches": 67,
+      "untouchedLost": 26,
+      "prevented": 7,
+      "caused": 4,
+      "logMinRabbits": 0,
+      "logMinFoxes": -0.18,
+      "logRabbits30d": 0.05,
+      "logFoxes30d": -0.21
+     },
+     "rabbits >= 300, bushes < 20% full": {
+      "branches": 29,
+      "untouchedLost": 2,
+      "prevented": 1,
+      "caused": 2,
+      "logMinRabbits": 0.08,
+      "logMinFoxes": 0,
+      "logRabbits30d": -0.02,
+      "logFoxes30d": -0.21
+     },
+     "rabbits >= 250, foxes >= 20": {
+      "branches": 68,
+      "untouchedLost": 6,
+      "prevented": 5,
+      "caused": 2,
+      "logMinRabbits": 0.11,
+      "logMinFoxes": 0,
+      "logRabbits30d": 0.07,
+      "logFoxes30d": -0.21
+     },
+     "rabbits >= 250, foxes <= 10": {
+      "branches": 24,
+      "untouchedLost": 2,
+      "prevented": 0,
+      "caused": 0,
+      "logMinRabbits": 0,
+      "logMinFoxes": 0,
+      "logRabbits30d": -0.03,
+      "logFoxes30d": 0.04
+     },
+     "rabbit boom (+40%/10 d, bushes < 35%)": {
+      "branches": 35,
+      "untouchedLost": 6,
+      "prevented": 1,
+      "caused": 1,
+      "logMinRabbits": 0,
+      "logMinFoxes": 0,
+      "logRabbits30d": 0.04,
+      "logFoxes30d": -0.09
+     },
+     "bushes <= 16": {
+      "branches": 47,
+      "untouchedLost": 13,
+      "prevented": 3,
+      "caused": 3,
+      "logMinRabbits": 0,
+      "logMinFoxes": 0,
+      "logRabbits30d": 0.05,
+      "logFoxes30d": -0.08
+     },
+     "bushes <= 20": {
+      "branches": 94,
+      "untouchedLost": 21,
+      "prevented": 6,
+      "caused": 5,
+      "logMinRabbits": 0,
+      "logMinFoxes": -0.04,
+      "logRabbits30d": 0.12,
+      "logFoxes30d": -0.15
+     },
+     "bushes <= 20, < 20% full": {
+      "branches": 58,
+      "untouchedLost": 9,
+      "prevented": 2,
+      "caused": 2,
+      "logMinRabbits": 0,
+      "logMinFoxes": -0.07,
+      "logRabbits30d": 0.11,
+      "logFoxes30d": -0.12
+     },
+     "bushes >= 40": {
+      "branches": 99,
+      "untouchedLost": 13,
+      "prevented": 4,
+      "caused": 4,
+      "logMinRabbits": 0,
+      "logMinFoxes": -0.05,
+      "logRabbits30d": 0.2,
+      "logFoxes30d": -0.23
+     },
+     "bushes < 15% full, rabbits < 35% energy": {
+      "branches": 12,
+      "untouchedLost": 2,
+      "prevented": 1,
+      "caused": 1,
+      "logMinRabbits": 0.14,
+      "logMinFoxes": -0.17,
+      "logRabbits30d": 0.17,
+      "logFoxes30d": -0.11
+     },
+     "bushes >= 60% full": {
+      "branches": 72,
+      "untouchedLost": 21,
+      "prevented": 3,
+      "caused": 4,
+      "logMinRabbits": 0,
+      "logMinFoxes": -0.12,
+      "logRabbits30d": 0.13,
+      "logFoxes30d": -0.22
+     }
+    }
+   }
+  },
+  {
+   "label": "hours120",
+   "effects": {
+    "illness": {
+     "seedMax": 6,
+     "seedShare": 0.2,
+     "every": 6,
+     "radius": 0.045,
+     "chance": 0.15,
+     "drain": 0.65,
+     "hours": 120,
+     "immunity": 720
+    },
+    "plant": {
+     "count": 4,
+     "stockShare": 0.5
+    },
+    "releasePrey": 8,
+    "releasePred": 3,
+    "feedShare": 1,
+    "cullDivisor": 3
+   },
+   "seeds": {
+    "start": 8000,
+    "count": 40
+   },
+   "every": 480,
+   "runtime": {
+    "node": "v22.22.2",
+    "wallSeconds": 370.204
+   },
+   "branches": 948,
+   "summary": {
+    "illnessPrey": {
+     "probe: timely": {
+      "branches": 29,
+      "untouchedLost": 2,
+      "prevented": 2,
+      "caused": 2,
+      "logMinRabbits": -0.02,
+      "logMinFoxes": 0,
+      "logRabbits30d": -0.17,
+      "logFoxes30d": -0.18
+     },
+     "probe: mistimed": {
+      "branches": 67,
+      "untouchedLost": 26,
+      "prevented": 4,
+      "caused": 3,
+      "logMinRabbits": 0,
+      "logMinFoxes": 0,
+      "logRabbits30d": -0.17,
+      "logFoxes30d": -0.13
+     },
+     "any": {
+      "branches": 472,
+      "untouchedLost": 72,
+      "prevented": 24,
+      "caused": 16,
+      "logMinRabbits": -0.1,
+      "logMinFoxes": 0,
+      "logRabbits30d": -0.15,
+      "logFoxes30d": -0.16
+     },
+     "foxes <= 5": {
+      "branches": 24,
+      "untouchedLost": 11,
+      "prevented": 2,
+      "caused": 3,
+      "logMinRabbits": -0.03,
+      "logMinFoxes": 0,
+      "logRabbits30d": -0.05,
+      "logFoxes30d": 0
+     },
+     "foxes <= 6": {
+      "branches": 27,
+      "untouchedLost": 12,
+      "prevented": 2,
+      "caused": 3,
+      "logMinRabbits": -0.09,
+      "logMinFoxes": 0,
+      "logRabbits30d": -0.07,
+      "logFoxes30d": 0
+     },
+     "foxes <= 8": {
+      "branches": 36,
+      "untouchedLost": 14,
+      "prevented": 3,
+      "caused": 3,
+      "logMinRabbits": -0.06,
+      "logMinFoxes": 0,
+      "logRabbits30d": -0.06,
+      "logFoxes30d": 0
+     },
+     "foxes <= 6, energy < 40%": {
+      "branches": 7,
+      "untouchedLost": 5,
+      "prevented": 1,
+      "caused": 0,
+      "logMinRabbits": 0,
+      "logMinFoxes": 0,
+      "logRabbits30d": 0.03,
+      "logFoxes30d": 0.06
+     },
+     "foxes <= 8, bushes < 30% full": {
+      "branches": 26,
+      "untouchedLost": 11,
+      "prevented": 2,
+      "caused": 3,
+      "logMinRabbits": -0.19,
+      "logMinFoxes": 0,
+      "logRabbits30d": -0.05,
+      "logFoxes30d": 0
+     },
+     "overhunt (10+ foxes, < 5 rabbits/fox, rabbits -15%/10 d)": {
+      "branches": 131,
+      "untouchedLost": 31,
+      "prevented": 10,
+      "caused": 5,
+      "logMinRabbits": 0,
+      "logMinFoxes": -0.08,
+      "logRabbits30d": -0.21,
+      "logFoxes30d": -0.18
+     },
+     "fox-heavy (20+ foxes, < 8 rabbits/fox)": {
+      "branches": 287,
+      "untouchedLost": 47,
+      "prevented": 17,
+      "caused": 9,
+      "logMinRabbits": -0.09,
+      "logMinFoxes": -0.05,
+      "logRabbits30d": -0.19,
+      "logFoxes30d": -0.21
+     },
+     "fox boom (+50%/10 d, 6+ foxes)": {
+      "branches": 70,
+      "untouchedLost": 8,
+      "prevented": 2,
+      "caused": 2,
+      "logMinRabbits": 0,
+      "logMinFoxes": 0,
+      "logRabbits30d": -0.15,
+      "logFoxes30d": -0.15
+     },
+     "rabbits <= 30": {
+      "branches": 31,
+      "untouchedLost": 17,
+      "prevented": 3,
+      "caused": 2,
+      "logMinRabbits": 0,
+      "logMinFoxes": 0,
+      "logRabbits30d": -0.21,
+      "logFoxes30d": 0
+     },
+     "rabbits <= 60": {
+      "branches": 67,
+      "untouchedLost": 26,
+      "prevented": 4,
+      "caused": 3,
+      "logMinRabbits": 0,
+      "logMinFoxes": 0,
+      "logRabbits30d": -0.17,
+      "logFoxes30d": -0.13
+     },
+     "rabbits >= 300, bushes < 20% full": {
+      "branches": 29,
+      "untouchedLost": 2,
+      "prevented": 2,
+      "caused": 2,
+      "logMinRabbits": -0.02,
+      "logMinFoxes": 0,
+      "logRabbits30d": -0.17,
+      "logFoxes30d": -0.18
+     },
+     "rabbits >= 250, foxes >= 20": {
+      "branches": 68,
+      "untouchedLost": 6,
+      "prevented": 4,
+      "caused": 3,
+      "logMinRabbits": -0.25,
+      "logMinFoxes": 0,
+      "logRabbits30d": -0.25,
+      "logFoxes30d": -0.18
+     },
+     "rabbits >= 250, foxes <= 10": {
+      "branches": 24,
+      "untouchedLost": 2,
+      "prevented": 0,
+      "caused": 1,
+      "logMinRabbits": -0.03,
+      "logMinFoxes": 0,
+      "logRabbits30d": -0.18,
+      "logFoxes30d": 0
+     },
+     "rabbit boom (+40%/10 d, bushes < 35%)": {
+      "branches": 35,
+      "untouchedLost": 6,
+      "prevented": 3,
+      "caused": 1,
+      "logMinRabbits": -0.21,
+      "logMinFoxes": 0,
+      "logRabbits30d": -0.16,
+      "logFoxes30d": -0.13
+     },
+     "bushes <= 16": {
+      "branches": 47,
+      "untouchedLost": 13,
+      "prevented": 2,
+      "caused": 2,
+      "logMinRabbits": -0.25,
+      "logMinFoxes": 0,
+      "logRabbits30d": -0.15,
+      "logFoxes30d": -0.17
+     },
+     "bushes <= 20": {
+      "branches": 94,
+      "untouchedLost": 21,
+      "prevented": 5,
+      "caused": 2,
+      "logMinRabbits": -0.14,
+      "logMinFoxes": 0,
+      "logRabbits30d": -0.08,
+      "logFoxes30d": -0.1
+     },
+     "bushes <= 20, < 20% full": {
+      "branches": 58,
+      "untouchedLost": 9,
+      "prevented": 3,
+      "caused": 2,
+      "logMinRabbits": -0.17,
+      "logMinFoxes": -0.05,
+      "logRabbits30d": 0,
+      "logFoxes30d": -0.13
+     },
+     "bushes >= 40": {
+      "branches": 99,
+      "untouchedLost": 13,
+      "prevented": 2,
+      "caused": 5,
+      "logMinRabbits": -0.19,
+      "logMinFoxes": 0,
+      "logRabbits30d": -0.28,
+      "logFoxes30d": -0.23
+     },
+     "bushes < 15% full, rabbits < 35% energy": {
+      "branches": 12,
+      "untouchedLost": 2,
+      "prevented": 1,
+      "caused": 0,
+      "logMinRabbits": -0.17,
+      "logMinFoxes": 0,
+      "logRabbits30d": -0.12,
+      "logFoxes30d": -0.29
+     },
+     "bushes >= 60% full": {
+      "branches": 72,
+      "untouchedLost": 21,
+      "prevented": 5,
+      "caused": 4,
+      "logMinRabbits": 0,
+      "logMinFoxes": 0,
+      "logRabbits30d": -0.28,
+      "logFoxes30d": -0.18
+     }
+    },
+    "illnessPred": {
+     "probe: timely": {
+      "branches": 287,
+      "untouchedLost": 47,
+      "prevented": 15,
+      "caused": 7,
+      "logMinRabbits": 0,
+      "logMinFoxes": -0.09,
+      "logRabbits30d": 0.07,
+      "logFoxes30d": -0.11
+     },
+     "probe: mistimed": {
+      "branches": 37,
+      "untouchedLost": 14,
+      "prevented": 2,
+      "caused": 3,
+      "logMinRabbits": 0,
+      "logMinFoxes": 0,
+      "logRabbits30d": -0.05,
+      "logFoxes30d": 0
+     },
+     "any": {
+      "branches": 473,
+      "untouchedLost": 72,
+      "prevented": 18,
+      "caused": 14,
+      "logMinRabbits": 0,
+      "logMinFoxes": -0.01,
+      "logRabbits30d": 0.02,
+      "logFoxes30d": -0.08
+     },
+     "foxes <= 5": {
+      "branches": 24,
+      "untouchedLost": 11,
+      "prevented": 2,
+      "caused": 3,
+      "logMinRabbits": 0,
+      "logMinFoxes": 0,
+      "logRabbits30d": -0.03,
+      "logFoxes30d": 0
+     },
+     "foxes <= 6": {
+      "branches": 27,
+      "untouchedLost": 12,
+      "prevented": 2,
+      "caused": 3,
+      "logMinRabbits": 0,
+      "logMinFoxes": 0,
+      "logRabbits30d": -0.04,
+      "logFoxes30d": 0
+     },
+     "foxes <= 8": {
+      "branches": 37,
+      "untouchedLost": 14,
+      "prevented": 2,
+      "caused": 3,
+      "logMinRabbits": 0,
+      "logMinFoxes": 0,
+      "logRabbits30d": -0.05,
+      "logFoxes30d": 0
+     },
+     "foxes <= 6, energy < 40%": {
+      "branches": 7,
+      "untouchedLost": 5,
+      "prevented": 0,
+      "caused": 0,
+      "logMinRabbits": 0,
+      "logMinFoxes": 0,
+      "logRabbits30d": 0.08,
+      "logFoxes30d": -0.22
+     },
+     "foxes <= 8, bushes < 30% full": {
+      "branches": 26,
+      "untouchedLost": 11,
+      "prevented": 1,
+      "caused": 3,
+      "logMinRabbits": 0,
+      "logMinFoxes": 0,
+      "logRabbits30d": -0.05,
+      "logFoxes30d": 0
+     },
+     "overhunt (10+ foxes, < 5 rabbits/fox, rabbits -15%/10 d)": {
+      "branches": 131,
+      "untouchedLost": 31,
+      "prevented": 6,
+      "caused": 4,
+      "logMinRabbits": 0,
+      "logMinFoxes": -0.13,
+      "logRabbits30d": 0.1,
+      "logFoxes30d": -0.11
+     },
+     "fox-heavy (20+ foxes, < 8 rabbits/fox)": {
+      "branches": 287,
+      "untouchedLost": 47,
+      "prevented": 15,
+      "caused": 7,
+      "logMinRabbits": 0,
+      "logMinFoxes": -0.09,
+      "logRabbits30d": 0.07,
+      "logFoxes30d": -0.11
+     },
+     "fox boom (+50%/10 d, 6+ foxes)": {
+      "branches": 70,
+      "untouchedLost": 8,
+      "prevented": 2,
+      "caused": 2,
+      "logMinRabbits": 0,
+      "logMinFoxes": 0,
+      "logRabbits30d": -0.01,
+      "logFoxes30d": -0.07
+     },
+     "rabbits <= 30": {
+      "branches": 32,
+      "untouchedLost": 17,
+      "prevented": 1,
+      "caused": 1,
+      "logMinRabbits": 0,
+      "logMinFoxes": -0.02,
+      "logRabbits30d": 0.05,
+      "logFoxes30d": -0.22
+     },
+     "rabbits <= 60": {
+      "branches": 68,
+      "untouchedLost": 26,
+      "prevented": 4,
+      "caused": 4,
+      "logMinRabbits": 0,
+      "logMinFoxes": -0.18,
+      "logRabbits30d": 0.05,
+      "logFoxes30d": -0.13
+     },
+     "rabbits >= 300, bushes < 20% full": {
+      "branches": 29,
+      "untouchedLost": 2,
+      "prevented": 1,
+      "caused": 1,
+      "logMinRabbits": 0.07,
+      "logMinFoxes": 0,
+      "logRabbits30d": -0.04,
+      "logFoxes30d": -0.03
+     },
+     "rabbits >= 250, foxes >= 20": {
+      "branches": 68,
+      "untouchedLost": 6,
+      "prevented": 3,
+      "caused": 1,
+      "logMinRabbits": 0.03,
+      "logMinFoxes": -0.01,
+      "logRabbits30d": 0.01,
+      "logFoxes30d": -0.09
+     },
+     "rabbits >= 250, foxes <= 10": {
+      "branches": 24,
+      "untouchedLost": 2,
+      "prevented": 0,
+      "caused": 0,
+      "logMinRabbits": -0.1,
+      "logMinFoxes": 0,
+      "logRabbits30d": -0.03,
+      "logFoxes30d": 0.05
+     },
+     "rabbit boom (+40%/10 d, bushes < 35%)": {
+      "branches": 35,
+      "untouchedLost": 6,
+      "prevented": 1,
+      "caused": 0,
+      "logMinRabbits": 0,
+      "logMinFoxes": 0,
+      "logRabbits30d": -0.03,
+      "logFoxes30d": -0.03
+     },
+     "bushes <= 16": {
+      "branches": 47,
+      "untouchedLost": 13,
+      "prevented": 2,
+      "caused": 5,
+      "logMinRabbits": 0,
+      "logMinFoxes": 0,
+      "logRabbits30d": -0.05,
+      "logFoxes30d": -0.04
+     },
+     "bushes <= 20": {
+      "branches": 94,
+      "untouchedLost": 21,
+      "prevented": 3,
+      "caused": 6,
+      "logMinRabbits": 0,
+      "logMinFoxes": -0.04,
+      "logRabbits30d": -0.02,
+      "logFoxes30d": -0.11
+     },
+     "bushes <= 20, < 20% full": {
+      "branches": 58,
+      "untouchedLost": 9,
+      "prevented": 1,
+      "caused": 3,
+      "logMinRabbits": -0.01,
+      "logMinFoxes": -0.1,
+      "logRabbits30d": -0.03,
+      "logFoxes30d": -0.04
+     },
+     "bushes >= 40": {
+      "branches": 100,
+      "untouchedLost": 13,
+      "prevented": 2,
+      "caused": 1,
+      "logMinRabbits": 0,
+      "logMinFoxes": -0.06,
+      "logRabbits30d": 0.07,
+      "logFoxes30d": -0.12
+     },
+     "bushes < 15% full, rabbits < 35% energy": {
+      "branches": 12,
+      "untouchedLost": 2,
+      "prevented": 1,
+      "caused": 1,
+      "logMinRabbits": 0.1,
+      "logMinFoxes": -0.08,
+      "logRabbits30d": 0.01,
+      "logFoxes30d": -0.15
+     },
+     "bushes >= 60% full": {
+      "branches": 73,
+      "untouchedLost": 21,
+      "prevented": 3,
+      "caused": 1,
+      "logMinRabbits": 0,
+      "logMinFoxes": -0.1,
+      "logRabbits30d": 0.07,
+      "logFoxes30d": -0.17
+     }
+    }
+   }
+  },
+  {
+   "label": "chance0.05",
+   "effects": {
+    "illness": {
+     "seedMax": 6,
+     "seedShare": 0.2,
+     "every": 6,
+     "radius": 0.045,
+     "chance": 0.05,
+     "drain": 0.65,
+     "slow": 1,
+     "hours": 240,
+     "immunity": 720
+    },
+    "plant": {
+     "count": 4,
+     "stockShare": 0.5
+    },
+    "releasePrey": 8,
+    "releasePred": 3,
+    "feedShare": 1,
+    "cullDivisor": 3
+   },
+   "seeds": {
+    "start": 8000,
+    "count": 40
+   },
+   "every": 480,
+   "runtime": {
+    "node": "v22.22.2",
+    "wallSeconds": 379.517
+   },
+   "branches": 948,
+   "summary": {
+    "illnessPrey": {
+     "probe: timely": {
+      "branches": 29,
+      "untouchedLost": 2,
+      "prevented": 1,
+      "caused": 2,
+      "logMinRabbits": -0.14,
+      "logMinFoxes": 0,
+      "logRabbits30d": -0.07,
+      "logFoxes30d": -0.11
+     },
+     "probe: mistimed": {
+      "branches": 68,
+      "untouchedLost": 26,
+      "prevented": 6,
+      "caused": 2,
+      "logMinRabbits": 0,
+      "logMinFoxes": 0,
+      "logRabbits30d": -0.24,
+      "logFoxes30d": 0
+     },
+     "any": {
+      "branches": 473,
+      "untouchedLost": 72,
+      "prevented": 18,
+      "caused": 13,
+      "logMinRabbits": -0.06,
+      "logMinFoxes": 0,
+      "logRabbits30d": -0.15,
+      "logFoxes30d": -0.11
+     },
+     "foxes <= 5": {
+      "branches": 24,
+      "untouchedLost": 11,
+      "prevented": 2,
+      "caused": 1,
+      "logMinRabbits": -0.04,
+      "logMinFoxes": 0,
+      "logRabbits30d": -0.08,
+      "logFoxes30d": 0.07
+     },
+     "foxes <= 6": {
+      "branches": 27,
+      "untouchedLost": 12,
+      "prevented": 2,
+      "caused": 1,
+      "logMinRabbits": -0.06,
+      "logMinFoxes": 0,
+      "logRabbits30d": -0.14,
+      "logFoxes30d": 0.07
+     },
+     "foxes <= 8": {
+      "branches": 37,
+      "untouchedLost": 14,
+      "prevented": 2,
+      "caused": 1,
+      "logMinRabbits": -0.06,
+      "logMinFoxes": 0,
+      "logRabbits30d": -0.19,
+      "logFoxes30d": 0
+     },
+     "foxes <= 6, energy < 40%": {
+      "branches": 7,
+      "untouchedLost": 5,
+      "prevented": 0,
+      "caused": 0,
+      "logMinRabbits": 0,
+      "logMinFoxes": 0,
+      "logRabbits30d": -0.08,
+      "logFoxes30d": 0.18
+     },
+     "foxes <= 8, bushes < 30% full": {
+      "branches": 26,
+      "untouchedLost": 11,
+      "prevented": 1,
+      "caused": 1,
+      "logMinRabbits": -0.09,
+      "logMinFoxes": 0,
+      "logRabbits30d": -0.07,
+      "logFoxes30d": 0.07
+     },
+     "overhunt (10+ foxes, < 5 rabbits/fox, rabbits -15%/10 d)": {
+      "branches": 131,
+      "untouchedLost": 31,
+      "prevented": 6,
+      "caused": 4,
+      "logMinRabbits": 0,
+      "logMinFoxes": -0.03,
+      "logRabbits30d": -0.09,
+      "logFoxes30d": -0.14
+     },
+     "fox-heavy (20+ foxes, < 8 rabbits/fox)": {
+      "branches": 287,
+      "untouchedLost": 47,
+      "prevented": 13,
+      "caused": 9,
+      "logMinRabbits": -0.03,
+      "logMinFoxes": -0.01,
+      "logRabbits30d": -0.14,
+      "logFoxes30d": -0.12
+     },
+     "fox boom (+50%/10 d, 6+ foxes)": {
+      "branches": 70,
+      "untouchedLost": 8,
+      "prevented": 1,
+      "caused": 1,
+      "logMinRabbits": -0.01,
+      "logMinFoxes": 0,
+      "logRabbits30d": -0.19,
+      "logFoxes30d": -0.09
+     },
+     "rabbits <= 30": {
+      "branches": 32,
+      "untouchedLost": 17,
+      "prevented": 4,
+      "caused": 1,
+      "logMinRabbits": 0,
+      "logMinFoxes": 0,
+      "logRabbits30d": -0.05,
+      "logFoxes30d": 0.06
+     },
+     "rabbits <= 60": {
+      "branches": 68,
+      "untouchedLost": 26,
+      "prevented": 6,
+      "caused": 2,
+      "logMinRabbits": 0,
+      "logMinFoxes": 0,
+      "logRabbits30d": -0.24,
+      "logFoxes30d": 0
+     },
+     "rabbits >= 300, bushes < 20% full": {
+      "branches": 29,
+      "untouchedLost": 2,
+      "prevented": 1,
+      "caused": 2,
+      "logMinRabbits": -0.14,
+      "logMinFoxes": 0,
+      "logRabbits30d": -0.07,
+      "logFoxes30d": -0.11
+     },
+     "rabbits >= 250, foxes >= 20": {
+      "branches": 68,
+      "untouchedLost": 6,
+      "prevented": 2,
+      "caused": 3,
+      "logMinRabbits": -0.27,
+      "logMinFoxes": 0,
+      "logRabbits30d": -0.18,
+      "logFoxes30d": -0.1
+     },
+     "rabbits >= 250, foxes <= 10": {
+      "branches": 24,
+      "untouchedLost": 2,
+      "prevented": 0,
+      "caused": 0,
+      "logMinRabbits": -0.09,
+      "logMinFoxes": 0,
+      "logRabbits30d": -0.26,
+      "logFoxes30d": 0
+     },
+     "rabbit boom (+40%/10 d, bushes < 35%)": {
+      "branches": 35,
+      "untouchedLost": 6,
+      "prevented": 1,
+      "caused": 0,
+      "logMinRabbits": -0.14,
+      "logMinFoxes": 0,
+      "logRabbits30d": -0.13,
+      "logFoxes30d": -0.09
+     },
+     "bushes <= 16": {
+      "branches": 47,
+      "untouchedLost": 13,
+      "prevented": 2,
+      "caused": 2,
+      "logMinRabbits": -0.06,
+      "logMinFoxes": 0,
+      "logRabbits30d": -0.11,
+      "logFoxes30d": 0
+     },
+     "bushes <= 20": {
+      "branches": 94,
+      "untouchedLost": 21,
+      "prevented": 4,
+      "caused": 3,
+      "logMinRabbits": -0.04,
+      "logMinFoxes": 0,
+      "logRabbits30d": -0.08,
+      "logFoxes30d": -0.11
+     },
+     "bushes <= 20, < 20% full": {
+      "branches": 58,
+      "untouchedLost": 9,
+      "prevented": 2,
+      "caused": 1,
+      "logMinRabbits": -0.04,
+      "logMinFoxes": 0,
+      "logRabbits30d": -0.04,
+      "logFoxes30d": -0.09
+     },
+     "bushes >= 40": {
+      "branches": 100,
+      "untouchedLost": 13,
+      "prevented": 4,
+      "caused": 1,
+      "logMinRabbits": -0.15,
+      "logMinFoxes": 0,
+      "logRabbits30d": -0.29,
+      "logFoxes30d": -0.15
+     },
+     "bushes < 15% full, rabbits < 35% energy": {
+      "branches": 12,
+      "untouchedLost": 2,
+      "prevented": 1,
+      "caused": 0,
+      "logMinRabbits": -0.08,
+      "logMinFoxes": 0,
+      "logRabbits30d": 0.04,
+      "logFoxes30d": -0.1
+     },
+     "bushes >= 60% full": {
+      "branches": 73,
+      "untouchedLost": 21,
+      "prevented": 7,
+      "caused": 2,
+      "logMinRabbits": 0,
+      "logMinFoxes": 0,
+      "logRabbits30d": -0.26,
+      "logFoxes30d": -0.22
+     }
+    },
+    "illnessPred": {
+     "probe: timely": {
+      "branches": 288,
+      "untouchedLost": 47,
+      "prevented": 14,
+      "caused": 8,
+      "logMinRabbits": 0.01,
+      "logMinFoxes": -0.18,
+      "logRabbits30d": 0.13,
+      "logFoxes30d": -0.26
+     },
+     "probe: mistimed": {
+      "branches": 37,
+      "untouchedLost": 14,
+      "prevented": 1,
+      "caused": 5,
+      "logMinRabbits": 0,
+      "logMinFoxes": 0,
+      "logRabbits30d": -0.04,
+      "logFoxes30d": -0.08
+     },
+     "any": {
+      "branches": 474,
+      "untouchedLost": 72,
+      "prevented": 16,
+      "caused": 20,
+      "logMinRabbits": 0,
+      "logMinFoxes": -0.08,
+      "logRabbits30d": 0.09,
+      "logFoxes30d": -0.21
+     },
+     "foxes <= 5": {
+      "branches": 24,
+      "untouchedLost": 11,
+      "prevented": 1,
+      "caused": 4,
+      "logMinRabbits": 0,
+      "logMinFoxes": 0,
+      "logRabbits30d": -0.02,
+      "logFoxes30d": -0.08
+     },
+     "foxes <= 6": {
+      "branches": 27,
+      "untouchedLost": 12,
+      "prevented": 1,
+      "caused": 4,
+      "logMinRabbits": 0,
+      "logMinFoxes": 0,
+      "logRabbits30d": -0.02,
+      "logFoxes30d": -0.08
+     },
+     "foxes <= 8": {
+      "branches": 37,
+      "untouchedLost": 14,
+      "prevented": 1,
+      "caused": 5,
+      "logMinRabbits": 0,
+      "logMinFoxes": 0,
+      "logRabbits30d": -0.04,
+      "logFoxes30d": -0.08
+     },
+     "foxes <= 6, energy < 40%": {
+      "branches": 7,
+      "untouchedLost": 5,
+      "prevented": 0,
+      "caused": 1,
+      "logMinRabbits": 0,
+      "logMinFoxes": 0,
+      "logRabbits30d": 0.2,
+      "logFoxes30d": 0
+     },
+     "foxes <= 8, bushes < 30% full": {
+      "branches": 26,
+      "untouchedLost": 11,
+      "prevented": 0,
+      "caused": 4,
+      "logMinRabbits": 0.03,
+      "logMinFoxes": 0,
+      "logRabbits30d": -0.03,
+      "logFoxes30d": -0.13
+     },
+     "overhunt (10+ foxes, < 5 rabbits/fox, rabbits -15%/10 d)": {
+      "branches": 132,
+      "untouchedLost": 31,
+      "prevented": 7,
+      "caused": 3,
+      "logMinRabbits": 0,
+      "logMinFoxes": -0.19,
+      "logRabbits30d": 0.13,
+      "logFoxes30d": -0.25
+     },
+     "fox-heavy (20+ foxes, < 8 rabbits/fox)": {
+      "branches": 288,
+      "untouchedLost": 47,
+      "prevented": 14,
+      "caused": 8,
+      "logMinRabbits": 0.01,
+      "logMinFoxes": -0.18,
+      "logRabbits30d": 0.13,
+      "logFoxes30d": -0.26
+     },
+     "fox boom (+50%/10 d, 6+ foxes)": {
+      "branches": 70,
+      "untouchedLost": 8,
+      "prevented": 2,
+      "caused": 1,
+      "logMinRabbits": 0.02,
+      "logMinFoxes": 0,
+      "logRabbits30d": 0.1,
+      "logFoxes30d": -0.18
+     },
+     "rabbits <= 30": {
+      "branches": 33,
+      "untouchedLost": 17,
+      "prevented": 2,
+      "caused": 3,
+      "logMinRabbits": 0,
+      "logMinFoxes": 0,
+      "logRabbits30d": 0.09,
+      "logFoxes30d": 0.04
+     },
+     "rabbits <= 60": {
+      "branches": 69,
+      "untouchedLost": 26,
+      "prevented": 4,
+      "caused": 4,
+      "logMinRabbits": 0,
+      "logMinFoxes": -0.31,
+      "logRabbits30d": 0.07,
+      "logFoxes30d": -0.29
+     },
+     "rabbits >= 300, bushes < 20% full": {
+      "branches": 29,
+      "untouchedLost": 2,
+      "prevented": 0,
+      "caused": 4,
+      "logMinRabbits": 0.03,
+      "logMinFoxes": 0,
+      "logRabbits30d": 0.18,
+      "logFoxes30d": -0.14
+     },
+     "rabbits >= 250, foxes >= 20": {
+      "branches": 68,
+      "untouchedLost": 6,
+      "prevented": 1,
+      "caused": 2,
+      "logMinRabbits": 0.01,
+      "logMinFoxes": -0.05,
+      "logRabbits30d": 0.18,
+      "logFoxes30d": -0.29
+     },
+     "rabbits >= 250, foxes <= 10": {
+      "branches": 24,
+      "untouchedLost": 2,
+      "prevented": 0,
+      "caused": 1,
+      "logMinRabbits": -0.01,
+      "logMinFoxes": 0,
+      "logRabbits30d": 0.03,
+      "logFoxes30d": 0.11
+     },
+     "rabbit boom (+40%/10 d, bushes < 35%)": {
+      "branches": 35,
+      "untouchedLost": 6,
+      "prevented": 0,
+      "caused": 2,
+      "logMinRabbits": 0.01,
+      "logMinFoxes": 0,
+      "logRabbits30d": 0.02,
+      "logFoxes30d": -0.16
+     },
+     "bushes <= 16": {
+      "branches": 47,
+      "untouchedLost": 13,
+      "prevented": 2,
+      "caused": 4,
+      "logMinRabbits": 0,
+      "logMinFoxes": -0.17,
+      "logRabbits30d": 0.07,
+      "logFoxes30d": -0.32
+     },
+     "bushes <= 20": {
+      "branches": 94,
+      "untouchedLost": 21,
+      "prevented": 5,
+      "caused": 6,
+      "logMinRabbits": 0,
+      "logMinFoxes": -0.18,
+      "logRabbits30d": 0.09,
+      "logFoxes30d": -0.31
+     },
+     "bushes <= 20, < 20% full": {
+      "branches": 58,
+      "untouchedLost": 9,
+      "prevented": 2,
+      "caused": 5,
+      "logMinRabbits": 0,
+      "logMinFoxes": -0.23,
+      "logRabbits30d": 0.09,
+      "logFoxes30d": -0.32
+     },
+     "bushes >= 40": {
+      "branches": 100,
+      "untouchedLost": 13,
+      "prevented": 3,
+      "caused": 4,
+      "logMinRabbits": 0,
+      "logMinFoxes": -0.14,
+      "logRabbits30d": 0.17,
+      "logFoxes30d": -0.3
+     },
+     "bushes < 15% full, rabbits < 35% energy": {
+      "branches": 12,
+      "untouchedLost": 2,
+      "prevented": 1,
+      "caused": 1,
+      "logMinRabbits": 0.13,
+      "logMinFoxes": -0.39,
+      "logRabbits30d": 0.21,
+      "logFoxes30d": -0.41
+     },
+     "bushes >= 60% full": {
+      "branches": 73,
+      "untouchedLost": 21,
+      "prevented": 3,
+      "caused": 4,
+      "logMinRabbits": 0,
+      "logMinFoxes": -0.18,
+      "logRabbits30d": 0.06,
+      "logFoxes30d": -0.23
+     }
+    }
+   }
+  },
+  {
+   "label": "slow0.6",
+   "effects": {
+    "illness": {
+     "seedMax": 6,
+     "seedShare": 0.2,
+     "every": 6,
+     "radius": 0.045,
+     "chance": 0.15,
+     "drain": 0.65,
+     "slow": 0.6,
+     "hours": 240,
+     "immunity": 720
+    },
+    "plant": {
+     "count": 4,
+     "stockShare": 0.5
+    },
+    "releasePrey": 8,
+    "releasePred": 3,
+    "feedShare": 1,
+    "cullDivisor": 3
+   },
+   "seeds": {
+    "start": 8000,
+    "count": 40
+   },
+   "every": 480,
+   "runtime": {
+    "node": "v22.22.2",
+    "wallSeconds": 376.636
+   },
+   "branches": 948,
+   "summary": {
+    "illnessPrey": {
+     "probe: timely": {
+      "branches": 29,
+      "untouchedLost": 2,
+      "prevented": 1,
+      "caused": 1,
+      "logMinRabbits": -0.21,
+      "logMinFoxes": 0,
+      "logRabbits30d": -0.3,
+      "logFoxes30d": -0.15
+     },
+     "probe: mistimed": {
+      "branches": 68,
+      "untouchedLost": 26,
+      "prevented": 5,
+      "caused": 7,
+      "logMinRabbits": 0,
+      "logMinFoxes": -0.06,
+      "logRabbits30d": -0.35,
+      "logFoxes30d": -0.26
+     },
+     "any": {
+      "branches": 473,
+      "untouchedLost": 72,
+      "prevented": 17,
+      "caused": 26,
+      "logMinRabbits": -0.13,
+      "logMinFoxes": 0,
+      "logRabbits30d": -0.2,
+      "logFoxes30d": -0.21
+     },
+     "foxes <= 5": {
+      "branches": 24,
+      "untouchedLost": 11,
+      "prevented": 1,
+      "caused": 1,
+      "logMinRabbits": -0.14,
+      "logMinFoxes": 0,
+      "logRabbits30d": -0.19,
+      "logFoxes30d": -0.18
+     },
+     "foxes <= 6": {
+      "branches": 27,
+      "untouchedLost": 12,
+      "prevented": 1,
+      "caused": 2,
+      "logMinRabbits": -0.15,
+      "logMinFoxes": 0,
+      "logRabbits30d": -0.2,
+      "logFoxes30d": -0.18
+     },
+     "foxes <= 8": {
+      "branches": 37,
+      "untouchedLost": 14,
+      "prevented": 1,
+      "caused": 3,
+      "logMinRabbits": -0.15,
+      "logMinFoxes": 0,
+      "logRabbits30d": -0.23,
+      "logFoxes30d": -0.16
+     },
+     "foxes <= 6, energy < 40%": {
+      "branches": 7,
+      "untouchedLost": 5,
+      "prevented": 1,
+      "caused": 1,
+      "logMinRabbits": -0.06,
+      "logMinFoxes": 0,
+      "logRabbits30d": -0.23,
+      "logFoxes30d": -0.22
+     },
+     "foxes <= 8, bushes < 30% full": {
+      "branches": 26,
+      "untouchedLost": 11,
+      "prevented": 0,
+      "caused": 2,
+      "logMinRabbits": -0.18,
+      "logMinFoxes": 0,
+      "logRabbits30d": -0.23,
+      "logFoxes30d": -0.18
+     },
+     "overhunt (10+ foxes, < 5 rabbits/fox, rabbits -15%/10 d)": {
+      "branches": 131,
+      "untouchedLost": 31,
+      "prevented": 7,
+      "caused": 8,
+      "logMinRabbits": -0.05,
+      "logMinFoxes": -0.1,
+      "logRabbits30d": -0.12,
+      "logFoxes30d": -0.26
+     },
+     "fox-heavy (20+ foxes, < 8 rabbits/fox)": {
+      "branches": 287,
+      "untouchedLost": 47,
+      "prevented": 14,
+      "caused": 17,
+      "logMinRabbits": -0.11,
+      "logMinFoxes": -0.08,
+      "logRabbits30d": -0.18,
+      "logFoxes30d": -0.24
+     },
+     "fox boom (+50%/10 d, 6+ foxes)": {
+      "branches": 70,
+      "untouchedLost": 8,
+      "prevented": 2,
+      "caused": 0,
+      "logMinRabbits": -0.01,
+      "logMinFoxes": 0,
+      "logRabbits30d": -0.21,
+      "logFoxes30d": -0.15
+     },
+     "rabbits <= 30": {
+      "branches": 32,
+      "untouchedLost": 17,
+      "prevented": 2,
+      "caused": 1,
+      "logMinRabbits": 0,
+      "logMinFoxes": 0,
+      "logRabbits30d": -0.36,
+      "logFoxes30d": -0.22
+     },
+     "rabbits <= 60": {
+      "branches": 68,
+      "untouchedLost": 26,
+      "prevented": 5,
+      "caused": 7,
+      "logMinRabbits": 0,
+      "logMinFoxes": -0.06,
+      "logRabbits30d": -0.35,
+      "logFoxes30d": -0.26
+     },
+     "rabbits >= 300, bushes < 20% full": {
+      "branches": 29,
+      "untouchedLost": 2,
+      "prevented": 1,
+      "caused": 1,
+      "logMinRabbits": -0.21,
+      "logMinFoxes": 0,
+      "logRabbits30d": -0.3,
+      "logFoxes30d": -0.15
+     },
+     "rabbits >= 250, foxes >= 20": {
+      "branches": 68,
+      "untouchedLost": 6,
+      "prevented": 3,
+      "caused": 3,
+      "logMinRabbits": -0.28,
+      "logMinFoxes": -0.04,
+      "logRabbits30d": -0.23,
+      "logFoxes30d": -0.2
+     },
+     "rabbits >= 250, foxes <= 10": {
+      "branches": 24,
+      "untouchedLost": 2,
+      "prevented": 0,
+      "caused": 1,
+      "logMinRabbits": -0.13,
+      "logMinFoxes": 0,
+      "logRabbits30d": -0.21,
+      "logFoxes30d": -0.14
+     },
+     "rabbit boom (+40%/10 d, bushes < 35%)": {
+      "branches": 35,
+      "untouchedLost": 6,
+      "prevented": 1,
+      "caused": 1,
+      "logMinRabbits": -0.12,
+      "logMinFoxes": 0,
+      "logRabbits30d": -0.16,
+      "logFoxes30d": -0.14
+     },
+     "bushes <= 16": {
+      "branches": 47,
+      "untouchedLost": 13,
+      "prevented": 3,
+      "caused": 3,
+      "logMinRabbits": -0.21,
+      "logMinFoxes": 0,
+      "logRabbits30d": -0.18,
+      "logFoxes30d": -0.18
+     },
+     "bushes <= 20": {
+      "branches": 94,
+      "untouchedLost": 21,
+      "prevented": 5,
+      "caused": 9,
+      "logMinRabbits": -0.16,
+      "logMinFoxes": 0,
+      "logRabbits30d": -0.02,
+      "logFoxes30d": -0.18
+     },
+     "bushes <= 20, < 20% full": {
+      "branches": 58,
+      "untouchedLost": 9,
+      "prevented": 1,
+      "caused": 6,
+      "logMinRabbits": -0.15,
+      "logMinFoxes": -0.04,
+      "logRabbits30d": 0,
+      "logFoxes30d": -0.14
+     },
+     "bushes >= 40": {
+      "branches": 100,
+      "untouchedLost": 13,
+      "prevented": 1,
+      "caused": 7,
+      "logMinRabbits": -0.14,
+      "logMinFoxes": -0.02,
+      "logRabbits30d": -0.25,
+      "logFoxes30d": -0.3
+     },
+     "bushes < 15% full, rabbits < 35% energy": {
+      "branches": 12,
+      "untouchedLost": 2,
+      "prevented": 1,
+      "caused": 0,
+      "logMinRabbits": -0.25,
+      "logMinFoxes": -0.08,
+      "logRabbits30d": -0.11,
+      "logFoxes30d": -0.22
+     },
+     "bushes >= 60% full": {
+      "branches": 73,
+      "untouchedLost": 21,
+      "prevented": 3,
+      "caused": 8,
+      "logMinRabbits": 0,
+      "logMinFoxes": -0.04,
+      "logRabbits30d": -0.35,
+      "logFoxes30d": -0.37
+     }
+    },
+    "illnessPred": {
+     "probe: timely": {
+      "branches": 288,
+      "untouchedLost": 47,
+      "prevented": 16,
+      "caused": 4,
+      "logMinRabbits": 0.04,
+      "logMinFoxes": -0.21,
+      "logRabbits30d": 0.18,
+      "logFoxes30d": -0.3
+     },
+     "probe: mistimed": {
+      "branches": 36,
+      "untouchedLost": 14,
+      "prevented": 1,
+      "caused": 4,
+      "logMinRabbits": 0,
+      "logMinFoxes": 0,
+      "logRabbits30d": -0.07,
+      "logFoxes30d": 0
+     },
+     "any": {
+      "branches": 473,
+      "untouchedLost": 72,
+      "prevented": 20,
+      "caused": 14,
+      "logMinRabbits": 0.02,
+      "logMinFoxes": -0.09,
+      "logRabbits30d": 0.1,
+      "logFoxes30d": -0.24
+     },
+     "foxes <= 5": {
+      "branches": 24,
+      "untouchedLost": 11,
+      "prevented": 1,
+      "caused": 4,
+      "logMinRabbits": 0,
+      "logMinFoxes": 0,
+      "logRabbits30d": 0.04,
+      "logFoxes30d": 0
+     },
+     "foxes <= 6": {
+      "branches": 27,
+      "untouchedLost": 12,
+      "prevented": 1,
+      "caused": 4,
+      "logMinRabbits": 0,
+      "logMinFoxes": 0,
+      "logRabbits30d": -0.07,
+      "logFoxes30d": 0
+     },
+     "foxes <= 8": {
+      "branches": 36,
+      "untouchedLost": 14,
+      "prevented": 1,
+      "caused": 4,
+      "logMinRabbits": 0,
+      "logMinFoxes": 0,
+      "logRabbits30d": -0.07,
+      "logFoxes30d": 0
+     },
+     "foxes <= 6, energy < 40%": {
+      "branches": 7,
+      "untouchedLost": 5,
+      "prevented": 0,
+      "caused": 1,
+      "logMinRabbits": 0,
+      "logMinFoxes": 0,
+      "logRabbits30d": -0.08,
+      "logFoxes30d": 0
+     },
+     "foxes <= 8, bushes < 30% full": {
+      "branches": 26,
+      "untouchedLost": 11,
+      "prevented": 0,
+      "caused": 4,
+      "logMinRabbits": 0,
+      "logMinFoxes": 0,
+      "logRabbits30d": -0.07,
+      "logFoxes30d": 0
+     },
+     "overhunt (10+ foxes, < 5 rabbits/fox, rabbits -15%/10 d)": {
+      "branches": 132,
+      "untouchedLost": 31,
+      "prevented": 9,
+      "caused": 3,
+      "logMinRabbits": 0.01,
+      "logMinFoxes": -0.26,
+      "logRabbits30d": 0.31,
+      "logFoxes30d": -0.31
+     },
+     "fox-heavy (20+ foxes, < 8 rabbits/fox)": {
+      "branches": 288,
+      "untouchedLost": 47,
+      "prevented": 16,
+      "caused": 4,
+      "logMinRabbits": 0.04,
+      "logMinFoxes": -0.21,
+      "logRabbits30d": 0.18,
+      "logFoxes30d": -0.3
+     },
+     "fox boom (+50%/10 d, 6+ foxes)": {
+      "branches": 70,
+      "untouchedLost": 8,
+      "prevented": 2,
+      "caused": 2,
+      "logMinRabbits": 0.21,
+      "logMinFoxes": 0,
+      "logRabbits30d": 0.03,
+      "logFoxes30d": -0.17
+     },
+     "rabbits <= 30": {
+      "branches": 32,
+      "untouchedLost": 17,
+      "prevented": 3,
+      "caused": 0,
+      "logMinRabbits": 0,
+      "logMinFoxes": 0,
+      "logRabbits30d": 0.29,
+      "logFoxes30d": 0.07
+     },
+     "rabbits <= 60": {
+      "branches": 68,
+      "untouchedLost": 26,
+      "prevented": 6,
+      "caused": 0,
+      "logMinRabbits": 0,
+      "logMinFoxes": -0.2,
+      "logRabbits30d": 0.29,
+      "logFoxes30d": -0.23
+     },
+     "rabbits >= 300, bushes < 20% full": {
+      "branches": 29,
+      "untouchedLost": 2,
+      "prevented": 2,
+      "caused": 1,
+      "logMinRabbits": 0.31,
+      "logMinFoxes": 0,
+      "logRabbits30d": 0.13,
+      "logFoxes30d": -0.21
+     },
+     "rabbits >= 250, foxes >= 20": {
+      "branches": 68,
+      "untouchedLost": 6,
+      "prevented": 4,
+      "caused": 1,
+      "logMinRabbits": 0.17,
+      "logMinFoxes": -0.04,
+      "logRabbits30d": 0.26,
+      "logFoxes30d": -0.27
+     },
+     "rabbits >= 250, foxes <= 10": {
+      "branches": 24,
+      "untouchedLost": 2,
+      "prevented": 0,
+      "caused": 0,
+      "logMinRabbits": -0.03,
+      "logMinFoxes": 0,
+      "logRabbits30d": -0.02,
+      "logFoxes30d": 0
+     },
+     "rabbit boom (+40%/10 d, bushes < 35%)": {
+      "branches": 35,
+      "untouchedLost": 6,
+      "prevented": 2,
+      "caused": 0,
+      "logMinRabbits": 0.1,
+      "logMinFoxes": 0,
+      "logRabbits30d": 0.05,
+      "logFoxes30d": -0.21
+     },
+     "bushes <= 16": {
+      "branches": 47,
+      "untouchedLost": 13,
+      "prevented": 2,
+      "caused": 6,
+      "logMinRabbits": 0,
+      "logMinFoxes": -0.25,
+      "logRabbits30d": 0.08,
+      "logFoxes30d": -0.22
+     },
+     "bushes <= 20": {
+      "branches": 94,
+      "untouchedLost": 21,
+      "prevented": 4,
+      "caused": 8,
+      "logMinRabbits": 0,
+      "logMinFoxes": -0.22,
+      "logRabbits30d": 0.09,
+      "logFoxes30d": -0.28
+     },
+     "bushes <= 20, < 20% full": {
+      "branches": 58,
+      "untouchedLost": 9,
+      "prevented": 1,
+      "caused": 5,
+      "logMinRabbits": 0,
+      "logMinFoxes": -0.29,
+      "logRabbits30d": 0.11,
+      "logFoxes30d": -0.28
+     },
+     "bushes >= 40": {
+      "branches": 99,
+      "untouchedLost": 13,
+      "prevented": 3,
+      "caused": 0,
+      "logMinRabbits": 0.04,
+      "logMinFoxes": -0.17,
+      "logRabbits30d": 0.29,
+      "logFoxes30d": -0.3
+     },
+     "bushes < 15% full, rabbits < 35% energy": {
+      "branches": 12,
+      "untouchedLost": 2,
+      "prevented": 1,
+      "caused": 1,
+      "logMinRabbits": 0.07,
+      "logMinFoxes": -0.22,
+      "logRabbits30d": 0.08,
+      "logFoxes30d": -0.27
+     },
+     "bushes >= 60% full": {
+      "branches": 72,
+      "untouchedLost": 21,
+      "prevented": 4,
+      "caused": 0,
+      "logMinRabbits": 0,
+      "logMinFoxes": -0.14,
+      "logRabbits30d": 0.11,
+      "logFoxes30d": -0.2
+     }
+    }
+   }
+  }
+ ]
+}
