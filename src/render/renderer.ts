@@ -69,6 +69,12 @@ export class WorldRenderer {
     this.ctx = context2d(canvas)
   }
 
+  /** Frees the detached canvas's backing store; `setCanvas` sizes it again on return. */
+  releaseCanvas(): void {
+    this.canvas.width = 0
+    this.canvas.height = 0
+  }
+
   /** Draw into another canvas element, keeping the painted terrain and sprites. */
   setCanvas(canvas: HTMLCanvasElement): void {
     this.canvas = canvas

@@ -123,7 +123,10 @@ export class GameController {
   /** Detaching keeps the renderer, so returning to the meadow reuses its painted terrain and sprites (~30 ms to rebuild). */
   attachCanvas(canvas: HTMLCanvasElement | null): void {
     this.rendererAttached = canvas !== null
-    if (!canvas) return
+    if (!canvas) {
+      this.renderer?.releaseCanvas()
+      return
+    }
     if (this.renderer) this.renderer.setCanvas(canvas)
     else this.renderer = new WorldRenderer(canvas)
     if (this.params) this.renderer.setWorld(this.cover, this.params.eco.coverR, this.config?.seed ?? 0, this.params.patchStock)
