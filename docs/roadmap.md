@@ -34,6 +34,10 @@ Show what it eats and what eats it; extend death causes and inspection consisten
 Gate: it creates new, understandable player decisions and does not merely add more animals.
 Keep the existing two-species scenario as a comparison and introduction.
 
+Chosen: the field vole, alternative prey that eats tall-grass seed, raids berry bushes and
+feeds foxes, in a separate Vole meadow scenario. See the design record in
+[third-species.md](third-species.md).
+
 ## Then: evolving bodies and ecological varieties
 
 Add visible, inherited morphology with explicit energy trade-offs. Track persistent trait
