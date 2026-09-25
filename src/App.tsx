@@ -102,13 +102,14 @@ export default function App() {
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
+      if (e.defaultPrevented) return
       const t = e.target as HTMLElement
-      if (t.closest('input, textarea, [role="slider"], [role="combobox"], [role="listbox"]')) return
+      if (t.closest('input, textarea, select, [role="slider"], [role="combobox"], [role="listbox"], [role="radiogroup"], [role="radio"]')) return
       if (e.metaKey || e.ctrlKey || e.altKey) return
       const s = game.getSnapshot()
       switch (e.key) {
         case ' ':
-          if (t.closest('button')) return
+          if (t.closest('button, a')) return
           e.preventDefault()
           if (s.phase === 'planning' && left < 0) return
           game.toggle()
