@@ -73,10 +73,11 @@ export const CATEGORY: Record<JournalKind, JournalCategory> = {
 }
 
 /**
- * A trait shift is recorded when a species' mean moves at least `threshold` from its baseline and stays there for
- * `samples` consecutive daily samples, each with at least `minCount` animals. It is recorded once per trait and
- * direction, and can be recorded again only after the mean comes back within `release` of the baseline.
- * Samples with fewer animals neither extend a run nor count as a return (small groups make noisy means).
+ * A trait shift is recorded when a species' mean is at least `threshold` from its baseline (the first daily sample
+ * with `minCount` animals) in each of `samples` consecutive daily samples, each with at least `minCount` animals.
+ * It is recorded once per trait and direction; it can be recorded again only after a daily sample with enough
+ * animals has its mean less than `release` from the baseline in that direction.
+ * A sample with fewer animals ends a run and is never read as a return (small groups make noisy means).
  */
 export const TRAIT_SHIFT = { threshold: 0.25, release: 0.125, samples: 20, minCount: 10 } as const
 export const JOURNAL_LIMIT = 80
