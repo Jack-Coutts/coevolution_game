@@ -39,7 +39,7 @@ export function ResultDialog({ snap, open, onOpenChange, onRetune, onReplay }: P
             {STARS.map((s, i) => (
               <Star
                 key={s.label}
-                className={cn('size-6', i < stars ? 'fill-amber-300 text-amber-300' : 'text-muted-foreground/40')}
+                className={cn('size-6', i < stars ? 'fill-gold text-gold' : 'text-muted-foreground/40')}
                 aria-label={i < stars ? `Reached ${s.label}` : `Not reached: ${s.label}`}
               />
             ))}
@@ -68,9 +68,9 @@ export function ResultDialog({ snap, open, onOpenChange, onRetune, onReplay }: P
 
         {snap.best && (
           <div className="flex items-center gap-2 text-sm">
-            <Trophy className="size-4 text-amber-300" />
+            <Trophy className="size-4 text-gold" />
             {snap.newBest ? (
-              <span className="font-medium text-amber-200">New best for this scenario and seed!</span>
+              <span className="font-medium text-tone-warn-foreground">New best for this scenario and seed!</span>
             ) : (
               <span className="text-muted-foreground">
                 Best for this scenario and seed:{' '}
@@ -81,11 +81,11 @@ export function ResultDialog({ snap, open, onOpenChange, onRetune, onReplay }: P
         )}
 
         {e.suggestions.length > 0 && (
-          <div className="rounded-lg border border-amber-300/25 bg-amber-300/8 p-3">
-            <div className="mb-1 flex items-center gap-1.5 text-xs font-semibold tracking-wide text-amber-200 uppercase">
+          <div className="rounded-lg border border-tone-warn-border bg-tone-warn p-3">
+            <div className="mb-1 flex items-center gap-1.5 text-xs font-semibold tracking-wide text-tone-warn-foreground uppercase">
               <Lightbulb className="size-3.5" /> {end.survived ? 'Next' : 'Try'}
             </div>
-            <ul className="list-disc pl-5 text-sm text-amber-50/90">
+            <ul className="list-disc pl-5 text-sm text-tone-warn-foreground">
               {e.suggestions.map((s) => (
                 <li key={s}>{s}</li>
               ))}

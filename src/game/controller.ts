@@ -83,6 +83,7 @@ export class GameController {
   private saving = false
   private worker: Worker
   private renderer: WorldRenderer | null = null
+  private rendererAttached = false
   private runId = 0
   private displayTick = 0
   private playing = false
@@ -119,9 +120,16 @@ export class GameController {
     this.worker.terminate()
   }
 
+  /** Detaching keeps the renderer, so returning to the meadow reuses its painted terrain and sprites (~30 ms to rebuild). */
   attachCanvas(canvas: HTMLCanvasElement | null): void {
-    this.renderer = canvas ? new WorldRenderer(canvas) : null
-    if (this.renderer && this.params) this.renderer.setWorld(this.cover, this.params.eco.coverR, this.config?.seed ?? 0, this.params.patchStock)
+    this.rendererAttached = canvas !== null
+    if (!canvas) {
+      this.renderer?.releaseCanvas()
+      return
+    }
+    if (this.renderer) this.renderer.setCanvas(canvas)
+    else this.renderer = new WorldRenderer(canvas)
+    if (this.params) this.renderer.setWorld(this.cover, this.params.eco.coverR, this.config?.seed ?? 0, this.params.patchStock)
   }
 
   resize(cssSize: number): void {
@@ -434,7 +442,7 @@ export class GameController {
       }
     }
     const t = Math.floor(this.displayTick)
-    if (this.renderer) {
+    if (this.renderer && this.rendererAttached) {
       if (this.playing && t > this.lastFxTick && t - this.lastFxTick < 40) {
         for (let k = this.lastFxTick + 1; k <= t; k++) {
           const f = h.frame(k)

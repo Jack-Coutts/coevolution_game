@@ -2,6 +2,7 @@ import { visibleSpans } from '@/sim/scenarios'
 import { useEffect, useRef, useState } from 'react'
 import { forecast } from '@/game/insights'
 import { useGame } from '@/hooks/use-game'
+import { onThemeChange } from '@/hooks/use-theme'
 import { dateLabel, monthStarts } from '@/sim/time'
 import { STAT } from '@/worker/protocol'
 
@@ -11,9 +12,13 @@ const PAD_R = 30
 const PAD_T = 14
 const PAD_B = 20
 
-const RABBIT = '#dcc7a3'
-const FOX = '#ec8a45'
-const BERRY = 'rgba(143, 191, 106, 0.22)'
+const TOKENS = ['rabbit', 'fox', 'berry', 'gold', 'primary', 'border', 'card', 'muted', 'muted-foreground', 'background', 'tone-info-foreground', 'tone-warn-foreground'] as const
+type Palette = Record<(typeof TOKENS)[number], string>
+
+function readPalette(): Palette {
+  const css = getComputedStyle(document.documentElement)
+  return Object.fromEntries(TOKENS.map((k) => [k, css.getPropertyValue(`--${k}`).trim()])) as Palette
+}
 
 export function Timeline() {
   const [game, snap] = useGame()
@@ -32,6 +37,8 @@ export function Timeline() {
 
   useEffect(() => {
     let raf = 0
+    let c = readPalette()
+    const stopWatching = onThemeChange(() => { c = readPalette() })
     const draw = () => {
       raf = requestAnimationFrame(draw)
       const el = canvas.current
@@ -66,32 +73,38 @@ export function Timeline() {
       const yPrey = (v: number) => PAD_T + ih - (v / preyMax) * ih
       const yPred = (v: number) => PAD_T + ih - (v / predMax) * ih
 
-      ctx.fillStyle = 'rgba(255,255,255,0.025)'
+      ctx.fillStyle = c.muted
+      ctx.globalAlpha = 0.5
       ctx.fillRect(PAD_L, PAD_T, iw, ih)
 
       for (const s of visibleSpans(game.scenario, start, horizon, h.endless)) {
         if (s.to < start || s.from > horizon) continue
-        ctx.fillStyle = s.tone === 'winter' ? 'rgba(186, 220, 255, 0.10)' : 'rgba(240, 190, 90, 0.10)'
+        ctx.fillStyle = s.tone === 'winter' ? c['tone-info-foreground'] : c['tone-warn-foreground']
+        ctx.globalAlpha = 0.12
         ctx.fillRect(xOf(Math.max(start, s.from)), PAD_T, xOf(Math.min(horizon, s.to)) - xOf(Math.max(start, s.from)), ih)
-        ctx.fillStyle = s.tone === 'winter' ? 'rgba(186, 220, 255, 0.7)' : 'rgba(240, 190, 90, 0.8)'
+        ctx.globalAlpha = 0.9
         ctx.font = '500 10px Geist Variable, sans-serif'
         ctx.fillText(s.label, xOf(Math.max(start, s.from)) + 4, PAD_T + 10)
       }
+      ctx.globalAlpha = 1
 
       ctx.font = '10px Geist Variable, sans-serif'
       ctx.textAlign = 'center'
       for (const m of monthStarts(horizon, start)) {
         const x = xOf(m.tick)
-        ctx.strokeStyle = 'rgba(255,255,255,0.06)'
+        ctx.strokeStyle = c.border
+        ctx.lineWidth = 1
         ctx.beginPath()
         ctx.moveTo(x, PAD_T)
         ctx.lineTo(x, PAD_T + ih)
         ctx.stroke()
       }
       const labels = [{ tick: start, label: dateLabel(start) }, ...monthStarts(horizon, start)]
+      const sparse = iw / labels.length < 32
       labels.forEach((m, i) => {
+        if (sparse && i % 2) return
         const next = labels[i + 1]?.tick ?? horizon
-        ctx.fillStyle = 'rgba(255,255,255,0.45)'
+        ctx.fillStyle = c['muted-foreground']
         ctx.fillText(m.label, xOf((m.tick + next) / 2), H - 6)
       })
       ctx.textAlign = 'left'
@@ -105,8 +118,10 @@ export function Timeline() {
         ctx.lineTo(xOf(head), PAD_T + ih - Math.min(1, h.stat(head, 'stock')) * ih)
         ctx.lineTo(xOf(head), PAD_T + ih)
         ctx.closePath()
-        ctx.fillStyle = BERRY
+        ctx.fillStyle = c.berry
+        ctx.globalAlpha = 0.22
         ctx.fill()
+        ctx.globalAlpha = 1
 
         const line = (key: keyof typeof STAT, y: (v: number) => number, color: string, width: number) => {
           ctx.beginPath()
@@ -121,84 +136,93 @@ export function Timeline() {
           ctx.lineJoin = 'round'
           ctx.stroke()
         }
-        line('prey', yPrey, RABBIT, 1.8)
-        line('pred', yPred, FOX, 1.8)
+        line('prey', yPrey, c.rabbit, 1.8)
+        line('pred', yPred, c.fox, 1.8)
 
         const f = !game.getSnapshot().end ? forecast(h, head) : null
         if (f && f.ahead > 0) {
           ctx.setLineDash([4, 4])
           ctx.lineWidth = 1.3
-          ctx.strokeStyle = 'rgba(220, 199, 163, 0.7)'
+          ctx.globalAlpha = 0.75
+          ctx.strokeStyle = c.rabbit
           ctx.beginPath()
           ctx.moveTo(xOf(head), yPrey(h.stat(head, 'prey')))
           ctx.lineTo(xOf(head + f.ahead), yPrey(Math.min(preyMax, f.prey)))
           ctx.stroke()
-          ctx.strokeStyle = 'rgba(236, 138, 69, 0.75)'
+          ctx.strokeStyle = c.fox
           ctx.beginPath()
           ctx.moveTo(xOf(head), yPred(h.stat(head, 'pred')))
           ctx.lineTo(xOf(head + f.ahead), yPred(Math.min(predMax, f.pred)))
           ctx.stroke()
           ctx.setLineDash([])
+          ctx.globalAlpha = 1
         }
       }
 
       if (head < horizon) {
-        ctx.fillStyle = 'rgba(0,0,0,0.18)'
+        ctx.fillStyle = c.background
+        ctx.globalAlpha = 0.5
         ctx.fillRect(xOf(head), PAD_T, xOf(horizon) - xOf(head), ih)
+        ctx.globalAlpha = 1
       }
 
       for (const m of game.scenario.markers) {
         if (m.tick < start) continue
         const x = xOf(m.tick)
-        ctx.strokeStyle = 'rgba(236, 138, 69, 0.8)'
+        ctx.strokeStyle = c.fox
         ctx.setLineDash([3, 3])
         ctx.beginPath()
         ctx.moveTo(x, PAD_T)
         ctx.lineTo(x, PAD_T + ih)
         ctx.stroke()
         ctx.setLineDash([])
-        ctx.fillStyle = 'rgba(236, 138, 69, 0.95)'
+        ctx.fillStyle = c.fox
         ctx.font = '500 10px Geist Variable, sans-serif'
         ctx.fillText(m.label, x + 4, PAD_T + 10)
       }
       for (const iv of h.interventions) {
         if (iv.tick < start) continue
         const x = xOf(iv.tick)
-        ctx.fillStyle = '#f5d67b'
         ctx.beginPath()
         ctx.moveTo(x, PAD_T + 1)
         ctx.lineTo(x + 4, PAD_T + 7)
         ctx.lineTo(x - 4, PAD_T + 7)
         ctx.closePath()
+        // A card-coloured halo keeps the marker at 3:1 over the berry fill as well as the plain plot.
+        ctx.strokeStyle = c.card
+        ctx.lineWidth = 2
+        ctx.lineJoin = 'round'
+        ctx.stroke()
+        ctx.fillStyle = c.gold
         ctx.fill()
       }
 
       // axes labels
       ctx.font = '10px Geist Variable, sans-serif'
-      ctx.fillStyle = RABBIT
+      ctx.fillStyle = c.rabbit
       ctx.textAlign = 'right'
       ctx.fillText(String(preyMax), PAD_L - 5, PAD_T + 8)
       ctx.fillText('0', PAD_L - 5, PAD_T + ih)
-      ctx.fillStyle = FOX
+      ctx.fillStyle = c.fox
       ctx.textAlign = 'left'
       ctx.fillText(String(predMax), W - PAD_R + 5, PAD_T + 8)
       ctx.fillText('0', W - PAD_R + 5, PAD_T + ih)
 
       const t = game.displayTickValue
       const x = xOf(t)
-      ctx.strokeStyle = '#f7e2a8'
+      ctx.strokeStyle = c.primary
       ctx.lineWidth = 1.5
       ctx.beginPath()
       ctx.moveTo(x, PAD_T - 4)
       ctx.lineTo(x, PAD_T + ih)
       ctx.stroke()
-      ctx.fillStyle = '#f7e2a8'
+      ctx.fillStyle = c.primary
       ctx.beginPath()
       ctx.arc(x, PAD_T - 4, 3.5, 0, Math.PI * 2)
       ctx.fill()
     }
     raf = requestAnimationFrame(draw)
-    return () => cancelAnimationFrame(raf)
+    return () => { cancelAnimationFrame(raf); stopWatching() }
   }, [game])
 
   const onDown = (e: React.PointerEvent) => {

@@ -26,26 +26,26 @@ import { cn } from '@/lib/utils'
 interface Props {
   levers: LeverValues
   base: LeverValues
-  locked: boolean
   onChange: (id: string, value: number) => void
   onResetLevers: () => void
-  onUnlock: () => void
 }
 
-export function LeverPanel({ levers, base, locked, onChange, onResetLevers, onUnlock }: Props) {
-  const used = spent(levers, base)
-  const left = Math.round((BUDGET - used) * 10) / 10
+/** Budget points still unspent, to one decimal. */
+function pointsLeft(levers: LeverValues, base: LeverValues): number {
+  return Math.round((BUDGET - spent(levers, base)) * 10) / 10
+}
+
+export function LeverPanel({ levers, base, onChange, onResetLevers }: Props) {
+  const left = pointsLeft(levers, base)
   const over = left < 0
-  const params = deriveParams(levers)
-  const defs = LEVERS
-  const changed = defs.filter((d) => Math.abs(levers[d.id] - base[d.id]) > 1e-9).length
+  const changed = LEVERS.filter((d) => Math.abs(levers[d.id] - base[d.id]) > 1e-9).length
 
   return (
     <div className="flex flex-col gap-3">
       <div
         className={cn(
-          'sticky top-0 z-10 rounded-lg border p-3 shadow-md backdrop-blur-md',
-          over ? 'border-destructive/60 bg-[oklch(0.24_0.05_25/0.92)]' : 'bg-[oklch(0.23_0.014_155/0.92)]',
+          'sticky top-0 z-10 rounded-lg border p-3 shadow-md backdrop-blur-md lg:-top-3',
+          over ? 'border-tone-danger-border bg-tone-danger/95' : 'bg-card/95',
         )}
       >
         <div className="flex items-baseline justify-between gap-2">
@@ -65,51 +65,72 @@ export function LeverPanel({ levers, base, locked, onChange, onResetLevers, onUn
           <span className="text-xs text-muted-foreground">
             {changed === 0 ? 'Starting balance' : `${changed} lever${changed === 1 ? '' : 's'} changed`}
           </span>
-          <Button variant="ghost" size="xs" onClick={onResetLevers} disabled={locked || changed === 0}>
+          <Button variant="ghost" size="xs" onClick={onResetLevers} disabled={changed === 0}>
             <RotateCcw /> Reset levers
           </Button>
         </div>
       </div>
 
-      {locked && (
-        <div className="flex items-center gap-2 rounded-lg border border-amber-300/30 bg-amber-300/10 p-2.5 text-xs text-amber-100">
-          <Lock className="size-4 shrink-0" />
-          <span className="flex-1">Levers are locked while the meadow is running.</span>
-          <Button size="xs" variant="outline" onClick={onUnlock}>
-            Reset to retune
-          </Button>
-        </div>
-      )}
-
-      <Accordion type="multiple" defaultValue={['populations', 'food']} className="rounded-lg border">
-        {GROUPS.map((g) => {
-          const gdefs = defs.filter((d) => d.group === g.id)
-          if (gdefs.length === 0) return null
-          return (
-            <AccordionItem key={g.id} value={g.id} className="px-3">
-              <AccordionTrigger className="py-3 hover:no-underline">
-                <div className="flex flex-1 items-center justify-between pr-2">
-                  <span className="text-sm font-medium">{g.label}</span>
-                  <GroupCost defs={gdefs} levers={levers} base={base} />
-                </div>
-              </AccordionTrigger>
-              <AccordionContent className="flex flex-col gap-1 pb-4">
-                <p className="mb-1 text-xs text-muted-foreground">{g.blurb}</p>
-                <GroupBody
-                  group={g.id}
-                  defs={gdefs}
-                  levers={levers}
-                  base={base}
-                  locked={locked}
-                  onChange={onChange}
-                  params={params}
-                />
-              </AccordionContent>
-            </AccordionItem>
-          )
-        })}
-      </Accordion>
+      <LeverGroups levers={levers} base={base} onChange={onChange} />
     </div>
+  )
+}
+
+/** The run's settings, read-only while the meadow is running. */
+export function LockedSetup({ levers, base, onUnlock }: { levers: LeverValues; base: LeverValues; onUnlock: () => void }) {
+  const left = pointsLeft(levers, base)
+  return (
+    <Accordion type="single" collapsible className="rounded-lg border">
+      <div className="flex items-center gap-2 px-3 pt-2.5 text-xs">
+        <Lock className="size-4 shrink-0 text-muted-foreground" />
+        <span className="flex-1">
+          Setup locked <span className="text-muted-foreground tabular">· {left} pts unspent</span>
+        </span>
+        <Button size="xs" variant="outline" onClick={onUnlock}>
+          Reset to retune
+        </Button>
+      </div>
+      <AccordionItem value="settings" className="border-b-0 px-3">
+        <AccordionTrigger className="py-2 text-xs text-muted-foreground hover:no-underline">View this run's settings</AccordionTrigger>
+        <AccordionContent>
+          <LeverGroups levers={levers} base={base} />
+        </AccordionContent>
+      </AccordionItem>
+    </Accordion>
+  )
+}
+
+/** Without `onChange` the sliders are read-only. */
+function LeverGroups({ levers, base, onChange }: { levers: LeverValues; base: LeverValues; onChange?: (id: string, v: number) => void }) {
+  const params = deriveParams(levers)
+  return (
+    <Accordion type="multiple" defaultValue={['populations', 'food']} className="rounded-lg border">
+      {GROUPS.map((g) => {
+        const gdefs = LEVERS.filter((d) => d.group === g.id)
+        if (gdefs.length === 0) return null
+        return (
+          <AccordionItem key={g.id} value={g.id} className="px-3">
+            <AccordionTrigger className="py-3 hover:no-underline">
+              <div className="flex flex-1 items-center justify-between pr-2">
+                <span className="text-sm font-medium">{g.label}</span>
+                <GroupCost defs={gdefs} levers={levers} base={base} />
+              </div>
+            </AccordionTrigger>
+            <AccordionContent className="flex flex-col gap-1 pb-4">
+              <p className="mb-1 text-xs text-muted-foreground">{g.blurb}</p>
+              <GroupBody
+                group={g.id}
+                defs={gdefs}
+                levers={levers}
+                base={base}
+                onChange={onChange}
+                params={params}
+              />
+            </AccordionContent>
+          </AccordionItem>
+        )
+      })}
+    </Accordion>
   )
 }
 
@@ -117,7 +138,7 @@ function GroupCost({ defs, levers, base }: { defs: LeverDef[]; levers: LeverValu
   const c = defs.reduce((t, d) => t + leverCost(d, levers[d.id], base[d.id]), 0)
   if (Math.abs(c) < 0.05) return null
   return (
-    <Badge variant={c > 0 ? 'secondary' : 'outline'} className={cn('tabular', c < 0 && 'text-emerald-300')}>
+    <Badge variant={c > 0 ? 'secondary' : 'outline'} className={cn('tabular', c < 0 && 'text-tone-good-foreground')}>
       {c > 0 ? `−${fmt(c)}` : `+${fmt(-c)}`} pts
     </Badge>
   )
@@ -132,7 +153,6 @@ function GroupBody({
   defs,
   levers,
   base,
-  locked,
   onChange,
   params,
 }: {
@@ -140,8 +160,7 @@ function GroupBody({
   defs: LeverDef[]
   levers: LeverValues
   base: LeverValues
-  locked: boolean
-  onChange: (id: string, v: number) => void
+  onChange?: (id: string, v: number) => void
   params: SimParams
 }) {
   const icons = useAnimalIcons()
@@ -150,7 +169,7 @@ function GroupBody({
     return (
       <>
         {defs.map((d) => (
-          <LeverRow key={d.id} def={d} value={levers[d.id]} base={base[d.id]} locked={locked} onChange={onChange} />
+          <LeverRow key={d.id} def={d} value={levers[d.id]} base={base[d.id]} onChange={onChange} />
         ))}
         {group === 'food' && <FoodReadout params={params} />}
       </>
@@ -167,7 +186,7 @@ function GroupBody({
           {defs
             .filter((d) => d.species === s)
             .map((d) => (
-              <LeverRow key={d.id} def={d} value={levers[d.id]} base={base[d.id]} locked={locked} onChange={onChange} />
+              <LeverRow key={d.id} def={d} value={levers[d.id]} base={base[d.id]} onChange={onChange} />
             ))}
           <SpeciesReadout group={group} sp={s === 'prey' ? params.prey : params.pred} species={s} />
         </div>
@@ -180,14 +199,12 @@ function LeverRow({
   def,
   value,
   base,
-  locked,
   onChange,
 }: {
   def: LeverDef
   value: number
   base: number
-  locked: boolean
-  onChange: (id: string, v: number) => void
+  onChange?: (id: string, v: number) => void
 }) {
   const cost = leverCost(def, value, base)
   const moved = Math.abs(value - base) > 1e-9
@@ -205,7 +222,7 @@ function LeverRow({
         </Tooltip>
         <div className="ml-auto flex items-center gap-1.5">
           {moved && Math.abs(cost) >= 0.05 && (
-            <span className={cn('text-[11px] tabular', cost > 0 ? 'text-amber-300' : 'text-emerald-300')}>
+            <span className={cn('text-[11px] tabular', cost > 0 ? 'text-tone-warn-foreground' : 'text-tone-good-foreground')}>
               {cost > 0 ? `−${fmt(cost)}` : `+${fmt(-cost)}`}
             </span>
           )}
@@ -219,8 +236,8 @@ function LeverRow({
         max={def.max}
         step={def.step}
         value={[value]}
-        disabled={locked}
-        onValueChange={([v]) => onChange(def.id, clampLever(def, v))}
+        disabled={!onChange}
+        onValueChange={([v]) => onChange?.(def.id, clampLever(def, v))}
         aria-label={def.species ? `${def.species === 'prey' ? 'Rabbit' : 'Fox'} ${def.label.toLowerCase()}` : def.label}
       />
     </div>

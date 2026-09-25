@@ -9,7 +9,7 @@ population trends, then intervene before either species disappears.
 - **Eight interventions, four uses.** Rain, plant bushes, release rabbits, release foxes,
   cull foxes, feed foxes, rabbit illness and fox illness. Illness spreads locally, drains
   energy and can overshoot; purple rings mark affected animals.
-- **Watch evolution.** The Evolution tab shows inherited trait distributions, generations,
+- **Watch evolution.** The Evolution page shows inherited trait distributions, generations,
   lineages and observed milestones. Click an animal to inspect its family, health and traits.
 - **Keep a world.** Save/resume preserves animals, genes, food, random streams, intervention
   charges and recent replay in one device-local save slot.
