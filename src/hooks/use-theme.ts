@@ -26,6 +26,7 @@ export function useTheme(): [Theme, (t: Theme) => void] {
     } catch {
       // storage unavailable: the choice still applies for this visit
     }
+    if (theme !== 'system') return
     mq.addEventListener('change', apply)
     return () => mq.removeEventListener('change', apply)
   }, [theme])

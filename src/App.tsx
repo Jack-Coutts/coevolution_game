@@ -79,7 +79,7 @@ export default function App() {
 
   useEffect(() => {
     if (pendingSave.current) { game.restore(pendingSave.current); pendingSave.current = null }
-    else game.configure({ levers, base, scenario, seed, endless })
+    else { setSelected(null); game.configure({ levers, base, scenario, seed, endless }) }
   }, [game, levers, base, scenario, seed, endless, resetKey])
 
   useEffect(() => {
@@ -98,7 +98,7 @@ export default function App() {
     if (snap.saveStatus) toast(snap.saveStatus, { id: 'save' })
   }, [snap.saveStatus])
 
-  const reset = () => { setSelected(null); setResetKey((k) => k + 1) }
+  const reset = () => setResetKey((k) => k + 1)
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
@@ -215,7 +215,7 @@ export default function App() {
             <select aria-label="Run duration" className="h-8 rounded-md border bg-background px-2 text-xs" value={endless ? 'endless' : 'year'} disabled={locked} onChange={e => setEndless(e.target.value === 'endless')}>
               <option value="year">One year</option><option value="endless">Endless</option>
             </select>
-            <MeadowSettings onPractice={() => { setSelected(null); setLevers(STABLE_PRESET); setScenario('stable'); setSeedChoice({ kind: 'custom', seed: 5007 }); setEndless(false); reset() }} locked={locked} choice={seedChoice} onChange={setSeedChoice} />
+            <MeadowSettings onPractice={() => { setLevers(STABLE_PRESET); setScenario('stable'); setSeedChoice({ kind: 'custom', seed: 5007 }); setEndless(false); reset() }} locked={locked} choice={seedChoice} onChange={setSeedChoice} />
             <div className="flex items-center gap-1">
               <Tooltip>
                 <TooltipTrigger asChild>

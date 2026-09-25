@@ -30,9 +30,13 @@ interface Props {
   onResetLevers: () => void
 }
 
+/** Budget points still unspent, to one decimal. */
+function pointsLeft(levers: LeverValues, base: LeverValues): number {
+  return Math.round((BUDGET - spent(levers, base)) * 10) / 10
+}
+
 export function LeverPanel({ levers, base, onChange, onResetLevers }: Props) {
-  const used = spent(levers, base)
-  const left = Math.round((BUDGET - used) * 10) / 10
+  const left = pointsLeft(levers, base)
   const over = left < 0
   const changed = LEVERS.filter((d) => Math.abs(levers[d.id] - base[d.id]) > 1e-9).length
 
@@ -67,14 +71,14 @@ export function LeverPanel({ levers, base, onChange, onResetLevers }: Props) {
         </div>
       </div>
 
-      <LeverGroups levers={levers} base={base} locked={false} onChange={onChange} />
+      <LeverGroups levers={levers} base={base} onChange={onChange} />
     </div>
   )
 }
 
 /** The run's settings, read-only while the meadow is running. */
 export function LockedSetup({ levers, base, onUnlock }: { levers: LeverValues; base: LeverValues; onUnlock: () => void }) {
-  const left = Math.round((BUDGET - spent(levers, base)) * 10) / 10
+  const left = pointsLeft(levers, base)
   return (
     <Accordion type="single" collapsible className="rounded-lg border">
       <div className="flex items-center gap-2 px-3 pt-2.5 text-xs">
@@ -89,20 +93,20 @@ export function LockedSetup({ levers, base, onUnlock }: { levers: LeverValues; b
       <AccordionItem value="settings" className="border-b-0 px-3">
         <AccordionTrigger className="py-2 text-xs text-muted-foreground hover:no-underline">View this run's settings</AccordionTrigger>
         <AccordionContent>
-          <LeverGroups levers={levers} base={base} locked onChange={() => {}} />
+          <LeverGroups levers={levers} base={base} />
         </AccordionContent>
       </AccordionItem>
     </Accordion>
   )
 }
 
-function LeverGroups({ levers, base, locked, onChange }: { levers: LeverValues; base: LeverValues; locked: boolean; onChange: (id: string, v: number) => void }) {
+/** Without `onChange` the sliders are read-only. */
+function LeverGroups({ levers, base, onChange }: { levers: LeverValues; base: LeverValues; onChange?: (id: string, v: number) => void }) {
   const params = deriveParams(levers)
-  const defs = LEVERS
   return (
     <Accordion type="multiple" defaultValue={['populations', 'food']} className="rounded-lg border">
       {GROUPS.map((g) => {
-        const gdefs = defs.filter((d) => d.group === g.id)
+        const gdefs = LEVERS.filter((d) => d.group === g.id)
         if (gdefs.length === 0) return null
         return (
           <AccordionItem key={g.id} value={g.id} className="px-3">
@@ -119,7 +123,6 @@ function LeverGroups({ levers, base, locked, onChange }: { levers: LeverValues; 
                 defs={gdefs}
                 levers={levers}
                 base={base}
-                locked={locked}
                 onChange={onChange}
                 params={params}
               />
@@ -150,7 +153,6 @@ function GroupBody({
   defs,
   levers,
   base,
-  locked,
   onChange,
   params,
 }: {
@@ -158,8 +160,7 @@ function GroupBody({
   defs: LeverDef[]
   levers: LeverValues
   base: LeverValues
-  locked: boolean
-  onChange: (id: string, v: number) => void
+  onChange?: (id: string, v: number) => void
   params: SimParams
 }) {
   const icons = useAnimalIcons()
@@ -168,7 +169,7 @@ function GroupBody({
     return (
       <>
         {defs.map((d) => (
-          <LeverRow key={d.id} def={d} value={levers[d.id]} base={base[d.id]} locked={locked} onChange={onChange} />
+          <LeverRow key={d.id} def={d} value={levers[d.id]} base={base[d.id]} onChange={onChange} />
         ))}
         {group === 'food' && <FoodReadout params={params} />}
       </>
@@ -185,7 +186,7 @@ function GroupBody({
           {defs
             .filter((d) => d.species === s)
             .map((d) => (
-              <LeverRow key={d.id} def={d} value={levers[d.id]} base={base[d.id]} locked={locked} onChange={onChange} />
+              <LeverRow key={d.id} def={d} value={levers[d.id]} base={base[d.id]} onChange={onChange} />
             ))}
           <SpeciesReadout group={group} sp={s === 'prey' ? params.prey : params.pred} species={s} />
         </div>
@@ -198,14 +199,12 @@ function LeverRow({
   def,
   value,
   base,
-  locked,
   onChange,
 }: {
   def: LeverDef
   value: number
   base: number
-  locked: boolean
-  onChange: (id: string, v: number) => void
+  onChange?: (id: string, v: number) => void
 }) {
   const cost = leverCost(def, value, base)
   const moved = Math.abs(value - base) > 1e-9
@@ -237,8 +236,8 @@ function LeverRow({
         max={def.max}
         step={def.step}
         value={[value]}
-        disabled={locked}
-        onValueChange={([v]) => onChange(def.id, clampLever(def, v))}
+        disabled={!onChange}
+        onValueChange={([v]) => onChange?.(def.id, clampLever(def, v))}
         aria-label={def.species ? `${def.species === 'prey' ? 'Rabbit' : 'Fox'} ${def.label.toLowerCase()}` : def.label}
       />
     </div>
