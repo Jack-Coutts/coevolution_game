@@ -2,7 +2,7 @@
 
 This page tracks the work on the open issues in [roadmap #2](https://github.com/Jack-Coutts/coevolution_game/issues/2) and the UI update. A box is ticked when its pull request has merged into `main`. Every pull request updates its own line.
 
-Last updated: 25 September 2026, 16:40 UTC.
+Last updated: 25 September 2026, 16:30 UTC.
 
 ## How the work runs
 
@@ -26,20 +26,20 @@ Last updated: 25 September 2026, 16:40 UTC.
 
 - [x] #3 Playtest and clarity fixes. [#19](https://github.com/Jack-Coutts/coevolution_game/pull/19)
 - [ ] #4 Balance all eight interventions. Built; the final evaluation is running.
-- [ ] #5 Intervention budget for Endless mode. Built: one use renews each season, up to four held. Next in review.
+- [x] #5 Intervention budget for Endless mode: one use renews each season, up to four held. [#21](https://github.com/Jack-Coutts/coevolution_game/pull/21)
 - [ ] #6 Calibrate Drought, Harsh winter and Fox invasion. In progress.
 
 ### A third species
 
 - [ ] #7 Choose the third species. The design record is written: the field vole. It merges after #3 and #4.
-- [ ] #8 Add the vole to the simulation and saves. In progress.
-- [ ] #9 Make the three-species meadow playable. Starts after #8.
+- [ ] #8 Add the vole to the simulation and saves. Built; merges after #4 and #7.
+- [ ] #9 Make the three-species meadow playable. In progress.
 
 ### Bodies and ecological varieties
 
 - [ ] #10 Visible inherited body traits with energy costs. Starts after #9.
 - [ ] #11 Track persistent ecological varieties. Starts after #10.
-- [ ] #12 Journal with family history and trait changes. Starts after #10 and #11.
+- [ ] #12 Journal with family history and trait changes. In progress; variety events plug in after #11.
 
 ### Growing brains
 
