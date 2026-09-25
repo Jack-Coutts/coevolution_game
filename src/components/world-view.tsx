@@ -108,8 +108,8 @@ export function WorldView({ maxSize, selected, onSelect }: { maxSize: number; se
         )}
 
         {planning && (
-          <div className="absolute inset-0 flex items-end justify-center bg-gradient-to-t from-black/60 via-black/10 to-transparent p-6">
-            <div className="flex flex-col items-center gap-3 text-center text-white">
+          <div className="pointer-events-none absolute inset-0 flex items-end justify-center bg-gradient-to-t from-black/60 via-black/10 to-transparent p-6">
+            <div className="pointer-events-auto flex flex-col items-center gap-3 text-center text-white">
               <p className="max-w-sm text-sm text-white/85 drop-shadow">
                 {snap.prey} rabbits and {snap.pred} foxes with random genes. Tune the levers, then release them.
               </p>
