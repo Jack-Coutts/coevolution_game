@@ -540,7 +540,7 @@ export class GameController {
 
   budgetLeft(): number {
     if (!this.config) return BUDGET
-    return BUDGET - spent(this.config.levers, this.config.base)
+    return BUDGET - spent(this.config.levers, this.config.base, this.scenario.species)
   }
 
   weather(tick: number): Weather {
@@ -561,7 +561,7 @@ export class GameController {
     this.phase = 'ended'
     this.playing = false
     this.explanation = explain(this.history, this.end, this.scenario)
-    const used = spent(this.config.levers, this.config.base)
+    const used = spent(this.config.levers, this.config.base, this.scenario.species)
     this.score = scoreRun(this.end.tick, this.end.survived, used, this.history.interventions.length)
     const prev = this.best
     this.best = recordScore(this.config, this.score.total, this.end.tick)

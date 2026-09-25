@@ -6,6 +6,8 @@ import { Progress } from '@/components/ui/progress'
 import { Slider } from '@/components/ui/slider'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
 import { useAnimalIcons } from '@/hooks/use-animal-icons'
+import { SPECIES_UI } from '@/game/species-ui'
+import { TWO_SPECIES, type Species } from '@/sim/species'
 import {
   BUDGET,
   clampLever,
@@ -13,7 +15,7 @@ import {
   formatLever,
   GROUPS,
   leverCost,
-  LEVERS,
+  leversFor,
   spent,
   type LeverDef,
   type LeverGroup,
@@ -30,17 +32,19 @@ interface Props {
   onResetLevers: () => void
   /** In Endless the score is hours survived, so unspent points earn nothing. */
   endless?: boolean
+  /** The species in the chosen meadow; Starting voles is shown only where voles live. */
+  species?: readonly Species[]
 }
 
 /** Budget points still unspent, to one decimal. */
-function pointsLeft(levers: LeverValues, base: LeverValues): number {
-  return Math.round((BUDGET - spent(levers, base)) * 10) / 10
+function pointsLeft(levers: LeverValues, base: LeverValues, species: readonly Species[]): number {
+  return Math.round((BUDGET - spent(levers, base, species)) * 10) / 10
 }
 
-export function LeverPanel({ levers, base, onChange, onResetLevers, endless = false }: Props) {
-  const left = pointsLeft(levers, base)
+export function LeverPanel({ levers, base, onChange, onResetLevers, endless = false, species = TWO_SPECIES }: Props) {
+  const left = pointsLeft(levers, base, species)
   const over = left < 0
-  const changed = LEVERS.filter((d) => Math.abs(levers[d.id] - base[d.id]) > 1e-9).length
+  const changed = leversFor(species).filter((d) => Math.abs((levers[d.id] ?? base[d.id]) - base[d.id]) > 1e-9).length
 
   return (
     <div className="flex flex-col gap-3">
@@ -63,7 +67,7 @@ export function LeverPanel({ levers, base, onChange, onResetLevers, endless = fa
             ? 'Over budget. Weaken something to earn points back before you can play.'
             : endless
               ? 'Making animals stronger or food richer costs points. Weakening refunds half. In Endless the score is hours survived, so unspent points add nothing.'
-              : 'Making animals stronger or food richer costs points. Weakening refunds half. Unspent points add 10 each to your score if both species last the year.'}
+              : 'Making animals stronger or food richer costs points. Weakening refunds half. Unspent points add 10 each to your score if every species lasts the year.'}
         </p>
         <div className="mt-2 flex items-center justify-between">
           <span className="text-xs text-muted-foreground">
@@ -75,14 +79,14 @@ export function LeverPanel({ levers, base, onChange, onResetLevers, endless = fa
         </div>
       </div>
 
-      <LeverGroups levers={levers} base={base} onChange={onChange} />
+      <LeverGroups levers={levers} base={base} onChange={onChange} species={species} />
     </div>
   )
 }
 
 /** The run's settings, read-only while the meadow is running. */
-export function LockedSetup({ levers, base, onUnlock }: { levers: LeverValues; base: LeverValues; onUnlock: () => void }) {
-  const left = pointsLeft(levers, base)
+export function LockedSetup({ levers, base, onUnlock, species = TWO_SPECIES }: { levers: LeverValues; base: LeverValues; onUnlock: () => void; species?: readonly Species[] }) {
+  const left = pointsLeft(levers, base, species)
   return (
     <Accordion type="single" collapsible className="rounded-lg border">
       <div className="flex items-center gap-2 px-3 pt-2.5 text-xs">
@@ -97,7 +101,7 @@ export function LockedSetup({ levers, base, onUnlock }: { levers: LeverValues; b
       <AccordionItem value="settings" className="border-b-0 px-3">
         <AccordionTrigger className="py-2 text-xs text-muted-foreground hover:no-underline">View this run's settings</AccordionTrigger>
         <AccordionContent>
-          <LeverGroups levers={levers} base={base} />
+          <LeverGroups levers={levers} base={base} species={species} />
         </AccordionContent>
       </AccordionItem>
     </Accordion>
@@ -105,12 +109,13 @@ export function LockedSetup({ levers, base, onUnlock }: { levers: LeverValues; b
 }
 
 /** Without `onChange` the sliders are read-only. */
-function LeverGroups({ levers, base, onChange }: { levers: LeverValues; base: LeverValues; onChange?: (id: string, v: number) => void }) {
+function LeverGroups({ levers, base, onChange, species }: { levers: LeverValues; base: LeverValues; onChange?: (id: string, v: number) => void; species: readonly Species[] }) {
   const params = deriveParams(levers)
+  const defs = leversFor(species)
   return (
     <Accordion type="multiple" defaultValue={['populations', 'food']} className="rounded-lg border">
       {GROUPS.map((g) => {
-        const gdefs = LEVERS.filter((d) => d.group === g.id)
+        const gdefs = defs.filter((d) => d.group === g.id)
         if (gdefs.length === 0) return null
         return (
           <AccordionItem key={g.id} value={g.id} className="px-3">
@@ -139,7 +144,7 @@ function LeverGroups({ levers, base, onChange }: { levers: LeverValues; base: Le
 }
 
 function GroupCost({ defs, levers, base }: { defs: LeverDef[]; levers: LeverValues; base: LeverValues }) {
-  const c = defs.reduce((t, d) => t + leverCost(d, levers[d.id], base[d.id]), 0)
+  const c = defs.reduce((t, d) => t + leverCost(d, levers[d.id] ?? base[d.id], base[d.id]), 0)
   if (Math.abs(c) < 0.05) return null
   return (
     <Badge variant={c > 0 ? 'secondary' : 'outline'} className={cn('tabular', c < 0 && 'text-tone-good-foreground')}>
@@ -173,7 +178,7 @@ function GroupBody({
     return (
       <>
         {defs.map((d) => (
-          <LeverRow key={d.id} def={d} value={levers[d.id]} base={base[d.id]} onChange={onChange} />
+          <LeverRow key={d.id} def={d} value={levers[d.id] ?? base[d.id]} base={base[d.id]} onChange={onChange} />
         ))}
         {group === 'food' && <FoodReadout params={params} />}
       </>
@@ -242,7 +247,7 @@ function LeverRow({
         value={[value]}
         disabled={!onChange}
         onValueChange={([v]) => onChange?.(def.id, clampLever(def, v))}
-        aria-label={def.species ? `${def.species === 'prey' ? 'Rabbit' : 'Fox'} ${def.label.toLowerCase()}` : def.label}
+        aria-label={def.species && def.species !== 'vole' ? `${SPECIES_UI[def.species].name} ${def.label.toLowerCase()}` : def.label}
       />
     </div>
   )

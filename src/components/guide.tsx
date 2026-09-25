@@ -1,4 +1,6 @@
 import { useAnimalIcons } from '@/hooks/use-animal-icons'
+import { useGame } from '@/hooks/use-game'
+import { FoodWeb } from '@/components/food-web'
 
 const KEYS: [string, string][] = [
   ['Space', 'Play / pause'],
@@ -10,16 +12,20 @@ const KEYS: [string, string][] = [
 
 export function Guide() {
   const icons = useAnimalIcons()
+  const [game] = useGame()
+  const voles = game.scenario.species.includes('vole')
   return (
     <div className="gap-10 text-sm leading-relaxed lg:columns-2 [&>section]:mb-5 [&>section]:max-w-[70ch] [&>section]:break-inside-avoid">
       <section>
         <h3 className="mb-1 font-semibold">Goal</h3>
         <p className="text-muted-foreground">
-          Keep <b className="text-rabbit">rabbits</b> and <b className="text-fox">foxes</b> alive together from 1
-          September to the following September. Endless mode continues past the first year, until either species dies out.
+          {voles
+            ? <>In the Vole meadow, keep <b className="text-rabbit">rabbits</b>, <b className="text-vole">voles</b> and <b className="text-fox">foxes</b> alive together from 1 September to the following September. The run ends as soon as any of the three dies out; Endless continues past the first year on the same rule.</>
+            : <>Keep <b className="text-rabbit">rabbits</b> and <b className="text-fox">foxes</b> alive together from 1
+          September to the following September. Endless mode continues past the first year, until either species dies out.</>}
         </p>
       </section>
-      <section className="grid grid-cols-2 gap-2">
+      <section className={voles ? 'grid grid-cols-3 gap-2' : 'grid grid-cols-2 gap-2'}>
         <div className="flex items-center gap-2 rounded-lg border p-2">
           <img src={icons.rabbit} alt="" className="size-8" />
           <span className="text-xs text-muted-foreground">
@@ -28,8 +34,23 @@ export function Guide() {
         </div>
         <div className="flex items-center gap-2 rounded-lg border p-2">
           <img src={icons.fox} alt="" className="size-8" />
-          <span className="text-xs text-muted-foreground">Foxes hunt rabbits. A full fox stops hunting.</span>
+          <span className="text-xs text-muted-foreground">{voles ? 'Foxes hunt rabbits and voles. A full fox stops hunting.' : 'Foxes hunt rabbits. A full fox stops hunting.'}</span>
         </div>
+        {voles && (
+          <div className="flex items-center gap-2 rounded-lg border p-2">
+            <img src={icons.vole} alt="" className="size-8" />
+            <span className="text-xs text-muted-foreground">Voles eat grass seed, and berries when seed runs short. A vole is a small meal for a fox.</span>
+          </div>
+        )}
+      </section>
+      <section>
+        <h3 className="mb-1 font-semibold">The Vole meadow</h3>
+        <p className="mb-2 text-muted-foreground">
+          The fifth scenario adds field voles: small, slate-grey animals that live in the tall grass and boom and crash fast. They change two old habits.
+          Culling foxes can free the voles to boom and strip the bushes, so rabbits starve instead of being eaten. And when voles crash, the foxes they fed
+          turn to rabbits. Two extra interventions, Release voles and Vole illness, share the same four uses. The Open meadow has no voles.
+        </p>
+        <FoodWeb compact />
       </section>
       <section>
         <h3 className="mb-1 font-semibold">How the animals work</h3>
@@ -54,7 +75,7 @@ export function Guide() {
         <h3 className="mb-1 font-semibold">Setup, then run</h3>
         <p className="text-muted-foreground">
           Tune the levers within the budget, then release the animals. During the run you can intervene with rain,
-          release animals, cull foxes, plant bushes, feed foxes or start species-specific illness, each followed by a cooldown. You have four uses shared across all eight options; in Endless, one use comes back each season (see Keep a world). Illness spreads between nearby animals of the same species, adds an energy drain for ten days per case, and gives survivors temporary immunity. Purple rings mark illness. It can overshoot and cause extinction. The meadow pauses when a new red field note appears, so you have time to act; the switch beside the field notes turns this off.
+          release animals, cull foxes, plant bushes, feed foxes or start species-specific illness, each followed by a cooldown. You have four uses shared across all eight options (ten in the Vole meadow); in Endless, one use comes back each season (see Keep a world). Illness spreads between nearby animals of the same species, adds an energy drain for ten days per case, and gives survivors temporary immunity. Purple rings mark illness. It can overshoot and cause extinction. The meadow pauses when a new red field note appears, so you have time to act; the switch beside the field notes turns this off.
         </p>
       </section>
       <section>

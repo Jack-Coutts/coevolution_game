@@ -4,6 +4,8 @@ import { FOOD_WEB, perSpecies, TWO_SPECIES, type Species } from '@/sim/species'
 import { STAT, STAT_STRIDE, type FrameData } from '@/worker/protocol'
 
 export const HISTORY_HOURS = 8760
+/** A column of the statistics row. */
+export type StatKey = keyof typeof STAT
 const CAPACITY = HISTORY_HOURS + 1
 const RECENT = 360
 const KEY_EVERY = 3

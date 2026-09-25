@@ -23,6 +23,7 @@ import { speedLabel } from '@/game/insights'
 import { STABLE_PRESET } from '@/game/presets'
 import { seedOf, type SeedChoice } from '@/game/seed'
 import { useAnimalIcons } from '@/hooks/use-animal-icons'
+import { FoodWeb } from '@/components/food-web'
 import { useGame } from '@/hooks/use-game'
 import { useTheme } from '@/hooks/use-theme'
 import { hrefOf, useView, type View } from '@/hooks/use-view'
@@ -97,7 +98,7 @@ export default function App() {
   }, [scenario, seedChoice, visit])
 
   const locked = snap.phase === 'running' || snap.phase === 'ended'
-  const left = BUDGET - spent(levers, base)
+  const left = BUDGET - spent(levers, base, SCENARIO_BY_ID[scenario].species)
 
   useEffect(() => {
     if (snap.saveStatus) toast(snap.saveStatus, { id: 'save' })
@@ -213,7 +214,7 @@ export default function App() {
             </div>
             <div className="leading-tight">
               <h1 className="text-lg font-semibold tracking-tight">Coevolution</h1>
-              <p className="hidden text-xs text-muted-foreground sm:block">Meadow Keeper · {endless ? 'a world that keeps evolving' : 'keep both species alive for a year'}</p>
+              <p className="hidden text-xs text-muted-foreground sm:block">Meadow Keeper · {endless ? 'a world that keeps evolving' : SCENARIO_BY_ID[scenario].species.length > 2 ? 'keep all three species alive for a year' : 'keep both species alive for a year'}</p>
             </div>
           </div>
 
@@ -294,6 +295,7 @@ export default function App() {
                 <Timeline />
                 <div className="flex flex-wrap items-center gap-x-4 gap-y-1 px-1 text-[11px] text-muted-foreground">
                   <Legend color="bg-rabbit" label="Rabbits (left scale)" />
+                  {sc.species.includes('vole') && <Legend color="bg-vole" label="Voles (left scale)" />}
                   <Legend color="bg-fox" label="Foxes (right scale)" />
                   <Legend color="bg-berry/40" label="Berries on bushes" />
                   <span className="flex items-center gap-1.5">
@@ -308,13 +310,15 @@ export default function App() {
               <Card className="gap-0 p-0 lg:sticky lg:top-4 lg:max-h-[calc(100vh-2rem)]">
                 <div className="min-h-0 flex-1 p-3 lg:overflow-y-auto">
                   {locked ? (
-                    <RunPanel inspector={inspector} onShowResult={() => setDismissed(-1)} setup={<LockedSetup levers={levers} base={base} onUnlock={askReset} />} />
+                    <RunPanel inspector={inspector} onShowResult={() => setDismissed(-1)} setup={<LockedSetup levers={levers} base={base} onUnlock={askReset} species={sc.species} />} />
                   ) : (
                     <div className="flex flex-col gap-4">
                       <BestScore />
+                      {sc.species.includes('vole') && <FoodWeb />}
                       {inspector}
                       <LeverPanel
                         endless={endless}
+                        species={sc.species}
                         levers={levers}
                         base={base}
                         onChange={(id, v) => setLevers((prev) => ({ ...prev, [id]: v }))}

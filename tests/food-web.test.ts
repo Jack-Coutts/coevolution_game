@@ -343,9 +343,9 @@ describe('vole actions', () => {
 })
 
 describe('Vole meadow scenario', () => {
-  it('exists for scripts and tests but is not offered in the picker', () => {
-    expect(SCENARIOS.map(s => s.id)).not.toContain('voles')
+  it('is offered last in the picker; the other meadows stay two-species and the Open meadow comes first', () => {
+    expect(SCENARIOS.map(s => s.id)).toEqual(['stable', 'drought', 'invasion', 'winter', 'voles'])
     expect(SCENARIO_BY_ID.voles.species).toEqual(['prey', 'pred', 'vole'])
-    for (const s of SCENARIOS) expect(s.species).toEqual(['prey', 'pred'])
+    for (const s of SCENARIOS.filter(s => s.id !== 'voles')) expect(s.species).toEqual(['prey', 'pred'])
   })
 })

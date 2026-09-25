@@ -24,8 +24,8 @@ const DEC_1 = tickAt(3)
 const MAR_1 = tickAt(6)
 const MAY_1 = tickAt(8)
 
-/** Scenarios offered in the picker. The Vole meadow joins in #9. */
-export const SCENARIOS: Scenario[] = [
+/** The two-species scenarios, in picker order. */
+const TWO_SPECIES_SCENARIOS: Scenario[] = [
   {
     id: 'stable',
     species: TWO_SPECIES,
@@ -82,8 +82,7 @@ export const SCENARIOS: Scenario[] = [
 
 /**
  * The Vole meadow (docs/third-species.md section 11): the Open meadow preset plus field voles
- * and grass seed, with no weather. Hidden from the scenario picker until #9 makes it playable;
- * scripts and tests reach it through `SCENARIO_BY_ID.voles`.
+ * and grass seed, with no weather. Listed last in the picker; the Open meadow stays the default.
  */
 export const VOLE_MEADOW: Scenario = {
   id: 'voles',
@@ -97,8 +96,9 @@ export const VOLE_MEADOW: Scenario = {
   markers: [],
 }
 
-/** Every scenario, including ones not yet offered in the picker (`SCENARIOS`). */
-export const ALL_SCENARIOS: Scenario[] = [...SCENARIOS, VOLE_MEADOW]
+/** Scenarios offered in the picker: the four two-species meadows, then the Vole meadow. */
+export const SCENARIOS: Scenario[] = [...TWO_SPECIES_SCENARIOS, VOLE_MEADOW]
+export const ALL_SCENARIOS: Scenario[] = SCENARIOS
 
 export const SCENARIO_BY_ID: Record<ScenarioId, Scenario> = Object.fromEntries(
   ALL_SCENARIOS.map((s) => [s.id, s]),
