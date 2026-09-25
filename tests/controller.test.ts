@@ -106,3 +106,42 @@ it('asks before resetting a run that has gone past a week, but not during planni
   expect(game.resetNeedsConfirm()).toBe(true)
   game.dispose()
 })
+
+it('pauses once when a new red note appears while playing live, if the player wants that', () => {
+  const { game, runId, frame } = ready()
+  const loop = (now: number) => (game as unknown as { loop(now: number): void }).loop(now)
+  // 20 days of 40 rabbits and 4 foxes, then the rabbits fall towards 12 over the next 10 days.
+  const row = (t: number) => {
+    const r = new Float64Array(STAT_STRIDE)
+    r[STAT.prey] = t <= 480 ? 40 : Math.round(40 - 28 * (t - 480) / 240)
+    r[STAT.pred] = 4
+    r[STAT.preyEnergy] = r[STAT.predEnergy] = 0.6
+    r[STAT.stock] = 0.5
+    return r
+  }
+  let head = 0
+  const answer = () => {
+    const ask = mock.messages.splice(0).filter(m => m.type === 'advance').at(-1)
+    if (ask?.type !== 'advance') return
+    const ticks = Array.from({ length: ask.target - head }, (_, i) => head + i + 1)
+    const stats = new Float64Array(ticks.length * STAT_STRIDE)
+    ticks.forEach((t, i) => stats.set(row(t), i * STAT_STRIDE))
+    head = ask.target
+    mock.receive({ type: 'frames', runId, frames: ticks.map(tick => ({ ...frame, tick })), stats, head, end: null, evolution: [] })
+  }
+  game.setSpeed(0)
+  game.play()
+  // 12 hours per second, in 100 ms frames, with the worker answering every request.
+  let now = performance.now()
+  for (let i = 0; i < 1000 && game.getSnapshot().playing; i++) { loop((now += 100)); answer() }
+  const snap = game.getSnapshot()
+  expect(snap.playing).toBe(false)
+  expect(snap.pausedFor?.id).toBe('overhunt')
+  // The ratio first drops below 5 rabbits per fox at hour 656 (19 rabbits, 4 foxes).
+  expect(snap.tick).toBeGreaterThanOrEqual(656)
+  expect(snap.tick).toBeLessThanOrEqual(658)
+  game.play()
+  expect(game.getSnapshot().pausedFor).toBeNull()
+  game.setAutoPause(false)
+  game.dispose()
+})

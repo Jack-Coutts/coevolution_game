@@ -4,6 +4,7 @@ import { AlertTriangle, CheckCircle2, CloudRain, Crosshair, Info, OctagonAlert, 
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Progress } from '@/components/ui/progress'
+import { Switch } from '@/components/ui/switch'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
 import { useAnimalIcons } from '@/hooks/use-animal-icons'
 import { CHARGES, COOLDOWN } from '@/game/controller'
@@ -47,7 +48,18 @@ export function RunPanel({ inspector, setup, onShowResult }: { inspector: ReactN
       {inspector}
 
       <section>
-        <h3 className="mb-2 text-xs font-semibold tracking-wide text-muted-foreground uppercase">Field notes</h3>
+        <div className="mb-2 flex items-center justify-between gap-2">
+          <h3 className="text-xs font-semibold tracking-wide text-muted-foreground uppercase">Field notes</h3>
+          <label className="flex items-center gap-1.5 text-xs text-muted-foreground">
+            <Switch size="sm" checked={snap.autoPause} onCheckedChange={(on) => game.setAutoPause(on)} />
+            Pause on new red notes
+          </label>
+        </div>
+        {snap.pausedFor && !snap.playing && (
+          <p role="status" className="mb-2 rounded-lg border border-tone-danger-border px-2.5 py-1.5 text-xs">
+            Paused for a new warning, so you have time to decide. Press Space or Play to continue.
+          </p>
+        )}
         {snap.tick < 24 ? (
           <p className="rounded-lg border border-dashed p-3 text-sm text-muted-foreground">
             Notes on booms, busts and risks appear here once the animals are out.

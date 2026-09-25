@@ -54,7 +54,7 @@ export function Guide() {
         <h3 className="mb-1 font-semibold">Setup, then run</h3>
         <p className="text-muted-foreground">
           Tune the levers within the budget, then release the animals. During the run you can intervene with rain,
-          release animals, cull foxes, plant bushes, feed foxes or start species-specific illness, each followed by a cooldown. You have four uses shared across all eight options. Illness spreads between nearby animals of the same species, adds an energy drain for ten days per case, and gives survivors temporary immunity. Purple rings mark illness. It can overshoot and cause extinction.
+          release animals, cull foxes, plant bushes, feed foxes or start species-specific illness, each followed by a cooldown. You have four uses shared across all eight options. Illness spreads between nearby animals of the same species, adds an energy drain for ten days per case, and gives survivors temporary immunity. Purple rings mark illness. It can overshoot and cause extinction. The meadow pauses when a new red field note appears, so you have time to act; the switch beside the field notes turns this off.
         </p>
       </section>
       <section>

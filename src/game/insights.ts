@@ -73,6 +73,12 @@ export function hints(h: RunHistory, tick: number): Hint[] {
   return (alarms.length ? alarms : out).sort((a, b) => RANK[a.tone] - RANK[b.tone])
 }
 
+/** Red notes in `next` that were not in `prev`: what should stop the clock for a player who wants time to react. */
+export function newDangers(prev: Hint[], next: Hint[]): Hint[] {
+  const seen = new Set(prev.map(n => n.id))
+  return next.filter(n => n.tone === 'danger' && !seen.has(n.id))
+}
+
 function notesAt(h: RunHistory, tick: number): Hint[] {
   const out: Hint[] = []
   if (tick - h.firstTick < 24) return out

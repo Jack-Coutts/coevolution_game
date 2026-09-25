@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { scoreWords, traitValue, usesLeft } from '@/game/insights'
+import { newDangers, scoreWords, traitValue, usesLeft, type Hint } from '@/game/insights'
 import { scoreRun } from '@/game/scores'
 
 describe('intervention allowance in words', () => {
@@ -31,5 +31,15 @@ describe('trait headline', () => {
     expect(traitValue(pop(12, 0.617), 'forage')).toBe('0.62')
     expect(traitValue(pop(0, 0), 'forage')).toBe('none alive')
     expect(traitValue(undefined, 'forage')).toBe('—')
+  })
+})
+
+describe('pause on new red notes', () => {
+  const note = (id: string, tone: Hint['tone']): Hint => ({ id, tone, text: id })
+  it('reports only red notes that were not showing before', () => {
+    const before = [note('overhunt', 'danger'), note('bare', 'info')]
+    const after = [note('overhunt', 'danger'), note('fewfox', 'danger'), note('boom', 'warn')]
+    expect(newDangers(before, after).map(n => n.id)).toEqual(['fewfox'])
+    expect(newDangers(after, after)).toEqual([])
   })
 })

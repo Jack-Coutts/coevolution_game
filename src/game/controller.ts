@@ -8,7 +8,7 @@ import { WorldRenderer, type Weather } from '@/render/renderer'
 import { STAT_STRIDE, type EndInfo, type FrameData, type FromWorker, type ToWorker } from '@/worker/protocol'
 import SimWorker from '@/worker/sim.worker.ts?worker'
 import { RunHistory } from './history'
-import { explain, hints, type Explanation, type Hint } from './insights'
+import { explain, hints, newDangers, type Explanation, type Hint } from './insights'
 import { recordScore, scoreFor, scoreRun, type BestScore, type ScoreBreakdown } from './scores'
 
 export type Phase = 'loading' | 'planning' | 'running' | 'ended'
@@ -33,6 +33,16 @@ export const DEFAULT_SPEED = 1
 
 /** Resetting a run that has gone further than this asks first; planning resets stay instant. */
 export const RESET_CONFIRM_HOURS = 7 * 24
+
+const AUTO_PAUSE_KEY = 'coevo-game:pause-on-warning'
+
+function readAutoPause(): boolean {
+  try {
+    return localStorage.getItem(AUTO_PAUSE_KEY) !== 'off'
+  } catch {
+    return true
+  }
+}
 
 export const CHARGES = 4
 export const COOLDOWN = 400
@@ -64,6 +74,10 @@ export interface Snapshot {
   atLive: boolean
   interventions: { tick: number; action: Intervention }[]
   runId: number
+  /** Pause when a new red field note appears (a per-device preference). */
+  autoPause: boolean
+  /** The warning that just paused the meadow, until the player plays again. */
+  pausedFor: Hint | null
 }
 
 const WINTER = [tickAt(3), tickAt(6)] as const
@@ -112,6 +126,10 @@ export class GameController {
   private best: BestScore | null = null
   private newBest = false
   private hintCache: { tick: number; hints: Hint[] } = { tick: -1, hints: [] }
+  private autoPause = readAutoPause()
+  private pausedFor: Hint | null = null
+  /** The hour and notes the warning watch last saw; -1 after a jump, so the next check only takes a baseline. */
+  private watched: { tick: number; hints: Hint[] } = { tick: -1, hints: [] }
 
   constructor() {
     this.worker = new SimWorker()
@@ -165,12 +183,7 @@ export class GameController {
     const t = Math.floor(this.displayTick)
     const h = this.history
     const p = this.params
-    if (p && this.hintCache.tick !== t) {
-      this.hintCache = {
-        tick: t,
-        hints: hints(h, t),
-      }
-    }
+    if (p) this.hintsAt(t)
     return {
       phase: this.phase,
       playing: this.playing,
@@ -198,7 +211,38 @@ export class GameController {
       atLive: this.atLive(),
       interventions: h.interventions,
       runId: this.runId,
+      autoPause: this.autoPause,
+      pausedFor: this.pausedFor,
     }
+  }
+
+  private hintsAt(t: number): Hint[] {
+    if (this.hintCache.tick !== t) this.hintCache = { tick: t, hints: hints(this.history, t) }
+    return this.hintCache.hints
+  }
+
+  setAutoPause(on: boolean): void {
+    this.autoPause = on
+    try {
+      localStorage.setItem(AUTO_PAUSE_KEY, on ? 'on' : 'off')
+    } catch {
+      /* storage unavailable: the choice lasts for this visit */
+    }
+    this.notify(true)
+  }
+
+  /** While playing live, pause once when a red field note appears that was not showing an hour or so earlier. */
+  private watchWarnings(t: number): void {
+    const prev = this.watched
+    if (t === prev.tick) return
+    const now = this.hintsAt(t)
+    this.watched = { tick: t, hints: now }
+    if (!this.autoPause || this.phase !== 'running' || prev.tick < 0 || t < prev.tick || t - prev.tick > 48) return
+    const fresh = newDangers(prev.hints, now)
+    if (fresh.length === 0) return
+    this.pause()
+    this.pausedFor = fresh[0]
+    this.notify(true)
   }
 
   private atLive(): boolean {
@@ -216,6 +260,8 @@ export class GameController {
     this.saveStatus = ''
     this.saving = false
     this.hintCache = { tick: -1, hints: [] }
+    this.watched = { tick: -1, hints: [] }
+    this.pausedFor = null
     this.displayTick = 0
     this.lastFxTick = 0
     this.playing = false
@@ -337,6 +383,7 @@ export class GameController {
     if (this.phase === 'ended' && this.displayTick >= this.history.head) this.displayTick = this.history.replayStart
     if (this.phase === 'planning') this.phase = 'running'
     this.playing = true
+    this.pausedFor = null
     this.last = performance.now()
     this.notify(true)
   }
@@ -361,6 +408,7 @@ export class GameController {
   seek(tick: number): void {
     this.stepTarget = null
     this.displayTick = Math.max(this.history.replayStart, Math.min(this.history.head, tick))
+    this.watched = { tick: -1, hints: [] }
     this.lastFxTick = Math.floor(this.displayTick)
     this.renderer?.clearFx()
     if (this.end && this.displayTick >= this.end.tick) this.finalize()
@@ -485,6 +533,8 @@ export class GameController {
       }
     }
     const t = Math.floor(this.displayTick)
+    if (this.playing && this.atLive()) this.watchWarnings(t)
+    else this.watched = { tick: -1, hints: [] }
     if (this.renderer && this.rendererAttached) {
       if (this.playing && t > this.lastFxTick && t - this.lastFxTick < 40) {
         for (let k = this.lastFxTick + 1; k <= t; k++) {
