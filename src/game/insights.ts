@@ -272,3 +272,9 @@ export function explain(h: RunHistory, end: EndInfo, scenario: Scenario): Explan
     ],
   }
 }
+
+/** The intervention allowance in words, shown next to the dots. */
+export function usesLeft(charges: number, total: number, planning: boolean): string {
+  if (planning) return `${total} uses per run`
+  return charges === 0 ? `none of ${total} uses left` : `${charges} of ${total} uses left`
+}

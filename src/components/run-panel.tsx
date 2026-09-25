@@ -8,7 +8,7 @@ import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip
 import { useAnimalIcons } from '@/hooks/use-animal-icons'
 import { CHARGES, COOLDOWN } from '@/game/controller'
 import { CALM_BONUS } from '@/game/scores'
-import { forecast, type Tone } from '@/game/insights'
+import { forecast, usesLeft, type Tone } from '@/game/insights'
 import { useGame } from '@/hooks/use-game'
 import type { Intervention } from '@/sim/sim'
 import { clockLabel, dateLabel, formatDuration } from '@/sim/time'
@@ -119,12 +119,20 @@ export function Interventions({ preview = false }: { preview?: boolean }) {
     <section aria-labelledby="interventions-heading">
       <div className="mb-2 flex items-center justify-between">
         <h3 id="interventions-heading" className="text-xs font-semibold tracking-wide text-muted-foreground uppercase">Interventions</h3>
-        <div className="flex items-center gap-1" aria-label={`${snap.charges} of ${CHARGES} left`}>
-          {Array.from({ length: CHARGES }, (_, i) => (
-            <span key={i} className={cn('size-2 rounded-full', i < snap.charges ? 'bg-primary' : 'bg-muted')} />
-          ))}
+        <div className="flex items-center gap-2">
+          <span className="text-xs text-muted-foreground tabular">{usesLeft(snap.charges, CHARGES, preview || snap.phase === 'planning')}</span>
+          <div className="flex items-center gap-1" aria-hidden="true">
+            {Array.from({ length: CHARGES }, (_, i) => (
+              <span key={i} className={cn('size-2 rounded-full', i < snap.charges ? 'bg-primary' : 'bg-muted')} />
+            ))}
+          </div>
         </div>
       </div>
+      {preview && (
+        <p className="mb-2 text-xs text-muted-foreground">
+          You get {CHARGES} uses per run, shared across all eight options, with a {formatDuration(COOLDOWN)} cooldown after each.
+        </p>
+      )}
       {preview ? (
         <ul className="flex flex-col gap-1.5 text-xs">
           {ACTIONS.map((a) => (
@@ -158,10 +166,12 @@ export function Interventions({ preview = false }: { preview?: boolean }) {
         </div>
       )}
       <p className="mt-2 text-xs text-muted-foreground">
-        {snap.phase !== 'running'
+        {snap.phase === 'ended'
+          ? 'This run has ended.'
+          : snap.phase !== 'running'
           ? 'Available once the run starts.'
           : snap.charges === 0
-            ? 'All interventions used.'
+            ? `All ${CHARGES} uses spent. No more interventions this run.`
             : !snap.atLive
               ? 'You are replaying the past. Return to live to intervene.'
               : cooling
