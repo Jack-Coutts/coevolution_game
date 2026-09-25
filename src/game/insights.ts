@@ -51,9 +51,32 @@ export function forecast(h: RunHistory, tick: number): Forecast | null {
   return { prey: project('prey'), pred: project('pred'), ahead }
 }
 
-export function hints(h: RunHistory, tick: number): Hint[] {
+/** Field notes announce a scenario's weather or arrival this many days ahead. */
+export const NOTICE_DAYS = 14
+
+/** "Harsh winter starts in 5 days (1 Dec)." Weather recurs each year in Endless; an arrival happens once. */
+export function upcoming(scenario: Scenario, tick: number, endless: boolean): Hint | null {
+  const soon = (start: number, label: string, id: string): Hint | null => {
+    const days = Math.ceil((start - tick) / 24)
+    if (start <= tick || days > NOTICE_DAYS) return null
+    return { id, tone: 'warn', text: `${label} in ${days} day${days === 1 ? '' : 's'} (${dateLabel(start)}).` }
+  }
+  for (const s of scenario.spans) {
+    const start = endless ? s.from + Math.ceil((tick - s.from + 1) / 8760) * 8760 : s.from
+    const hint = soon(start, `${s.label} starts`, 'upcoming')
+    if (hint) return hint
+  }
+  for (const m of scenario.markers) {
+    const hint = soon(m.tick, m.label, 'upcoming')
+    if (hint) return hint
+  }
+  return null
+}
+
+export function hints(h: RunHistory, tick: number, scenario?: Scenario): Hint[] {
   const out: Hint[] = []
   if (tick - h.firstTick < 24) return out
+  const notice = scenario && upcoming(scenario, tick, h.endless)
   const prey = h.stat(tick, 'prey')
   const pred = h.stat(tick, 'pred')
   const past = Math.max(h.firstTick, tick - WINDOW)
@@ -148,6 +171,7 @@ export function hints(h: RunHistory, tick: number): Hint[] {
       text: `Holding steady: ${prey} rabbits and ${pred} foxes, with bushes ${Math.round(stock * 100)}% full.`,
     })
   }
+  if (notice) out.unshift(notice)
   return out
 }
 
@@ -177,8 +201,10 @@ function lastBirthTick(h: RunHistory, key: 'preyBorn' | 'predBorn', end: number)
   return null
 }
 
-function inSpan(scenario: Scenario, tick: number): string | null {
-  for (const s of scenario.spans) if (tick >= s.from && tick <= s.to) return s.label
+/** Weather spans repeat each year in Endless; arrival markers happen once. */
+function inSpan(scenario: Scenario, tick: number, endless: boolean): string | null {
+  const t = endless ? tick % 8760 : tick
+  for (const s of scenario.spans) if (t >= s.from && t <= s.to) return s.label
   for (const m of scenario.markers) if (tick >= m.tick && tick - m.tick < 30 * 24) return m.label
   return null
 }
@@ -194,7 +220,7 @@ export function explain(h: RunHistory, end: EndInfo, scenario: Scenario): Explan
     }
   }
   const from = Math.max(h.firstTick, T - 300)
-  const context = inSpan(scenario, h.endless ? T % 8760 : T)
+  const context = inSpan(scenario, T, h.endless)
   const ctx = context ? ` This happened during the ${context.toLowerCase()} period.` : ''
   const species = end.predEnd === 0 ? 'pred' : 'prey'
   const illness = delta(h, species === 'pred' ? 'predIllness' : 'preyIllness', from, T)
