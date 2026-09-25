@@ -29,7 +29,7 @@ export interface MeadowSave {
 export interface MeadowSaveV2 extends Omit<MeadowSave, 'version' | 'state' | 'history' | 'evolution'> {
   version: 2
   state: MeadowStateV2
-  history: Omit<ReturnType<RunHistory['save']>, 'highestGeneration' | 'replayFrom' | 'journal' | 'families'> & { highestGeneration?: { prey: number; pred: number }; replayFrom?: number }
+  history: Omit<ReturnType<RunHistory['save']>, 'highestGeneration' | 'replayFrom' | 'journal' | 'families' | 'varieties'> & { highestGeneration?: { prey: number; pred: number }; replayFrom?: number }
     & Partial<Pick<ReturnType<RunHistory['save']>, 'journal' | 'families'>>
   evolution?: Omit<EvolutionSample, 'vole'>[]
 }
@@ -59,7 +59,7 @@ export function migrateSave(value: MeadowSave | MeadowSaveV2): MeadowSave {
       ...value,
       version: 3,
       state,
-      history: { ...value.history, journal: value.history.journal, families: value.history.families, replayFrom: value.history.replayFrom ?? value.history.start, stats, highestGeneration: { prey: 0, pred: 0, ...value.history.highestGeneration, vole: 0 } },
+      history: { ...value.history, journal: value.history.journal, families: value.history.families, varieties: undefined, replayFrom: value.history.replayFrom ?? value.history.start, stats, highestGeneration: { prey: 0, pred: 0, ...value.history.highestGeneration, vole: 0 } },
       evolution: (value.evolution ?? []).map(e => ({ ...e, vole: noAnimals() })),
     }
   } catch {

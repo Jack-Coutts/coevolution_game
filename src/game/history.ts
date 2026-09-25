@@ -4,6 +4,7 @@ import { TWO_SPECIES, type Species } from '@/sim/species'
 import { framePop } from './species-ui'
 import { FamilyHistory } from './families'
 import { Journal, type JournalEntry } from './journal'
+import { VarietyTracker } from './varieties'
 import { ANIMAL_STRIDE, STAT, STAT_STRIDE, type FrameData } from '@/worker/protocol'
 
 export interface Sighting { tick: number; row: Float32Array }
@@ -30,6 +31,7 @@ export class RunHistory {
   evolution: EvolutionSample[] = []
   readonly log: Journal
   readonly families: FamilyHistory
+  readonly varieties: VarietyTracker
   private frames = new Map<number, FrameData>()
   /** lastSeen answers by animal, valid until a rewind or restore. */
   private seen = new Map<string, { before: number; result: Sighting | null }>()
@@ -40,6 +42,7 @@ export class RunHistory {
     this.species = species
     this.log = new Journal(endless, species)
     this.families = new FamilyHistory(species)
+    this.varieties = new VarietyTracker(species)
   }
   get journal(): JournalEntry[] { return this.log.entries }
   get horizon(): number { return this.endless ? Math.max(this.limit, this.head + 300) : this.limit }
@@ -71,6 +74,7 @@ export class RunHistory {
       const frame = this.frames.get(sample.tick)
       this.log.observe(this.evolution, frame)
       this.families.observe(sample.tick, frame)
+      this.varieties.observe(sample.tick, frame, this.log)
     }
     // Preserve the founder reference, plus the most recent daily observations.
     if (this.evolution.length > 367) this.evolution.splice(1, this.evolution.length - 367)
@@ -87,6 +91,7 @@ export class RunHistory {
     while (this.evolution.length > 1 && (this.evolution.at(-1)?.tick ?? 0) > tick) this.evolution.pop()
     this.log.truncate(tick, this.evolution)
     this.families.truncate(tick)
+    this.varieties.truncate(tick)
   }
 
   /** Everything up to `upTo`: a save holds the world at that hour, so later hours would be replayed twice. */
@@ -97,13 +102,17 @@ export class RunHistory {
     log.restore(this.log.save())
     const families = new FamilyHistory(this.species)
     families.restore(this.families.save())
+    const varieties = new VarietyTracker(this.species)
+    varieties.restore(this.varieties.save())
     if (head < this.head) {
       log.truncate(head, this.evolution.filter(e => e.tick <= head))
       families.truncate(head)
+      varieties.truncate(head)
     }
     const journal = log.save()
     return { stats: this.stats, head, start: this.firstTick, replayFrom,
       journal: journal as ReturnType<Journal['save']> | undefined, families: families.save() as ReturnType<FamilyHistory['save']> | undefined,
+      varieties: varieties.save() as ReturnType<VarietyTracker['save']> | undefined,
       /** For older builds; this build reads `journal.highest`. */
       highestGeneration: journal.highest as Record<Species, number> | undefined,
       frames: [...this.frames.entries()].filter(([t]) => t >= replayFrom && t <= head) }
@@ -114,6 +123,7 @@ export class RunHistory {
     this.stats.set(data.stats)
     this.log.restore(data.journal ?? { entries: entries as JournalEntry[] | undefined }, data.highestGeneration)
     this.families.restore(data.families)
+    this.varieties.restore(data.varieties)
     this.head = data.head
     this.start = data.start
     // Saves made before replayFrom existed stored the replay start as `start`.
