@@ -1,5 +1,6 @@
-import { useMemo } from 'react'
+import { useMemo, useRef, useState } from 'react'
 import { AnimalInspector, type AnimalSelection } from '@/components/animal-inspector'
+import { EvolutionJournal, FamiliesCard } from '@/components/journal'
 import { TraitChart, type TraitSeries } from '@/components/trait-chart'
 import { Card } from '@/components/ui/card'
 import { useAnimalIcons } from '@/hooks/use-animal-icons'
@@ -32,7 +33,17 @@ export function EvolutionView({ selected, onSelect }: { selected: AnimalSelectio
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const series = useMemo(() => traitSeries(evolution.slice(0, last + 1)), [evolution, evolution.length, last, lastTick])
   const latest = series.plotted.at(-1)
-  const journal = game.history.journal.filter(e => e.tick <= snap.tick).reverse()
+  const [family, setFamily] = useState<AnimalSelection | null>(null)
+  const inspector = useRef<HTMLElement>(null)
+  const inspect = (a: AnimalSelection) => {
+    game.pause()
+    onSelect(a)
+    inspector.current?.scrollIntoView({ behavior: 'smooth', block: 'nearest' })
+  }
+  const showFamily = (f: AnimalSelection) => {
+    setFamily(f)
+    requestAnimationFrame(() => document.getElementById('families')?.scrollIntoView({ behavior: 'smooth', block: 'nearest' }))
+  }
   return <div className="flex flex-col gap-3">
     <Card className="gap-3 p-4">
       <div>
@@ -62,21 +73,17 @@ export function EvolutionView({ selected, onSelect }: { selected: AnimalSelectio
       {SPECIES.map(s => <section key={s.id} aria-label={`${s.name} traits`}>
         <h4 className={`mb-2 text-xs font-semibold tracking-wide uppercase ${s.tone}`}>{s.name}</h4>
         <div className="grid gap-2 sm:grid-cols-2 xl:grid-cols-4">
-          {TRAITS.map(t => <TraitChart key={t} series={series} species={s.id} trait={t} />)}
+          {TRAITS.map(t => <div key={t} id={`trait-${s.id}-${t}`} className="scroll-mt-4"><TraitChart series={series} species={s.id} trait={t} /></div>)}
         </div>
       </section>)}
     </Card>
 
     <div className="grid items-start gap-3 lg:grid-cols-2">
-      <AnimalInspector picker selected={selected} onSelect={onSelect} />
-      <Card className="gap-0 p-4">
-        <h3 className="text-sm font-semibold">Evolution journal</h3>
-        <p className="mt-1 text-xs text-muted-foreground">Observed milestones, newest first. Trait changes alone do not prove an advantage.</p>
-        {journal.length > 0
-          ? <ul className="mt-2 max-h-[60vh] space-y-2 overflow-y-auto text-xs">{journal.map(e => <li key={`${e.tick}-${e.text}`} className="rounded-md border p-2"><span className="text-muted-foreground">Day {Math.floor(e.tick / 24) + 1} · </span>{e.text}</li>)}</ul>
-          : <p className="mt-2 text-xs text-muted-foreground">Generation and lineage milestones will appear as the meadow evolves.</p>}
-      </Card>
+      <AnimalInspector ref={inspector} picker selected={selected} onSelect={onSelect} onFamily={showFamily} />
+      <EvolutionJournal onInspect={inspect} onFamily={showFamily} />
     </div>
+
+    <FamiliesCard family={family} onFamily={showFamily} onInspect={inspect} endless={snap.endless} />
   </div>
 }
 

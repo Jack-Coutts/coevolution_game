@@ -2,7 +2,7 @@ import type { Intervention } from '@/sim/sim'
 import type { EvolutionSample } from '@/sim/evolution'
 import { FamilyHistory } from './families'
 import { Journal, type JournalEntry } from './journal'
-import { STAT, STAT_STRIDE, type FrameData } from '@/worker/protocol'
+import { ANIMAL_STRIDE, STAT, STAT_STRIDE, type FrameData } from '@/worker/protocol'
 
 export const HISTORY_HOURS = 8760
 const CAPACITY = HISTORY_HOURS + 1
@@ -109,4 +109,29 @@ export class RunHistory {
     return { a, b, alpha: Math.min(1, Math.max(0, (t - lo) / (hi - lo))) }
   }
   frame(tick: number): FrameData | undefined { return this.frames.get(tick) }
+
+  /** The last kept hour at or before `before` when an animal was alive, with its frame row; null if the kept replay never shows it. */
+  lastSeen(species: 'prey' | 'pred', id: number, before: number): { tick: number; row: Float32Array } | null {
+    const find = (tick: number) => {
+      const f = this.frames.get(tick)
+      const rows = species === 'prey' ? f?.prey : f?.preds
+      if (rows) for (let i = 0; i < rows.length; i += ANIMAL_STRIDE) if (rows[i] === id) return rows.subarray(i, i + ANIMAL_STRIDE)
+      return f ? null : undefined
+    }
+    const end = Math.min(this.head, Math.floor(before))
+    // Daily frames are always kept; scan them back, then refine forward hour by hour within the day found.
+    for (let d = Math.floor(end / 24) * 24; d >= this.replayStart - 24; d -= 24) {
+      const day = Math.max(d, this.replayStart)
+      const row = find(day)
+      if (!row) continue
+      let best = { tick: day, row }
+      for (let t = day + 1; t <= Math.min(end, day + 23); t++) {
+        const r = find(t)
+        if (r === null) break
+        if (r) best = { tick: t, row: r }
+      }
+      return best
+    }
+    return null
+  }
 }
