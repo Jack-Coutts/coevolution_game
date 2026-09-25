@@ -40,7 +40,7 @@ export function LeverPanel({ levers, base, onChange, onResetLevers }: Props) {
     <div className="flex flex-col gap-3">
       <div
         className={cn(
-          'sticky top-0 z-10 rounded-lg border p-3 shadow-md backdrop-blur-md',
+          'sticky top-0 z-10 rounded-lg border p-3 shadow-md backdrop-blur-md lg:-top-3',
           over ? 'border-tone-danger-border bg-tone-danger/95' : 'bg-card/95',
         )}
       >

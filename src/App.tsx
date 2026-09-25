@@ -9,7 +9,7 @@ import { Guide } from '@/components/guide'
 import { MeadowSettings } from '@/components/meadow-settings'
 import { LeverPanel, LockedSetup } from '@/components/lever-panel'
 import { ResultDialog } from '@/components/result-dialog'
-import { RunPanel } from '@/components/run-panel'
+import { Almanac, BestScore, Interventions, RunPanel } from '@/components/run-panel'
 import { StatusStrip } from '@/components/status-strip'
 import { Timeline } from '@/components/timeline'
 import { Transport } from '@/components/transport'
@@ -164,6 +164,7 @@ export default function App() {
     } catch { toast.error('Could not load this meadow. Device storage may be unavailable, or the save is incompatible.', { id: 'save' }) }
   }
   const sc = SCENARIO_BY_ID[scenario]
+  const inspector = selected && <AnimalInspector selected={selected} onSelect={setSelected} />
 
   return (
     <TooltipProvider delayDuration={250}>
@@ -270,17 +271,20 @@ export default function App() {
               <Card className="gap-0 p-0 lg:sticky lg:top-4 lg:max-h-[calc(100vh-2rem)]">
                 <div className="min-h-0 flex-1 p-3 lg:overflow-y-auto">
                   {locked ? (
-                    <RunPanel
-                      inspector={selected && <AnimalInspector selected={selected} onSelect={setSelected} />}
-                      setup={<LockedSetup levers={levers} base={base} onUnlock={reset} />}
-                    />
+                    <RunPanel inspector={inspector} setup={<LockedSetup levers={levers} base={base} onUnlock={reset} />} />
                   ) : (
-                    <LeverPanel
-                      levers={levers}
-                      base={base}
-                      onChange={(id, v) => setLevers((prev) => ({ ...prev, [id]: v }))}
-                      onResetLevers={() => setLevers(STABLE_PRESET)}
-                    />
+                    <div className="flex flex-col gap-4">
+                      <BestScore />
+                      {inspector}
+                      <LeverPanel
+                        levers={levers}
+                        base={base}
+                        onChange={(id, v) => setLevers((prev) => ({ ...prev, [id]: v }))}
+                        onResetLevers={() => setLevers(STABLE_PRESET)}
+                      />
+                      <Interventions preview />
+                      <Almanac />
+                    </div>
                   )}
                 </div>
               </Card>

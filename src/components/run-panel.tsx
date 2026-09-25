@@ -27,77 +27,10 @@ export function RunPanel({ inspector, setup }: { inspector: ReactNode; setup: Re
   const [game, snap] = useGame()
   const icons = useAnimalIcons()
   const f = snap.tick > 48 && !snap.end && snap.atLive ? forecast(game.history, snap.tick) : null
-  const cooling = snap.head < snap.cooldownUntil
-  const coolLeft = Math.max(0, snap.cooldownUntil - snap.head)
-  const canAct = game.canIntervene()
-
-  const actionIcon = (id: Intervention) => {
-    switch (id) {
-      case 'plantBushes':
-      case 'rain':
-        return <CloudRain className="size-4 text-tone-info-foreground" />
-      case 'illnessPrey':
-      case 'releasePrey':
-        return <img src={icons.rabbit} alt="" className="size-5" />
-      case 'cullPred':
-        return <Crosshair className="size-4 text-tone-danger-foreground" />
-      case 'feedFoxes':
-      case 'illnessPred':
-      case 'releasePred':
-        return <img src={icons.fox} alt="" className="size-5" />
-      default: {
-        const never: never = id
-        return never
-      }
-    }
-  }
 
   return (
     <div className="flex flex-col gap-4">
-      <section aria-labelledby="interventions-heading">
-        <div className="mb-2 flex items-center justify-between">
-          <h3 id="interventions-heading" className="text-xs font-semibold tracking-wide text-muted-foreground uppercase">Interventions</h3>
-          <div className="flex items-center gap-1" aria-label={`${snap.charges} of ${CHARGES} left`}>
-            {Array.from({ length: CHARGES }, (_, i) => (
-              <span key={i} className={cn('size-2 rounded-full', i < snap.charges ? 'bg-primary' : 'bg-muted')} />
-            ))}
-          </div>
-        </div>
-        <div className="grid grid-cols-2 gap-2">
-          {ACTIONS.map((a) => (
-            <Tooltip key={a.id}>
-              <TooltipTrigger asChild>
-                <Button
-                  variant="outline"
-                  className="h-auto justify-start gap-2 py-2 text-left"
-                  disabled={!canAct}
-                  onClick={() => game.intervene(a.id)}
-                >
-                  {actionIcon(a.id)}
-                  <span className="text-[13px]">{a.label}</span>
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent>{a.blurb}</TooltipContent>
-            </Tooltip>
-          ))}
-        </div>
-        <p className="mt-2 text-xs text-muted-foreground">
-          {snap.phase !== 'running'
-            ? 'Available once the run starts.'
-            : snap.charges === 0
-              ? 'All interventions used.'
-              : !snap.atLive
-                ? 'You are replaying the past. Return to live to intervene.'
-                : cooling
-                  ? `Recharging: ready in ${formatDuration(coolLeft)}.`
-                  : `Ready. There is a ${formatDuration(COOLDOWN)} cooldown between interventions.`}
-        </p>
-        {cooling && <Progress value={100 - (coolLeft / COOLDOWN) * 100} className="mt-1 h-1" />}
-        <p className="mt-2 text-[11px] text-muted-foreground">Illness spreads locally and drains energy; it can overshoot. Planting supports future food. Feeding foxes gives relief but may encourage births.</p>
-        <p className="mt-2 text-[11px] text-muted-foreground">
-          {snap.endless ? 'These four charges last the whole Endless run. Score is hours survived, with no year-end bonus.' : `A full year with no interventions earns +${CALM_BONUS[0]}, and each one used lowers that bonus by 100.`}
-        </p>
-      </section>
+      <Interventions />
 
       {inspector}
 
@@ -155,38 +88,7 @@ export function RunPanel({ inspector, setup }: { inspector: ReactNode; setup: Re
         {game.history.stat(snap.tick, 'ceilingHits') > 0 && <p className="mt-2 text-xs text-tone-warn-foreground">The performance safety limit has restricted births. This run is not valid for balance comparisons.</p>}
       </section>
 
-      {(snap.interventions.length > 0 || game.scenario.markers.length > 0 || game.scenario.spans.length > 0) && (
-        <section>
-          <h3 className="mb-2 text-xs font-semibold tracking-wide text-muted-foreground uppercase">Almanac</h3>
-          <ul className="flex flex-col gap-1 text-[13px]">
-            {game.scenario.spans.map((s) => (
-              <li key={s.label} className="flex justify-between gap-2">
-                <span>{s.label}</span>
-                <span className="text-muted-foreground tabular">
-                  {dateLabel(s.from)} – {dateLabel(Math.min(s.to, snap.horizon))}
-                </span>
-              </li>
-            ))}
-            {game.scenario.markers.map((m) => (
-              <li key={m.label} className="flex justify-between gap-2">
-                <span>{m.label}</span>
-                <span className="text-muted-foreground tabular">{dateLabel(m.tick)}</span>
-              </li>
-            ))}
-            {snap.interventions.map((iv, i) => (
-              <li key={i} className="flex justify-between gap-2">
-                <span className="flex items-center gap-1.5">
-                  <Badge variant="secondary" className="px-1.5">
-                    You
-                  </Badge>
-                  {ACTIONS.find((a) => a.id === iv.action)?.label}
-                </span>
-                <span className="text-muted-foreground tabular">{dateLabel(iv.tick)}</span>
-              </li>
-            ))}
-          </ul>
-        </section>
-      )}
+      <Almanac />
 
       <BestScore />
 
@@ -195,7 +97,7 @@ export function RunPanel({ inspector, setup }: { inspector: ReactNode; setup: Re
   )
 }
 
-function BestScore() {
+export function BestScore() {
   const [, snap] = useGame()
   if (!snap.best) return null
   return (
@@ -203,6 +105,133 @@ function BestScore() {
       <Trophy className="size-4 text-gold" />
       <span className="text-muted-foreground">Your best on this meadow</span>
       <span className="ml-auto font-semibold tabular">{snap.best.score.toLocaleString()}</span>
+    </section>
+  )
+}
+
+/** With `preview`, a read-only list shown during setup so the options are known before the run. */
+export function Interventions({ preview = false }: { preview?: boolean }) {
+  const [game, snap] = useGame()
+  const cooling = snap.head < snap.cooldownUntil
+  const coolLeft = Math.max(0, snap.cooldownUntil - snap.head)
+  const canAct = game.canIntervene()
+  return (
+    <section aria-labelledby="interventions-heading">
+      <div className="mb-2 flex items-center justify-between">
+        <h3 id="interventions-heading" className="text-xs font-semibold tracking-wide text-muted-foreground uppercase">Interventions</h3>
+        <div className="flex items-center gap-1" aria-label={`${snap.charges} of ${CHARGES} left`}>
+          {Array.from({ length: CHARGES }, (_, i) => (
+            <span key={i} className={cn('size-2 rounded-full', i < snap.charges ? 'bg-primary' : 'bg-muted')} />
+          ))}
+        </div>
+      </div>
+      {preview ? (
+        <ul className="flex flex-col gap-1.5 text-xs">
+          {ACTIONS.map((a) => (
+            <li key={a.id} className="flex items-start gap-2">
+              <ActionIcon id={a.id} />
+              <span>
+                <span className="font-medium">{a.label}</span>
+                <span className="text-muted-foreground"> · {a.blurb}</span>
+              </span>
+            </li>
+          ))}
+        </ul>
+      ) : (
+        <div className="grid grid-cols-2 gap-2">
+          {ACTIONS.map((a) => (
+            <Tooltip key={a.id}>
+              <TooltipTrigger asChild>
+                <Button
+                  variant="outline"
+                  className="h-auto justify-start gap-2 py-2 text-left"
+                  disabled={!canAct}
+                  onClick={() => game.intervene(a.id)}
+                >
+                  <ActionIcon id={a.id} />
+                  <span className="text-[13px]">{a.label}</span>
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>{a.blurb}</TooltipContent>
+            </Tooltip>
+          ))}
+        </div>
+      )}
+      <p className="mt-2 text-xs text-muted-foreground">
+        {snap.phase !== 'running'
+          ? 'Available once the run starts.'
+          : snap.charges === 0
+            ? 'All interventions used.'
+            : !snap.atLive
+              ? 'You are replaying the past. Return to live to intervene.'
+              : cooling
+                ? `Recharging: ready in ${formatDuration(coolLeft)}.`
+                : `Ready. There is a ${formatDuration(COOLDOWN)} cooldown between interventions.`}
+      </p>
+      {cooling && <Progress value={100 - (coolLeft / COOLDOWN) * 100} className="mt-1 h-1" />}
+      <p className="mt-2 text-[11px] text-muted-foreground">Illness spreads locally and drains energy; it can overshoot. Planting supports future food. Feeding foxes gives relief but may encourage births.</p>
+      <p className="mt-2 text-[11px] text-muted-foreground">
+        {snap.endless ? 'These four charges last the whole Endless run. Score is hours survived, with no year-end bonus.' : `A full year with no interventions earns +${CALM_BONUS[0]}, and each one used lowers that bonus by 100.`}
+      </p>
+    </section>
+  )
+}
+
+function ActionIcon({ id }: { id: Intervention }) {
+  const icons = useAnimalIcons()
+  switch (id) {
+    case 'plantBushes':
+    case 'rain':
+      return <CloudRain className="size-4 shrink-0 text-tone-info-foreground" />
+    case 'illnessPrey':
+    case 'releasePrey':
+      return <img src={icons.rabbit} alt="" className="size-5 shrink-0" />
+    case 'cullPred':
+      return <Crosshair className="size-4 shrink-0 text-tone-danger-foreground" />
+    case 'feedFoxes':
+    case 'illnessPred':
+    case 'releasePred':
+      return <img src={icons.fox} alt="" className="size-5 shrink-0" />
+    default: {
+      const never: never = id
+      return never
+    }
+  }
+}
+
+export function Almanac() {
+  const [game, snap] = useGame()
+  if (snap.interventions.length === 0 && game.scenario.markers.length === 0 && game.scenario.spans.length === 0) return null
+  return (
+    <section>
+      <h3 className="mb-2 text-xs font-semibold tracking-wide text-muted-foreground uppercase">Almanac</h3>
+      <ul className="flex flex-col gap-1 text-[13px]">
+        {game.scenario.spans.map((s) => (
+          <li key={s.label} className="flex justify-between gap-2">
+            <span>{s.label}</span>
+            <span className="text-muted-foreground tabular">
+              {dateLabel(s.from)} – {dateLabel(Math.min(s.to, snap.horizon))}
+            </span>
+          </li>
+        ))}
+        {game.scenario.markers.map((m) => (
+          <li key={m.label} className="flex justify-between gap-2">
+            <span>{m.label}</span>
+            <span className="text-muted-foreground tabular">{dateLabel(m.tick)}</span>
+          </li>
+        ))}
+        {snap.interventions.map((iv, i) => (
+          <li key={i} className="flex justify-between gap-2">
+            <span className="flex items-center gap-1.5">
+              <Badge variant="secondary" className="px-1.5">
+                You
+              </Badge>
+              {ACTIONS.find((a) => a.id === iv.action)?.label}
+            </span>
+            <span className="text-muted-foreground tabular">{dateLabel(iv.tick)}</span>
+          </li>
+        ))}
+      </ul>
     </section>
   )
 }
