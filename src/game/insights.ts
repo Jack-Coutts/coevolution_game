@@ -288,7 +288,7 @@ export function explain(h: RunHistory, end: EndInfo, scenario: Scenario): Explan
   if (eaten >= starved && eaten >= old) {
     return {
       headline: `Rabbits were eaten out on ${when}.`,
-      detail: `${eaten} of the last ${eaten + starved + old} rabbit deaths were to foxes, with about 1 fox for every ${(1 / Math.max(ratio, 1e-6)).toFixed(1)} rabbits.${ctx}`,
+      detail: `${eaten} of the last ${eaten + starved + old} rabbit deaths were to foxes, with ${ratio >= 1 ? `about ${ratio.toFixed(1)} foxes for every rabbit` : `about 1 fox for every ${(1 / Math.max(ratio, 1e-6)).toFixed(1)} rabbits`}.${ctx}`,
       suggestions: ['Start with fewer foxes', 'Speed up rabbit breeding', 'Give rabbits more speed or sense range'],
     }
   }

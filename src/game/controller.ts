@@ -105,6 +105,8 @@ export class GameController {
   private rendererAttached = false
   private runId = 0
   private displayTick = 0
+  /** Latest hour the player has seen. Hours before it have been watched, so acting there would rewrite them. */
+  private seenTick = 0
   private playing = false
   private speed = DEFAULT_SPEED
   private phase: Phase = 'loading'
@@ -184,6 +186,7 @@ export class GameController {
 
   private makeSnapshot(): Snapshot {
     const t = Math.floor(this.displayTick)
+    this.seenTick = Math.max(this.seenTick, t)
     const h = this.history
     const p = this.params
     if (p) this.hintsAt(t)
@@ -269,7 +272,8 @@ export class GameController {
   }
 
   private atLive(): boolean {
-    return this.history.head - this.displayTick < Math.max(8, SPEEDS[this.speed].tps * 0.6)
+    const t = Math.floor(this.displayTick)
+    return t >= this.seenTick && this.history.head - this.displayTick < Math.max(8, SPEEDS[this.speed].tps * 0.6)
   }
 
   /** Start a fresh run at tick 0 (planning phase). */
@@ -287,6 +291,7 @@ export class GameController {
     this.pausedFor = null
     this.resetRate()
     this.displayTick = 0
+    this.seenTick = 0
     this.lastFxTick = 0
     this.playing = false
     this.phase = 'loading'
@@ -325,7 +330,7 @@ export class GameController {
         this.history.add(msg.frame, msg.stats, 0)
         this.history.addEvolution(msg.evolution)
         this.phase = msg.restored ? 'running' : 'planning'
-        if (msg.restored) { this.displayTick = msg.frame.tick; this.end = msg.end ?? null; if (this.end) this.finalize() }
+        if (msg.restored) { this.displayTick = this.seenTick = msg.frame.tick; this.end = msg.end ?? null; if (this.end) this.finalize() }
         if (this.renderer && this.params && this.config) {
           this.renderer.setWorld(msg.cover, this.params.eco.coverR, this.config.seed, this.params.patchStock)
         }
@@ -385,7 +390,7 @@ export class GameController {
         this.history.add(msg.frame, msg.stats, 0)
         msg.evolution.forEach(e => this.history.addEvolution(e))
         this.end = msg.end
-        this.displayTick = msg.tick
+        this.displayTick = this.seenTick = msg.tick
         this.lastFxTick = msg.tick
         if (this.renderer && this.rendererAttached) this.renderer.addEvents(msg.frame, performance.now(), false)
         this.cooldownUntil = msg.from + COOLDOWN
@@ -433,6 +438,7 @@ export class GameController {
   /** Jump the view to a tick already simulated (scrub). */
   seek(tick: number): void {
     if (this.intervening) return
+    this.seenTick = Math.max(this.seenTick, Math.floor(this.displayTick))
     this.stepTarget = null
     this.displayTick = Math.max(this.history.replayStart, Math.min(this.history.head, tick))
     this.watched = { tick: -1, hints: [] }
@@ -544,6 +550,7 @@ export class GameController {
     this.raf = requestAnimationFrame(this.loop)
     const dt = Math.min(100, now - this.last)
     this.last = now
+    this.seenTick = Math.max(this.seenTick, Math.floor(this.displayTick))
     const h = this.history
     const tps = SPEEDS[this.speed].tps
     if (this.playing && !this.intervening) {

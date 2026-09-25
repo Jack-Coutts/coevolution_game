@@ -181,3 +181,16 @@ it('ignores a seek while an intervention is in flight, so the run is not ended e
   game.dispose()
 })
 
+it('does not intervene at an hour the player has already watched, only at the latest hour seen', () => {
+  const { game, runId, frame } = ready()
+  game.stepBy(12)
+  const frames = Array.from({ length: 12 }, (_, i) => ({ ...frame, tick: i + 1 }))
+  mock.receive({ type: 'frames', runId, frames, stats: new Float64Array(12 * STAT_STRIDE), head: 12, end: null, evolution: [] })
+  expect([game.displayTickValue, game.canIntervene()]).toEqual([12, true])
+  game.seek(5)
+  expect([game.displayTickValue, game.canIntervene()]).toEqual([5, false])
+  game.seek(12)
+  expect(game.canIntervene()).toBe(true)
+  game.dispose()
+})
+

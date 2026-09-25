@@ -129,10 +129,12 @@ export default function App() {
     const onPointer = (e: PointerEvent) => { pointerFocus = (e.target as Element).closest?.(CONTROL) ?? null }
     const onFocus = (e: FocusEvent) => { if (e.target !== pointerFocus) pointerFocus = null }
     const onKey = (e: KeyboardEvent) => {
-      if (e.defaultPrevented) return
       const t = e.target as HTMLElement
+      // A control the mouse focused should not swallow the game's shortcuts (Space, R, arrows) until the keyboard moves focus.
+      const clicked = pointerFocus !== null && t.closest(CONTROL) === pointerFocus && !t.closest('input, textarea, select, [role="dialog"]') &&
+        (e.key === ' ' || !t.closest('[role="slider"]'))
+      if (e.defaultPrevented && !clicked) return
       if (e.metaKey || e.ctrlKey || e.altKey || t.closest('[role="dialog"], [role="alertdialog"]')) return
-      const clicked = e.key === ' ' && pointerFocus !== null && t.closest(CONTROL) === pointerFocus && !t.closest('input, textarea, select, [role="dialog"]')
       if (!clicked && t.closest('input, textarea, select, [role="slider"], [role="combobox"], [role="listbox"], [role="radiogroup"], [role="radio"]')) return
       const s = game.getSnapshot()
       switch (e.key) {
@@ -365,7 +367,7 @@ export default function App() {
       />
       <ConfirmReset
         open={confirmReset}
-        hours={snap.head}
+        hours={snap.tick}
         onCancel={() => setConfirmReset(false)}
         onConfirm={() => {
           setConfirmReset(false)
