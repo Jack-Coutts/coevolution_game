@@ -198,7 +198,7 @@ export default function App() {
                 key={v}
                 href={hrefOf(v)}
                 aria-current={view === v ? 'page' : undefined}
-                onClick={(e) => view === v && e.preventDefault()}
+                onClick={(e) => { if (view === v && e.button === 0 && !e.metaKey && !e.ctrlKey && !e.shiftKey && !e.altKey) e.preventDefault() }}
                 className={cn(
                   'flex flex-1 items-center justify-center gap-1.5 rounded-md px-3 py-1 text-sm font-medium transition-colors lg:flex-none',
                   view === v ? 'bg-background text-foreground shadow-sm' : 'text-muted-foreground hover:text-foreground',

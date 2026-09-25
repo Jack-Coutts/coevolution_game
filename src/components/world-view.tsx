@@ -71,7 +71,7 @@ export function WorldView({ maxSize, selected, onSelect }: { maxSize: number; se
 
         {marker && <div aria-hidden="true" className="pointer-events-none absolute size-6 -translate-x-1/2 -translate-y-1/2 rounded-full border-2 border-amber-200 shadow-lg" style={{ left: marker[0], top: marker[1] }} />}
         <div className="pointer-events-none absolute inset-x-0 top-0 flex flex-wrap items-start justify-between gap-2 p-2 sm:p-3">
-          <div className="flex items-center gap-2 rounded-lg bg-black/70 px-2.5 py-1.5 text-white shadow-lg backdrop-blur-md">
+          <div className="flex items-center gap-2 rounded-lg bg-black/75 px-2.5 py-1.5 text-white shadow-lg backdrop-blur-md">
             <TimeIcon className="size-4 text-amber-200" />
             <div className="leading-tight">
               <div className="text-sm font-semibold tabular">
@@ -83,7 +83,7 @@ export function WorldView({ maxSize, selected, onSelect }: { maxSize: number; se
             </div>
           </div>
           {/* `dark` scopes the species tokens to their light-on-dark values over this chip in both themes */}
-          <div className="dark flex items-center gap-1.5 rounded-lg bg-black/70 px-2 py-1.5 text-white shadow-lg backdrop-blur-md">
+          <div className="dark flex items-center gap-1.5 rounded-lg bg-black/75 px-2 py-1.5 text-white shadow-lg backdrop-blur-md">
             <Count icon={icons.rabbit} value={snap.prey} label="rabbits" tone="text-rabbit" />
             <Count icon={icons.fox} value={snap.pred} label={`foxes · ${snap.predKits10d} kits born in the last 10 days`} tone="text-fox" />
             <div
@@ -109,11 +109,11 @@ export function WorldView({ maxSize, selected, onSelect }: { maxSize: number; se
 
         {planning && (
           <div className="pointer-events-none absolute inset-0 flex items-end justify-center bg-gradient-to-t from-black/60 via-black/10 to-transparent p-6">
-            <div className="pointer-events-auto flex flex-col items-center gap-3 text-center text-white">
+            <div className="flex flex-col items-center gap-3 text-center text-white">
               <p className="max-w-sm text-sm text-white/85 drop-shadow">
                 {snap.prey} rabbits and {snap.pred} foxes with random genes. Tune the levers, then release them.
               </p>
-              <Button size="lg" onClick={() => game.play()} className="gap-2 shadow-xl">
+              <Button size="lg" onClick={() => game.play()} className="pointer-events-auto gap-2 shadow-xl">
                 <Play className="size-4" /> Release the animals
               </Button>
               <span className="text-[11px] text-white/60">or press Space</span>

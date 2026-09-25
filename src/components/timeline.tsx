@@ -93,6 +93,7 @@ export function Timeline() {
       for (const m of monthStarts(horizon, start)) {
         const x = xOf(m.tick)
         ctx.strokeStyle = c.border
+        ctx.lineWidth = 1
         ctx.beginPath()
         ctx.moveTo(x, PAD_T)
         ctx.lineTo(x, PAD_T + ih)
