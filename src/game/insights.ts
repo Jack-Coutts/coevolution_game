@@ -53,7 +53,27 @@ export function forecast(h: RunHistory, tick: number): Forecast | null {
   return { prey: project('prey'), pred: project('pred'), ahead }
 }
 
+const RANK: Record<Tone, number> = { danger: 0, warn: 1, info: 2, good: 3 }
+/** A danger note stays this many hours after its condition last held, so a one-hour blip does not hide it. */
+export const DANGER_HOLD = 48
+
+/**
+ * Field notes at `tick`, most urgent first. A danger note that held within the last DANGER_HOLD hours stays,
+ * marked with how long ago it was last true.
+ */
 export function hints(h: RunHistory, tick: number): Hint[] {
+  const out = notesAt(h, tick)
+  for (let lag = 1; lag <= DANGER_HOLD && tick - lag - h.firstTick >= 24; lag++) {
+    for (const n of notesAt(h, tick - lag)) {
+      if (n.tone !== 'danger' || out.some(o => o.id === n.id)) continue
+      out.push({ ...n, text: `${n.text} (${lag} h ago)` })
+    }
+  }
+  const alarms = out.filter(n => n.id !== 'steady' && n.id !== 'trend')
+  return (alarms.length ? alarms : out).sort((a, b) => RANK[a.tone] - RANK[b.tone])
+}
+
+function notesAt(h: RunHistory, tick: number): Hint[] {
   const out: Hint[] = []
   if (tick - h.firstTick < 24) return out
   const prey = h.stat(tick, 'prey')
@@ -116,7 +136,7 @@ export function hints(h: RunHistory, tick: number): Hint[] {
       tone: kits >= foxOld ? 'info' : 'warn',
       text:
         kits >= foxOld
-          ? `Kits are replacing the foxes that die of old age (${kits} in the last 10 days).`
+          ? `Kits are replacing the foxes that die of old age (${kits} kits and ${Math.round(foxOld)} old-age deaths in 10 days).`
           : `Old foxes are dying faster than kits replace them (${kits} kits and ${Math.round(foxOld)} deaths of old age in 10 days).`,
     })
   }
@@ -144,11 +164,21 @@ export function hints(h: RunHistory, tick: number): Hint[] {
     }
   }
   if (out.length === 0) {
-    out.push({
-      id: 'steady',
-      tone: 'good',
-      text: `Holding steady: ${prey} rabbits and ${pred} foxes, with bushes ${Math.round(stock * 100)}% full.`,
-    })
+    // Only call it steady when the trend agrees; a forecast that halves or grows by half is not steady.
+    const moving = (now: number, next: number) => (next + 1) / (now + 1) > 1.5 || (now + 1) / (next + 1) > 1.5
+    if (f && f.ahead > 0 && (moving(prey, f.prey) || moving(pred, f.pred))) {
+      out.push({
+        id: 'trend',
+        tone: 'info',
+        text: `No warnings yet, but the meadow is changing: at the current trend, about ${Math.round(f.prey)} rabbits and ${Math.round(f.pred)} foxes by ${dateLabel(tick + f.ahead)} (now ${prey} and ${pred}).`,
+      })
+    } else {
+      out.push({
+        id: 'steady',
+        tone: 'good',
+        text: `Holding steady: ${prey} rabbits and ${pred} foxes, with bushes ${Math.round(stock * 100)}% full.`,
+      })
+    }
   }
   return out
 }
