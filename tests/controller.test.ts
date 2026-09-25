@@ -14,7 +14,8 @@ vi.mock('@/worker/sim.worker.ts?worker', () => ({ default: class {
   terminate() {}
 } }))
 vi.mock('@/game/saves', () => ({ writeSave: mock.save }))
-import { GameController } from '@/game/controller'
+import { CHARGES, COOLDOWN, GameController } from '@/game/controller'
+import * as probes from '../scripts/action-probes'
 
 beforeEach(() => {
   vi.stubGlobal('requestAnimationFrame', () => 1)
@@ -58,4 +59,8 @@ it('starts the full cooldown at the actual worker intervention time', () => {
   expect(game.getSnapshot().cooldownUntil).toBe(424)
   expect(game.getSnapshot().charges).toBe(3)
   game.dispose()
+})
+
+it('the intervention experiment uses the game budget', () => {
+  expect([probes.CHARGES, probes.COOLDOWN]).toEqual([CHARGES, COOLDOWN])
 })
