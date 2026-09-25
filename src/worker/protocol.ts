@@ -3,9 +3,14 @@ import type { SimParams } from '@/sim/params'
 import type { Disturbance, Intervention, MeadowState } from '@/sim/sim'
 import { ALL_SPECIES, type Species } from '@/sim/species'
 
-/** Per-animal floats: id, x, y, hx, hy, energy fraction, maturity, pace, cover, generation,
- * age, parent, lineage, offspring, sight, turn, hidden units, forage, flee, cruise, hide, illness hours. */
-export const ANIMAL_STRIDE = 22
+/** Per-animal floats: id, x, y, hx, hy, energy fraction (of its own max), maturity, pace, cover, generation,
+ * age, parent, lineage, offspring, sight, turn, hidden units, forage, flee, cruise, hide, illness hours,
+ * inherited body size (multiplier, 1 = the species' base body). */
+export const ANIMAL_STRIDE = 23
+/** Stride of frames saved before body size; `migrateSave` widens them with size 1. */
+export const ANIMAL_STRIDE_V3 = 22
+/** Index of the inherited body size in an animal's floats. */
+export const ANIMAL_SIZE = 22
 
 /** Per-tick stats row. Vole columns are appended after the 23 two-species columns, so those keep their places. */
 export const STAT = {

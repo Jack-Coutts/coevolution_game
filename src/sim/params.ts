@@ -1,3 +1,5 @@
+import { defaultBody } from './body'
+
 export interface SpeciesParams {
   initial: number
   adultAge: number
@@ -48,6 +50,16 @@ export interface EcoParams {
   /** Births stop here so a runaway population cannot freeze the tab. Normal play stays far below. */
   ceilingPrey: number
   ceilingPred: number
+  /** Inherited body size (docs/game-design.md). Absent = off: every animal is exactly ×1. */
+  body?: BodyEvolution
+}
+
+/** Settings for inherited body size. The mutation rate is the per-gene `mutationRate`. */
+export interface BodyEvolution {
+  /** Founder genes are uniform in [-spread, spread] (the gene range is [-1, 1]). */
+  spread: number
+  /** Standard deviation of a mutation step on the gene. */
+  sigma: number
 }
 
 export interface SimParams {
@@ -147,6 +159,8 @@ export function defaultEco(): EcoParams {
     brainUpkeep: 0.01,
     ceilingPrey: 800,
     ceilingPred: 400,
+    // Inherited body size is on by default (issue #10; docs/validation.md). Delete to switch it off.
+    body: defaultBody(),
   }
 }
 

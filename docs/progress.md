@@ -37,7 +37,7 @@ Last updated: 25 September 2026, 17:35 UTC.
 
 ### Bodies and ecological varieties
 
-- [ ] #10 Visible inherited body traits with energy costs. Starts after #9.
+- [x] #10 Visible inherited body traits with energy costs. [#28](https://github.com/Jack-Coutts/coevolution_game/pull/28)
 - [ ] #11 Track persistent ecological varieties. Starts after #10.
 - [ ] #12 Journal with family history and trait changes. Family history and trait-change entries merged in [#22](https://github.com/Jack-Coutts/coevolution_game/pull/22); variety entries arrive with #11.
 

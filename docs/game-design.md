@@ -21,6 +21,53 @@ The meadow grows new bushes at seasonal rates. Overgrazed bushes wither; tall gr
 rabbits beyond close range and slows movement. Population ceilings are technical safeguards,
 not player levers: any ceiling-hit run is flagged and excluded from balance claims.
 
+### Inherited body size (issue #10)
+
+Controllers change behaviour, which is hard to see. One visible body trait, **body size**,
+makes adaptation show in appearance. It is written here before it was implemented.
+
+- **Gene.** One number `g` per animal, carried in its genome next to the controller weights,
+  bounded to [-1, 1]. Body size is `m = 1.25^g`: from ×0.80 (small) through ×1.00 (neutral,
+  `g = 0`) to ×1.25 (large). Every species has it; each species keeps its own base body, so
+  a large rabbit is still a rabbit and still far smaller than a fox.
+- **Founders** draw `g` uniformly from [-spread, spread] (default spread 1: the whole range).
+  Released and arriving animals copy a living ancestor's gene, then mutate it.
+- **Inheritance.** A child copies its parent's gene; in sexual variants it takes either
+  parent's gene with equal chance. Founder-pool controls sample founder genomes, sizes
+  included. **Mutation**: with the per-gene mutation rate (the Mutation lever), add a normal
+  step of σ = 0.1, then clamp to [-1, 1].
+- **Effects**, each multiplying that species' base value:
+
+  | Quantity | Scales with | Large ×1.25 | Small ×0.80 | Why |
+  | --- | --- | --- | --- | --- |
+  | Max energy (reserves) | `m` | +25% | −20% | bigger store for lean times |
+  | Basal metabolism | `m^0.75` | +18% | −15% | a bigger body costs more to run |
+  | Top speed | `m^-0.5` | −11% | +12% | small is nimble |
+  | Movement energy | `m` × (speed / reference speed)² | +25% at equal speed | −20% | heavier body to move |
+  | Plant bite (food removed and energy gained) | `m` | +25% | −20% | bigger mouthfuls: fills faster, strips bushes faster |
+  | Catch reach | `eatR × (m_hunter + m_victim) / 2` | reaches further; easier to catch | shorter reach; harder to catch | body radius |
+  | Worth as a meal to a hunter | `m` of the victim | +25% | −20% | more meat |
+  | Breeding threshold and energy given to each young | fraction of own max energy | +25% in absolute energy | −20% | bigger young cost more |
+
+  At full pace every size pays the same movement energy per hour, so per distance a large
+  body pays about 12% more and a small one about 11% less. Hunger (sensed and shown) is
+  energy as a share of the animal's own maximum. Vision, brain upkeep, turning, lifespan,
+  maturity and litter size do not depend on size.
+- **Nothing is free.** Large: more reserves, faster refuelling, longer reach and bigger meals
+  for hunters; but slower, dearer to run and to breed, easier to catch and a richer meal.
+  Small: faster, cheaper, harder to catch; but lower reserves, slower refuelling, shorter reach.
+- **Default and off switch.** On by default (`defaultEco().body`) after the population check
+  in `validation.md`. Deleting `eco.body` switches it off: every animal is then exactly
+  ×1.00, no random numbers are drawn for it, and a meadow runs identically to one from before
+  the feature. Genes in a genome are ignored while it is off. Saved meadows keep the setting
+  they started with.
+- **Display.** The sprite is drawn at `m` times its size (on top of the juvenile scale).
+  Hunger keeps its dashed ring and illness its purple ring, so a thin or sick animal is never
+  drawn smaller. The inspector reports the inherited size; Evolution charts its mean and
+  middle 80%.
+- **Saves.** The gene is in the saved genome and the derived body values on each animal; a
+  save from before this change loads with every animal at ×1.00.
+
 ## Player choices
 
 Before release, change parameters within 30 points. During the run, four intervention uses
@@ -55,7 +102,7 @@ standardised situations and plots mean and middle-80% variation; founders are a 
 reference. Probed inherited tendencies are distinct from current animal movement.
 
 Click an animal or choose it from the inspector (sorted by generation, family or id) to pause
-and read its age, energy, health, generation, offspring and inherited responses. Its family links
+and read its age, energy, health, generation, offspring, inherited body size and inherited responses. Its family links
 lead up and down: a living parent is selected directly; a dead one shows when it was last seen,
 with a link to that hour while the replay still holds it (otherwise "died before the kept
 replay"). Living offspring and the founder family are links too. A selected animal that is not

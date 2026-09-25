@@ -39,7 +39,7 @@ it('planting creates four stocked bushes and feeding refills fox energy without 
   const bushes = s.bushes.length
   s.queue('plantBushes'); s.queue('feedFoxes'); s.step()
   expect(s.bushes.length).toBe(bushes + 4)
-  expect(s.preds.every(a => a.energy > s.p.pred.maxEnergy - 5)).toBe(true)
+  expect(s.preds.every(a => a.energy > a.maxEnergy - 5)).toBe(true)
   expect(s.counters.preyEaten).toBe(0)
 })
 it('released descendants retain their lineage and generation', () => {
