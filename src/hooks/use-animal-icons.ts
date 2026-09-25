@@ -1,6 +1,9 @@
-import { useMemo } from 'react'
 import { animalIcon } from '@/render/sprites'
 
+let icons: { rabbit: string; fox: string } | null = null
+
+/** Painted once per page load; every view reuses the same data URLs. */
 export function useAnimalIcons(): { rabbit: string; fox: string } {
-  return useMemo(() => ({ rabbit: animalIcon('prey', 40), fox: animalIcon('pred', 40) }), [])
+  icons ??= { rabbit: animalIcon('prey', 40), fox: animalIcon('pred', 40) }
+  return icons
 }

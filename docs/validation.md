@@ -27,19 +27,110 @@ independent trials. To reproduce the browser check, run the dev server and open
 
 ## Does intervention help?
 
-The [paired intervention experiment](experiments/interventions.json) starts from those same
-50 seeds and permits four actions, with the game's 400-hour cooldown. After hour 240, a
-simple fixed policy culls foxes when rabbits are scarce and foxes numerous, feeds very few
-hungry foxes, supplies rain when rabbits are hungry, or releases rabbits when very scarce.
-Exact priorities, thresholds and action times are in the script and raw report.
+Short answer: every action has a situation where it helps over the next 60 days, but a
+fixed heuristic does not reliably change **year** survival, and the 20 held-out seeds did
+not confirm the short-term gains. This is evidence about the actions and a fixed rule, not
+about skilled play.
 
-Raw outcomes: **18/50 untouched vs 23/50 with interventions**. The policy rescued nine
-otherwise failing seeds and spoiled four otherwise successful ones. One paired seed (5041)
-is excluded from balance evidence because its intervention run hit the rabbit safeguard;
-both versions failed. Among the remaining **49 valid pairs: 18 survived untouched, 23 with
-interventions**. This suggests useful agency; it is not evidence of optimal play or a
-statistically established general improvement. The new illness and planting choices have
-mechanical tests, but this policy does not establish their strategic balance.
+**Method.** `scripts/action-probes.ts` defines, for each action, a *timely* situation and a
+plausible-but-wrong *mistimed* one, read only from on-screen signals (counts, berry stock,
+mean energy, 10-day trends). `scripts/action-assay.ts` runs each seed untouched; each action
+once at the first hour at or after 240 where its situation holds (timely, then mistimed);
+fox illness at the hour a cull would be used; a *keeper* that uses all eight with the game
+budget (4 charges, 400-hour cooldown, two charges kept for releases/feeding/culls); and a
+placebo *nudge* that moves one rabbit 0.0001 at hour 241. Rows record action hours and
+signals, outcomes, deaths by cause, 30-day populations, illness shape and ceiling hits.
+Pairs with a ceiling hit are excluded from balance claims (there were two runs on tuning
+seeds, none on evaluation seeds). Node 22.22.2, Linux x64, four worker processes.
+
+- Tuning seeds **8000–8039**: situations were chosen from 60-day branches at checkpoints
+  every 480 hours ([summary](experiments/actions-explore.json)), then the paired assay was
+  run ([actions-tuning.json](experiments/actions-tuning.json), 1,447 s;
+  [keeper with reserve](experiments/actions-tuning-keeper.json)).
+- Evaluation seeds **8100–8119**, run once with everything frozen
+  ([actions-final.json](experiments/actions-final.json), 1,552 s). A 100-seed evaluation
+  (8100–8199) was started and stopped part-way to free a shared machine; no rows from it
+  were kept, so **20 seeds is the whole held-out sample**.
+
+**The chaos floor.** The meadow is chaotic: the placebo nudge changed the year outcome on
+15 of 40 tuning seeds (9 improved, 6 spoiled; 19 vs 16 survived) and 5 of 20 evaluation
+seeds (2 improved, 3 spoiled). Any single action reshuffles which seeds survive, so year
+counts below are only meaningful where they clearly exceed that floor. None does.
+
+**60-day branches (tuning seeds).** From each checkpoint, each action was branched for
+60 days and compared with the untouched run: *prevented* = the untouched run lost a species
+within 60 days and the branch did not; *caused* = the reverse. Applying an action at every
+checkpoint regardless of situation gives the noise reference (for example rain 16 / 35,
+planting 21 / 13).
+
+| Action | Timely: branches, prevented / caused | Mistimed: branches, prevented / caused |
+| --- | ---: | ---: |
+| Rain | 58: 3 / 1 | 63: 1 / 11 |
+| Plant bushes | 94: 8 / 3 | 100: 3 / 3 |
+| Release rabbits | 68: 12 / 1 | 68: 1 / 5 |
+| Release foxes | 24: 7 / 0 | 288: 9 / 14 |
+| Cull foxes | 132: 14 / 5 | 36: 1 / 4 |
+| Feed foxes | 27: 5 / 0 | 132: 7 / 15 |
+| Rabbit illness | 29: 0 / 4 | 68: 5 / 5 |
+| Fox illness | 288: 15 / 8 | 37: 1 / 4 |
+
+**Held-out paired runs (20 evaluation seeds; 10/20 survived untouched, Wilson 30–70%).**
+Counts are seeds improved / spoiled versus untouched, over seeds where the situation arose.
+
+| Action | Timely arose | Year | 60 days | Mistimed arose | Year | 60 days | Timely-only / mistimed-only survivals |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| Rain | 14 | 1 / 5 | 0 / 1 | 19 | 3 / 4 | 2 / 1 | 0 / 3 |
+| Plant bushes | 16 | 0 / 3 | 0 / 3 | 16 | 3 / 3 | 2 / 2 | 1 / 4 |
+| Release rabbits | 18 | 2 / 2 | 2 / 3 | 19 | 0 / 5 | 1 / 1 | 6 / 1 |
+| Release foxes | 6 | 0 / 1 | 0 / 0 | 19 | 4 / 5 | 2 / 1 | 1 / 0 |
+| Cull foxes | 19 | 1 / 2 | 1 / 0 | 8 | 1 / 3 | 0 / 1 | 2 / 1 |
+| Feed foxes | 6 | 1 / 0 | 0 / 0 | 19 | 2 / 4 | 2 / 1 | 4 / 0 |
+| Rabbit illness | 15 | 2 / 4 | 0 / 0 | 18 | 5 / 4 | 3 / 4 | 2 / 4 |
+| Fox illness | 19 | 3 / 5 | 2 / 1 | 8 | 1 / 3 | 0 / 2 | 1 / 0 |
+| Keeper (all eight) | 20 | 2 / 5 | 3 / 0 | | | | |
+| Placebo nudge | 20 | 2 / 3 | 2 / 1 | | | | |
+
+The keeper survived 7/20 against 10/20 untouched (tuning: 19/40 against 16/40, equal to the
+placebo). Where evaluation agrees with tuning is the mistimed column: releasing rabbits into
+a boom (0 / 5), culling or infecting a small fox group (1 / 3 each) and feeding foxes while
+they overhunt (2 / 4) spoiled more seeds than they rescued. The held-out sample is too small
+to confirm any timely benefit. Comparing timely with mistimed use of the same action favours
+timely use for releases, culls, feeding and fox illness, and does not for rain, planting or
+rabbit illness.
+
+**Illness versus culling (evaluation seeds, medians).** A cull at the overhunting signal
+removed 12 of 36 foxes at once; foxes were back to 37 thirty days later. Fox illness at the
+same moment infected 42 foxes over the outbreak, peaked at 23 ill after 120 hours, killed 19
+within 60 days and left 9 fewer foxes than untouched at day 30. Neither beat the placebo on
+year survival. Players can watch it develop: ill foxes numbered 11, 16, 16, 4 and 0 at days
+1, 3, 7, 14 and 30 (median; under 1 by day 30). Overshoot (target extinct within 60 days):
+
+| Illness use | Tuning seeds | Evaluation seeds |
+| --- | ---: | ---: |
+| Fox illness, fox-heavy meadow (median 28–30 foxes) | 1/40 | 0/19 (Wilson 0–17%) |
+| Fox illness, 8 or fewer foxes | 6/18 | 2/8 (7–59%) |
+| Rabbit illness, 300+ rabbits on bare bushes | 5/36 | 1/15 (1–30%) |
+| Rabbit illness, 60 or fewer rabbits | 12/34 | 6/18 (16–56%) |
+
+Rabbit illness is far larger than fox illness: in a boom of about 310 rabbits it caused 969
+cases and 728 illness deaths within 60 days (it reaches newborns too), peaking at 140 ill
+after 205 hours.
+
+**Tuning outcome: no mechanics changed.** The one-year budget (4 charges, 400-hour cooldown)
+and all effects are unchanged; untouched runs are identical (`validate-balance.ts 5000 50`
+gives the same 50 rows, 19/50 on this runtime). Rabbit illness never showed a useful situation
+on tuning seeds, so four small variants were branched: drain 0.35 per hour, 120-hour illness,
+spread chance 0.05 and a 40% slowdown while ill. In the rabbit-boom situation they gave
+prevented / caused of 0 / 2, 2 / 2, 1 / 2 and 1 / 1 (game: 0 / 4), inside the noise, so none
+was adopted. Fox illness in a fox-heavy meadow gave 21 / 12, 15 / 7, 14 / 8 and 16 / 4 under the same
+variants (game: 15 / 8): no variant was clearly better. Culling was not dominated by fox
+illness at 60 days (overhunting: cull 14 / 5, fox illness 8 / 7 on tuning seeds), so neither
+was changed.
+
+**Limitations.** The situations are fixed thresholds, not a model of skilled play. 20
+evaluation seeds cannot confirm small effects; the 60-day branch table uses tuning seeds only.
+A held-out branch check of the frozen situations (`action-explore.ts 8100 100 … --evaluate`)
+is scripted but was not run. Rabbit illness still has no demonstrated beneficial use.
 
 ## Does evolution improve behaviour?
 
@@ -94,7 +185,7 @@ founder-pool controls, illness spread/recovery/death attribution, planting/feedi
 checkpoint continuation (including hidden controller memory), repeat seasons, bounded
 Endless history and journal milestones. See the README for reproduction commands.
 
-Final local checks: **33 tests passed** across five test files; TypeScript and the production
+Final local checks: **35 tests passed** across five test files; TypeScript and the production
 build passed; lint completed with no errors and four existing component-export warnings.
 Vite reports a roughly 507 kB main JavaScript chunk (162 kB gzip), just above its advisory
 500 kB threshold. The reusable browser validation page was also checked through worker

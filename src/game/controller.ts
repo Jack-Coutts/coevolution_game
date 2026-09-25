@@ -1,4 +1,5 @@
 import { writeSave, type MeadowSave } from './saves'
+import { chargesAt, COOLDOWN, nextRenewal } from './budget'
 import { BUDGET, deriveParams, spent, type LeverValues } from '@/sim/levers'
 import type { SimParams } from '@/sim/params'
 import { SCENARIO_BY_ID, type Scenario, type ScenarioId } from '@/sim/scenarios'
@@ -8,7 +9,7 @@ import { WorldRenderer, type Weather } from '@/render/renderer'
 import { STAT_STRIDE, type EndInfo, type FrameData, type FromWorker, type ToWorker } from '@/worker/protocol'
 import SimWorker from '@/worker/sim.worker.ts?worker'
 import { RunHistory } from './history'
-import { explain, hints, type Explanation, type Hint } from './insights'
+import { explain, hints, newDangers, type Explanation, type Hint } from './insights'
 import { recordScore, scoreFor, scoreRun, type BestScore, type ScoreBreakdown } from './scores'
 
 export type Phase = 'loading' | 'planning' | 'running' | 'ended'
@@ -31,8 +32,20 @@ export const SPEEDS = [
 ]
 export const DEFAULT_SPEED = 1
 
-export const CHARGES = 4
-export const COOLDOWN = 400
+/** Resetting a run that has gone further than this asks first; planning resets stay instant. */
+export const RESET_CONFIRM_HOURS = 7 * 24
+
+const AUTO_PAUSE_KEY = 'coevo-game:pause-on-warning'
+
+function readAutoPause(): boolean {
+  try {
+    return localStorage.getItem(AUTO_PAUSE_KEY) !== 'off'
+  } catch {
+    return true
+  }
+}
+
+export { CHARGES, COOLDOWN } from './budget'
 
 export interface Snapshot {
   phase: Phase
@@ -56,11 +69,20 @@ export interface Snapshot {
   best: BestScore | null
   newBest: boolean
   hints: Hint[]
+  /** Uses available at the displayed hour. */
   charges: number
+  /** Endless only: the hour the next use renews (the next season start); null in the one-year challenge. */
+  nextRenewal: number | null
   cooldownUntil: number
   atLive: boolean
   interventions: { tick: number; action: Intervention }[]
   runId: number
+  /** Pause when a new red field note appears (a per-device preference). */
+  autoPause: boolean
+  /** The warning that just paused the meadow, until the player plays again. */
+  pausedFor: Hint | null
+  /** Hours per second actually shown, when the simulation cannot keep up with the chosen speed; otherwise null. */
+  effectiveTps: number | null
 }
 
 const WINTER = [tickAt(3), tickAt(6)] as const
@@ -83,18 +105,25 @@ export class GameController {
   private saving = false
   private worker: Worker
   private renderer: WorldRenderer | null = null
+  private rendererAttached = false
   private runId = 0
   private displayTick = 0
+  /** Latest hour the player has seen. Hours before it have been watched, so acting there would rewrite them. */
+  private seenTick = 0
   private playing = false
   private speed = DEFAULT_SPEED
   private phase: Phase = 'loading'
   private end: EndInfo | null = null
   private stepTarget: number | null = null
   private inflight = false
+  /** An intervention is on its way to the worker; hold the display and advance requests until it lands. */
+  private intervening = false
+  private refund: number | null = null
   private raf = 0
   private last = 0
   private lastFxTick = 0
-  private charges = CHARGES
+  /** The hour of an intervention sent to the worker but not yet recorded; it already counts as spent. */
+  private pendingAt: number | null = null
   private cooldownUntil = 0
   private listeners = new Set<() => void>()
   private snap: Snapshot
@@ -105,6 +134,11 @@ export class GameController {
   private best: BestScore | null = null
   private newBest = false
   private hintCache: { tick: number; hints: Hint[] } = { tick: -1, hints: [] }
+  private autoPause = readAutoPause()
+  private pausedFor: Hint | null = null
+  private rate: { since: number; from: number; tps: number | null } = { since: 0, from: 0, tps: null }
+  /** The hour and notes the warning watch last saw; -1 after a jump, so the next check only takes a baseline. */
+  private watched: { tick: number; hints: Hint[] } = { tick: -1, hints: [] }
 
   constructor() {
     this.worker = new SimWorker()
@@ -119,9 +153,16 @@ export class GameController {
     this.worker.terminate()
   }
 
+  /** Detaching keeps the renderer, so returning to the meadow reuses its painted terrain and sprites (~30 ms to rebuild). */
   attachCanvas(canvas: HTMLCanvasElement | null): void {
-    this.renderer = canvas ? new WorldRenderer(canvas) : null
-    if (this.renderer && this.params) this.renderer.setWorld(this.cover, this.params.eco.coverR, this.config?.seed ?? 0, this.params.patchStock)
+    this.rendererAttached = canvas !== null
+    if (!canvas) {
+      this.renderer?.releaseCanvas()
+      return
+    }
+    if (this.renderer) this.renderer.setCanvas(canvas)
+    else this.renderer = new WorldRenderer(canvas)
+    if (this.params) this.renderer.setWorld(this.cover, this.params.eco.coverR, this.config?.seed ?? 0, this.params.patchStock)
   }
 
   resize(cssSize: number): void {
@@ -149,14 +190,10 @@ export class GameController {
 
   private makeSnapshot(): Snapshot {
     const t = Math.floor(this.displayTick)
+    this.seenTick = Math.max(this.seenTick, t)
     const h = this.history
     const p = this.params
-    if (p && this.hintCache.tick !== t) {
-      this.hintCache = {
-        tick: t,
-        hints: hints(h, t, this.scenario),
-      }
-    }
+    if (p) this.hintsAt(t)
     return {
       phase: this.phase,
       playing: this.playing,
@@ -179,16 +216,69 @@ export class GameController {
       best: this.best,
       newBest: this.newBest,
       hints: this.hintCache.hints,
-      charges: this.charges,
+      charges: this.chargesAt(t),
+      nextRenewal: this.config?.endless ? nextRenewal(t) : null,
       cooldownUntil: this.cooldownUntil,
       atLive: this.atLive(),
       interventions: h.interventions,
       runId: this.runId,
+      autoPause: this.autoPause,
+      pausedFor: this.pausedFor,
+      effectiveTps: this.playing ? this.rate.tps : null,
     }
   }
 
+  /** Measure the shown rate over ~2 s windows; flag it when it falls below 80% of the chosen speed. */
+  private measureRate(now: number): void {
+    const r = this.rate
+    if (!this.playing || this.intervening || r.since === 0) {
+      this.rate = { since: now, from: this.displayTick, tps: this.playing ? r.tps : null }
+      return
+    }
+    const elapsed = (now - r.since) / 1000
+    if (elapsed < 2) return
+    const shown = (this.displayTick - r.from) / elapsed
+    const lagging = shown < 0.8 * SPEEDS[this.speed].tps && !(this.end && this.displayTick >= this.end.tick)
+    this.rate = { since: now, from: this.displayTick, tps: lagging ? shown : null }
+    this.notify(true)
+  }
+
+  private resetRate(): void {
+    this.rate = { since: 0, from: 0, tps: null }
+  }
+
+  private hintsAt(t: number): Hint[] {
+    if (this.hintCache.tick !== t) this.hintCache = { tick: t, hints: hints(this.history, t, this.scenario) }
+    return this.hintCache.hints
+  }
+
+  setAutoPause(on: boolean): void {
+    this.autoPause = on
+    try {
+      localStorage.setItem(AUTO_PAUSE_KEY, on ? 'on' : 'off')
+    } catch {
+      /* storage unavailable: the choice lasts for this visit */
+    }
+    this.notify(true)
+  }
+
+  /** While playing live, pause once when a red field note appears that was not showing an hour or so earlier. */
+  private watchWarnings(t: number): void {
+    const prev = this.watched
+    if (t === prev.tick) return
+    const now = this.hintsAt(t)
+    this.watched = { tick: t, hints: now }
+    if (!this.autoPause || this.phase !== 'running' || prev.tick < 0 || t < prev.tick || t - prev.tick > 48) return
+    const fresh = newDangers(prev.hints, now)
+    if (fresh.length === 0) return
+    this.pause()
+    this.pausedFor = fresh[0]
+    this.notify(true)
+  }
+
   private atLive(): boolean {
-    return this.history.head - this.displayTick < Math.max(8, SPEEDS[this.speed].tps * 0.6)
+    const t = Math.floor(this.displayTick)
+    return t >= this.seenTick && this.history.head - this.displayTick < Math.max(8, SPEEDS[this.speed].tps * 0.6)
   }
 
   /** Start a fresh run at tick 0 (planning phase). */
@@ -202,18 +292,24 @@ export class GameController {
     this.saveStatus = ''
     this.saving = false
     this.hintCache = { tick: -1, hints: [] }
+    this.watched = { tick: -1, hints: [] }
+    this.pausedFor = null
+    this.resetRate()
     this.displayTick = 0
+    this.seenTick = 0
     this.lastFxTick = 0
     this.playing = false
     this.phase = 'loading'
     this.stepTarget = null
     this.end = null
     this.inflight = false
+    this.intervening = false
+    this.refund = null
     this.finalized = false
     this.explanation = null
     this.score = null
     this.newBest = false
-    this.charges = CHARGES
+    this.pendingAt = null
     this.cooldownUntil = 0
     this.best = scoreFor(config)
     this.renderer?.clearFx()
@@ -239,7 +335,7 @@ export class GameController {
         this.history.add(msg.frame, msg.stats, 0)
         this.history.addEvolution(msg.evolution)
         this.phase = msg.restored ? 'running' : 'planning'
-        if (msg.restored) { this.displayTick = msg.frame.tick; this.end = msg.end ?? null; if (this.end) this.finalize() }
+        if (msg.restored) { this.displayTick = this.seenTick = msg.frame.tick; this.end = msg.end ?? null; if (this.end) this.finalize() }
         if (this.renderer && this.params && this.config) {
           this.renderer.setWorld(msg.cover, this.params.eco.coverR, this.config.seed, this.params.patchStock)
         }
@@ -248,7 +344,7 @@ export class GameController {
       case 'frames':
         this.inflight = false
         msg.frames.forEach((f: FrameData, i: number) => this.history.add(f, msg.stats, i * STAT_STRIDE))
-        msg.evolution.forEach(e => this.history.addEvolution(e))
+        msg.evolution.forEach(e => this.history.addEvolution(e, e.tick === msg.end?.tick))
         if (msg.end) this.end = msg.end
         if (this.stepTarget !== null) {
           this.displayTick = Math.min(this.history.head, this.stepTarget)
@@ -257,7 +353,7 @@ export class GameController {
             this.send({ type: 'advance', runId: this.runId, target: this.stepTarget })
           } else {
             this.stepTarget = null
-            if (this.end) this.finalize()
+            if (this.end && this.displayTick >= this.end.tick) this.finalize()
           }
         }
         this.notify()
@@ -265,9 +361,12 @@ export class GameController {
       case 'saved': {
         if (!this.config) break
         this.displayTick = msg.state.tick
+        const at = msg.state.tick
+        const h = this.history
         const save: MeadowSave = { version: 2, savedAt: new Date().toISOString(), config: this.config,
-          state: msg.state, history: this.history.save(), charges: this.charges, cooldownUntil: this.cooldownUntil,
-          interventions: this.history.interventions, evolution: this.history.evolution, journal: this.history.journal }
+          state: msg.state, history: h.save(at), charges: this.chargesAt(at), cooldownUntil: this.cooldownUntil,
+          interventions: h.interventions.filter(i => i.tick <= at), evolution: h.evolution.filter(e => e.tick <= at),
+          journal: h.journal.filter(e => e.tick <= at) }
         const id = this.runId
         void writeSave(save).then(() => {
           if (id !== this.runId) return
@@ -282,11 +381,33 @@ export class GameController {
         })
         break
       }
-      case 'intervened':
-        this.cooldownUntil = msg.tick - 1 + COOLDOWN
+      case 'intervened': {
+        this.intervening = false
+        // Any advance sent before the intervention has already answered, and none was sent after it.
+        this.inflight = false
+        if (msg.tick === msg.from) {
+          // Nothing was applied (the run had ended, or no checkpoint reached that hour), so the use was never spent.
+          this.pendingAt = null
+          this.cooldownUntil = this.refund ?? 0
+          this.refund = null
+          this.notify(true)
+          break
+        }
+        this.refund = null
+        this.pendingAt = null
+        this.history.truncate(msg.from)
+        this.history.add(msg.frame, msg.stats, 0)
+        msg.evolution.forEach(e => this.history.addEvolution(e, e.tick === msg.end?.tick))
+        this.end = msg.end
+        this.displayTick = this.seenTick = msg.tick
+        this.lastFxTick = msg.tick
+        if (this.renderer && this.rendererAttached) this.renderer.addEvents(msg.frame, performance.now(), false)
+        this.cooldownUntil = msg.from + COOLDOWN
         this.history.interventions = [...this.history.interventions, { tick: msg.tick, action: msg.action }]
+        if (this.end && this.displayTick >= this.end.tick) this.finalize()
         this.notify(true)
         break
+      }
       default: {
         const never: never = msg
         throw new Error(`unknown message ${String(never)}`)
@@ -297,9 +418,11 @@ export class GameController {
   play(): void {
     if (this.phase === 'loading' || this.saving) return
     if (this.phase === 'planning' && this.budgetLeft() < 0) return
-    if (this.phase === 'ended' && this.displayTick >= this.history.head) this.displayTick = this.history.firstTick
+    if (this.phase === 'ended' && this.displayTick >= this.history.head) this.displayTick = this.history.replayStart
     if (this.phase === 'planning') this.phase = 'running'
     this.playing = true
+    this.pausedFor = null
+    this.resetRate()
     this.last = performance.now()
     this.notify(true)
   }
@@ -317,20 +440,27 @@ export class GameController {
 
   setSpeed(i: number): void {
     this.speed = Math.max(0, Math.min(SPEEDS.length - 1, i))
+    this.resetRate()
     this.notify(true)
   }
 
   /** Jump the view to a tick already simulated (scrub). */
   seek(tick: number): void {
+    if (this.intervening) return
+    this.seenTick = Math.max(this.seenTick, Math.floor(this.displayTick))
     this.stepTarget = null
-    this.displayTick = Math.max(this.history.firstTick, Math.min(this.history.head, tick))
+    this.displayTick = Math.max(this.history.replayStart, Math.min(this.history.head, tick))
+    this.watched = { tick: -1, hints: [] }
+    this.resetRate()
     this.lastFxTick = Math.floor(this.displayTick)
     this.renderer?.clearFx()
+    if (this.end && this.displayTick >= this.end.tick) this.finalize()
     this.notify(true)
   }
 
   /** Step forward or back by `n` ticks; stepping past the head simulates when running. */
   stepBy(n: number): void {
+    if (this.intervening) return
     this.pause()
     const target = Math.round(this.displayTick + n)
     if (target > this.history.head && !this.end && this.phase !== 'loading' && !this.saving) {
@@ -349,38 +479,59 @@ export class GameController {
     this.pause()
     this.saving = true
     this.saveStatus = 'Saving meadow…'
-    this.send({ type: 'save', runId: this.runId })
+    // The latest hour seen, not a replayed one: the world before a later intervention must not be saved with it.
+    const at = Math.min(this.history.head, Math.max(Math.floor(this.displayTick), this.seenTick))
+    this.send({ type: 'save', runId: this.runId, at })
     this.notify(true)
   }
 
   restore(save: MeadowSave): void {
     this.configure(save.config, save.state)
-    this.history.restore(save.history)
-    this.charges = save.charges
-    this.cooldownUntil = save.cooldownUntil
-    this.history.interventions = save.interventions
-    this.history.evolution = save.evolution
-    this.history.journal = save.journal
-    this.saveStatus = 'Meadow restored and paused. Recent replay and the evolution journal are preserved.'
+    this.history.restore(save.history, save.journal)
+    // Uses are recomputed from the recorded interventions, so a save can neither duplicate nor lose one; the stored
+    // `charges` is only for older builds. Saves from before a field existed get its empty default.
+    this.cooldownUntil = save.cooldownUntil ?? 0
+    this.history.interventions = save.interventions ?? []
+    this.history.evolution = save.evolution ?? []
+    this.saveStatus = 'Meadow restored and paused. The graph and journal are kept; replay covers the last 15 days before the save.'
   }
 
+  /** The worker may already have simulated past the displayed hour (even to the end); what counts is what the player sees. */
   canIntervene(): boolean {
+    const t = Math.floor(this.displayTick)
     return (
       this.phase === 'running' &&
-      !this.end &&
+      (!this.end || t < this.end.tick) &&
       !this.saving &&
-      this.charges > 0 &&
-      this.history.head >= this.cooldownUntil &&
+      !this.intervening &&
+      this.chargesAt(t) > 0 &&
+      t >= this.cooldownUntil &&
       this.atLive()
     )
   }
 
+  /** Act at the displayed hour. The effect shows one hour later, straight away even while paused. */
   intervene(action: Intervention): void {
     if (!this.canIntervene()) return
-    this.charges -= 1
-    this.cooldownUntil = this.history.head + COOLDOWN
-    this.send({ type: 'intervene', runId: this.runId, action })
+    const at = Math.floor(this.displayTick)
+    this.pendingAt = at
+    this.refund = this.cooldownUntil
+    this.cooldownUntil = at + COOLDOWN
+    this.stepTarget = null
+    this.intervening = true
+    this.send({ type: 'intervene', runId: this.runId, action, at })
     this.notify(true)
+  }
+
+  /** Uses available at hour `t`. A recorded intervention was made the hour before its `tick` (the effect shows one hour later). */
+  private chargesAt(t: number): number {
+    const spentAt = this.history.interventions.map(iv => iv.tick - 1)
+    if (this.pendingAt !== null) spentAt.push(this.pendingAt)
+    return chargesAt(spentAt, t, this.config?.endless ?? false)
+  }
+
+  resetNeedsConfirm(): boolean {
+    return (this.phase === 'running' || this.phase === 'ended') && this.history.head > RESET_CONFIRM_HOURS
   }
 
   budgetLeft(): number {
@@ -417,24 +568,28 @@ export class GameController {
     this.raf = requestAnimationFrame(this.loop)
     const dt = Math.min(100, now - this.last)
     this.last = now
+    this.seenTick = Math.max(this.seenTick, Math.floor(this.displayTick))
     const h = this.history
     const tps = SPEEDS[this.speed].tps
-    if (this.playing) {
+    if (this.playing && !this.intervening) {
       this.displayTick += (dt / 1000) * tps
       if (this.displayTick >= h.head) {
         this.displayTick = h.head
         if (this.end && h.head >= this.end.tick) this.finalize()
       }
     }
-    if (!this.end && this.phase === 'running' && this.playing && !this.inflight) {
+    if (!this.end && this.phase === 'running' && this.playing && !this.inflight && !this.intervening) {
       const lead = Math.max(6, tps * 0.25)
       if (h.head < this.displayTick + lead) {
         this.inflight = true
         this.send({ type: 'advance', runId: this.runId, target: Math.ceil(this.displayTick + lead) })
       }
     }
+    this.measureRate(now)
     const t = Math.floor(this.displayTick)
-    if (this.renderer) {
+    if (this.playing && this.atLive()) this.watchWarnings(t)
+    else this.watched = { tick: -1, hints: [] }
+    if (this.renderer && this.rendererAttached) {
       if (this.playing && t > this.lastFxTick && t - this.lastFxTick < 40) {
         for (let k = this.lastFxTick + 1; k <= t; k++) {
           const f = h.frame(k)

@@ -1,0 +1,520 @@
+{
+ "issue": 5,
+ "command": "npx tsx scripts/endless-budget.ts 3 3 stable 7300; npx tsx scripts/endless-budget.ts 2 3 stable 7303; npx tsx scripts/endless-budget.ts 5 3 winter 7300",
+ "note": "Greedy fixed-threshold keeper (acts whenever a trigger fires and the cooldown and budget allow), not human play. Endless, default levers, seeds 7300-7304, capped at 3 years (1095 days). deniedDays = days on which the keeper wanted to act and was off cooldown but had no use left. Rules: lifetime = 4 uses per run; seasonal = +1 at each season start (1 Dec, 1 Mar, 1 Jun, 1 Sep), cap 4 (chosen); monthly = +1 every 30 days, cap 4; yearlyRefill = back to 4 each 1 Sep.",
+ "summary": [
+  {
+   "scenario": "stable",
+   "rule": "lifetime",
+   "survived3y": 0,
+   "meanDays": 424,
+   "meanUsesY1/Y2/Y3": "4.0/0.0/0.0",
+   "runsPastYear1": 3,
+   "year2UsesInThoseRuns": [
+    0,
+    0,
+    0
+   ],
+   "meanWinterUses": 1.4,
+   "meanDeniedDays": 90
+  },
+  {
+   "scenario": "stable",
+   "rule": "seasonal",
+   "survived3y": 0,
+   "meanDays": 318,
+   "meanUsesY1/Y2/Y3": "5.6/1.2/0.0",
+   "runsPastYear1": 2,
+   "year2UsesInThoseRuns": [
+    4,
+    2
+   ],
+   "meanWinterUses": 2.6,
+   "meanDeniedDays": 47
+  },
+  {
+   "scenario": "stable",
+   "rule": "monthly",
+   "survived3y": 2,
+   "meanDays": 637,
+   "meanUsesY1/Y2/Y3": "9.4/5.6/3.6",
+   "runsPastYear1": 3,
+   "year2UsesInThoseRuns": [
+    9,
+    10,
+    9
+   ],
+   "meanWinterUses": 7.2,
+   "meanDeniedDays": 3
+  },
+  {
+   "scenario": "stable",
+   "rule": "yearlyRefill",
+   "survived3y": 1,
+   "meanDays": 510,
+   "meanUsesY1/Y2/Y3": "4.0/2.4/0.8",
+   "runsPastYear1": 3,
+   "year2UsesInThoseRuns": [
+    4,
+    4,
+    4
+   ],
+   "meanWinterUses": 2.0,
+   "meanDeniedDays": 60
+  },
+  {
+   "scenario": "winter",
+   "rule": "lifetime",
+   "survived3y": 0,
+   "meanDays": 268,
+   "meanUsesY1/Y2/Y3": "4.0/0.0/0.0",
+   "runsPastYear1": 1,
+   "year2UsesInThoseRuns": [
+    0
+   ],
+   "meanWinterUses": 1.8,
+   "meanDeniedDays": 57
+  },
+  {
+   "scenario": "winter",
+   "rule": "seasonal",
+   "survived3y": 0,
+   "meanDays": 210,
+   "meanUsesY1/Y2/Y3": "5.0/0.4/0.0",
+   "runsPastYear1": 1,
+   "year2UsesInThoseRuns": [
+    2
+   ],
+   "meanWinterUses": 2.6,
+   "meanDeniedDays": 17
+  },
+  {
+   "scenario": "winter",
+   "rule": "monthly",
+   "survived3y": 0,
+   "meanDays": 254,
+   "meanUsesY1/Y2/Y3": "6.2/3.2/0.0",
+   "runsPastYear1": 1,
+   "year2UsesInThoseRuns": [
+    16
+   ],
+   "meanWinterUses": 3.6,
+   "meanDeniedDays": 2
+  },
+  {
+   "scenario": "winter",
+   "rule": "yearlyRefill",
+   "survived3y": 0,
+   "meanDays": 200,
+   "meanUsesY1/Y2/Y3": "4.0/0.8/0.0",
+   "runsPastYear1": 1,
+   "year2UsesInThoseRuns": [
+    4
+   ],
+   "meanWinterUses": 2.0,
+   "meanDeniedDays": 23
+  }
+ ],
+ "rows": [
+  {
+   "seed": 7300,
+   "rule": "lifetime",
+   "days": 527,
+   "survived": false,
+   "usesPerYear": "4/0/0",
+   "winterUses": 0,
+   "deniedDays": 75,
+   "scenario": "stable"
+  },
+  {
+   "seed": 7300,
+   "rule": "seasonal",
+   "days": 162,
+   "survived": false,
+   "usesPerYear": "5/0/0",
+   "winterUses": 1,
+   "deniedDays": 22,
+   "scenario": "stable"
+  },
+  {
+   "seed": 7300,
+   "rule": "monthly",
+   "days": 1095,
+   "survived": true,
+   "usesPerYear": "14/9/7",
+   "winterUses": 12,
+   "deniedDays": 2,
+   "scenario": "stable"
+  },
+  {
+   "seed": 7300,
+   "rule": "yearlyRefill",
+   "days": 1095,
+   "survived": true,
+   "usesPerYear": "4/4/4",
+   "winterUses": 1,
+   "deniedDays": 74,
+   "scenario": "stable"
+  },
+  {
+   "seed": 7301,
+   "rule": "lifetime",
+   "days": 387,
+   "survived": false,
+   "usesPerYear": "4/0/0",
+   "winterUses": 2,
+   "deniedDays": 10,
+   "scenario": "stable"
+  },
+  {
+   "seed": 7301,
+   "rule": "seasonal",
+   "days": 496,
+   "survived": false,
+   "usesPerYear": "4/4/0",
+   "winterUses": 3,
+   "deniedDays": 23,
+   "scenario": "stable"
+  },
+  {
+   "seed": 7301,
+   "rule": "monthly",
+   "days": 608,
+   "survived": false,
+   "usesPerYear": "4/10/0",
+   "winterUses": 6,
+   "deniedDays": 0,
+   "scenario": "stable"
+  },
+  {
+   "seed": 7301,
+   "rule": "yearlyRefill",
+   "days": 497,
+   "survived": false,
+   "usesPerYear": "4/4/0",
+   "winterUses": 2,
+   "deniedDays": 25,
+   "scenario": "stable"
+  },
+  {
+   "seed": 7302,
+   "rule": "lifetime",
+   "days": 116,
+   "survived": false,
+   "usesPerYear": "4/0/0",
+   "winterUses": 1,
+   "deniedDays": 6,
+   "scenario": "stable"
+  },
+  {
+   "seed": 7302,
+   "rule": "seasonal",
+   "days": 115,
+   "survived": false,
+   "usesPerYear": "5/0/0",
+   "winterUses": 2,
+   "deniedDays": 0,
+   "scenario": "stable"
+  },
+  {
+   "seed": 7302,
+   "rule": "monthly",
+   "days": 115,
+   "survived": false,
+   "usesPerYear": "5/0/0",
+   "winterUses": 2,
+   "deniedDays": 0,
+   "scenario": "stable"
+  },
+  {
+   "seed": 7302,
+   "rule": "yearlyRefill",
+   "days": 116,
+   "survived": false,
+   "usesPerYear": "4/0/0",
+   "winterUses": 1,
+   "deniedDays": 6,
+   "scenario": "stable"
+  },
+  {
+   "seed": 7303,
+   "rule": "lifetime",
+   "days": 888,
+   "survived": false,
+   "usesPerYear": "4/0/0",
+   "winterUses": 2,
+   "deniedDays": 333,
+   "scenario": "stable"
+  },
+  {
+   "seed": 7303,
+   "rule": "seasonal",
+   "days": 327,
+   "survived": false,
+   "usesPerYear": "7/0/0",
+   "winterUses": 3,
+   "deniedDays": 48,
+   "scenario": "stable"
+  },
+  {
+   "seed": 7303,
+   "rule": "monthly",
+   "days": 271,
+   "survived": false,
+   "usesPerYear": "9/0/0",
+   "winterUses": 5,
+   "deniedDays": 0,
+   "scenario": "stable"
+  },
+  {
+   "seed": 7303,
+   "rule": "yearlyRefill",
+   "days": 639,
+   "survived": false,
+   "usesPerYear": "4/4/0",
+   "winterUses": 4,
+   "deniedDays": 170,
+   "scenario": "stable"
+  },
+  {
+   "seed": 7304,
+   "rule": "lifetime",
+   "days": 203,
+   "survived": false,
+   "usesPerYear": "4/0/0",
+   "winterUses": 2,
+   "deniedDays": 26,
+   "scenario": "stable"
+  },
+  {
+   "seed": 7304,
+   "rule": "seasonal",
+   "days": 488,
+   "survived": false,
+   "usesPerYear": "7/2/0",
+   "winterUses": 4,
+   "deniedDays": 141,
+   "scenario": "stable"
+  },
+  {
+   "seed": 7304,
+   "rule": "monthly",
+   "days": 1095,
+   "survived": true,
+   "usesPerYear": "15/9/11",
+   "winterUses": 11,
+   "deniedDays": 13,
+   "scenario": "stable"
+  },
+  {
+   "seed": 7304,
+   "rule": "yearlyRefill",
+   "days": 203,
+   "survived": false,
+   "usesPerYear": "4/0/0",
+   "winterUses": 2,
+   "deniedDays": 26,
+   "scenario": "stable"
+  },
+  {
+   "seed": 7300,
+   "rule": "lifetime",
+   "days": 117,
+   "survived": false,
+   "usesPerYear": "4/0/0",
+   "winterUses": 0,
+   "deniedDays": 27,
+   "scenario": "winter"
+  },
+  {
+   "seed": 7300,
+   "rule": "seasonal",
+   "days": 142,
+   "survived": false,
+   "usesPerYear": "5/0/0",
+   "winterUses": 1,
+   "deniedDays": 35,
+   "scenario": "winter"
+  },
+  {
+   "seed": 7300,
+   "rule": "monthly",
+   "days": 144,
+   "survived": false,
+   "usesPerYear": "8/0/0",
+   "winterUses": 3,
+   "deniedDays": 0,
+   "scenario": "winter"
+  },
+  {
+   "seed": 7300,
+   "rule": "yearlyRefill",
+   "days": 117,
+   "survived": false,
+   "usesPerYear": "4/0/0",
+   "winterUses": 0,
+   "deniedDays": 27,
+   "scenario": "winter"
+  },
+  {
+   "seed": 7301,
+   "rule": "lifetime",
+   "days": 147,
+   "survived": false,
+   "usesPerYear": "4/0/0",
+   "winterUses": 4,
+   "deniedDays": 0,
+   "scenario": "winter"
+  },
+  {
+   "seed": 7301,
+   "rule": "seasonal",
+   "days": 147,
+   "survived": false,
+   "usesPerYear": "4/0/0",
+   "winterUses": 4,
+   "deniedDays": 0,
+   "scenario": "winter"
+  },
+  {
+   "seed": 7301,
+   "rule": "monthly",
+   "days": 147,
+   "survived": false,
+   "usesPerYear": "4/0/0",
+   "winterUses": 4,
+   "deniedDays": 0,
+   "scenario": "winter"
+  },
+  {
+   "seed": 7301,
+   "rule": "yearlyRefill",
+   "days": 147,
+   "survived": false,
+   "usesPerYear": "4/0/0",
+   "winterUses": 4,
+   "deniedDays": 0,
+   "scenario": "winter"
+  },
+  {
+   "seed": 7302,
+   "rule": "lifetime",
+   "days": 104,
+   "survived": false,
+   "usesPerYear": "4/0/0",
+   "winterUses": 1,
+   "deniedDays": 0,
+   "scenario": "winter"
+  },
+  {
+   "seed": 7302,
+   "rule": "seasonal",
+   "days": 104,
+   "survived": false,
+   "usesPerYear": "4/0/0",
+   "winterUses": 1,
+   "deniedDays": 0,
+   "scenario": "winter"
+  },
+  {
+   "seed": 7302,
+   "rule": "monthly",
+   "days": 104,
+   "survived": false,
+   "usesPerYear": "4/0/0",
+   "winterUses": 1,
+   "deniedDays": 0,
+   "scenario": "winter"
+  },
+  {
+   "seed": 7302,
+   "rule": "yearlyRefill",
+   "days": 104,
+   "survived": false,
+   "usesPerYear": "4/0/0",
+   "winterUses": 1,
+   "deniedDays": 0,
+   "scenario": "winter"
+  },
+  {
+   "seed": 7303,
+   "rule": "lifetime",
+   "days": 840,
+   "survived": false,
+   "usesPerYear": "4/0/0",
+   "winterUses": 2,
+   "deniedDays": 252,
+   "scenario": "winter"
+  },
+  {
+   "seed": 7303,
+   "rule": "seasonal",
+   "days": 525,
+   "survived": false,
+   "usesPerYear": "7/2/0",
+   "winterUses": 4,
+   "deniedDays": 48,
+   "scenario": "winter"
+  },
+  {
+   "seed": 7303,
+   "rule": "monthly",
+   "days": 744,
+   "survived": false,
+   "usesPerYear": "10/16/0",
+   "winterUses": 7,
+   "deniedDays": 11,
+   "scenario": "winter"
+  },
+  {
+   "seed": 7303,
+   "rule": "yearlyRefill",
+   "days": 498,
+   "survived": false,
+   "usesPerYear": "4/4/0",
+   "winterUses": 3,
+   "deniedDays": 81,
+   "scenario": "winter"
+  },
+  {
+   "seed": 7304,
+   "rule": "lifetime",
+   "days": 133,
+   "survived": false,
+   "usesPerYear": "4/0/0",
+   "winterUses": 2,
+   "deniedDays": 6,
+   "scenario": "winter"
+  },
+  {
+   "seed": 7304,
+   "rule": "seasonal",
+   "days": 133,
+   "survived": false,
+   "usesPerYear": "5/0/0",
+   "winterUses": 3,
+   "deniedDays": 0,
+   "scenario": "winter"
+  },
+  {
+   "seed": 7304,
+   "rule": "monthly",
+   "days": 133,
+   "survived": false,
+   "usesPerYear": "5/0/0",
+   "winterUses": 3,
+   "deniedDays": 0,
+   "scenario": "winter"
+  },
+  {
+   "seed": 7304,
+   "rule": "yearlyRefill",
+   "days": 133,
+   "survived": false,
+   "usesPerYear": "4/0/0",
+   "winterUses": 2,
+   "deniedDays": 6,
+   "scenario": "winter"
+  }
+ ]
+}

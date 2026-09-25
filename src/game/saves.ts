@@ -1,7 +1,8 @@
 import type { RunHistory } from './history'
 import type { RunConfig } from './controller'
 import type { Sim, Intervention } from '@/sim/sim'
-import type { EvolutionSample, JournalEntry } from '@/sim/evolution'
+import type { EvolutionSample } from '@/sim/evolution'
+import type { JournalEntry } from './journal'
 
 export interface MeadowSave {
   version: 2
@@ -9,11 +10,14 @@ export interface MeadowSave {
   config: RunConfig
   state: ReturnType<Sim['save']>
   history: ReturnType<RunHistory['save']>
-  charges: number
-  cooldownUntil: number
-  interventions: { tick: number; action: Intervention }[]
-  evolution: EvolutionSample[]
-  journal: JournalEntry[]
+  /** Uses left when saved. Written for older builds; on resume, uses are recomputed from `interventions`. */
+  charges?: number
+  /** The fields below may be missing from early version-2 saves; resume treats them as empty. */
+  cooldownUntil?: number
+  interventions?: { tick: number; action: Intervention }[]
+  evolution?: EvolutionSample[]
+  /** Journal entries, also kept (with the journal's state) in `history.journal`; older builds read them from here. */
+  journal?: (JournalEntry | { tick: number; text: string })[]
 }
 
 async function database(): Promise<IDBDatabase> {

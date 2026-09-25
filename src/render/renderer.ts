@@ -40,6 +40,12 @@ const FOX_LEN = 0.052
 const BUSH_R = 0.03
 const MARGIN = 0.025
 
+function context2d(canvas: HTMLCanvasElement): CanvasRenderingContext2D {
+  const ctx = canvas.getContext('2d')
+  if (!ctx) throw new Error('2d context unavailable')
+  return ctx
+}
+
 export class WorldRenderer {
   private canvas: HTMLCanvasElement
   private ctx: CanvasRenderingContext2D
@@ -60,9 +66,20 @@ export class WorldRenderer {
 
   constructor(canvas: HTMLCanvasElement) {
     this.canvas = canvas
-    const ctx = canvas.getContext('2d')
-    if (!ctx) throw new Error('2d context unavailable')
-    this.ctx = ctx
+    this.ctx = context2d(canvas)
+  }
+
+  /** Frees the detached canvas's backing store; `setCanvas` sizes it again on return. */
+  releaseCanvas(): void {
+    this.canvas.width = 0
+    this.canvas.height = 0
+  }
+
+  /** Draw into another canvas element, keeping the painted terrain and sprites. */
+  setCanvas(canvas: HTMLCanvasElement): void {
+    this.canvas = canvas
+    this.ctx = context2d(canvas)
+    this.applySize()
   }
 
   setWorld(cover: [number, number][], coverR: number, seed: number, patchStock: number): void {
@@ -82,11 +99,16 @@ export class WorldRenderer {
     if (size === this.size && dpr === this.dpr) return
     this.size = size
     this.dpr = dpr
-    this.canvas.width = Math.round(size * dpr)
-    this.canvas.height = Math.round(size * dpr)
-    this.canvas.style.width = `${size}px`
-    this.canvas.style.height = `${size}px`
+    this.applySize()
     this.rebuild()
+  }
+
+  private applySize(): void {
+    if (!this.size) return
+    this.canvas.width = Math.round(this.size * this.dpr)
+    this.canvas.height = Math.round(this.size * this.dpr)
+    this.canvas.style.width = `${this.size}px`
+    this.canvas.style.height = `${this.size}px`
   }
 
   private rebuild(): void {
