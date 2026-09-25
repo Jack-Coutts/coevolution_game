@@ -100,3 +100,65 @@ Vite reports a roughly 507 kB main JavaScript chunk (162 kB gzip), just above it
 500 kB threshold. The reusable browser validation page was also checked through worker
 startup and progress reporting; the recorded full browser batch used the same simulation
 loop and parameters.
+
+## Three-species engine (#8)
+
+The field vole ([design](third-species.md)) is implemented in the engine, worker, history and
+saves, with the provisional section 5 values. The Vole meadow (`SCENARIO_BY_ID.voles`) is not
+in the scenario picker yet; it is for scripts and tests until #9. Measured with Node 22.22.2
+on Linux x64, in a shared cloud container under heavy load (load average 12 to 14 on 4
+cores), so absolute times are noisy; ratios and paired figures are the useful part.
+
+**Two-species regression.** `node --import tsx scripts/validate-balance.ts 5000 50` gives
+rows identical to the base branch (`547bf81`) in the same runtime: 50/50 rows equal in tick,
+final counts, peaks, ceiling hits and every death counter; **19/50** survived on both
+(`experiments/vole-sim-regression.json`). A version-2 `Sim.save()` fixture made by the base
+engine loads as a two-species world and matches that engine's state digest 500 hours later
+(`tests/vole-persistence.test.ts`). Open meadow step time against the base engine, same
+process, interleaved, seed 9100 and 9107 for 1,500 hours: fastest runs +1.5% and +2.4%,
+median paired ratio 1.05, within the noise of this machine.
+
+**Vole meadow, untouched, fresh seeds 9100 to 9109**, against the Open meadow on the same
+seeds, one run at a time, game rules (a run ends at the first extinction).
+`node --import tsx scripts/vole-batch.ts 9100 10`, raw rows in `experiments/vole-sim.json`.
+
+| Measure | Open meadow | Vole meadow |
+| --- | ---: | ---: |
+| All species alive at a year | 3/10 | 5/10 |
+| First species lost (rabbit / fox / vole) | 5 / 2 / n/a | 4 / 0 / 1 |
+| Median `sim.step` time per simulated year | 10.9 s | 16.0 s |
+| Paired Vole / Open step time, median (range) | | 1.43 (1.05 to 2.30) |
+| Median worker packing (frames, stats, evolution) per simulated year | 2.2 s | 2.2 s |
+| Safety-ceiling hits | 0 | 0 |
+| Peak voles (range over runs) | | 264 to 355 (ceiling 800) |
+| Stats row | 32 values, 256 bytes | 32 values, 256 bytes |
+| History stats buffer (one year) | 2.24 MB | 2.24 MB |
+| Mean frame per hour, median of runs (largest frame) | 19.1 kB (42.6 kB) | 26.7 kB (53.9 kB) |
+| Saved history (stats plus the last 360 frames), median (largest) | 5.8 MB (13.3 MB) | 10.9 MB (16.2 MB) |
+
+The stats row grew from 23 to 32 values in both meadows (the version-2 buffer was 1.61 MB),
+within the design's limit of 32. Replay frames are about 40% larger with voles; a full year
+of in-memory replay (about 3,160 kept frames) is roughly 60 MB in the Open meadow and 84 MB
+with voles. The paired step-time median of 1.43 is inside the design budget of 1.6, but
+single seeds reached 2.3, where foxes grew to 200 on a vole diet; cost follows the number
+of animals. Voles boom and starve as in the prototype: 85% of vole deaths were starvation,
+8% predation and 5% old age. Survival here is not a balance claim; #9 tunes the scenario.
+
+Implementation notes and deviations from the design record:
+
+- Species and feeding are data: `FOOD_WEB` in `src/sim/species.ts` says who hunts whom, the
+  plant foods in order of preference and whether tall grass slows a species; `speciesDefs`
+  adds the numbers (bite, energy share per food, meal value as a victim, body, ceiling).
+- Vole numbers live in one optional `SimParams.vole` block (body, ceiling, bite, berry
+  value, meal value, seed stock and regrowth), not split across `EcoParams`. Two-species
+  parameters are therefore unchanged and version-2 parameters stay valid.
+- Death counts are per species (`Sim.tally`); `Sim.counters` remains as a read-only rabbit
+  and fox view with the old names, so scripts and the stats row are unchanged.
+- Plant events carry no species (encoded -1 in frames); `graze` now uses each species' own
+  body for fullness (the census bug).
+- Bush regrowth still adds one berry without clamping, as in version 2, so a vole-bitten
+  bush can briefly hold up to 0.6 above its stock; clamping would change two-species runs
+  with odd stock levers and planted bushes.
+- Deferred to #9: vole levers (only an optional `vole.initial` value is read), hints and
+  forecasts, full vole explanations (a plain cause summary stands in), rendering, the run
+  panel's vole actions (`VOLE_ACTIONS` exists but is not shown) and picker visibility.
