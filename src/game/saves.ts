@@ -9,11 +9,13 @@ export interface MeadowSave {
   config: RunConfig
   state: ReturnType<Sim['save']>
   history: ReturnType<RunHistory['save']>
-  charges: number
-  cooldownUntil: number
-  interventions: { tick: number; action: Intervention }[]
-  evolution: EvolutionSample[]
-  journal: JournalEntry[]
+  /** Uses left when saved. Written for older builds; on resume, uses are recomputed from `interventions`. */
+  charges?: number
+  /** The fields below may be missing from early version-2 saves; resume treats them as empty. */
+  cooldownUntil?: number
+  interventions?: { tick: number; action: Intervention }[]
+  evolution?: EvolutionSample[]
+  journal?: JournalEntry[]
 }
 
 async function database(): Promise<IDBDatabase> {

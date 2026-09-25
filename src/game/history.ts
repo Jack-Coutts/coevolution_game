@@ -72,10 +72,12 @@ export class RunHistory {
     for (const s of ['prey', 'pred'] as const) this.highestGeneration[s] = Math.max(0, ...this.evolution.map(e => e[s].generation))
   }
 
-  save() {
-    const replayFrom = Math.max(this.replayStart, this.head - RECENT)
-    return { stats: this.stats, highestGeneration: this.highestGeneration, head: this.head, start: this.firstTick, replayFrom,
-      frames: [...this.frames.entries()].filter(([t]) => t >= replayFrom) }
+  /** Everything up to `upTo`: a save holds the world at that hour, so later hours would be replayed twice. */
+  save(upTo = this.head) {
+    const head = Math.min(this.head, upTo)
+    const replayFrom = Math.max(this.replayStart, head - RECENT)
+    return { stats: this.stats, highestGeneration: this.highestGeneration, head, start: this.firstTick, replayFrom,
+      frames: [...this.frames.entries()].filter(([t]) => t >= replayFrom && t <= head) }
   }
 
   restore(data: ReturnType<RunHistory['save']>): void {

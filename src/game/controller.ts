@@ -1,4 +1,5 @@
 import { writeSave, type MeadowSave } from './saves'
+import { chargesAt, COOLDOWN, nextRenewal } from './budget'
 import { BUDGET, deriveParams, spent, type LeverValues } from '@/sim/levers'
 import type { SimParams } from '@/sim/params'
 import { SCENARIO_BY_ID, type Scenario, type ScenarioId } from '@/sim/scenarios'
@@ -44,8 +45,7 @@ function readAutoPause(): boolean {
   }
 }
 
-export const CHARGES = 4
-export const COOLDOWN = 400
+export { CHARGES, COOLDOWN } from './budget'
 
 export interface Snapshot {
   phase: Phase
@@ -69,7 +69,10 @@ export interface Snapshot {
   best: BestScore | null
   newBest: boolean
   hints: Hint[]
+  /** Uses available at the displayed hour. */
   charges: number
+  /** Endless only: the hour the next use renews (the next season start); null in the one-year challenge. */
+  nextRenewal: number | null
   cooldownUntil: number
   atLive: boolean
   interventions: { tick: number; action: Intervention }[]
@@ -119,7 +122,8 @@ export class GameController {
   private raf = 0
   private last = 0
   private lastFxTick = 0
-  private charges = CHARGES
+  /** The hour of an intervention sent to the worker but not yet recorded; it already counts as spent. */
+  private pendingAt: number | null = null
   private cooldownUntil = 0
   private listeners = new Set<() => void>()
   private snap: Snapshot
@@ -212,7 +216,8 @@ export class GameController {
       best: this.best,
       newBest: this.newBest,
       hints: this.hintCache.hints,
-      charges: this.charges,
+      charges: this.chargesAt(t),
+      nextRenewal: this.config?.endless ? nextRenewal(t) : null,
       cooldownUntil: this.cooldownUntil,
       atLive: this.atLive(),
       interventions: h.interventions,
@@ -304,7 +309,7 @@ export class GameController {
     this.explanation = null
     this.score = null
     this.newBest = false
-    this.charges = CHARGES
+    this.pendingAt = null
     this.cooldownUntil = 0
     this.best = scoreFor(config)
     this.renderer?.clearFx()
@@ -356,9 +361,12 @@ export class GameController {
       case 'saved': {
         if (!this.config) break
         this.displayTick = msg.state.tick
+        const at = msg.state.tick
+        const h = this.history
         const save: MeadowSave = { version: 2, savedAt: new Date().toISOString(), config: this.config,
-          state: msg.state, history: this.history.save(), charges: this.charges, cooldownUntil: this.cooldownUntil,
-          interventions: this.history.interventions, evolution: this.history.evolution, journal: this.history.journal }
+          state: msg.state, history: h.save(at), charges: this.chargesAt(at), cooldownUntil: this.cooldownUntil,
+          interventions: h.interventions.filter(i => i.tick <= at), evolution: h.evolution.filter(e => e.tick <= at),
+          journal: h.journal.filter(e => e.tick <= at) }
         const id = this.runId
         void writeSave(save).then(() => {
           if (id !== this.runId) return
@@ -378,14 +386,15 @@ export class GameController {
         // Any advance sent before the intervention has already answered, and none was sent after it.
         this.inflight = false
         if (msg.tick === msg.from) {
-          // Nothing was applied (the run had ended, or no checkpoint reached that hour): give the charge back.
-          this.charges += 1
+          // Nothing was applied (the run had ended, or no checkpoint reached that hour), so the use was never spent.
+          this.pendingAt = null
           this.cooldownUntil = this.refund ?? 0
           this.refund = null
           this.notify(true)
           break
         }
         this.refund = null
+        this.pendingAt = null
         this.history.truncate(msg.from)
         this.history.add(msg.frame, msg.stats, 0)
         msg.evolution.forEach(e => this.history.addEvolution(e))
@@ -470,18 +479,21 @@ export class GameController {
     this.pause()
     this.saving = true
     this.saveStatus = 'Saving meadow…'
-    this.send({ type: 'save', runId: this.runId })
+    // The latest hour seen, not a replayed one: the world before a later intervention must not be saved with it.
+    const at = Math.min(this.history.head, Math.max(Math.floor(this.displayTick), this.seenTick))
+    this.send({ type: 'save', runId: this.runId, at })
     this.notify(true)
   }
 
   restore(save: MeadowSave): void {
     this.configure(save.config, save.state)
     this.history.restore(save.history)
-    this.charges = save.charges
-    this.cooldownUntil = save.cooldownUntil
-    this.history.interventions = save.interventions
-    this.history.evolution = save.evolution
-    this.history.journal = save.journal
+    // Uses are recomputed from the recorded interventions, so a save can neither duplicate nor lose one; the stored
+    // `charges` is only for older builds. Saves from before a field existed get its empty default.
+    this.cooldownUntil = save.cooldownUntil ?? 0
+    this.history.interventions = save.interventions ?? []
+    this.history.evolution = save.evolution ?? []
+    this.history.journal = save.journal ?? []
     this.saveStatus = 'Meadow restored and paused. The graph and journal are kept; replay covers the last 15 days before the save.'
   }
 
@@ -493,7 +505,7 @@ export class GameController {
       (!this.end || t < this.end.tick) &&
       !this.saving &&
       !this.intervening &&
-      this.charges > 0 &&
+      this.chargesAt(t) > 0 &&
       t >= this.cooldownUntil &&
       this.atLive()
     )
@@ -503,13 +515,20 @@ export class GameController {
   intervene(action: Intervention): void {
     if (!this.canIntervene()) return
     const at = Math.floor(this.displayTick)
-    this.charges -= 1
+    this.pendingAt = at
     this.refund = this.cooldownUntil
     this.cooldownUntil = at + COOLDOWN
     this.stepTarget = null
     this.intervening = true
     this.send({ type: 'intervene', runId: this.runId, action, at })
     this.notify(true)
+  }
+
+  /** Uses available at hour `t`. A recorded intervention was made the hour before its `tick` (the effect shows one hour later). */
+  private chargesAt(t: number): number {
+    const spentAt = this.history.interventions.map(iv => iv.tick - 1)
+    if (this.pendingAt !== null) spentAt.push(this.pendingAt)
+    return chargesAt(spentAt, t, this.config?.endless ?? false)
   }
 
   resetNeedsConfirm(): boolean {
