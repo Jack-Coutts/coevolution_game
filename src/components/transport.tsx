@@ -4,6 +4,7 @@ import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
 import { SPEEDS } from '@/game/controller'
 import { useGame } from '@/hooks/use-game'
+import { rateLabel } from '@/game/insights'
 import { formatDuration } from '@/sim/time'
 
 export function Transport({ onReset, onShowResult }: { onReset: () => void; onShowResult: () => void }) {
@@ -52,6 +53,11 @@ export function Transport({ onReset, onShowResult }: { onReset: () => void; onSh
           </ToggleGroupItem>
         ))}
       </ToggleGroup>
+      {snap.effectiveTps !== null && (
+        <span className="text-xs text-tone-warn-foreground tabular" role="status" title="The simulation cannot keep up with the chosen speed on this device, so the meadow runs slower than the label.">
+          running at {rateLabel(snap.effectiveTps)}
+        </span>
+      )}
 
       <div className="ml-auto flex items-center gap-3 text-xs text-muted-foreground tabular">
         {snap.phase === 'ended' && (

@@ -336,3 +336,15 @@ export function traitValue(pop: PopulationEvolution | undefined, trait: TraitKey
   if (!pop) return '—'
   return pop.count === 0 ? 'none alive' : pop.traits[trait].mean.toFixed(2)
 }
+
+/** A playback rate in the speed buttons' units: "20 h/s", "3 d/s", "1.5 d/s". */
+export function rateLabel(tps: number): string {
+  if (tps < 23.5) return `${Math.max(0, Math.round(tps))} h/s`
+  const days = Math.round((tps / 24) * 10) / 10
+  return `${days} d/s`
+}
+
+/** The speed label, with the rate actually shown when the simulation cannot keep up. */
+export function speedLabel(label: string, effectiveTps: number | null): string {
+  return effectiveTps === null ? label : `${label} (running at ${rateLabel(effectiveTps)})`
+}

@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { newDangers, scoreWords, traitValue, usesLeft, type Hint } from '@/game/insights'
+import { newDangers, rateLabel, scoreWords, speedLabel, traitValue, usesLeft, type Hint } from '@/game/insights'
 import { scoreRun } from '@/game/scores'
 
 describe('intervention allowance in words', () => {
@@ -41,5 +41,14 @@ describe('pause on new red notes', () => {
     const after = [note('overhunt', 'danger'), note('fewfox', 'danger'), note('boom', 'warn')]
     expect(newDangers(before, after).map(n => n.id)).toEqual(['fewfox'])
     expect(newDangers(after, after)).toEqual([])
+  })
+})
+
+describe('speed label', () => {
+  it('shows the chosen speed, and the real rate when the simulation lags', () => {
+    expect(speedLabel('1 wk/s', null)).toBe('1 wk/s')
+    expect(speedLabel('1 wk/s', 72)).toBe('1 wk/s (running at 3 d/s)')
+    expect(speedLabel('1 wk/s', 40)).toBe('1 wk/s (running at 1.7 d/s)')
+    expect(rateLabel(20)).toBe('20 h/s')
   })
 })

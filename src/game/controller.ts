@@ -78,6 +78,8 @@ export interface Snapshot {
   autoPause: boolean
   /** The warning that just paused the meadow, until the player plays again. */
   pausedFor: Hint | null
+  /** Hours per second actually shown, when the simulation cannot keep up with the chosen speed; otherwise null. */
+  effectiveTps: number | null
 }
 
 const WINTER = [tickAt(3), tickAt(6)] as const
@@ -128,6 +130,7 @@ export class GameController {
   private hintCache: { tick: number; hints: Hint[] } = { tick: -1, hints: [] }
   private autoPause = readAutoPause()
   private pausedFor: Hint | null = null
+  private rate: { since: number; from: number; tps: number | null } = { since: 0, from: 0, tps: null }
   /** The hour and notes the warning watch last saw; -1 after a jump, so the next check only takes a baseline. */
   private watched: { tick: number; hints: Hint[] } = { tick: -1, hints: [] }
 
@@ -213,7 +216,27 @@ export class GameController {
       runId: this.runId,
       autoPause: this.autoPause,
       pausedFor: this.pausedFor,
+      effectiveTps: this.playing ? this.rate.tps : null,
     }
+  }
+
+  /** Measure the shown rate over ~2 s windows; flag it when it falls below 80% of the chosen speed. */
+  private measureRate(now: number): void {
+    const r = this.rate
+    if (!this.playing || this.intervening || r.since === 0) {
+      this.rate = { since: now, from: this.displayTick, tps: this.playing ? r.tps : null }
+      return
+    }
+    const elapsed = (now - r.since) / 1000
+    if (elapsed < 2) return
+    const shown = (this.displayTick - r.from) / elapsed
+    const lagging = shown < 0.8 * SPEEDS[this.speed].tps && !(this.end && this.displayTick >= this.end.tick)
+    this.rate = { since: now, from: this.displayTick, tps: lagging ? shown : null }
+    this.notify(true)
+  }
+
+  private resetRate(): void {
+    this.rate = { since: 0, from: 0, tps: null }
   }
 
   private hintsAt(t: number): Hint[] {
@@ -262,6 +285,7 @@ export class GameController {
     this.hintCache = { tick: -1, hints: [] }
     this.watched = { tick: -1, hints: [] }
     this.pausedFor = null
+    this.resetRate()
     this.displayTick = 0
     this.lastFxTick = 0
     this.playing = false
@@ -384,6 +408,7 @@ export class GameController {
     if (this.phase === 'planning') this.phase = 'running'
     this.playing = true
     this.pausedFor = null
+    this.resetRate()
     this.last = performance.now()
     this.notify(true)
   }
@@ -401,6 +426,7 @@ export class GameController {
 
   setSpeed(i: number): void {
     this.speed = Math.max(0, Math.min(SPEEDS.length - 1, i))
+    this.resetRate()
     this.notify(true)
   }
 
@@ -409,6 +435,7 @@ export class GameController {
     this.stepTarget = null
     this.displayTick = Math.max(this.history.replayStart, Math.min(this.history.head, tick))
     this.watched = { tick: -1, hints: [] }
+    this.resetRate()
     this.lastFxTick = Math.floor(this.displayTick)
     this.renderer?.clearFx()
     if (this.end && this.displayTick >= this.end.tick) this.finalize()
@@ -532,6 +559,7 @@ export class GameController {
         this.send({ type: 'advance', runId: this.runId, target: Math.ceil(this.displayTick + lead) })
       }
     }
+    this.measureRate(now)
     const t = Math.floor(this.displayTick)
     if (this.playing && this.atLive()) this.watchWarnings(t)
     else this.watched = { tick: -1, hints: [] }

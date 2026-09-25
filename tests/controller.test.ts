@@ -145,3 +145,25 @@ it('pauses once when a new red note appears while playing live, if the player wa
   game.setAutoPause(false)
   game.dispose()
 })
+
+it('reports the real playback rate when the worker cannot keep up with the chosen speed', () => {
+  const { game, runId, frame } = ready()
+  const loop = (now: number) => (game as unknown as { loop(now: number): void }).loop(now)
+  let head = 0
+  // The worker delivers only 4 hours per 100 ms frame: 40 hours a second against 1 wk/s (168).
+  const answer = () => {
+    if (!mock.messages.splice(0).some(m => m.type === 'advance')) return
+    const ticks = [head + 1, head + 2, head + 3, head + 4]
+    head += 4
+    mock.receive({ type: 'frames', runId, frames: ticks.map(tick => ({ ...frame, tick })), stats: new Float64Array(4 * STAT_STRIDE), head, end: null, evolution: [] })
+  }
+  game.setAutoPause(false)
+  game.setSpeed(3)
+  game.play()
+  let now = performance.now()
+  for (let i = 0; i < 45; i++) { loop((now += 100)); answer() }
+  expect(Math.round(game.getSnapshot().effectiveTps ?? 0)).toBe(40)
+  game.setSpeed(0)
+  expect(game.getSnapshot().effectiveTps).toBeNull()
+  game.dispose()
+})

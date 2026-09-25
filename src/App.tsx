@@ -19,6 +19,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
 import { WorldView } from '@/components/world-view'
 import { SPEEDS } from '@/game/controller'
+import { speedLabel } from '@/game/insights'
 import { STABLE_PRESET } from '@/game/presets'
 import { seedOf, type SeedChoice } from '@/game/seed'
 import { useAnimalIcons } from '@/hooks/use-animal-icons'
@@ -296,7 +297,7 @@ export default function App() {
                   <span className="flex items-center gap-1.5">
                     <span className="inline-block w-4 border-t border-dashed border-rabbit" /> Forecast
                   </span>
-                  <span className="ml-auto">Click or drag the graph to replay · {SPEEDS[snap.speed].label}</span>
+                  <span className="ml-auto">Click or drag the graph to replay · {speedLabel(SPEEDS[snap.speed].label, snap.effectiveTps)}</span>
                 </div>
               </Card>
             </section>
