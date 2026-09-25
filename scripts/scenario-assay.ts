@@ -13,6 +13,7 @@
  *   nudge      placebo: move one rabbit 0.0001 at hour 240, to measure how much any change reshuffles
  *
  *   node --import tsx scripts/scenario-assay.ts 8200 20 docs/experiments/scenarios-tuning.json [--jobs 2] [--scenarios drought,winter]
+ *     [--conditions untouched,informed] [--disturbance '{"regrow":[...]}']   (exploration: replaces the disturbance)
  */
 import { fork } from 'node:child_process'
 import { writeFileSync } from 'node:fs'
@@ -36,17 +37,17 @@ export const CONDITIONS: Condition[] = ['untouched', 'keeper', 'informed', 'nudg
 
 /** When the scenario's disturbance begins (first span, else first arrival). */
 export function onset(sc: Scenario): number {
-  return sc.spans[0]?.from ?? sc.markers[0].tick
+  return sc.spans[0]?.from ?? sc.markers[0]?.tick ?? Infinity
 }
 /** When it ends; an arrival counts as a 30-day event, as in the end-screen explanation. */
 export function offset(sc: Scenario): number {
-  return sc.spans[0]?.to ?? sc.markers[0].tick + 30 * 24
+  return sc.spans[0]?.to ?? (sc.markers[0] ? sc.markers[0].tick + 30 * 24 : Infinity)
 }
 
 interface Plan {
   decision: string
-  /** Keep every charge until the field-note warning appears (NOTICE_DAYS before onset). */
-  hold: boolean
+  /** Keep every charge until this many hours after onset (negative: before it; -NOTICE is when the warning appears). */
+  from: number
   /** Scenario-specific moves, tried before the keeper's situations whenever a charge is ready. */
   move: (x: Signals, start: number) => Intervention | null
 }
@@ -58,18 +59,18 @@ interface Plan {
 export const PLANS: Record<Exclude<ScenarioId, 'stable'>, Plan> = {
   drought: {
     decision: 'Save charges for the dry months; refill bushes with rain once they are stripped during the drought.',
-    hold: true,
+    from: -NOTICE,
     move: (x, start) => (x.hour >= start && x.stock < 0.25 ? 'rain' : null),
   },
   winter: {
-    decision: 'Save charges for winter; feed the foxes when they go hungry in the cold.',
-    hold: true,
-    move: (x, start) => (x.hour >= start && x.foxEnergy < 0.35 && x.foxes >= 1 ? 'feedFoxes' : null),
+    decision: 'Go into winter with fewer foxes: cull on the warning if there are 12 or more; rain once bushes are stripped in the cold.',
+    from: -NOTICE,
+    move: (x, start) => (x.hour < start ? (x.foxes >= 12 ? 'cullPred' : null) : x.stock < 0.25 ? 'rain' : null),
   },
   invasion: {
-    decision: 'Cull the pack soon after it arrives, before it eats the warren out.',
-    hold: true,
-    move: (x, start) => (x.hour >= start + 48 && x.hour < start + 30 * 24 && x.foxes >= 12 ? 'cullPred' : null),
+    decision: 'Save charges for the pack; cull two days after it arrives (it has spread out by then), before it eats the warren out.',
+    from: 48,
+    move: (x, start) => (x.hour < start + 30 * 24 && x.foxes >= 12 ? 'cullPred' : null),
   },
 }
 
@@ -146,7 +147,7 @@ export function runOne(seed: number, scenario: ScenarioId, condition: Condition)
       const a = s.prey[0]
       a.x = a.x < 0.5 ? a.x + 1e-4 : a.x - 1e-4
     }
-    const keeper = condition === 'keeper' || (condition === 'informed' && (!plan?.hold || s.tick >= start - NOTICE))
+    const keeper = condition === 'keeper' || (condition === 'informed' && s.tick >= start + (plan?.from ?? 0))
     if (keeper && s.tick >= FIRST_HOUR && charges > 0 && s.tick >= cooldownUntil) {
       let action: Intervention | null = condition === 'informed' && plan ? plan.move(x, start) : null
       if (!action) action = KEEPER_ORDER.map(a => PROBES.find(p => p.action === a)!)
@@ -175,7 +176,14 @@ export function runOne(seed: number, scenario: ScenarioId, condition: Condition)
   }
 }
 
+/** Exploration only: replace the disturbance of the scenarios being run (the report records what was used). */
+function applyDisturbance(json: string | undefined, ids: ScenarioId[]): void {
+  if (!json) return
+  for (const id of ids) Object.assign(SCENARIO_BY_ID[id].disturbance, JSON.parse(json))
+}
+
 if (process.argv[2] === '--child') {
+  applyDisturbance(process.env.DISTURBANCE_OVERRIDE, (process.env.DISTURBANCE_SCENARIOS ?? '').split(',') as ScenarioId[])
   process.on('message', (job: { seed: number; scenario: ScenarioId; condition: Condition; i: number } | { done: true }) => {
     if ('done' in job) process.exit(0)
     process.send!({ i: job.i, row: runOne(job.seed, job.scenario, job.condition) })
@@ -186,6 +194,8 @@ if (process.argv[2] === '--child') {
   const jobsN = Number(flag('--jobs') ?? 2)
   const scenarios = (flag('--scenarios')?.split(',') ?? ['drought', 'winter', 'invasion']) as ScenarioId[]
   const conds = (flag('--conditions')?.split(',') ?? CONDITIONS) as Condition[]
+  const override = flag('--disturbance')
+  applyDisturbance(override, scenarios)
   const start = Number(args[0] ?? 8200), count = Number(args[1] ?? 20), out = args[2] ?? '/tmp/scenarios.json'
   const jobs = scenarios.flatMap(scenario => Array.from({ length: count }, (_, k) => conds.map(condition => ({ seed: start + k, scenario, condition }))).flat())
     .map((j, i) => ({ ...j, i }))
@@ -193,7 +203,7 @@ if (process.argv[2] === '--child') {
   const t0 = Date.now()
   let next = 0, done = 0
   await Promise.all(Array.from({ length: jobsN }, () => new Promise<void>((resolve, reject) => {
-    const child = fork(fileURLToPath(import.meta.url), ['--child'], { execArgv: ['--import', 'tsx'] })
+    const child = fork(fileURLToPath(import.meta.url), ['--child'], { execArgv: ['--import', 'tsx'], env: { ...process.env, DISTURBANCE_OVERRIDE: override ?? '', DISTURBANCE_SCENARIOS: scenarios.join(',') } })
     const feed = () => child.send(next < jobs.length ? jobs[next++] : { done: true })
     child.on('message', (m: { i: number; row: Row }) => {
       rows[m.i] = m.row
@@ -214,7 +224,7 @@ if (process.argv[2] === '--child') {
     noticeDays: NOTICE_DAYS,
     scenarios: SCENARIOS.filter(s => scenarios.includes(s.id)).map(s => ({
       id: s.id, disturbance: s.disturbance, onset: onset(s), end: offset(s),
-      decision: s.id === 'stable' ? null : PLANS[s.id].decision, hold: s.id === 'stable' ? null : PLANS[s.id].hold,
+      decision: s.id === 'stable' ? null : PLANS[s.id].decision, from: s.id === 'stable' ? null : PLANS[s.id].from,
       move: s.id === 'stable' ? null : PLANS[s.id].move.toString(),
     })),
     parameters: deriveParams(STABLE_PRESET),
