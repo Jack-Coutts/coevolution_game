@@ -48,9 +48,36 @@ Population history can be scrubbed. The Evolution page probes inherited controll
 standardised situations and plots mean and middle-80% variation; founders are a dashed
 reference. Probed inherited tendencies are distinct from current animal movement.
 
-Click an animal or choose it from the inspector to pause and read its age, energy, health,
-generation, parent, lineage, offspring and inherited responses. The journal records observed
-generation and lineage milestones, without inventing causal evolutionary explanations.
+Click an animal or choose it from the inspector (sorted by generation, family or id) to pause
+and read its age, energy, health, generation, offspring and inherited responses. Its family links
+lead up and down: a living parent is selected directly; a dead one shows when it was last seen,
+with a link to that hour while the replay still holds it (otherwise "died before the kept
+replay"). Living offspring and the founder family are links too. A selected animal that is not
+alive at the displayed hour shows when it died, or that the kept replay does not show it.
+
+### Evolution journal
+
+Entries are typed (`src/game/journal.ts`), each with the measurement it came from, a category
+(family, measured change, population outcome) and, where useful, links to an animal, a founder
+family or the trait chart. Entries observe; a caveat says what the observation does not show.
+No entry claims why something happened, and trait trends are never presented as an advantage.
+
+| Kind | Evidence | Threshold |
+| --- | --- | --- |
+| Generation | Highest living generation, daily sample | Each new multiple of 5, once |
+| Lineage | Founder families alive, daily sample | Falls from more than 1 to 1 |
+| Trait shift | Daily trait mean and middle-80% band | Mean at least 0.25 from the first measurement (founders, or first sample with 10+ animals) for 20 daily samples in a row, each with 10+ animals; once per trait and direction until the mean returns within 0.125 |
+| Extinction | Living count, daily samples | Above 0, then 0 |
+| Year | Both counts at a new year's first sample | Both above 0 |
+| Variety | Reserved for ecological varieties (issue #11) | Supplied by the detector; one entry per key until released |
+
+Samples with fewer than 10 animals neither extend a trait run nor count as a return, so an
+extinction does not read as a trait change. The journal keeps its latest 80 entries and says how
+many were dropped. The Families card counts each founder's descendants daily from frames (share
+of the living animals, generations, largest size, first and last count). Daily counts cover
+about a year; older days survive only as each family's first count and largest size, and at most
+40 extinct families per species are kept, which the Endless page states. Journal state, trait
+latches and family counts are saved with the meadow; journals from older saves load as notes.
 
 ## Time, persistence and scoring
 
@@ -86,7 +113,8 @@ could not act). Uses are recomputed from the recorded intervention hours by one 
 uses left and the date of the next renewal. Endless scoring is unchanged (hours survived).
 
 A rolling year of statistics and replay bounds memory. Daily evolution samples retain the
-founder reference plus the latest year, and the journal retains its latest 80 milestones.
+founder reference plus the latest year, the journal retains its latest 80 entries, and
+family counts retain about a year of days.
 A save includes the displayed hour's exact world, every RNG state, queued actions, charges/cooldown, recent
 15-day replay, and evolution observations. There is one device-local IndexedDB slot; saving
 replaces it. Resume is paused. It does not regenerate the world from the seed.
