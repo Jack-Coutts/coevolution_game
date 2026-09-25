@@ -344,7 +344,7 @@ export class GameController {
       case 'frames':
         this.inflight = false
         msg.frames.forEach((f: FrameData, i: number) => this.history.add(f, msg.stats, i * STAT_STRIDE))
-        msg.evolution.forEach(e => this.history.addEvolution(e))
+        msg.evolution.forEach(e => this.history.addEvolution(e, e.tick === msg.end?.tick))
         if (msg.end) this.end = msg.end
         if (this.stepTarget !== null) {
           this.displayTick = Math.min(this.history.head, this.stepTarget)
@@ -397,7 +397,7 @@ export class GameController {
         this.pendingAt = null
         this.history.truncate(msg.from)
         this.history.add(msg.frame, msg.stats, 0)
-        msg.evolution.forEach(e => this.history.addEvolution(e))
+        msg.evolution.forEach(e => this.history.addEvolution(e, e.tick === msg.end?.tick))
         this.end = msg.end
         this.displayTick = this.seenTick = msg.tick
         this.lastFxTick = msg.tick

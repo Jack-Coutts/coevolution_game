@@ -209,16 +209,19 @@ export class Journal {
           continue
         }
         // Walk back over the unbroken run of qualifying samples.
+        // Only daily samples count; the extra sample a resume adds at its own hour is skipped.
         let run = 0
         let fewest = Infinity
+        let since = sample.tick
         for (let i = samples.length - 1; i >= 0 && run < TRAIT_SHIFT.samples; i--) {
+          if (i < samples.length - 1 && samples[i].tick % 24 !== 0) continue
           const p = samples[i][s]
           if (p.count < minCount || direction * (p.traits[trait].mean - b.mean) < threshold || samples[i].tick < base.tick) break
           run++
           fewest = Math.min(fewest, p.count)
+          since = samples[i].tick
         }
         if (run < TRAIT_SHIFT.samples) continue
-        const since = samples[samples.length - run].tick
         const now = sample[s].traits[trait]
         const [one] = NAME[s]
         const label = TRAIT_LABEL[trait]

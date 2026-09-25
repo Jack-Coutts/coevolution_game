@@ -203,3 +203,22 @@ describe('audit: rewinds and save cuts after a re-recorded shift', () => {
     expect(shifts(resumed).map(e => e.tick / D)).toEqual([20])
   })
 })
+
+describe('audit: a resume at a non-daily hour', () => {
+  it('records on the same day as an uninterrupted run and adds no off-day family count', () => {
+    const h = run([0, ...repeat(10, 0.3)])
+    // A resume at day 10 + 5 h: the worker reports the world at that hour.
+    const at = 10 * D + 5
+    h.add(frame(at, [[1, 3, -1, 1]]), new Float64Array(STAT_STRIDE), 0)
+    h.addEvolution({ ...sample(10, 0.3), tick: at })
+    run(repeat(12, 0.3), h, 11)
+    expect(shifts(h).map(e => e.tick / D)).toEqual([20])
+    expect(h.families.days.map(d => d.tick % D)).not.toContain(5)
+  })
+  it('still records an extinction from the end-of-run sample', () => {
+    const h = run([0, 0])
+    h.add(frame(D + 7), new Float64Array(STAT_STRIDE), 0)
+    h.addEvolution({ ...sample(1, 0, 0), tick: D + 7 }, true)
+    expect(h.journal.map(e => [e.kind, e.tick])).toEqual([['extinction', D + 7]])
+  })
+})

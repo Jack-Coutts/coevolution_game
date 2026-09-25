@@ -42,14 +42,20 @@ export class RunHistory {
     this.frames.delete(t - HISTORY_HOURS - 1)
   }
 
-  addEvolution(sample: EvolutionSample): void {
+  /**
+   * Add a sample for the charts. The journal and family counts observe only daily samples, plus the run's final
+   * sample (`final`, which may fall mid-day), so a resume at its own hour does not add an extra day.
+   */
+  addEvolution(sample: EvolutionSample, final = false): void {
     const prev = this.evolution.at(-1)
     if (prev?.tick === sample.tick) return
     this.evolution.push(sample)
-    // The frame at the sample's hour has just arrived with it.
-    const frame = this.frames.get(sample.tick)
-    this.log.observe(this.evolution, frame)
-    this.families.observe(sample.tick, frame)
+    if (sample.tick % 24 === 0 || final) {
+      // The frame at the sample's hour has just arrived with it.
+      const frame = this.frames.get(sample.tick)
+      this.log.observe(this.evolution, frame)
+      this.families.observe(sample.tick, frame)
+    }
     // Preserve the founder reference, plus the most recent daily observations.
     if (this.evolution.length > 367) this.evolution.splice(1, this.evolution.length - 367)
   }
