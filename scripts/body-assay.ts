@@ -30,6 +30,7 @@ type Line = keyof typeof LINES
 function params(body: boolean): SimParams {
   const p = deriveParams(STABLE_PRESET)
   if (body) p.eco.body = defaultBody()
+  else delete p.eco.body
   return p
 }
 

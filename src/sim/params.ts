@@ -1,3 +1,5 @@
+import { defaultBody } from './body'
+
 export interface SpeciesParams {
   initial: number
   adultAge: number
@@ -157,6 +159,8 @@ export function defaultEco(): EcoParams {
     brainUpkeep: 0.01,
     ceilingPrey: 800,
     ceilingPred: 400,
+    // Inherited body size is on by default (issue #10; docs/validation.md). Delete to switch it off.
+    body: defaultBody(),
   }
 }
 

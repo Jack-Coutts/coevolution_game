@@ -196,9 +196,19 @@ describe('body size energy accounting', () => {
   })
 })
 
+/** The base meadow with body evolution switched off. */
+function bodyOff(p: SimParams = deriveParams(STABLE_PRESET)): SimParams {
+  p.eco.body = undefined
+  return p
+}
+
 describe('body evolution off', () => {
+  it('is on by default in new meadows', () => {
+    expect(deriveParams(STABLE_PRESET).eco.body).toEqual(defaultBody())
+  })
+
   it('ignores size genes: every animal is exactly the species body', () => {
-    const p = deriveParams(STABLE_PRESET)
+    const p = bodyOff()
     const g = lines(p, [1, -1])
     const s = new Sim(p, 4, undefined, { genomes: g })
     for (const a of [...s.prey, ...s.preds]) {
@@ -210,7 +220,7 @@ describe('body evolution off', () => {
   })
 
   it('runs identically whether or not genomes carry size genes', () => {
-    const p = deriveParams(STABLE_PRESET)
+    const p = bodyOff()
     const plain = new Sim(p, 77)
     const tagged = new Sim(p, 77, undefined, { genomes: { prey: plain.prey.map(a => ({ ...a.brain, sizeGene: 1 })), pred: plain.preds.map(a => ({ ...a.brain, sizeGene: -1 })) } })
     const ref = new Sim(p, 77, undefined, { genomes: { prey: plain.prey.map(a => a.brain), pred: plain.preds.map(a => a.brain) } })
@@ -241,7 +251,7 @@ describe('body size persistence and display', () => {
   })
 
   it('a save from before body size loads every animal at ×1 with its species body', () => {
-    const p = deriveParams(STABLE_PRESET)
+    const p = bodyOff()
     const s = new Sim(p, 12)
     for (let i = 0; i < 50; i++) s.step()
     const old = structuredClone(s.save()) as MeadowState
@@ -283,7 +293,7 @@ describe('body size persistence and display', () => {
     expect(e.prey.traits.size.mean).toBeCloseTo(sizes.reduce((a, b) => a + b, 0) / sizes.length, 12)
     expect(e.prey.traits.size.low).toBe(sizes[Math.floor((sizes.length - 1) * 0.1)])
     expect(e.prey.traits.size.high).toBe(sizes[Math.floor((sizes.length - 1) * 0.9)])
-    const off = summarizeEvolution(new Sim(deriveParams(STABLE_PRESET), 31))
+    const off = summarizeEvolution(new Sim(bodyOff(), 31))
     expect(off.prey.traits.size).toEqual({ mean: 1, low: 1, high: 1 })
   })
 })

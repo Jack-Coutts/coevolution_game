@@ -5,6 +5,8 @@ import { Sim } from '../src/sim/sim'
 const start = Number(process.argv[2] ?? 1000), count = Number(process.argv[3] ?? 50)
 const rows = []
 const p = deriveParams(STABLE_PRESET)
+// BODY=off runs the meadow without inherited body size (issue #10), exactly as before it existed.
+if (process.env.BODY === 'off') delete p.eco.body
 for (let seed = start; seed < start + count; seed++) {
   const s = new Sim(p, seed)
   let maxPrey = s.prey.length, maxFox = s.preds.length

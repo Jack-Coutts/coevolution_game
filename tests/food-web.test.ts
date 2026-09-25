@@ -13,6 +13,8 @@ import { FOOD_WEB, THREE_SPECIES, speciesList } from '@/sim/species'
  */
 function meadow(seed = 11, still = true, coverSlow?: number) {
   const p = deriveParams(STABLE_PRESET, THREE_SPECIES)
+  // These tests measure the species' base bodies; inherited body size has its own tests (body.test.ts).
+  p.eco.body = undefined
   if (still) for (const body of [p.prey, p.pred, p.vole!.body]) body.step = 0
   if (coverSlow !== undefined) p.eco.coverSlow = coverSlow
   p.sproutPerDay = 0

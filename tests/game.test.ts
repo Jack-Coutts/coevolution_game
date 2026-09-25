@@ -74,7 +74,7 @@ describe('simulation', () => {
       for (const a of s.prey) {
         const prev = before.get(a.id)
         if (!prev) continue
-        expect(Math.hypot(a.x - prev[0], a.y - prev[1])).toBeLessThanOrEqual(p.prey.step + 1e-12)
+        expect(Math.hypot(a.x - prev[0], a.y - prev[1])).toBeLessThanOrEqual(a.topStep + 1e-12)
       }
     }
   })
@@ -118,13 +118,13 @@ describe('simulation', () => {
     const s = new Sim(p, 2)
     const parent = s.prey[0]
     parent.age = p.prey.adultAge
-    parent.energy = p.prey.maxEnergy
+    parent.energy = parent.maxEnergy
     const before = s.counters.preyBorn
     s.step()
     const born = s.counters.preyBorn - before
     expect(born).toBeGreaterThanOrEqual(1)
-    const child = s.prey.find((a) => a.age === 0 && Math.hypot(a.x - parent.x, a.y - parent.y) <= p.birthR + p.prey.step)
-    expect(child?.energy).toBe(p.prey.childEnergy * p.prey.maxEnergy)
+    const child = s.prey.find((a) => a.age === 0 && Math.hypot(a.x - parent.x, a.y - parent.y) <= p.birthR + parent.topStep)
+    expect(child?.energy).toBe(p.prey.childEnergy * parent.maxEnergy)
     expect(parent.lastBirth).toBe(parent.age)
   })
 
