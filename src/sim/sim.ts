@@ -12,6 +12,7 @@ import {
   type Genome,
   type Traits,
 } from './brain'
+import { bodyValues, childGene, founderGene, sizeOf, SIZE_MAX } from './body'
 import type { SimParams, SpeciesParams } from './params'
 import { Rng } from './rng'
 import { calendar, type Season } from './time'
@@ -182,6 +183,12 @@ export class Creature {
   readonly parent: number
   readonly view: number
   readonly maxTurn: number
+  /** Inherited body size multiplier (1 = the species' base body; always 1 while body evolution is off). */
+  readonly size: number
+  /** This animal's own max energy, basal metabolism and top speed, after body size. */
+  readonly maxEnergy: number
+  readonly metabolism: number
+  readonly topStep: number
   age = 0
   hunger = 0
   meals = 0
@@ -207,6 +214,7 @@ export class Creature {
     gen: number,
     lineage: number,
     parent: number,
+    size = 1,
   ) {
     this.id = id
     this.species = species
@@ -221,6 +229,11 @@ export class Creature {
     this.parent = parent
     this.view = trait(bodyGene(brain, 0), body.view)
     this.maxTurn = trait(bodyGene(brain, 1), body.turn)
+    const b = bodyValues(body, size)
+    this.size = b.size
+    this.maxEnergy = b.maxEnergy
+    this.metabolism = b.metabolism
+    this.topStep = b.topStep
   }
 }
 
@@ -337,8 +350,10 @@ export class Sim {
       const n = opts.counts?.[s] ?? starts[s].length
       for (let i = 0; i < n; i++) {
         const [x, y] = starts[s][i] ?? [this.rng.random(), this.rng.random()]
-        const brain = given?.length ? given[i % given.length] : randomGenome(this.rng, p.eco.hidden, p.geneInit)
-        const a = this.spawn(s, x, y, brain, p.founderEnergy * this.defs[s].body.maxEnergy, 0, -1)
+        let brain = given?.length ? given[i % given.length] : randomGenome(this.rng, p.eco.hidden, p.geneInit)
+        if (p.eco.body && brain.sizeGene === undefined) brain = { ...brain, sizeGene: founderGene(this.rng, p.eco.body) }
+        const a = this.spawn(s, x, y, brain, 0, 0, -1)
+        a.energy = p.founderEnergy * a.maxEnergy
         this.pops[s].push(a)
       }
     }
@@ -438,7 +453,8 @@ export class Sim {
   private spawn(s: Species, x: number, y: number, brain: Genome, energy: number, gen: number, parent: number): Creature {
     const id = this.nextId[s]++
     const lineage = parent < 0 ? id : -1
-    return new Creature(id, s, x, y, this.rng.uniform(0, 2 * Math.PI), brain, this.defs[s].body, energy, gen, lineage, parent)
+    const size = this.p.eco.body ? sizeOf(brain.sizeGene ?? 0) : 1
+    return new Creature(id, s, x, y, this.rng.uniform(0, 2 * Math.PI), brain, this.defs[s].body, energy, gen, lineage, parent, size)
   }
 
   private emit(kind: TickEvent['kind'], species: Species | null, a: { x: number; y: number }): void {
@@ -600,7 +616,7 @@ export class Sim {
       const bushes = this.bushes
       const nb = bushes.length
       for (let i = 0; i < def.diet.length; i++) {
-        const bite = def.diet[i].bite
+        const bite = def.diet[i].bite * a.size
         if (def.diet[i].food === 'berries') {
           for (let k = 0; k < nb; k++) {
             const b = bushes[k]
@@ -694,7 +710,7 @@ export class Sim {
       x[SENSE.kin + 2] = Math.min(1, kn / 8)
     }
 
-    x[SENSE.hunger] = 1 - a.energy / def.body.maxEnergy
+    x[SENSE.hunger] = 1 - a.energy / a.maxEnergy
     x[SENSE.inCover] = a.inCover ? 1 : 0
     x[SENSE.wall] = wallAhead(a, p.wallView)
     x[SENSE.memory] = a.mem
@@ -734,14 +750,14 @@ export class Sim {
     const n = Math.sqrt(hx * hx + hy * hy)
     a.hx = hx / n
     a.hy = hy / n
-    const step = body.step * pace * (a.inCover && def.coverSlows ? eco.coverSlow : 1) * (a.illUntil > this.tick ? EFFECTS.illness.slow : 1)
+    const step = a.topStep * pace * (a.inCover && def.coverSlows ? eco.coverSlow : 1) * (a.illUntil > this.tick ? EFFECTS.illness.slow : 1)
     a.x = Math.min(1, Math.max(0, a.x + a.hx * step))
     a.y = Math.min(1, Math.max(0, a.y + a.hy * step))
-    a.pace = step / body.step
+    a.pace = step / a.topStep
     a.inCover = this.cover.length > 0 && this.inCover(a.x, a.y)
     const r = step / body.baseStep
     a.energy -=
-      (body.metabolism + body.visionUpkeep * a.view + eco.brainUpkeep * a.brain.nHid) * met + body.speedCost * r * r + (a.illUntil > this.tick ? EFFECTS.illness.drain : 0)
+      (a.metabolism + body.visionUpkeep * a.view + eco.brainUpkeep * a.brain.nHid) * met + body.speedCost * a.size * r * r + (a.illUntil > this.tick ? EFFECTS.illness.drain : 0)
   }
 
   /** Hungry plant eaters take one bite of the first food in their diet that is within reach. */
@@ -750,10 +766,10 @@ export class Sim {
     for (const s of this.species) {
       const def = this.defs[s]
       if (!def.eatsPlants) continue
-      // Each species' own body sets when it is full (the census bug: this used the rabbit's).
-      const full = def.body.maxEnergy - 0.5 * def.body.mealEnergy
+      // Each animal's own body sets when it is full (the census bug: this used the rabbit's).
+      const halfMeal = 0.5 * def.body.mealEnergy
       for (const a of this.pops[s]) {
-        if (a.energy > full) continue
+        if (a.energy > a.maxEnergy - halfMeal * a.size) continue
         for (let i = 0; i < def.diet.length; i++) if (this.bite(a, def, def.diet[i], feed2)) break
       }
     }
@@ -761,25 +777,26 @@ export class Sim {
 
   /** One bite of one plant food: seed in the tall-grass patch the animal stands in, or the nearest bush in reach. */
   private bite(a: Creature, def: SpeciesDef, diet: Diet, feed2: number): boolean {
+    const bite = diet.bite * a.size
     if (diet.food === 'seed') {
       if (!a.inCover) return false
       const r2 = this.p.eco.coverR * this.p.eco.coverR
       let g = -1
       for (let k = 0; k < this.cover.length; k++) {
         const [cx, cy] = this.cover[k]
-        if (this.grassSeed[k] >= diet.bite && (cx - a.x) ** 2 + (cy - a.y) ** 2 <= r2) {
+        if (this.grassSeed[k] >= bite && (cx - a.x) ** 2 + (cy - a.y) ** 2 <= r2) {
           g = k
           break
         }
       }
       if (g < 0) return false
-      this.grassSeed[g] = trimStock(this.grassSeed[g] - diet.bite)
+      this.grassSeed[g] = trimStock(this.grassSeed[g] - bite)
     } else {
       let best = feed2
       let bk = -1
       for (let k = 0; k < this.bushes.length; k++) {
         const b = this.bushes[k]
-        if (b.stock < diet.bite) continue
+        if (b.stock < bite) continue
         const d2 = (b.x - a.x) ** 2 + (b.y - a.y) ** 2
         if (d2 <= best) {
           best = d2
@@ -787,34 +804,37 @@ export class Sim {
         }
       }
       if (bk < 0) return false
-      this.bushes[bk].stock = trimStock(this.bushes[bk].stock - diet.bite)
+      this.bushes[bk].stock = trimStock(this.bushes[bk].stock - bite)
     }
     a.hunger = 0
     a.meals += 1
-    const gain = Math.min(def.body.maxEnergy - a.energy, def.body.mealEnergy * diet.value)
+    const gain = Math.min(a.maxEnergy - a.energy, def.body.mealEnergy * diet.value * a.size)
     a.energy += gain
     if (def.key === 'prey') this.evo.preyIntake += gain
     return true
   }
 
   private hunt(tick: number): void {
-    const eat2 = this.p.eatR * this.p.eatR
+    const eatR = this.p.eatR
+    // Catch reach is the mean of the two body sizes times eatR; exactly eatR while body evolution is off.
+    const biggest = this.p.eco.body ? SIZE_MAX : 1
     for (const s of this.species) {
       const def = this.defs[s]
       if (def.eats.length === 0) continue
-      const full = def.body.maxEnergy - 0.5 * def.body.mealEnergy
-      if (s === 'pred') for (const a of this.pops[s]) if (a.energy <= full) this.evo.predHungryHours++
+      const halfMeal = 0.5 * def.body.mealEnergy
+      if (s === 'pred') for (const a of this.pops[s]) if (a.energy <= a.maxEnergy - halfMeal) this.evo.predHungryHours++
       for (const victim of def.eats) {
-        // A small victim is a small meal: its worth is a share of the hunter's meal energy.
+        // A small victim is a small meal: its worth is a share of the hunter's meal energy, times the victim's size.
         const worth = def.body.mealEnergy * this.defs[victim].mealValue
         const survivors: Creature[] = []
         for (const a of this.pops[victim]) {
-          let best = eat2
+          let best = Infinity
           let hunter: Creature | null = null
-          this.grids[s].each(a.x, a.y, this.p.eatR, (q) => {
-            if (q.energy > full) return
+          this.grids[s].each(a.x, a.y, eatR * ((biggest + a.size) / 2), (q) => {
+            if (q.energy > q.maxEnergy - halfMeal) return
             const d2 = (q.x - a.x) ** 2 + (q.y - a.y) ** 2
-            if (d2 <= best) {
+            const reach = eatR * ((q.size + a.size) / 2)
+            if (d2 <= reach * reach && d2 <= best) {
               best = d2
               hunter = q
             }
@@ -830,7 +850,7 @@ export class Sim {
           const h = hunter as Creature
           h.hunger = 0
           h.meals += 1
-          h.energy = Math.min(def.body.maxEnergy, h.energy + worth)
+          h.energy = Math.min(h.maxEnergy, h.energy + worth * a.size)
           if (a.threatSince >= 0) this.evo.caught++
           this.tally[victim].eaten += 1
           this.emit('eaten', victim, a)
@@ -891,8 +911,8 @@ export class Sim {
     const since = parent.lastBirth < 0 ? body.birthGap : parent.age - parent.lastBirth
     if (pop.length >= cap) { this.ceilingHits++; return }
     if (parent.age < body.adultAge || since < body.birthGap) return
-    const childCost = body.childEnergy * body.maxEnergy
-    if (parent.energy < body.breedEnergy * body.maxEnergy || parent.energy <= childCost) return
+    const childCost = body.childEnergy * parent.maxEnergy
+    if (parent.energy < body.breedEnergy * parent.maxEnergy || parent.energy <= childCost) return
     const mate = p.eco.sexual ? this.findMate(parent) : null
     if (p.eco.sexual && !mate) return
     const rng = this.rng
@@ -907,9 +927,12 @@ export class Sim {
       else {
         const base = mate ? crossover(rng, parent.brain, mate.brain) : parent.brain
         brain = mutateGenome(rng, base, p.mutationRate, p.mutationSigma, p.eco.growRate, p.eco.maxHidden)
+        if (p.eco.body)
+          brain.sizeGene = childGene(rng, parent.brain.sizeGene ?? 0, mate ? mate.brain.sizeGene ?? 0 : null, p.mutationRate, p.eco.body)
       }
       const gen = Math.max(parent.gen, mate?.gen ?? 0) + 1
-      const child = this.spawn(s, x, y, brain, childCost, gen, parent.id)
+      const child = this.spawn(s, x, y, brain, 0, gen, parent.id)
+      child.energy = Math.min(childCost, child.maxEnergy)
       child.lineage = p.eco.heredity ? parent.lineage : child.id
       child.inCover = this.cover.length > 0 && this.inCover(x, y)
       parent.energy -= childCost
@@ -928,13 +951,18 @@ export class Sim {
     const p = this.p
     const pop = this.pops[s]
     const ancestor = pop.length ? pop[Math.floor(ev.random() * pop.length)] : null
-    const brain = !p.eco.heredity && this.founders[s].length
+    let brain = !p.eco.heredity && this.founders[s].length
       ? this.founders[s][Math.floor(ev.random() * this.founders[s].length)]
       : ancestor
         ? mutateGenome(ev, ancestor.brain, p.mutationRate, p.mutationSigma, 0, p.eco.maxHidden)
         : randomGenome(ev, p.eco.hidden, p.geneInit)
+    if (p.eco.body && (p.eco.heredity || !this.founders[s].length)) {
+      const sizeGene = ancestor ? childGene(ev, ancestor.brain.sizeGene ?? 0, null, p.mutationRate, p.eco.body) : founderGene(ev, p.eco.body)
+      brain = { ...brain, sizeGene }
+    }
     const inherited = p.eco.heredity && ancestor
-    const a = this.spawn(s, x, y, brain, this.defs[s].body.maxEnergy, inherited ? ancestor.gen + 1 : 0, inherited ? ancestor.id : -1)
+    const a = this.spawn(s, x, y, brain, 0, inherited ? ancestor.gen + 1 : 0, inherited ? ancestor.id : -1)
+    a.energy = a.maxEnergy
     if (inherited) a.lineage = ancestor.lineage
     a.inCover = this.cover.length > 0 && this.inCover(x, y)
     return a
@@ -1012,7 +1040,7 @@ export class Sim {
         }
         break
       case 'feedFoxes':
-        for (const a of this.preds) a.energy = this.p.pred.maxEnergy
+        for (const a of this.preds) a.energy = a.maxEnergy
         break
       case 'rain':
         for (const b of this.bushes) b.stock = this.p.patchStock
@@ -1146,11 +1174,11 @@ export interface MeadowStateV2 {
  * in the version-2 engine. Anything else is refused, never partly loaded.
  */
 export function migrateState(data: MeadowState | MeadowStateV2): MeadowState {
-  if (data?.version === 3) return data
+  if (data?.version === 3) return withBodies(data)
   if (data?.version !== 2 || !data.counters || !data.pops?.prey || !data.pops?.pred || data.p?.vole)
     throw new Error('Unsupported meadow save version')
   const c = data.counters
-  return {
+  return withBodies({
     version: 3, species: ['prey', 'pred'], p: data.p, seed: data.seed, dist: data.dist, opts: data.opts,
     pops: { prey: data.pops.prey, pred: data.pops.pred, vole: [] },
     founders: { prey: data.founders.prey, pred: data.founders.pred, vole: [] },
@@ -1165,7 +1193,20 @@ export function migrateState(data: MeadowState | MeadowStateV2): MeadowState {
     nextId: { prey: data.nextId.prey, pred: data.nextId.pred, vole: 0 },
     nextBush: data.nextBush, regrowAcc: data.regrowAcc, sproutAcc: data.sproutAcc, seedAcc: 0,
     pending: data.pending, ceilingHits: data.ceilingHits, rng: data.rng, evRng: data.evRng, foodRng: data.foodRng,
-  }
+  })
+}
+
+/**
+ * Animals saved before inherited body size have no size: they load at exactly ×1, with their
+ * species' base body. States that already have sizes are returned unchanged.
+ */
+function withBodies(state: MeadowState): MeadowState {
+  const all = Object.values(state.pops).flat()
+  if (all.every((a) => typeof a.size === 'number')) return state
+  const defs = speciesDefs(state.p)
+  const pops = perSpecies((s) => (state.pops[s] ?? []).map((a) =>
+    typeof a.size === 'number' ? a : ({ ...a, ...bodyValues(defs[s].body, 1) } as Creature)))
+  return { ...state, pops }
 }
 
 const ILLNESS_TARGET = { illnessPrey: 'prey', illnessPred: 'pred', illnessVole: 'vole' } as const satisfies Record<string, Species>

@@ -2,8 +2,9 @@ import { HISTORY_HOURS, type RunHistory } from './history'
 import type { RunConfig } from './controller'
 import { migrateState, type Intervention, type MeadowState, type MeadowStateV2 } from '@/sim/sim'
 import type { EvolutionSample, PopulationEvolution } from '@/sim/evolution'
-import { TRAITS } from '@/sim/evolution'
-import { STAT_STRIDE, STAT_STRIDE_V2 } from '@/worker/protocol'
+import { CHARTED_TRAITS } from '@/sim/evolution'
+import { ALL_SPECIES } from '@/sim/species'
+import { ANIMAL_SIZE, ANIMAL_STRIDE, ANIMAL_STRIDE_V3, STAT_STRIDE, STAT_STRIDE_V2, type FrameData } from '@/worker/protocol'
 import type { JournalEntry } from './journal'
 
 export const SAVE_VERSION = 3
@@ -29,7 +30,7 @@ export interface MeadowSave {
 export interface MeadowSaveV2 extends Omit<MeadowSave, 'version' | 'state' | 'history' | 'evolution'> {
   version: 2
   state: MeadowStateV2
-  history: Omit<ReturnType<RunHistory['save']>, 'highestGeneration' | 'replayFrom' | 'journal' | 'families'> & { highestGeneration?: { prey: number; pred: number }; replayFrom?: number }
+  history: Omit<ReturnType<RunHistory['save']>, 'highestGeneration' | 'replayFrom' | 'journal' | 'families' | 'animalStride'> & { highestGeneration?: { prey: number; pred: number }; replayFrom?: number }
     & Partial<Pick<ReturnType<RunHistory['save']>, 'journal' | 'families'>>
   evolution?: Omit<EvolutionSample, 'vole'>[]
 }
@@ -38,7 +39,7 @@ const ROWS = HISTORY_HOURS + 1
 
 function noAnimals(): PopulationEvolution {
   const none = { mean: 0, low: 0, high: 0 }
-  return { count: 0, generation: 0, lineages: 0, neurons: 0, traits: Object.fromEntries(TRAITS.map(k => [k, { ...none }])) as PopulationEvolution['traits'] }
+  return { count: 0, generation: 0, lineages: 0, neurons: 0, traits: Object.fromEntries(CHARTED_TRAITS.map(k => [k, { ...none }])) as PopulationEvolution['traits'] }
 }
 
 /**
@@ -48,23 +49,58 @@ function noAnimals(): PopulationEvolution {
  */
 export function migrateSave(value: MeadowSave | MeadowSaveV2): MeadowSave {
   try {
-    if (value.version === 3 && value.state.version === 3 && value.history.stats.length === ROWS * STAT_STRIDE) return value
+    if (value.version === 3 && value.state.version === 3 && value.history.stats.length === ROWS * STAT_STRIDE) return withBodySize(value)
     if (value.version !== 2 || value.state.version !== 2 || value.history.stats.length !== ROWS * STAT_STRIDE_V2)
       throw new Error(INCOMPATIBLE_SAVE)
     const state = migrateState(value.state)
     const stats = new Float64Array(ROWS * STAT_STRIDE)
     for (let r = 0; r < ROWS; r++)
       stats.set(value.history.stats.subarray(r * STAT_STRIDE_V2, (r + 1) * STAT_STRIDE_V2), r * STAT_STRIDE)
-    return {
+    return withBodySize({
       ...value,
       version: 3,
       state,
-      history: { ...value.history, journal: value.history.journal, families: value.history.families, replayFrom: value.history.replayFrom ?? value.history.start, stats, highestGeneration: { prey: 0, pred: 0, ...value.history.highestGeneration, vole: 0 } },
+      history: { ...value.history, journal: value.history.journal, families: value.history.families, replayFrom: value.history.replayFrom ?? value.history.start, stats, highestGeneration: { prey: 0, pred: 0, ...value.history.highestGeneration, vole: 0 }, animalStride: ANIMAL_STRIDE_V3 },
       evolution: (value.evolution ?? []).map(e => ({ ...e, vole: noAnimals() })),
-    }
+    })
   } catch {
     throw new Error(INCOMPATIBLE_SAVE)
   }
+}
+
+/** Widen 22-float animals to the current stride with body size 1. */
+function widenAnimals(a: Float32Array): Float32Array {
+  const n = a.length / ANIMAL_STRIDE_V3
+  if (!Number.isInteger(n)) throw new Error(INCOMPATIBLE_SAVE)
+  const out = new Float32Array(n * ANIMAL_STRIDE)
+  for (let i = 0; i < n; i++) {
+    out.set(a.subarray(i * ANIMAL_STRIDE_V3, (i + 1) * ANIMAL_STRIDE_V3), i * ANIMAL_STRIDE)
+    out[i * ANIMAL_STRIDE + ANIMAL_SIZE] = 1
+  }
+  return out
+}
+
+/**
+ * Saves from before inherited body size: replay frames gain a size of 1 per animal and
+ * evolution samples gain a body-size distribution (1 where animals lived). Current saves pass through.
+ */
+function withBodySize(save: MeadowSave): MeadowSave {
+  const oldFrames = (save.history.animalStride ?? ANIMAL_STRIDE_V3) !== ANIMAL_STRIDE
+  const oldSamples = (save.evolution ?? []).some(e => ALL_SPECIES.some(s => e[s] && !e[s].traits.size))
+  if (!oldFrames && !oldSamples) return save
+  const frames = oldFrames
+    ? save.history.frames.map(([t, f]): [number, FrameData] => [t, { ...f, prey: widenAnimals(f.prey), preds: widenAnimals(f.preds), ...(f.voles ? { voles: widenAnimals(f.voles) } : {}) }])
+    : save.history.frames
+  const evolution = save.evolution?.map(e => {
+    const out = { ...e }
+    for (const s of ALL_SPECIES) {
+      if (!e[s] || e[s].traits.size) continue
+      const v = e[s].count > 0 ? 1 : 0
+      out[s] = { ...e[s], traits: { ...e[s].traits, size: { mean: v, low: v, high: v } } }
+    }
+    return out
+  })
+  return { ...save, history: { ...save.history, frames, animalStride: ANIMAL_STRIDE }, evolution }
 }
 
 async function database(): Promise<IDBDatabase> {

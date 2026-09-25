@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button'
 import { useGame } from '@/hooks/use-game'
 import type { Species } from '@/sim/sim'
 import { clockLabel, dateLabel, formatHours } from '@/sim/time'
-import { ANIMAL_STRIDE } from '@/worker/protocol'
+import { ANIMAL_SIZE, ANIMAL_STRIDE } from '@/worker/protocol'
 import { displayOrder, framePop, SPECIES_UI } from '@/game/species-ui'
 
 export interface AnimalSelection { species: Species; id: number }
@@ -127,6 +127,7 @@ function facts(animal: Float32Array, species: Species): [string, string | number
     ['Energy', `${Math.round(animal[5] * 100)}%`, 'Fuel left in the tank. At 0% the animal starves.'],
     ['Illness', animal[21] > 0 ? `Ill for up to ${formatHours(animal[21])} more` : 'None', 'Illness adds an energy drain; it is separate from hunger.'],
     ['Offspring', animal[13]],
+    ['Body size', `×${(animal[ANIMAL_SIZE] || 1).toFixed(2)}`, 'Inherited, ×0.8 to ×1.25. Larger: more energy reserve and bigger bites, but slower, dearer to run and to breed, and a bigger meal. Hunger and illness never change it.'],
     ['Sight range', `${Math.round(animal[14] * 100)}% of meadow`, 'How far it sees, as a share of the meadow width. Over 100% means it can see across the whole meadow.'],
   ]
   // Brains start with no extra neurons; mutation can add them. Only worth a row once there are some.

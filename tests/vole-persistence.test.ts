@@ -77,7 +77,10 @@ const replacer = (_k: string, v: unknown) => v instanceof Float64Array ? { $f64:
 /** The same digest the fixture generator took from the version-2 engine, over the fields both versions share. */
 function digestV2(s: Sim): string {
   const d = s.save()
-  const keep = { tick: d.tick, ended: d.ended, pops: { prey: d.pops.prey, pred: d.pops.pred }, bushes: d.bushes, counters: s.counters,
+  // Body-size fields (issue #10) are new derived values the version-2 engine never had; they are ×1 here.
+  const v2 = (pop: typeof d.pops.prey) => pop.map(({ size: _s, maxEnergy: _m, metabolism: _b, topStep: _t, ...rest }) => rest)
+  for (const a of [...d.pops.prey, ...d.pops.pred]) expect([a.size, a.maxEnergy, a.metabolism, a.topStep]).toEqual([1, s.defs[a.species].body.maxEnergy, s.defs[a.species].body.metabolism, s.defs[a.species].body.step])
+  const keep = { tick: d.tick, ended: d.ended, pops: { prey: v2(d.pops.prey), pred: v2(d.pops.pred) }, bushes: d.bushes, counters: s.counters,
     evo: d.evo, lastBirth: { prey: d.lastBirth.prey, pred: d.lastBirth.pred }, nextId: { prey: d.nextId.prey, pred: d.nextId.pred },
     nextBush: d.nextBush, regrowAcc: d.regrowAcc, sproutAcc: d.sproutAcc, pending: d.pending, ceilingHits: d.ceilingHits,
     rng: d.rng, evRng: d.evRng, foodRng: d.foodRng }

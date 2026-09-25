@@ -508,3 +508,75 @@ The tuning reports record their exact commands. Their output paths pointed at a 
 directory, and the files were then copied here. The practice meadow (seed 5007), the open
 meadow and the two-species simulation are unchanged: this work does not touch
 `src/sim/sim.ts`, `src/sim/levers.ts` or `src/game/presets.ts`.
+
+## Inherited body size (#10)
+
+Specification: `game-design.md`, "Inherited body size". Raw output:
+`experiments/body-size.json` (`scripts/body-assay.ts`, `scripts/validate-balance.ts`).
+
+**Common garden.** One pool of controllers, evolved for 90 days with body size off (seeds
+900–903), is given one size gene per line. Each line meets the same neutral-size opponents
+in 16 arena worlds (4242–4257): 60 rabbits and 10 foxes, births and ageing off, for 240 hours.
+The famine arena has no food and no catching, and the other species is fed each hour. The
+30-day breeding arena has births and ageing on and mutation off.
+
+| Rabbits | Small ×0.80 | Neutral | Large ×1.25 |
+| --- | --- | --- | --- |
+| Distance per hour (speed) | **0.00564** | 0.00501 | 0.00457 |
+| Energy burnt per hour, fasting | **0.427** | 0.483 | 0.551 |
+| Energy eaten per rabbit-hour | 0.509 | 0.541 | **0.616** |
+| Hours from full to starvation | 337 | 372 | **408** |
+| Starved in 240 h | 5.0% | 2.4% | **1.8%** |
+| Eaten in 240 h | 14.9% | 15.5% | 15.0% |
+| Energy to breed / given to each young | **94 / 65** | 117 / 81 | 146 / 101 |
+| Births per rabbit-day (30 days) | **0.129** | 0.119 | 0.113 |
+| Rabbits alive per founder after 30 days | **3.60** | 3.55 | 3.22 |
+| Starved per founder in 30 days (boom and bust) | 12.2 | 9.7 | **8.2** |
+
+| Foxes | Small ×0.80 | Neutral | Large ×1.25 |
+| --- | --- | --- | --- |
+| Catches per fox-day (240 h) | 0.075 | 0.093 | **0.094** |
+| Energy burnt per hour, fasting | **0.232** | 0.258 | 0.295 |
+| Hours from full to starvation | 828 | 931 | **1018** |
+| Energy to breed / given to each young | **182 / 115** | 228 / 144 | 285 / 180 |
+| Births per fox-day (30 days) | 0.044 | 0.047 | 0.047 |
+| Foxes alive per founder after 30 days | 3.44 | 3.79 | **3.86** |
+
+Neither size wins everywhere. A large rabbit is 9% slower, burns 14% more energy an hour,
+pays 25% more for each young and breeds 5% less often. Its line was 9% smaller after 30
+days. In return it refuels 14% faster, lasts 10% longer without food and starves less. A
+small rabbit is fast and cheap and breeds most, but it starves most. A small fox catches
+19% less. A large fox gains little over a neutral one in these arenas, while paying 14% more
+per hour and 25% more per young. The catch-reach effect is covered by the unit tests. In the
+arena it was too small to change how many rabbits were eaten (15% in every line), because
+controllers decide most encounters. A large rabbit's other predation cost is that it is a
+25% larger meal, which feeds foxes rather than harming the rabbit directly.
+
+**Populations (untouched, fresh seeds).**
+
+| Meadow, seeds | Survived, off | Survived, on | Median end hour off / on | Fox peak off / on |
+| --- | --- | --- | --- | --- |
+| Open, 9400–9419 | 9/20 (45%) | 9/20 (45%) | 6856 / 7125 | 90 / 108 |
+| Open, 5000–5049 (validate-balance) | 19/50 (38%) | 23/50 (46%) | 6102 / 7995 | 95 / 107 |
+| Vole meadow, 9400–9409 | 3/10 | 3/10 | 4038 / 5649 | 104 / 114 |
+
+Body size did not destabilise the meadows. Survival stays inside the intended 30–50% band,
+first extinctions split the same way (Open 9400–9419: rabbits 7, foxes 4 either way), and
+no body-on run hit a safety ceiling (one body-off run of 5000–5049 did). Fox peaks are
+10–20% higher. Body evolution is therefore **on by default** (`defaultEco().body`). Mean
+sizes moved modestly and not in the same direction everywhere. In the Open meadow, living
+rabbits went from ×1.01 to ×0.98 by month 9 and foxes from ×1.01 to ×1.08, with foxes ending
+larger than their founders in 5 of 9 surviving meadows. In the Vole meadow, voles went from
+×1.01 to ×0.93 and rabbits to ×0.93. With 10–20 seeds, these are observations, not a
+settled selection result.
+
+**Two-species regression.** `BODY=off node --import tsx scripts/validate-balance.ts 5000 50`
+reproduces all 50 rows of the pre-feature engine exactly (19/50 survived) in this runtime.
+With body size off, no random numbers are drawn for it and every derived value is exactly the
+species value.
+
+**Persistence.** The gene is saved in each genome, and each animal saves its derived size,
+max energy, metabolism and top speed. Older saves load at ×1, and their replay frames are
+widened from 22 to 23 floats per animal. Frames carry the size in slot 22
+(`ANIMAL_SIZE`). The energy fraction in frames is now a share of the animal's own maximum.
+The stats row's mean energy still divides by the species maximum.

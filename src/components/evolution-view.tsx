@@ -6,7 +6,7 @@ import { Card } from '@/components/ui/card'
 import { iconFor, useAnimalIcons } from '@/hooks/use-animal-icons'
 import { displayOrder, SPECIES_UI } from '@/game/species-ui'
 import { useGame } from '@/hooks/use-game'
-import { TRAITS, type EvolutionSample } from '@/sim/evolution'
+import { CHARTED_TRAITS, type EvolutionSample } from '@/sim/evolution'
 import type { Species } from '@/sim/sim'
 
 function traitSeries(samples: EvolutionSample[]): TraitSeries {
@@ -69,12 +69,12 @@ export function EvolutionView({ selected, onSelect }: { selected: AnimalSelectio
     <Card className="gap-3 p-4">
       <div>
         <h3 className="font-semibold">Inherited traits</h3>
-        <p className="mt-1 text-xs text-muted-foreground">Line: mean · band: middle 80% · dashed: founders. Cruising pace runs from 0 = resting to 1 = maximum pace; for the other traits, positive = stronger response and negative = the opposite.</p>
+        <p className="mt-1 text-xs text-muted-foreground">Line: mean · band: middle 80% · dashed: founders. Cruising pace runs from 0 = resting to 1 = maximum pace; for the other responses, positive = stronger response and negative = the opposite. Body size is inherited: ×1 is the species' usual body, ×0.8 small to ×1.25 large.</p>
       </div>
       {SPECIES.map(s => <section key={s.id} aria-label={`${s.name} traits`}>
         <h4 className={`mb-2 text-xs font-semibold tracking-wide uppercase ${s.tone}`}>{s.name}</h4>
         <div className="grid gap-2 sm:grid-cols-2 xl:grid-cols-4">
-          {TRAITS.map(t => <div key={t} id={`trait-${s.id}-${t}`} className="scroll-mt-4"><TraitChart series={series} species={s.id} trait={t} /></div>)}
+          {CHARTED_TRAITS.map(t => <div key={t} id={`trait-${s.id}-${t}`} className="scroll-mt-4"><TraitChart series={series} species={s.id} trait={t} /></div>)}
         </div>
       </section>)}
     </Card>

@@ -106,7 +106,9 @@ export class RunHistory {
       journal: journal as ReturnType<Journal['save']> | undefined, families: families.save() as ReturnType<FamilyHistory['save']> | undefined,
       /** For older builds; this build reads `journal.highest`. */
       highestGeneration: journal.highest as Record<Species, number> | undefined,
-      frames: [...this.frames.entries()].filter(([t]) => t >= replayFrom && t <= head) }
+      frames: [...this.frames.entries()].filter(([t]) => t >= replayFrom && t <= head),
+      /** Floats per animal in `frames`; saves without it used the pre-body-size stride (#10). */
+      animalStride: ANIMAL_STRIDE as number | undefined }
   }
 
   /** `entries` are the journal entries stored beside the history by saves made before the journal state moved here. */
