@@ -91,4 +91,29 @@ describe('interventions apply at the displayed hour', () => {
     expect([reply.from, reply.tick]).toEqual([24, 25])
     expect(reply.stats[STAT.stock]).toBeGreaterThan(0.99)
   })
+
+  it('keeps an earlier action when a later one rewinds past the next checkpoint', () => {
+    const w = worker(7)
+    w.advance(80)
+    w.intervene('cullPred', 71)
+    w.advance(100)
+    w.intervene('releasePred', 92)
+    w.advance(120)
+    const ref = reference(7, [[71, 'cullPred'], [92, 'releasePred']], 120)
+    expect([w.stat(120, 'prey'), w.stat(120, 'pred'), w.stat(120, 'predCulled')]).toEqual(ref.get(120))
+  })
+
+  it('refuses an action at an hour no checkpoint reaches instead of applying it later', () => {
+    const saved = new Sim(params, 7, dist)
+    while (saved.tick < 100) saved.step()
+    const posts: FromWorker[] = []
+    const core = new SimCore(m => posts.push(m))
+    core.handle({ type: 'restore', runId: 2, state: saved.save() })
+    core.handle({ type: 'advance', runId: 2, target: 110 })
+    core.handle({ type: 'intervene', runId: 2, action: 'cullPred', at: 90 })
+    const reply = posts.at(-1)
+    if (reply?.type !== 'intervened') throw new Error('no reply')
+    expect(reply.from).toBeGreaterThan(100)
+    expect([reply.tick - reply.from, reply.stats[STAT.predCulled]]).toEqual([0, 0])
+  })
 })

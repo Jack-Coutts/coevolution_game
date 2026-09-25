@@ -167,3 +167,17 @@ it('reports the real playback rate when the worker cannot keep up with the chose
   expect(game.getSnapshot().effectiveTps).toBeNull()
   game.dispose()
 })
+
+it('ignores a seek while an intervention is in flight, so the run is not ended early', () => {
+  const { game, runId, frame } = ready()
+  game.stepBy(5)
+  const frames = Array.from({ length: 12 }, (_, i) => ({ ...frame, tick: i + 1 }))
+  mock.receive({ type: 'frames', runId, frames, stats: new Float64Array(12 * STAT_STRIDE), head: 12, end: { tick: 12, survived: false, preyEnd: 0, predEnd: 3 }, evolution: [] })
+  game.intervene('releasePrey')
+  game.seek(12)
+  mock.receive({ type: 'intervened', runId, action: 'releasePrey', from: 5, tick: 6, frame: { ...frame, tick: 6 }, stats: row(), evolution: [], end: null })
+  const s = game.getSnapshot()
+  expect([s.phase, s.end, s.tick, s.head, s.score]).toEqual(['running', null, 6, 6, null])
+  game.dispose()
+})
+

@@ -373,7 +373,7 @@ export class GameController {
         // Any advance sent before the intervention has already answered, and none was sent after it.
         this.inflight = false
         if (msg.tick === msg.from) {
-          // The run had already ended at that hour: nothing was applied, so give the charge back.
+          // Nothing was applied (the run had ended, or no checkpoint reached that hour): give the charge back.
           this.charges += 1
           this.cooldownUntil = this.refund ?? 0
           this.refund = null
@@ -432,6 +432,7 @@ export class GameController {
 
   /** Jump the view to a tick already simulated (scrub). */
   seek(tick: number): void {
+    if (this.intervening) return
     this.stepTarget = null
     this.displayTick = Math.max(this.history.replayStart, Math.min(this.history.head, tick))
     this.watched = { tick: -1, hints: [] }

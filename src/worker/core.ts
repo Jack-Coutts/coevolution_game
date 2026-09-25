@@ -215,17 +215,23 @@ export class SimCore {
     let s = this.sim as Sim
     if (at < s.tick) {
       const cp = this.checkpoints.findLast(c => c.tick <= at)
-      if (cp) {
-        s = Sim.restore(cp)
-        while (s.tick < at && s.step()) { /* replay the hours the display has already shown */ }
-        this.sim = s
-        this.checkpoints = this.checkpoints.filter(c => c.tick <= at)
+      if (!cp) {
+        // No checkpoint reaches back that far (e.g. just after a resume): refuse rather than act at a later hour.
+        const stats = statsRow(s)
+        this.post({ type: 'intervened', runId: this.runId, action, tick: s.tick, from: s.tick, frame: frame(s), stats, evolution: [], end: endInfo(s) }, [stats.buffer])
+        return
       }
+      s = Sim.restore(cp)
+      while (s.tick < at && s.step()) { /* replay the hours the display has already shown */ }
+      this.sim = s
+      this.checkpoints = this.checkpoints.filter(c => c.tick <= at)
     }
     const from = s.tick
     if (!s.ended) {
       s.queue(action)
       s.step()
+      // A later rewind must never restore a state from before this action.
+      this.checkpoint()
     }
     const evolution = s.tick % 24 === 0 || s.ended ? [summarizeEvolution(s)] : []
     const stats = statsRow(s)
