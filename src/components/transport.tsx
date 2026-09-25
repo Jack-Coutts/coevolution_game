@@ -47,7 +47,7 @@ export function Transport({ onReset }: { onReset: () => void }) {
         aria-label="Playback speed"
       >
         {SPEEDS.map((s, i) => (
-          <ToggleGroupItem key={s.label} value={String(i)} className="px-2 text-xs tabular">
+          <ToggleGroupItem key={s.label} value={String(i)} className="px-1.5 text-xs tabular sm:px-2">
             {s.label}
           </ToggleGroupItem>
         ))}

@@ -99,7 +99,9 @@ export function Timeline() {
         ctx.stroke()
       }
       const labels = [{ tick: start, label: dateLabel(start) }, ...monthStarts(horizon, start)]
+      const sparse = iw / labels.length < 32
       labels.forEach((m, i) => {
+        if (sparse && i % 2) return
         const next = labels[i + 1]?.tick ?? horizon
         ctx.fillStyle = c['muted-foreground']
         ctx.fillText(m.label, xOf((m.tick + next) / 2), H - 6)
