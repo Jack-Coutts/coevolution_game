@@ -144,7 +144,7 @@ export function Interventions({ preview = false }: { preview?: boolean }) {
       <div className="mb-2 flex items-center justify-between">
         <h3 id="interventions-heading" className="text-xs font-semibold tracking-wide text-muted-foreground uppercase">Interventions</h3>
         <div className="flex items-center gap-2">
-          <span className="text-xs text-muted-foreground tabular">{usesLeft(snap.charges, CHARGES, preview || snap.phase === 'planning')}</span>
+          <span className="text-xs text-muted-foreground tabular">{snap.endless && (preview || snap.phase === 'planning') ? `${CHARGES} to start, +1 each season` : usesLeft(snap.charges, CHARGES, preview || snap.phase === 'planning')}</span>
           <div className="flex items-center gap-1" aria-hidden="true">
             {Array.from({ length: CHARGES }, (_, i) => (
               <span key={i} className={cn('size-2 rounded-full', i < snap.charges ? 'bg-primary' : 'bg-muted')} />
