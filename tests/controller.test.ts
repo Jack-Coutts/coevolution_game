@@ -14,7 +14,8 @@ vi.mock('@/worker/sim.worker.ts?worker', () => ({ default: class {
   terminate() {}
 } }))
 vi.mock('@/game/saves', () => ({ writeSave: mock.save }))
-import { GameController } from '@/game/controller'
+import { CHARGES, COOLDOWN, GameController } from '@/game/controller'
+import * as probes from '../scripts/action-probes'
 
 beforeEach(() => {
   vi.stubGlobal('requestAnimationFrame', () => 1)
@@ -344,4 +345,8 @@ it('does not intervene at an hour the player has already watched, only at the la
   game.seek(12)
   expect(game.canIntervene()).toBe(true)
   game.dispose()
+})
+
+it('the intervention experiment uses the game budget', () => {
+  expect([probes.CHARGES, probes.COOLDOWN]).toEqual([CHARGES, COOLDOWN])
 })

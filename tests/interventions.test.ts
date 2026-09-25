@@ -66,3 +66,19 @@ it('spreads to nearby members of the same species without reaching isolated anim
   expect(isolated.illUntil).toBe(0)
   expect(s.preds.every(a => a.illUntil === 0)).toBe(true)
 })
+it('recovered animals stay immune until their immunity ends, then can catch it again', () => {
+  const p = deriveParams(STABLE_PRESET); p.prey.step = 0; p.pred.step = 0
+  const s = new Sim(p, 18, undefined, { noBirths: true, noAging: true })
+  const [source, recovered] = s.prey
+  s.pops.prey = [source, recovered]
+  source.x = recovered.x = 0.2; source.y = recovered.y = 0.2
+  for (const a of [...s.prey, ...s.preds]) a.energy = 100000
+  for (const a of s.preds) { a.x = 0.99; a.y = 0.99 }
+  source.illUntil = 1000; source.immuneUntil = 1000
+  recovered.illUntil = 1; recovered.immuneUntil = 300
+  for (let i = 0; i < 299; i++) s.step()
+  expect(recovered.illUntil).toBe(1)
+  for (let i = 0; i < 180; i++) s.step()
+  expect(recovered.illUntil).toBeGreaterThan(300)
+  expect(recovered.immuneUntil - recovered.illUntil).toBe(480)
+})

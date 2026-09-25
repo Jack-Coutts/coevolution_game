@@ -2,7 +2,7 @@
 
 This page tracks the work on the open issues in [roadmap #2](https://github.com/Jack-Coutts/coevolution_game/issues/2) and the UI update. A box is ticked when its pull request has merged into `main`. Every pull request updates its own line.
 
-Last updated: 25 September 2026, 16:30 UTC.
+Last updated: 25 September 2026, 17:00 UTC.
 
 ## How the work runs
 
@@ -25,7 +25,7 @@ Last updated: 25 September 2026, 16:30 UTC.
 ### Before the third species
 
 - [x] #3 Playtest and clarity fixes. [#19](https://github.com/Jack-Coutts/coevolution_game/pull/19)
-- [ ] #4 Balance all eight interventions. Built; the final evaluation is running.
+- [x] #4 Balance all eight interventions: each action's useful situation and failure mode is documented; on 20 held-out seeds no single action beat the placebo. [#23](https://github.com/Jack-Coutts/coevolution_game/pull/23)
 - [x] #5 Intervention budget for Endless mode: one use renews each season, up to four held. [#21](https://github.com/Jack-Coutts/coevolution_game/pull/21)
 - [ ] #6 Calibrate Drought, Harsh winter and Fox invasion. In progress.
 
@@ -50,3 +50,11 @@ Last updated: 25 September 2026, 16:30 UTC.
 
 - The #3 playtests were played by agents that saw only the screen, not by human players. `docs/playtest.md` describes what this biases.
 - Balance numbers can differ between runtimes. The base meadow gives 18/50 untouched survivors on Node 25 (macOS) and 19/50 on Node 22 (Linux) for the same seeds.
+
+## Follow-ups noted along the way
+
+- Warn before illness or a cull on 8 or fewer foxes, or rabbit illness on 60 or fewer rabbits (from #4).
+- Show the number of ill animals as a trend in the timeline or field notes (from #4).
+- Raise the "few foxes" warning from 3 or fewer to 5 or fewer (from #4).
+- Rabbit illness still has no demonstrated beneficial use (from #4).
+
