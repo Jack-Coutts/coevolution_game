@@ -216,8 +216,8 @@ controllers decide most encounters. A large rabbit's other predation cost is tha
 
 Body size did not destabilise the meadows. Survival stays inside the intended 30–50% band,
 first extinctions split the same way (Open 9400–9419: rabbits 7, foxes 4 either way), and
-safety ceilings were hit only on the one base seed that already hit them. Fox peaks are
-about 15% higher. Body evolution is therefore **on by default** (`defaultEco().body`). Mean
+no body-on run hit a safety ceiling (one body-off run of 5000–5049 did). Fox peaks are
+10–20% higher. Body evolution is therefore **on by default** (`defaultEco().body`). Mean
 sizes moved modestly and not in the same direction everywhere. In the Open meadow, living
 rabbits went from ×1.01 to ×0.98 by month 9 and foxes from ×1.01 to ×1.08, with foxes ending
 larger than their founders in 5 of 9 surviving meadows. In the Vole meadow, voles went from
