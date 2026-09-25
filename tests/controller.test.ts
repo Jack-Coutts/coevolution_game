@@ -64,10 +64,6 @@ it('starts the full cooldown at the hour the intervention was made', () => {
   game.dispose()
 })
 
-it('the intervention experiment uses the game budget', () => {
-  expect([probes.CHARGES, probes.COOLDOWN]).toEqual([CHARGES, COOLDOWN])
-})
-
 it('intervenes at the displayed hour while paused and shows the result at once', () => {
   const { game, runId, frame } = ready()
   game.stepBy(5)
@@ -349,4 +345,8 @@ it('does not intervene at an hour the player has already watched, only at the la
   game.seek(12)
   expect(game.canIntervene()).toBe(true)
   game.dispose()
+})
+
+it('the intervention experiment uses the game budget', () => {
+  expect([probes.CHARGES, probes.COOLDOWN]).toEqual([CHARGES, COOLDOWN])
 })
