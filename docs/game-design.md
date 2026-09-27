@@ -241,6 +241,64 @@ practice meadow (seed 5007) is unchanged. Design record: `third-species.md`.
   seeds the same cull at the same warning had a different best alternative on 8 of 20 seeds
   with voles present, in both directions, and turned a surviving meadow into a loss on three (see `validation.md`).
 
+## The Wild meadow: stoats and red deer
+
+The sixth scenario is the Vole meadow plus two species. All five must be alive at the end of
+the year; the run ends at the first extinction. The other meadows are unchanged, value for
+value (see `validation.md`).
+
+- **Stoat** (`stoat`). A small, fast hunter. It eats voles, and rabbits younger than their
+  first-birth age; foxes eat stoats. Tall grass does not slow it, and it sees animals hidden in
+  tall grass within 0.04 (a fox's range). Stoats are agile: a fox must come within 0.3 of its
+  usual catch reach to take one, and a stoat is 20% of a fox meal. Seed, voles, stoats and
+  foxes form a four-level chain.
+- **Red deer** (`deer`). The largest animal. It eats berries (two per bite, from up to 0.05
+  away, where other plant eaters need 0.02) and grass seed; nothing in the meadow hunts it. It
+  breeds slowly and lives long, so only the player's Cull deer and Release deer change its
+  numbers quickly. It competes with every plant eater.
+- **Richer grass.** Grass seed regrows one head every 4 hours on each patch (6 in the Vole
+  meadow), because voles here feed two hunters.
+- **Levers.** Starting stoats (4 to 30, default 16) and Starting deer (2 to 12, default 4), shown
+  only in this meadow.
+- **Identity.** Stoat: a long, thin chestnut sprite with cream flanks and a black tail tip,
+  colour `--color-stoat` (light `oklch(0.5 0.15 355)`, 6.0:1 on the page; dark
+  `oklch(0.78 0.12 355)`, 8.4:1 on the card). Deer: a large russet sprite with a pale rump and
+  antlers, `--color-deer` (light `oklch(0.48 0.08 195)`, 5.8:1; dark `oklch(0.8 0.08 195)`,
+  9.9:1). Both appear wherever voles do, on the timeline's right scale with the foxes.
+
+| Trait | Rabbit | Vole | Stoat | Fox | Deer |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| Starting number | 30 (lever) | 60 | 16 | 6 (lever) | 4 |
+| First birth age (h) | lever | 40 | 200 | lever | 2000 |
+| Birth gap (h) / litter | lever | 96 / 3 | 450 / 1 | lever | 2500 / 1 |
+| Lifespan (h) | lever | 480 | 1500 | lever | 7000 |
+| Max energy / basal metabolism | lever | 60 / 0.22 | 110 / 0.10 | lever | 600 / 0.25 |
+| Top step | lever | 0.009 | 0.013 | lever | 0.008 |
+| Meal energy | lever | 14 | 100 | lever | 60 per berry bite |
+| Eats | berries | seed, berries | voles, young rabbits | rabbits, voles, stoats | berries, seed |
+| Eaten by | foxes, young by stoats | foxes, stoats | foxes | nothing | nothing |
+| Slowed by tall grass | yes | no | no | yes | yes |
+
+Body size and every inherited response apply to stoats and deer as to the other species.
+
+### Habitat and Wild meadow interventions
+
+The four shared uses and 400-hour cooldown are unchanged. Every meadow gains three habitat
+actions (eleven options in the Open meadow, thirteen with voles); the Wild meadow adds three
+more (sixteen).
+
+| Intervention | Where | Effect | Trade-off |
+| --- | --- | --- | --- |
+| Mow tall grass | all | Half the standing tall-grass patches (at least one) are cut for 30 days; their seed is lost and they grow back empty | Exposes rabbits and voles to foxes and stoats; starves voles of seed |
+| Sow tall grass | all | Two new patches for good, starting with no seed (at most 16 patches) | Slow; more hiding for prey means leaner foxes and stoats |
+| Put out hay | all | Four full hay piles, topped up by one every 3 hours, gone after 10 days | Deer and voles eat it too |
+| Release stoats | Wild | Four fed stoats in tall grass, descended from living stoats | Starve if released into a vole crash |
+| Cull deer | Wild | Removes a third of the deer, leaving at least one | Deer breed slowly; repeated culls can end the herd |
+| Release deer | Wild | Three fed deer at the edge | Every deer eats berries rabbits and voles need |
+
+Hay piles are drawn as golden bales and are not counted as bushes. Mowing and sowing redraw the
+tall grass on the map during the run.
+
 ## Validation
 
 Keep adaptation and ecological resilience separate. The common-garden assay compares

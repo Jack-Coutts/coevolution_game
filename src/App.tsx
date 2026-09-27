@@ -214,7 +214,7 @@ export default function App() {
             </div>
             <div className="leading-tight">
               <h1 className="text-lg font-semibold tracking-tight">Coevolution</h1>
-              <p className="hidden text-xs text-muted-foreground sm:block">Meadow Keeper · {endless ? 'a world that keeps evolving' : SCENARIO_BY_ID[scenario].species.length > 2 ? 'keep all three species alive for a year' : 'keep both species alive for a year'}</p>
+              <p className="hidden text-xs text-muted-foreground sm:block">Meadow Keeper · {endless ? 'a world that keeps evolving' : SCENARIO_BY_ID[scenario].species.length > 3 ? 'keep all five species alive for a year' : SCENARIO_BY_ID[scenario].species.length > 2 ? 'keep all three species alive for a year' : 'keep both species alive for a year'}</p>
             </div>
           </div>
 
