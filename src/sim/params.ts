@@ -91,6 +91,10 @@ export interface SimParams {
   eco: EcoParams
   /** The field vole. Absent in two-species meadows; its presence adds voles and grass seed. */
   vole?: VoleParams
+  /** The stoat (Wild meadow). Absent elsewhere. */
+  stoat?: StoatParams
+  /** The red deer (Wild meadow). Absent elsewhere. */
+  deer?: DeerParams
 }
 
 /**
@@ -139,6 +143,83 @@ export function defaultVole(): VoleParams {
     mealValue: 0.4,
     seedStock: 20,
     seedEvery: 6,
+  }
+}
+
+/** The stoat: a small, fast hunter of voles that foxes eat. Tall grass does not slow it. */
+export interface StoatParams {
+  body: SpeciesParams
+  ceiling: number
+  /** A stoat's worth to a fox, as a share of the fox's `mealEnergy`. */
+  mealValue: number
+  /** A stoat sees voles hidden in tall grass within this distance (a fox: `eco.coverSight`). */
+  coverSight: number
+}
+
+export function defaultStoat(): StoatParams {
+  return {
+    body: {
+      initial: 12,
+      adultAge: 60,
+      birthGap: 160,
+      litter: 2,
+      lifespan: 600,
+      maxEnergy: 70,
+      metabolism: 0.3,
+      speedCost: 0.5,
+      mealEnergy: 50,
+      breedEnergy: 0.65,
+      childEnergy: 0.3,
+      visionUpkeep: 0.1,
+      step: 0.013,
+      baseStep: 0.013,
+      view: [0.1, 0.25],
+      turn: [0.8, 1.4],
+    },
+    ceiling: 300,
+    mealValue: 0.5,
+    coverSight: 0.08,
+  }
+}
+
+/** The red deer: a large browser of berries and grass seed with no predator in the meadow. */
+export interface DeerParams {
+  body: SpeciesParams
+  ceiling: number
+  /** Berries a deer removes per bite (energy per bite is `body.mealEnergy`). */
+  bite: number
+  /** Seed heads a deer removes per bite, and their energy as a share of a berry bite. */
+  seedBite: number
+  seedValue: number
+  /** A deer browses a bush within this distance (other plant eaters: `feedR`). */
+  reach: number
+}
+
+export function defaultDeer(): DeerParams {
+  return {
+    body: {
+      initial: 6,
+      adultAge: 2000,
+      birthGap: 2500,
+      litter: 1,
+      lifespan: 7000,
+      maxEnergy: 400,
+      metabolism: 0.8,
+      speedCost: 0.5,
+      mealEnergy: 60,
+      breedEnergy: 0.7,
+      childEnergy: 0.3,
+      visionUpkeep: 0.1,
+      step: 0.008,
+      baseStep: 0.008,
+      view: [0.2, 0.3],
+      turn: [0.8, 0.8],
+    },
+    ceiling: 200,
+    bite: 3,
+    seedBite: 1,
+    seedValue: 0.4,
+    reach: 0.05,
   }
 }
 

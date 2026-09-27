@@ -17,6 +17,7 @@ import type { SimParams, SpeciesParams } from './params'
 import { Rng } from './rng'
 import { calendar, type Season } from './time'
 import {
+  ALL_SPECIES,
   emptyTally,
   perSpecies,
   speciesDefs,
@@ -31,6 +32,10 @@ export { speciesDefs, type Species, type SpeciesDef }
 /** The eight Open meadow actions, plus two vole actions for the Vole meadow (docs/third-species.md section 9). */
 export type Intervention = 'rain' | 'releasePrey' | 'cullPred' | 'releasePred' | 'plantBushes' | 'feedFoxes' | 'illnessPrey' | 'illnessPred'
   | 'releaseVole' | 'illnessVole'
+  /** Habitat actions, offered in every meadow. */
+  | 'mow' | 'sow' | 'hay'
+  /** Wild meadow actions. */
+  | 'releaseStoat' | 'cullDeer' | 'releaseDeer'
 
 export interface Window {
   from: number
@@ -72,6 +77,15 @@ export interface Bush {
   grazedFor: number
   /** Hours since it sprouted. */
   age: number
+  /** A hay pile put out by the player: the tick it is gone by. Hay does not regrow or wither; it is topped up until then. */
+  hay?: number
+}
+
+/** A mown tall-grass patch and the tick it grows back (with no seed). */
+export interface MownPatch {
+  x: number
+  y: number
+  until: number
 }
 
 /**
@@ -100,8 +114,17 @@ export const EFFECTS = {
   releasePred: 3,
   /** Voles released into tall grass, descended from living voles. */
   releaseVole: 12,
-  /** A cull removes floor(foxes / cullDivisor), always leaving one. */
+  /** A cull removes floor(foxes / cullDivisor), always leaving one. The deer cull uses the same share. */
   cullDivisor: 3,
+  /** Stoats released into tall grass; deer released at the edge. */
+  releaseStoat: 4,
+  releaseDeer: 3,
+  /** Mowing cuts half the standing tall-grass patches (rounded down, at least one) for `hours`. Their seed is lost. */
+  mow: { share: 0.5, hours: 720 },
+  /** Sowing adds `count` tall-grass patches that start with no seed, up to `max` patches in all. */
+  sow: { count: 2, max: 16 },
+  /** Hay: `piles` full piles (one bush stock each) topped up by one every `topUpEvery` hours for `hours`. */
+  hay: { piles: 4, hours: 240, topUpEvery: 3 },
 }
 
 const WITHER_LEVEL = 0.15
@@ -115,6 +138,9 @@ export interface World {
   preds: [number, number][]
   /** Empty without voles. Placed after foxes so two-species worlds draw the same numbers. */
   voles: [number, number][]
+  /** Wild meadow only, placed after voles. */
+  stoats: [number, number][]
+  deer: [number, number][]
 }
 
 export function placeWorld(seed: number, p: SimParams): World {
@@ -144,7 +170,11 @@ export function placeWorld(seed: number, p: SimParams): World {
   for (let i = 0; i < p.pred.initial; i++) preds.push([rng.random(), rng.random()])
   const voles: [number, number][] = []
   if (p.vole) for (let i = 0; i < p.vole.body.initial; i++) voles.push([rng.random(), rng.random()])
-  return { patches, prey, preds, voles }
+  const stoats: [number, number][] = []
+  if (p.stoat) for (let i = 0; i < p.stoat.body.initial; i++) stoats.push([rng.random(), rng.random()])
+  const deer: [number, number][] = []
+  if (p.deer) for (let i = 0; i < p.deer.body.initial; i++) deer.push([rng.random(), rng.random()])
+  return { patches, prey, preds, voles, stoats, deer }
 }
 
 /** Rabbit and fox counts under their original names, as scripts, statistics and old saves read them. */
@@ -297,7 +327,9 @@ export class Sim {
   readonly p: SimParams
   readonly seed: number
   bushes: Bush[] = []
-  readonly cover: [number, number][]
+  /** Standing tall-grass patches. Mowing moves some to `mown`; sowing adds more. */
+  cover: [number, number][]
+  mown: MownPatch[] = []
   /** Seed heads left in each tall-grass patch (same order as `cover`). Empty without voles. */
   grassSeed: number[] = []
   readonly dist: Disturbance
@@ -343,7 +375,7 @@ export class Sim {
     for (const [x, y] of world.patches) this.bushes.push({ id: this.nextBush++, x, y, stock: p.patchStock, grazedFor: 0, age: 9999 })
     this.rng = new Rng(seed + 10000)
     this.evRng = new Rng(seed + 20000)
-    const starts: Record<Species, [number, number][]> = { prey: world.prey, pred: world.preds, vole: world.voles }
+    const starts: Record<Species, [number, number][]> = { prey: world.prey, pred: world.preds, vole: world.voles, stoat: world.stoats, deer: world.deer }
     this.pops = perSpecies(() => [])
     for (const s of this.species) {
       const given = opts.genomes?.[s]
@@ -366,6 +398,7 @@ export class Sim {
     return {
       version: 3, species: this.species, p: this.p, seed: this.seed, dist: this.dist, opts: this.opts,
       pops: this.pops, founders: this.founders, bushes: this.bushes, grassSeed: this.grassSeed,
+      cover: this.cover, mown: this.mown,
       tick: this.tick, ended: this.ended, tally: this.tally, evo: this.evo,
       lastBirth: this.lastBirth, nextId: this.nextId, nextBush: this.nextBush,
       regrowAcc: this.regrowAcc, sproutAcc: this.sproutAcc, seedAcc: this.seedAcc, pending: this.pending,
@@ -379,6 +412,8 @@ export class Sim {
     const state = migrateState(data)
     const s = new Sim(state.p, state.seed, state.dist, state.opts)
     if (state.species.join() !== s.species.join()) throw new Error('Meadow save species do not match its parameters')
+    if (state.cover) s.cover = structuredClone(state.cover)
+    if (state.mown) s.mown = structuredClone(state.mown)
     for (const key of ['pops', 'founders', 'bushes', 'grassSeed', 'tick', 'ended', 'tally', 'evo', 'lastBirth',
       'nextId', 'nextBush', 'regrowAcc', 'sproutAcc', 'seedAcc', 'pending', 'ceilingHits'] as const) {
       Object.assign(s, { [key]: structuredClone(state[key]) })
@@ -521,6 +556,13 @@ export class Sim {
     const low = WITHER_LEVEL * p.patchStock
     const kept: Bush[] = []
     for (const b of this.bushes) {
+      if (b.hay !== undefined) {
+        b.age++
+        if (tick >= b.hay) continue
+        if (tick % EFFECTS.hay.topUpEvery === 0 && b.stock < p.patchStock) b.stock = Math.min(p.patchStock, b.stock + 1)
+        kept.push(b)
+        continue
+      }
       b.age++
       if (regrow && b.stock < p.patchStock) b.stock += 1
       b.grazedFor = b.stock < low ? b.grazedFor + 1 : 0
@@ -531,6 +573,7 @@ export class Sim {
       kept.push(b)
     }
     this.bushes = kept
+    if (this.mown.length) this.regrowMown(tick)
     if (p.vole) {
       // Grass seed regrows on the same weather as berries; rain does not refill it.
       this.seedAcc += f
@@ -670,12 +713,13 @@ export class Sim {
       let e1 = Infinity
       let e2 = Infinity
       let n = 0
-      const sight2 = p.eco.coverSight * p.eco.coverSight
+      const sight2 = def.coverSight * def.coverSight
       for (const s of def.eats) {
         const r = a.view
+        const adult = def.young.includes(s) ? this.defs[s].body.adultAge : Infinity
         this.grids[s].each(a.x, a.y, r, (o) => {
           const d = (o.x - a.x) ** 2 + (o.y - a.y) ** 2
-          if (d >= r * r || (o.inCover && d > sight2)) return
+          if (d >= r * r || (o.inCover && d > sight2) || o.age >= adult) return
           n++
           if (d < e1) {
             f2 = f1
@@ -762,10 +806,10 @@ export class Sim {
 
   /** Hungry plant eaters take one bite of the first food in their diet that is within reach. */
   private graze(): void {
-    const feed2 = this.p.feedR * this.p.feedR
     for (const s of this.species) {
       const def = this.defs[s]
       if (!def.eatsPlants) continue
+      const feed2 = def.feedR * def.feedR
       // Each animal's own body sets when it is full (the census bug: this used the rabbit's).
       const halfMeal = 0.5 * def.body.mealEnergy
       for (const a of this.pops[s]) {
@@ -826,8 +870,13 @@ export class Sim {
       for (const victim of def.eats) {
         // A small victim is a small meal: its worth is a share of the hunter's meal energy, times the victim's size.
         const worth = def.body.mealEnergy * this.defs[victim].mealValue
+        const adult = def.young.includes(victim) ? this.defs[victim].body.adultAge : Infinity
         const survivors: Creature[] = []
         for (const a of this.pops[victim]) {
+          if (a.age >= adult) {
+            survivors.push(a)
+            continue
+          }
           let best = Infinity
           let hunter: Creature | null = null
           this.grids[s].each(a.x, a.y, eatR * ((biggest + a.size) / 2), (q) => {
@@ -944,6 +993,30 @@ export class Sim {
     parent.meals = 0
     parent.lastBirth = parent.age
     this.lastBirth[s] = this.tick
+  }
+
+  /** Remove floor(n / cullDivisor) animals at random, always leaving one. */
+  private cullShare(s: Species): void {
+    const ev = this.evRng
+    const pop = this.pops[s]
+    const n = Math.floor(pop.length / EFFECTS.cullDivisor)
+    for (let i = 0; i < n && pop.length > 1; i++) {
+      const k = Math.floor(ev.random() * pop.length)
+      this.tally[s].culled++
+      this.emit('culled', s, pop[k])
+      pop.splice(k, 1)
+    }
+  }
+
+  /** Mown patches grow back, standing again with no seed. */
+  private regrowMown(tick: number): void {
+    const back = this.mown.filter((m) => m.until <= tick)
+    if (!back.length) return
+    this.mown = this.mown.filter((m) => m.until > tick)
+    for (const m of back) {
+      this.cover.push([m.x, m.y])
+      if (this.p.vole) this.grassSeed.push(0)
+    }
   }
 
   private newcomer(s: Species, x: number, y: number): Creature {
@@ -1091,16 +1164,78 @@ export class Sim {
         }
         break
       }
-      case 'cullPred': {
-        const n = Math.floor(this.preds.length / EFFECTS.cullDivisor)
-        for (let i = 0; i < n && this.preds.length > 1; i++) {
-          const k = Math.floor(ev.random() * this.preds.length)
-          this.tally.pred.culled++
-          this.emit('culled', 'pred', this.preds[k])
-          this.preds.splice(k, 1)
+      case 'cullPred':
+        this.cullShare('pred')
+        break
+      case 'cullDeer':
+        if (this.species.includes('deer')) this.cullShare('deer')
+        break
+      case 'releaseStoat': {
+        if (!this.species.includes('stoat')) break
+        const want = EFFECTS.releaseStoat
+        const room = Math.max(0, this.cap('stoat') - this.pops.stoat.length)
+        if (room < want) this.ceilingHits += want - room
+        const [cx, cy] = this.cover.length ? this.cover[Math.floor(ev.random() * this.cover.length)] : [0.5, 0.5]
+        for (let i = 0; i < Math.min(want, room); i++) {
+          const x = Math.min(1, Math.max(0, cx + ev.uniform(-0.04, 0.04)))
+          const y = Math.min(1, Math.max(0, cy + ev.uniform(-0.04, 0.04)))
+          const a = this.newcomer('stoat', x, y)
+          this.pops.stoat.push(a)
+          this.emit('released', 'stoat', a)
         }
         break
       }
+      case 'releaseDeer': {
+        if (!this.species.includes('deer')) break
+        const want = EFFECTS.releaseDeer
+        const room = Math.max(0, this.cap('deer') - this.pops.deer.length)
+        if (room < want) this.ceilingHits += want - room
+        const [ex, ey] = this.edgePoint()
+        for (let i = 0; i < Math.min(want, room); i++) {
+          const a = this.newcomer('deer', ex, ey)
+          this.pops.deer.push(a)
+          this.emit('released', 'deer', a)
+        }
+        break
+      }
+      case 'mow': {
+        const n = Math.max(1, Math.floor(this.cover.length * EFFECTS.mow.share))
+        for (let i = 0; i < n && this.cover.length > 0; i++) {
+          const k = Math.floor(ev.random() * this.cover.length)
+          const [x, y] = this.cover[k]
+          this.cover.splice(k, 1)
+          if (this.grassSeed.length) this.grassSeed.splice(k, 1)
+          this.mown.push({ x, y, until: this.tick + EFFECTS.mow.hours })
+        }
+        for (const s of this.species) for (const a of this.pops[s]) a.inCover = this.cover.length > 0 && this.inCover(a.x, a.y)
+        break
+      }
+      case 'sow': {
+        const r = this.p.eco.coverR
+        for (let i = 0; i < EFFECTS.sow.count && this.cover.length + this.mown.length < EFFECTS.sow.max; i++) {
+          for (let t = 0; t < 200; t++) {
+            const x = r + ev.random() * (1 - 2 * r)
+            const y = r + ev.random() * (1 - 2 * r)
+            const clearBush = this.bushes.every((b) => (b.x - x) ** 2 + (b.y - y) ** 2 >= (r + 0.02) ** 2)
+            const clearCover = [...this.cover, ...this.mown.map((m): [number, number] => [m.x, m.y])]
+              .every(([cx, cy]) => (cx - x) ** 2 + (cy - y) ** 2 >= (2 * r) ** 2)
+            if (clearBush && clearCover) {
+              this.cover.push([x, y])
+              if (this.p.vole) this.grassSeed.push(0)
+              break
+            }
+          }
+        }
+        for (const s of this.species) for (const a of this.pops[s]) a.inCover = this.inCover(a.x, a.y)
+        break
+      }
+      case 'hay':
+        for (let i = 0; i < EFFECTS.hay.piles; i++) {
+          const pile: Bush = { id: this.nextBush++, x: ev.uniform(0.1, 0.9), y: ev.uniform(0.1, 0.9),
+            stock: this.p.patchStock, grazedFor: 0, age: 0, hay: this.tick + EFFECTS.hay.hours }
+          this.bushes.push(pile)
+        }
+        break
       default: {
         const never: never = action
         throw new Error(`unknown intervention ${String(never)}`)
@@ -1123,6 +1258,9 @@ export interface MeadowState {
   founders: Record<Species, Genome[]>
   bushes: Bush[]
   grassSeed: number[]
+  /** Standing and mown tall grass. Absent in saves from before mowing and sowing: the seed's own layout. */
+  cover?: [number, number][]
+  mown?: MownPatch[]
   tick: number
   ended: boolean
   tally: Record<Species, Tally>
@@ -1174,11 +1312,11 @@ export interface MeadowStateV2 {
  * in the version-2 engine. Anything else is refused, never partly loaded.
  */
 export function migrateState(data: MeadowState | MeadowStateV2): MeadowState {
-  if (data?.version === 3) return withBodies(data)
+  if (data?.version === 3) return withBodies(allSpecies(data))
   if (data?.version !== 2 || !data.counters || !data.pops?.prey || !data.pops?.pred || data.p?.vole)
     throw new Error('Unsupported meadow save version')
   const c = data.counters
-  return withBodies({
+  return withBodies(allSpecies({
     version: 3, species: ['prey', 'pred'], p: data.p, seed: data.seed, dist: data.dist, opts: data.opts,
     pops: { prey: data.pops.prey, pred: data.pops.pred, vole: [] },
     founders: { prey: data.founders.prey, pred: data.founders.pred, vole: [] },
@@ -1193,7 +1331,21 @@ export function migrateState(data: MeadowState | MeadowStateV2): MeadowState {
     nextId: { prey: data.nextId.prey, pred: data.nextId.pred, vole: 0 },
     nextBush: data.nextBush, regrowAcc: data.regrowAcc, sproutAcc: data.sproutAcc, seedAcc: 0,
     pending: data.pending, ceilingHits: data.ceilingHits, rng: data.rng, evRng: data.evRng, foodRng: data.foodRng,
-  })
+  } as unknown as MeadowState))
+}
+
+/** Saves from before the stoat and the deer have no entries for them: add empty ones. */
+function allSpecies(state: MeadowState): MeadowState {
+  if (ALL_SPECIES.every((s) => state.pops[s] && state.tally[s])) return state
+  const fill = <T>(r: Partial<Record<Species, T>>, make: () => T) => perSpecies((s) => r[s] ?? make())
+  return {
+    ...state,
+    pops: fill(state.pops, () => []),
+    founders: fill(state.founders, () => []),
+    tally: fill(state.tally, emptyTally),
+    lastBirth: fill(state.lastBirth, () => 0),
+    nextId: fill(state.nextId, () => 0),
+  }
 }
 
 /**

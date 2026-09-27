@@ -1,4 +1,4 @@
-import { defaultParams, defaultVole, type SimParams, type SpeciesParams } from './params'
+import { defaultDeer, defaultParams, defaultStoat, defaultVole, type SimParams, type SpeciesParams } from './params'
 import { ALL_SPECIES, TWO_SPECIES, type Species } from './species'
 import { formatHours } from './time'
 
@@ -246,6 +246,32 @@ export const LEVERS: LeverDef[] = [
     boost: 1,
     cost: 1,
   },
+  {
+    id: 'stoat.initial',
+    group: 'populations',
+    species: 'stoat',
+    label: 'Starting stoats',
+    hint: 'Founding stoats, in the Wild meadow only. Stoats hunt voles, even in the tall grass, and foxes eat stoats.',
+    min: 4,
+    max: 30,
+    step: 2,
+    unit: 'count',
+    boost: 1,
+    cost: 1,
+  },
+  {
+    id: 'deer.initial',
+    group: 'populations',
+    species: 'deer',
+    label: 'Starting deer',
+    hint: 'Founding red deer, in the Wild meadow only. Deer eat berries in large bites and grass seed; nothing hunts them.',
+    min: 2,
+    max: 16,
+    step: 1,
+    unit: 'count',
+    boost: -1,
+    cost: 1,
+  },
   ...species('prey', 'rabbit'),
   ...species('pred', 'fox'),
   {
@@ -372,6 +398,8 @@ export function defaultLevers(): LeverValues {
     'habitat.cover': p.eco.cover,
     'evo.mutation': p.mutationRate,
     'vole.initial': defaultVole().body.initial,
+    'stoat.initial': defaultStoat().body.initial,
+    'deer.initial': defaultDeer().body.initial,
   }
 }
 
@@ -411,6 +439,14 @@ export function deriveParams(v: LeverValues, species: readonly Species[] = TWO_S
   if (species.includes('vole')) {
     p.vole = defaultVole()
     if (v['vole.initial'] !== undefined) p.vole.body.initial = v['vole.initial']
+  }
+  if (species.includes('stoat')) {
+    p.stoat = defaultStoat()
+    if (v['stoat.initial'] !== undefined) p.stoat.body.initial = v['stoat.initial']
+  }
+  if (species.includes('deer')) {
+    p.deer = defaultDeer()
+    if (v['deer.initial'] !== undefined) p.deer.body.initial = v['deer.initial']
   }
   applySpecies(p.prey, v, 'prey')
   applySpecies(p.pred, v, 'pred')
