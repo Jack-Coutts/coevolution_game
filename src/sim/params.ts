@@ -163,28 +163,28 @@ export interface StoatParams {
 export function defaultStoat(): StoatParams {
   return {
     body: {
-      initial: 12,
-      adultAge: 60,
-      birthGap: 160,
-      litter: 2,
-      lifespan: 600,
-      maxEnergy: 70,
-      metabolism: 0.3,
-      speedCost: 0.5,
-      mealEnergy: 50,
-      breedEnergy: 0.65,
-      childEnergy: 0.3,
-      visionUpkeep: 0.1,
+      initial: 16,
+      adultAge: 200,
+      birthGap: 450,
+      litter: 1,
+      lifespan: 1500,
+      maxEnergy: 110,
+      metabolism: 0.1,
+      speedCost: 0.3,
+      mealEnergy: 100,
+      breedEnergy: 0.8,
+      childEnergy: 0.4,
+      visionUpkeep: 0.05,
       step: 0.013,
       baseStep: 0.013,
       view: [0.1, 0.25],
       turn: [0.8, 1.4],
     },
     ceiling: 300,
-    mealValue: 0.5,
-    coverSight: 0.08,
+    mealValue: 0.2,
+    coverSight: 0.04,
     kits: true,
-    dodge: 0.5,
+    dodge: 0.3,
   }
 }
 
@@ -204,13 +204,13 @@ export interface DeerParams {
 export function defaultDeer(): DeerParams {
   return {
     body: {
-      initial: 6,
+      initial: 4,
       adultAge: 2000,
       birthGap: 2500,
       litter: 1,
       lifespan: 7000,
-      maxEnergy: 400,
-      metabolism: 0.8,
+      maxEnergy: 600,
+      metabolism: 0.25,
       speedCost: 0.5,
       mealEnergy: 60,
       breedEnergy: 0.7,
@@ -222,12 +222,15 @@ export function defaultDeer(): DeerParams {
       turn: [0.8, 0.8],
     },
     ceiling: 200,
-    bite: 3,
+    bite: 2,
     seedBite: 1,
     seedValue: 0.4,
     reach: 0.05,
   }
 }
+
+/** Hours per +1 seed on every tall-grass patch in the Wild meadow (the Vole meadow: 6): richer grass feeds voles for two hunters. */
+export const WILD_SEED_EVERY = 4
 
 export function defaultEco(): EcoParams {
   return {

@@ -99,8 +99,8 @@ describe('vole explanations', () => {
 describe('vole actions, levers and names', () => {
   it('offers the two vole actions only in the Vole meadow, sharing one list', () => {
     expect(actionsFor(TWO_SPECIES).map(a => a.id)).not.toContain('releaseVole')
-    expect(actionsFor(THREE_SPECIES).map(a => a.id).slice(-2)).toEqual(['releaseVole', 'illnessVole'])
-    expect([optionCount(TWO_SPECIES), optionCount(THREE_SPECIES)]).toEqual(['eight', 'ten'])
+    expect(actionsFor(THREE_SPECIES).map(a => a.id).slice(8, 10)).toEqual(['releaseVole', 'illnessVole'])
+    expect([optionCount(TWO_SPECIES), optionCount(THREE_SPECIES)]).toEqual(['eleven', 'thirteen'])
   })
 
   it('Starting voles is a Vole meadow lever; it sets the voles and costs points only there', () => {

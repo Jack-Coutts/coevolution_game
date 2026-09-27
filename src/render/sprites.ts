@@ -441,7 +441,6 @@ export function animalIcon(kind: 'prey' | 'pred' | 'vole' | 'stoat' | 'deer', px
     ctx.translate(px * 0.04, 0)
     drawStoat(ctx, px * 0.66, 0.1)
   } else if (kind === 'deer') {
-    ctx.translate(px * 0.0, 0)
     drawDeer(ctx, px * 0.78, 0.1)
   } else {
     ctx.translate(px * 0.14, 0)

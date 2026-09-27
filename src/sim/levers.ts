@@ -1,4 +1,4 @@
-import { defaultDeer, defaultParams, defaultStoat, defaultVole, type SimParams, type SpeciesParams } from './params'
+import { defaultDeer, defaultParams, defaultStoat, defaultVole, WILD_SEED_EVERY, type SimParams, type SpeciesParams } from './params'
 import { ALL_SPECIES, TWO_SPECIES, type Species } from './species'
 import { formatHours } from './time'
 
@@ -266,7 +266,7 @@ export const LEVERS: LeverDef[] = [
     label: 'Starting deer',
     hint: 'Founding red deer, in the Wild meadow only. Deer eat berries in large bites and grass seed; nothing hunts them.',
     min: 2,
-    max: 16,
+    max: 12,
     step: 1,
     unit: 'count',
     boost: -1,
@@ -441,6 +441,7 @@ export function deriveParams(v: LeverValues, species: readonly Species[] = TWO_S
     if (v['vole.initial'] !== undefined) p.vole.body.initial = v['vole.initial']
   }
   if (species.includes('stoat')) {
+    if (p.vole) p.vole.seedEvery = WILD_SEED_EVERY
     p.stoat = defaultStoat()
     if (v['stoat.initial'] !== undefined) p.stoat.body.initial = v['stoat.initial']
   }

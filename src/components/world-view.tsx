@@ -44,6 +44,8 @@ export function WorldView({ maxSize, selected, onSelect }: { maxSize: number; se
   const activeSpan = game.scenario.spans.find((s) => seasonTick >= s.from && seasonTick < s.to)
   const planning = snap.phase === 'planning' && snap.tick === 0
   const voles = game.scenario.species.includes('vole')
+  const stoats = game.scenario.species.includes('stoat')
+  const deer = game.scenario.species.includes('deer')
 
   const frame = game.history.frameAt(snap.tick)?.a
   let marker: [number, number] | null = null
@@ -88,6 +90,8 @@ export function WorldView({ maxSize, selected, onSelect }: { maxSize: number; se
           <div className="dark flex items-center gap-1.5 rounded-lg bg-black/75 px-2 py-1.5 text-white shadow-lg backdrop-blur-md">
             <Count icon={icons.rabbit} value={snap.prey} label="rabbits" tone="text-rabbit" />
             {voles && <Count icon={icons.vole} value={snap.vole} label="voles" tone="text-vole" />}
+            {deer && <Count icon={icons.deer} value={snap.deer} label="deer" tone="text-deer" />}
+            {stoats && <Count icon={icons.stoat} value={snap.stoat} label="stoats" tone="text-stoat" />}
             <Count icon={icons.fox} value={snap.pred} label={`foxes · ${snap.predKits10d} kits born in the last 10 days`} tone="text-fox" />
             <div
               className="flex items-center gap-1 pl-1 text-sm tabular"
@@ -114,7 +118,9 @@ export function WorldView({ maxSize, selected, onSelect }: { maxSize: number; se
           <div className="pointer-events-none absolute inset-0 flex items-end justify-center bg-gradient-to-t from-black/60 via-black/10 to-transparent p-6">
             <div className="flex flex-col items-center gap-3 text-center text-white">
               <p className="max-w-sm text-sm text-white/85 drop-shadow">
-                {voles ? `${snap.prey} rabbits, ${snap.vole} voles and ${snap.pred} foxes` : `${snap.prey} rabbits and ${snap.pred} foxes`} with random genes. Tune the levers, then release them.
+                {stoats || deer
+                  ? `${snap.prey} rabbits, ${snap.vole} voles, ${snap.deer} deer, ${snap.stoat} stoats and ${snap.pred} foxes`
+                  : voles ? `${snap.prey} rabbits, ${snap.vole} voles and ${snap.pred} foxes` : `${snap.prey} rabbits and ${snap.pred} foxes`} with random genes. Tune the levers, then release them.
               </p>
               <Button size="lg" onClick={() => game.play()} className="pointer-events-auto gap-2 shadow-xl">
                 <Play className="size-4" /> Release the animals
