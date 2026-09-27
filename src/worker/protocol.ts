@@ -47,10 +47,29 @@ export const STAT = {
   voleSick: 30,
   /** Grass seed across all tall-grass patches, 0..1 of full. */
   seed: 31,
+  /** Wild meadow columns, appended so earlier columns keep their places. */
+  stoat: 32,
+  stoatEnergy: 33,
+  stoatBorn: 34,
+  stoatStarved: 35,
+  stoatEaten: 36,
+  stoatOld: 37,
+  deer: 38,
+  deerEnergy: 39,
+  deerBorn: 40,
+  deerStarved: 41,
+  deerOld: 42,
+  deerCulled: 43,
+  /** Hay piles on the meadow now. */
+  hay: 44,
+  /** Standing tall-grass patches (mowing lowers it for 30 days; sowing raises it). */
+  cover: 45,
 } as const
-export const STAT_STRIDE = 32
+export const STAT_STRIDE = 46
 /** Stats row width in version-2 saves (two species). */
 export const STAT_STRIDE_V2 = 23
+/** Stats row width in version-3 saves made before the Wild meadow. */
+export const STAT_STRIDE_V3 = 32
 
 export const BUSH_STRIDE = 6
 
@@ -67,6 +86,13 @@ export interface FrameData {
   preds: Float32Array
   /** Empty in two-species meadows; absent in frames saved by version 2. */
   voles?: Float32Array
+  /** Wild meadow animals; absent in frames saved before it. */
+  stoats?: Float32Array
+  deer?: Float32Array
+  /** Per hay pile: id, x, y, fullness (0..1), time left (0..1). Absent when there is none. */
+  hay?: Float32Array
+  /** Standing tall-grass patches as x, y pairs. Absent in frames saved before mowing and sowing. */
+  cover?: Float32Array
   /** Per bush: id, x, y, fullness (0..1), grown (0..1 after sprouting), withering (0..1). */
   bushes: Float32Array
   events: Float32Array
@@ -86,6 +112,8 @@ export interface EndInfo {
   preyEnd: number
   predEnd: number
   voleEnd: number
+  stoatEnd: number
+  deerEnd: number
   /** The species in this meadow; the run ended at the first of them to die out. */
   species: Species[]
 }

@@ -345,9 +345,10 @@ describe('vole actions', () => {
 })
 
 describe('Vole meadow scenario', () => {
-  it('is offered last in the picker; the other meadows stay two-species and the Open meadow comes first', () => {
-    expect(SCENARIOS.map(s => s.id)).toEqual(['stable', 'drought', 'invasion', 'winter', 'voles'])
+  it('is offered after the two-species meadows and before the Wild meadow; the Open meadow comes first', () => {
+    expect(SCENARIOS.map(s => s.id)).toEqual(['stable', 'drought', 'invasion', 'winter', 'voles', 'wild'])
     expect(SCENARIO_BY_ID.voles.species).toEqual(['prey', 'pred', 'vole'])
-    for (const s of SCENARIOS.filter(s => s.id !== 'voles')) expect(s.species).toEqual(['prey', 'pred'])
+    expect(SCENARIO_BY_ID.wild.species).toEqual(['prey', 'pred', 'vole', 'stoat', 'deer'])
+    for (const s of SCENARIOS.filter(s => s.id !== 'voles' && s.id !== 'wild')) expect(s.species).toEqual(['prey', 'pred'])
   })
 })

@@ -17,6 +17,8 @@ const TONE: Record<Species, { text: string; stroke: string; fill: string }> = {
   prey: { text: 'text-rabbit', stroke: 'stroke-rabbit', fill: 'fill-rabbit' },
   pred: { text: 'text-fox', stroke: 'stroke-fox', fill: 'fill-fox' },
   vole: { text: 'text-vole', stroke: 'stroke-vole', fill: 'fill-vole' },
+  stoat: { text: 'text-stoat', stroke: 'stroke-stoat', fill: 'fill-stoat' },
+  deer: { text: 'text-deer', stroke: 'stroke-deer', fill: 'fill-deer' },
 }
 
 /** The samples to plot, shared by every chart on the page. */

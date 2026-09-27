@@ -162,7 +162,7 @@ export interface VarietyDay {
 }
 export type VarietyDays = { tick: number } & Partial<Record<Species, VarietyDay>>
 
-const NAME: Record<Species, [string, string]> = { prey: ['Rabbit', 'rabbits'], pred: ['Fox', 'foxes'], vole: ['Vole', 'voles'] }
+const NAME: Record<Species, [string, string]> = { prey: ['Rabbit', 'rabbits'], pred: ['Fox', 'foxes'], vole: ['Vole', 'voles'], stoat: ['Stoat', 'stoats'], deer: ['Deer', 'deer'] }
 const LABEL: Record<DimKey, string> = { forage: 'food seeking', flee: 'threat avoidance', cruise: 'cruising pace', hide: 'cover seeking', size: 'body size' }
 const day = (tick: number) => Math.floor(tick / 24) + 1
 const pct = (v: number) => `${Math.round(v * 100)}%`

@@ -581,6 +581,51 @@ widened from 22 to 23 floats per animal. Frames carry the size in slot 22
 (`ANIMAL_SIZE`). The energy fraction in frames is now a share of the animal's own maximum.
 The stats row's mean energy still divides by the species maximum.
 
+## Wild meadow: stoats and deer
+
+Measured with Node 22 on Linux x64 (shared container), one process, runs one at a time, game
+rules (a run ends at the first extinction). Probe script kept outside the repository; the
+engine, parameters and seeds below reproduce it with `new Sim(deriveParams(STABLE_PRESET,
+SCENARIO_BY_ID.wild.species), seed)`.
+
+**Regression.** `node --import tsx scripts/validate-balance.ts 5000 5` gives rows identical to
+origin/main, and Open meadow, Vole meadow and Drought runs on seeds 5000 to 5002 match main in
+end hour, counts, tallies and a position digest. `tests/wild-meadow.test.ts` pins the Open and
+Vole meadows at hour 1500 of seed 5000 to values recorded from main.
+
+**Tuning pass, seeds 9500 to 9519.** The first parameters starved every stoat within 350 to
+840 hours (random founders could not find voles before their energy ran out), and deer
+starved on seeds where their six founders found no bushes. Changes, in order of effect: stoats
+got cheaper bodies (metabolism 0.3 to 0.1) and bigger meals; they may take young rabbits (without
+them 0/8 survived on a probe batch); foxes need 0.3 of their reach to catch a stoat (foxes ate as
+many stoats as starved); deer got a lower metabolism and a 0.05 browsing reach; stoat breeding
+was slowed (litter 1, gap 450 h) to damp booms; seed regrows faster in this meadow (4 h). With
+the final values the untouched batch kept all five alive in **3/20 (15%)**, first losses spread
+over rabbits 5, stoats 5, voles 5, deer 1, foxes 1, with zero safety-ceiling hits. Other
+batches in the pass ranged from 0/20 to 3/20; no setting reached the 20 to 50% guide.
+
+**Fresh seeds 9600 to 9619**, untouched, default levers:
+
+| Measure | Result |
+| --- | ---: |
+| All five alive at a year | **2/20 (10%)**, Wilson 95% interval 3 to 30% |
+| First species lost (rabbit / deer / fox / stoat / vole) | 6 / 4 / 3 / 3 / 2 |
+| Median hour of the first extinction (lost runs) | about 3,700 |
+| Safety-ceiling hits | 0 in every run |
+| Peaks (range): rabbits, voles, stoats, deer | 212–363, 235–384, 27–217, 4–19 |
+| Simulation time per simulated year, Wild / Vole meadow (Vole: seeds 9600–9609) | 11.7 s / 8.9 s (1.32×) |
+
+Untouched survival sits **below** the 20 to 50% guide: with five species the year ends at the
+first of five risks, and no single species dominates the losses. The scenario is kept because
+losses are spread and each has a player action aimed at it; a second calibration pass on a
+larger batch (and a check of keeper play with the new actions) is left for later. Vole meadow
+survival on 9600–9609 was 6/10.
+
+**Interventions** are checked by tests with literal values: mowing leaves 4 of 8 patches for
+720 hours and returns them with no seed; sowing adds two empty patches; hay adds four piles that
+feed a rabbit and vanish after 240 hours; Release stoats adds four, Release deer three, and Cull
+deer removes one of four. Whether they help over a season is not measured yet.
+
 ## Observed ecological varieties (#11)
 
 Specification: `game-design.md`, "Observed ecological varieties". Tests:

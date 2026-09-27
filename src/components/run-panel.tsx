@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react'
 import { actionsFor, optionCount } from '@/game/interventions'
-import { AlertTriangle, CheckCircle2, CloudRain, Crosshair, Info, OctagonAlert, TrendingUp, Trophy } from 'lucide-react'
+import { AlertTriangle, CheckCircle2, CloudRain, Crosshair, Info, OctagonAlert, Scissors, Sprout, TrendingUp, Trophy, Wheat } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Progress } from '@/components/ui/progress'
@@ -109,6 +109,8 @@ export function RunPanel({ inspector, setup, onShowResult }: { inspector: ReactN
         <table className="mt-2 w-full text-left text-xs tabular"><thead><tr><th>Species</th><th>Starved</th><th>Eaten</th><th>Old age</th><th>Illness</th><th>Culled</th></tr></thead>
           <tbody><tr><td className="text-rabbit">Rabbits</td><td>{stat('preyStarved')}</td><td>{stat('preyEaten')}</td><td>{stat('preyOld')}</td><td>{stat('preyIllness')}</td><td>—</td></tr>
           {species.includes('vole') && <tr><td className="text-vole">Voles</td><td>{stat('voleStarved')}</td><td>{stat('voleEaten')}</td><td>{stat('voleOld')}</td><td>{stat('voleIllness')}</td><td>—</td></tr>}
+          {species.includes('deer') && <tr><td className="text-deer">Deer</td><td>{stat('deerStarved')}</td><td>—</td><td>{stat('deerOld')}</td><td>—</td><td>{stat('deerCulled')}</td></tr>}
+          {species.includes('stoat') && <tr><td className="text-stoat">Stoats</td><td>{stat('stoatStarved')}</td><td>{stat('stoatEaten')}</td><td>{stat('stoatOld')}</td><td>—</td><td>—</td></tr>}
           <tr><td className="text-fox">Foxes</td><td>{stat('predStarved')}</td><td>—</td><td>{stat('predOld')}</td><td>{stat('predIllness')}</td><td>{stat('predCulled')}</td></tr></tbody></table>
         <p className="mt-2 text-[11px] text-muted-foreground">Totals up to the displayed time. Illness deaths are energy exhaustion during illness.</p>
         {game.history.stat(snap.tick, 'ceilingHits') > 0 && <p className="mt-2 text-xs text-tone-warn-foreground">The performance safety limit has restricted births. This run is not valid for balance comparisons.</p>}
@@ -123,11 +125,12 @@ export function RunPanel({ inspector, setup, onShowResult }: { inspector: ReactN
   )
 }
 
-const SICK: Record<Species, StatKey> = { prey: 'preySick', pred: 'predSick', vole: 'voleSick' }
+/** Species that can fall ill (stoats and deer have no illness action). */
+const SICK: Partial<Record<Species, StatKey>> = { prey: 'preySick', pred: 'predSick', vole: 'voleSick' }
 
 function IllnessNote() {
   const [game, snap] = useGame()
-  const sick = displayOrder(game.scenario.species).map(s => ({ s, n: game.history.stat(snap.tick, SICK[s]) }))
+  const sick = displayOrder(game.scenario.species).flatMap(s => SICK[s] ? [{ s, n: game.history.stat(snap.tick, SICK[s]) }] : [])
   if (sick.every(x => x.n === 0)) return null
   const words = sick.map(x => `${x.n} ${SPECIES_UI[x.s].plural}`)
   const list = words.length <= 2 ? words.join(' and ') : `${words.slice(0, -1).join(', ')} and ${words.at(-1)}`
@@ -252,6 +255,18 @@ function ActionIcon({ id }: { id: Intervention }) {
     case 'illnessVole':
     case 'releaseVole':
       return <img src={icons.vole} alt="" className="size-5 shrink-0" />
+    case 'releaseStoat':
+      return <img src={icons.stoat} alt="" className="size-5 shrink-0" />
+    case 'releaseDeer':
+      return <img src={icons.deer} alt="" className="size-5 shrink-0" />
+    case 'cullDeer':
+      return <Crosshair className="size-4 shrink-0 text-tone-danger-foreground" />
+    case 'mow':
+      return <Scissors className="size-4 shrink-0 text-tone-warn-foreground" />
+    case 'sow':
+      return <Sprout className="size-4 shrink-0 text-tone-good-foreground" />
+    case 'hay':
+      return <Wheat className="size-4 shrink-0 text-tone-warn-foreground" />
     default: {
       const never: never = id
       return never

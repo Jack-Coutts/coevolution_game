@@ -19,13 +19,18 @@ export interface Forecast {
   pred: number
   /** 0 outside the Vole meadow. */
   vole: number
+  /** 0 outside the Wild meadow. */
+  stoat: number
+  deer: number
   ahead: number
 }
 
 const WINDOW = 240
 const AHEAD = 300
 
-function trend(h: RunHistory, key: 'prey' | 'pred' | 'vole', tick: number): number {
+type CountKey = 'prey' | 'pred' | 'vole' | 'stoat' | 'deer'
+
+function trend(h: RunHistory, key: CountKey, tick: number): number {
   const from = Math.max(h.firstTick, tick - WINDOW)
   const n = tick - from
   if (n < 24) return 0
@@ -48,11 +53,12 @@ function trend(h: RunHistory, key: 'prey' | 'pred' | 'vole', tick: number): numb
 export function forecast(h: RunHistory, tick: number): Forecast | null {
   if (tick - h.firstTick < 48) return null
   const ahead = Math.min(AHEAD, h.horizon - tick)
-  const project = (key: 'prey' | 'pred' | 'vole') => {
+  const project = (key: CountKey) => {
+    if (!h.species.includes(key)) return 0
     const now = h.stat(tick, key)
     return Math.max(0, (now + 1) * Math.exp(trend(h, key, tick) * ahead) - 1)
   }
-  return { prey: project('prey'), pred: project('pred'), vole: h.species.includes('vole') ? project('vole') : 0, ahead }
+  return { prey: project('prey'), pred: project('pred'), vole: project('vole'), stoat: project('stoat'), deer: project('deer'), ahead }
 }
 
 /** Field notes announce a scenario's weather or arrival this many days ahead. */
@@ -88,7 +94,7 @@ export const DANGER_HOLD = 48
 export function hints(h: RunHistory, tick: number, scenario?: Scenario): Hint[] {
   const out = notesAt(h, tick)
   // Once a species is gone there is nothing left to warn about, so old danger notes are not carried.
-  const alive = h.stat(tick, 'prey') > 0 && h.stat(tick, 'pred') > 0 && (!h.species.includes('vole') || h.stat(tick, 'vole') > 0)
+  const alive = h.species.every(s => h.stat(tick, s) > 0)
   for (let lag = 1; alive && lag <= DANGER_HOLD && tick - lag - h.firstTick >= 24; lag++) {
     for (const n of notesAt(h, tick - lag)) {
       if (n.tone !== 'danger' || out.some(o => o.id === n.id)) continue
@@ -126,6 +132,8 @@ function notesAt(h: RunHistory, tick: number): Hint[] {
   const vole0 = voles ? h.stat(past, 'vole') : 0
   const voleGrowth = vole0 > 0 ? vole / vole0 - 1 : 0
   if (voles) out.push(...voleNotes(h, tick, { vole, voleGrowth, pred, stock }))
+  const wild = h.species.includes('stoat') || h.species.includes('deer')
+  if (wild) out.push(...wildNotes(h, tick, past, stock))
 
   if (preyGrowth > 0.4 && stock < 0.35) {
     out.push({
@@ -190,7 +198,13 @@ function notesAt(h: RunHistory, tick: number): Hint[] {
   }
   const f = forecast(h, tick)
   if (f && tick + f.ahead < h.horizon) {
-    if (voles && vole > 0 && f.vole < 1 && pred > 0 && f.pred >= 1 && prey > 0 && f.prey >= 1) {
+    const stoat = h.species.includes('stoat') ? h.stat(tick, 'stoat') : 0
+    const deer = h.species.includes('deer') ? h.stat(tick, 'deer') : 0
+    if (stoat > 0 && f.stoat < 1) {
+      out.push({ id: 'fcstoat', tone: 'danger', text: `At the current trend, stoats die out by about ${dateLabel(tick + f.ahead)}.` })
+    } else if (deer > 0 && f.deer < 1) {
+      out.push({ id: 'fcdeer', tone: 'danger', text: `At the current trend, deer die out by about ${dateLabel(tick + f.ahead)}.` })
+    } else if (voles && vole > 0 && f.vole < 1 && pred > 0 && f.pred >= 1 && prey > 0 && f.prey >= 1) {
       out.push({
         id: 'fcvole',
         tone: 'danger',
@@ -213,7 +227,16 @@ function notesAt(h: RunHistory, tick: number): Hint[] {
   if (out.length === 0) {
     // Only call it steady when the trend agrees; a forecast that halves or grows by half is not steady.
     const moving = (now: number, next: number) => (next + 1) / (now + 1) > 1.5 || (now + 1) / (next + 1) > 1.5
-    if (f && f.ahead > 0 && (moving(prey, f.prey) || moving(pred, f.pred) || (voles && moving(vole, f.vole)))) {
+    if (wild) {
+      const names = { prey: 'rabbits', vole: 'voles', deer: 'deer', stoat: 'stoats', pred: 'foxes' } as const
+      const order = (['prey', 'vole', 'deer', 'stoat', 'pred'] as const).filter(s => h.species.includes(s))
+      const list = (xs: string[]) => `${xs.slice(0, -1).join(', ')} and ${xs.at(-1)}`
+      if (f && f.ahead > 0 && order.some(s => moving(h.stat(tick, s), f[s]))) {
+        out.push({ id: 'trend', tone: 'info', text: `No warnings yet, but the meadow is changing: at the current trend, about ${list(order.map(s => `${Math.round(f[s])} ${names[s]}`))} by ${dateLabel(tick + f.ahead)}.` })
+      } else {
+        out.push({ id: 'steady', tone: 'good', text: `Holding steady: ${list(order.map(s => `${h.stat(tick, s)} ${names[s]}`))}, with bushes ${Math.round(stock * 100)}% full.` })
+      }
+    } else if (f && f.ahead > 0 && (moving(prey, f.prey) || moving(pred, f.pred) || (voles && moving(vole, f.vole)))) {
       out.push({
         id: 'trend',
         tone: 'info',
@@ -269,6 +292,27 @@ function voleNotes(h: RunHistory, tick: number, x: { vole: number; voleGrowth: n
   return out
 }
 
+/**
+ * Wild meadow notes: few stoats or deer left, a stoat boom that will eat into the voles, and deer
+ * crowding the bushes every plant eater needs.
+ */
+function wildNotes(h: RunHistory, tick: number, past: number, stock: number): Hint[] {
+  const out: Hint[] = []
+  if (h.species.includes('stoat')) {
+    const stoat = h.stat(tick, 'stoat')
+    const stoat0 = h.stat(past, 'stoat')
+    const vole = h.stat(tick, 'vole')
+    if (stoat > 0 && stoat <= 5) out.push({ id: 'fewstoat', tone: 'danger', text: `Only ${stoat} stoat${stoat === 1 ? '' : 's'} left. Release stoats, or give the voles they live on time to recover.` })
+    if (stoat >= 20 && stoat0 > 0 && stoat / stoat0 > 1.6) out.push({ id: 'stoatboom', tone: 'warn', text: `Stoats are up ${Math.round((stoat / stoat0 - 1) * 100)}% in 10 days (${stoat} now). They hunt voles even in the tall grass; ${vole} voles are left.` })
+  }
+  if (h.species.includes('deer')) {
+    const deer = h.stat(tick, 'deer')
+    if (deer > 0 && deer <= 2) out.push({ id: 'fewdeer', tone: 'danger', text: `Only ${deer} deer left. Nothing hunts them, but deer breed slowly: Release deer adds three.` })
+    if (deer >= 15 && stock < 0.3) out.push({ id: 'deerbrowse', tone: 'warn', text: `${deer} deer are browsing bushes that are only ${Math.round(stock * 100)}% full. Every plant eater shares those berries; Cull deer removes a third.` })
+  }
+  return out
+}
+
 export interface Explanation {
   headline: string
   detail: string
@@ -307,6 +351,14 @@ export function explain(h: RunHistory, end: EndInfo, scenario: Scenario): Explan
   const T = end.tick
   const when = `${dateLabel(T)} (day ${Math.floor(T / 24) + 1})`
   const voles = end.species?.includes('vole') ?? false
+  const wild = end.species?.includes('stoat') ?? false
+  if (end.survived && wild) {
+    return {
+      headline: `All five species made it through ${formatDuration(T)}.`,
+      detail: `The meadow ended with ${end.preyEnd} rabbits, ${end.voleEnd} voles, ${end.deerEnd} deer, ${end.stoatEnd} stoats and ${end.predEnd} foxes.`,
+      suggestions: ['Win with more of the budget unspent for a higher score.'],
+    }
+  }
   if (end.survived && voles) {
     return {
       headline: `All three species made it through ${formatDuration(T)}.`,
@@ -324,7 +376,10 @@ export function explain(h: RunHistory, end: EndInfo, scenario: Scenario): Explan
   const from = Math.max(h.firstTick, T - 300)
   const context = inSpan(scenario, T, h.endless)
   const ctx = context ? ` This happened during the ${context.toLowerCase()} period.` : ''
-  if (voles && end.voleEnd === 0 && end.preyEnd > 0 && end.predEnd > 0) return explainVoles(h, T, when, ctx, from)
+  const others = end.preyEnd > 0 && end.predEnd > 0 && (!voles || end.voleEnd > 0)
+  if (wild && end.stoatEnd === 0 && others) return explainStoats(h, T, when, ctx, from)
+  if (end.species?.includes('deer') && end.deerEnd === 0 && others) return explainDeer(h, T, when, ctx, from)
+  if (voles && end.voleEnd === 0 && end.preyEnd > 0 && end.predEnd > 0) return explainVoles(h, T, when, ctx, from, wild)
   const species = end.predEnd === 0 ? 'pred' : 'prey'
   const illness = delta(h, species === 'pred' ? 'predIllness' : 'preyIllness', from, T)
   const other = delta(h, species === 'pred' ? 'predStarved' : 'preyStarved', from, T) +
@@ -412,12 +467,17 @@ export function explain(h: RunHistory, end: EndInfo, scenario: Scenario): Explan
 }
 
 /** Voles died out while rabbits and foxes lived: name the main cause, as for rabbits. */
-function explainVoles(h: RunHistory, T: number, when: string, ctx: string, from: number): Explanation {
+function explainVoles(h: RunHistory, T: number, when: string, ctx: string, from: number, stoats = false): Explanation {
   const eaten = delta(h, 'voleEaten', from, T)
   const starved = delta(h, 'voleStarved', from, T)
   const ill = delta(h, 'voleIllness', from, T)
   const old = delta(h, 'voleOld', from, T)
-  const counts = `In their last 12 days ${starved} voles starved, ${eaten} were eaten by foxes, ${ill} ran out of energy while ill and ${old} died of old age.`
+  const counts = `In their last 12 days ${starved} voles starved, ${eaten} were eaten by ${stoats ? 'foxes and stoats' : 'foxes'}, ${ill} ran out of energy while ill and ${old} died of old age.`
+  if (stoats && eaten >= starved && eaten >= old && ill < starved + eaten + old) return {
+    headline: `Voles were eaten out on ${when}.`,
+    detail: `${counts} About ${Math.round(avg(h, 'stoat', from, T))} stoats and ${Math.round(avg(h, 'pred', from, T))} foxes were hunting them. Stoats follow voles into the tall grass.${ctx}`,
+    suggestions: ['Release voles into the tall grass', 'Sow tall grass so the seed can feed more voles', 'Leave the foxes alone: they eat stoats as well as voles'],
+  }
   if (ill > 0 && ill >= starved + eaten + old) return {
     headline: `Voles died out during illness on ${when}.`,
     detail: `${counts} Illness adds energy costs and spreads among nearby voles.${ctx}`,
@@ -444,6 +504,48 @@ function explainVoles(h: RunHistory, T: number, when: string, ctx: string, from:
     headline: `The last voles died of old age on ${when}.`,
     detail: `${counts} Too few young were born to replace them.${ctx}`,
     suggestions: ['Release voles into the tall grass', 'Start with more voles'],
+  }
+}
+
+/** Stoats died out while the rest lived: starvation (too few voles) or foxes. */
+function explainStoats(h: RunHistory, T: number, when: string, ctx: string, from: number): Explanation {
+  const starved = delta(h, 'stoatStarved', from, T)
+  const eaten = delta(h, 'stoatEaten', from, T)
+  const old = delta(h, 'stoatOld', from, T)
+  const vole = Math.round(avg(h, 'vole', from, T))
+  const counts = `In their last 12 days ${starved} stoats starved, ${eaten} were eaten by foxes and ${old} died of old age, with about ${vole} voles around.`
+  if (eaten > starved && eaten >= old) return {
+    headline: `Foxes ate the last stoats on ${when}.`,
+    detail: `${counts} About ${Math.round(avg(h, 'pred', from, T))} foxes were hunting.${ctx}`,
+    suggestions: ['Cull foxes when stoats fall below about ten', 'Release stoats into the tall grass', 'Start with fewer foxes'],
+  }
+  if (starved >= old) return {
+    headline: `Stoats starved on ${when}, with too few voles to catch.`,
+    detail: `${counts} Stoats live on voles (and young rabbits), so they boom when voles are many and starve when voles crash.${ctx}`,
+    suggestions: ['Release voles when both voles and stoats are falling', 'Release stoats after the voles recover', 'Start with fewer stoats, so they do not eat the voles out early'],
+  }
+  return {
+    headline: `The last stoats died of old age on ${when}.`,
+    detail: `${counts} Too few young were born to replace them.${ctx}`,
+    suggestions: ['Release stoats into the tall grass', 'Start with more stoats'],
+  }
+}
+
+/** Deer died out while the rest lived. Nothing hunts deer, so it is food or age. */
+function explainDeer(h: RunHistory, T: number, when: string, ctx: string, from: number): Explanation {
+  const starved = delta(h, 'deerStarved', from, T)
+  const old = delta(h, 'deerOld', from, T)
+  const culled = delta(h, 'deerCulled', from, T)
+  const stock = Math.round(avg(h, 'stock', from, T) * 100)
+  if (starved >= old) return {
+    headline: `Deer starved on ${when}. Bushes averaged ${stock}% full.`,
+    detail: `In their last 12 days ${starved} deer starved${culled ? ` and ${culled} were culled` : ''}. Deer need many berries, and rabbits and voles eat the same bushes.${ctx}`,
+    suggestions: ['Put out hay or call rain when bushes run low', 'Plant bushes', 'Keep the deer herd small so they do not strip the bushes'],
+  }
+  return {
+    headline: `The last deer died of old age on ${when}.`,
+    detail: `In their last 12 days ${old} deer died of old age. Deer breed slowly, so an ageing herd with few fawns runs out.${ctx}`,
+    suggestions: ['Release deer to add younger animals', 'Start with more deer'],
   }
 }
 

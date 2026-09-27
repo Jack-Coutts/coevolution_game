@@ -16,8 +16,8 @@ export interface LineageSummary {
   maxGen: number
 }
 
-/** Daily counts per family, flattened as [lineage, count, minGen, maxGen, ...]. `vole` only in the Vole meadow. */
-interface DayCount { tick: number; prey: number[]; pred: number[]; vole?: number[] }
+/** Daily counts per family, flattened as [lineage, count, minGen, maxGen, ...]. Species beyond rabbits and foxes only where they live. */
+interface DayCount { tick: number; prey: number[]; pred: number[]; vole?: number[]; stoat?: number[]; deer?: number[] }
 
 /** Daily family counts kept in full (about a year); older days are folded into the summaries. */
 export const FAMILY_DAYS = 366
@@ -63,7 +63,7 @@ export class FamilyHistory {
   observe(tick: number, frame: FrameData | undefined): void {
     if (!frame || (this.days.at(-1)?.tick ?? -1) >= tick) return
     const day: DayCount = { tick, prey: count(frame, 'prey'), pred: count(frame, 'pred') }
-    if (this.species.includes('vole')) day.vole = count(frame, 'vole')
+    for (const s of ['vole', 'stoat', 'deer'] as const) if (this.species.includes(s)) day[s] = count(frame, s)
     this.days.push(day)
     if (this.days.length <= FAMILY_DAYS) return
     const old = this.days.shift()!

@@ -247,7 +247,7 @@ function LeverRow({
         value={[value]}
         disabled={!onChange}
         onValueChange={([v]) => onChange?.(def.id, clampLever(def, v))}
-        aria-label={def.species && def.species !== 'vole' ? `${SPECIES_UI[def.species].name} ${def.label.toLowerCase()}` : def.label}
+        aria-label={def.species && (def.species === 'prey' || def.species === 'pred') ? `${SPECIES_UI[def.species].name} ${def.label.toLowerCase()}` : def.label}
       />
     </div>
   )

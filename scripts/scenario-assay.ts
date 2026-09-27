@@ -56,7 +56,7 @@ interface Plan {
  * The intended player decision for each scenario, written as a fixed rule that reads only the
  * warning and on-screen counts. Chosen on tuning seeds 8200-8219, frozen before 8300-8319.
  */
-export const PLANS: Record<Exclude<ScenarioId, 'stable' | 'voles'>, Plan> = {
+export const PLANS: Record<Exclude<ScenarioId, 'stable' | 'voles' | 'wild'>, Plan> = {
   drought: {
     decision: 'Save charges for the dry months; refill bushes with rain once they are stripped during the drought.',
     from: -NOTICE,
@@ -162,7 +162,7 @@ export function runOne(seed: number, scenario: ScenarioId, condition: Condition)
   }
   if (s.tick >= start) lowDuring ??= { rabbits: s.prey.length, foxes: s.preds.length }
   if (s.tick === start && !atOnset) atOnset = { rabbits: s.prey.length, foxes: s.preds.length, bushes: s.bushes.length, stock: 0 }
-  const end = { tick: s.tick, survived: s.survived, preyEnd: s.prey.length, predEnd: s.preds.length, voleEnd: 0, species: s.species }
+  const end = { tick: s.tick, survived: s.survived, preyEnd: s.prey.length, predEnd: s.preds.length, voleEnd: 0, stoatEnd: 0, deerEnd: 0, species: s.species }
   const headline = explain(h, end, sc).headline
   const extinct = s.survived ? null : s.prey.length === 0 && s.preds.length === 0 ? 'both' : s.prey.length === 0 ? 'rabbits' : 'foxes'
   return {

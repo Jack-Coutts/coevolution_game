@@ -91,6 +91,10 @@ export interface SimParams {
   eco: EcoParams
   /** The field vole. Absent in two-species meadows; its presence adds voles and grass seed. */
   vole?: VoleParams
+  /** The stoat (Wild meadow). Absent elsewhere. */
+  stoat?: StoatParams
+  /** The red deer (Wild meadow). Absent elsewhere. */
+  deer?: DeerParams
 }
 
 /**
@@ -141,6 +145,92 @@ export function defaultVole(): VoleParams {
     seedEvery: 6,
   }
 }
+
+/** The stoat: a small, fast hunter of voles that foxes eat. Tall grass does not slow it. */
+export interface StoatParams {
+  body: SpeciesParams
+  ceiling: number
+  /** A stoat's worth to a fox, as a share of the fox's `mealEnergy`. */
+  mealValue: number
+  /** A stoat sees voles hidden in tall grass within this distance (a fox: `eco.coverSight`). */
+  coverSight: number
+  /** Stoats also catch young rabbits (below the rabbits' first-birth age). */
+  kits: boolean
+  /** A fox must come this much closer to catch a stoat than to catch a rabbit (agility; 1 = no harder). */
+  dodge: number
+}
+
+export function defaultStoat(): StoatParams {
+  return {
+    body: {
+      initial: 16,
+      adultAge: 200,
+      birthGap: 450,
+      litter: 1,
+      lifespan: 1500,
+      maxEnergy: 110,
+      metabolism: 0.1,
+      speedCost: 0.3,
+      mealEnergy: 100,
+      breedEnergy: 0.8,
+      childEnergy: 0.4,
+      visionUpkeep: 0.05,
+      step: 0.013,
+      baseStep: 0.013,
+      view: [0.1, 0.25],
+      turn: [0.8, 1.4],
+    },
+    ceiling: 300,
+    mealValue: 0.2,
+    coverSight: 0.04,
+    kits: true,
+    dodge: 0.3,
+  }
+}
+
+/** The red deer: a large browser of berries and grass seed with no predator in the meadow. */
+export interface DeerParams {
+  body: SpeciesParams
+  ceiling: number
+  /** Berries a deer removes per bite (energy per bite is `body.mealEnergy`). */
+  bite: number
+  /** Seed heads a deer removes per bite, and their energy as a share of a berry bite. */
+  seedBite: number
+  seedValue: number
+  /** A deer browses a bush within this distance (other plant eaters: `feedR`). */
+  reach: number
+}
+
+export function defaultDeer(): DeerParams {
+  return {
+    body: {
+      initial: 4,
+      adultAge: 2000,
+      birthGap: 2500,
+      litter: 1,
+      lifespan: 7000,
+      maxEnergy: 600,
+      metabolism: 0.25,
+      speedCost: 0.5,
+      mealEnergy: 60,
+      breedEnergy: 0.7,
+      childEnergy: 0.3,
+      visionUpkeep: 0.1,
+      step: 0.008,
+      baseStep: 0.008,
+      view: [0.2, 0.3],
+      turn: [0.8, 0.8],
+    },
+    ceiling: 200,
+    bite: 2,
+    seedBite: 1,
+    seedValue: 0.4,
+    reach: 0.05,
+  }
+}
+
+/** Hours per +1 seed on every tall-grass patch in the Wild meadow (the Vole meadow: 6): richer grass feeds voles for two hunters. */
+export const WILD_SEED_EVERY = 4
 
 export function defaultEco(): EcoParams {
   return {

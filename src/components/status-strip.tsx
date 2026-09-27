@@ -57,6 +57,20 @@ export function StatusStrip({ canStart }: { canStart: boolean }) {
               <span className="sr-only">voles</span>
             </span>
           )}
+          {game.scenario.species.includes('deer') && (
+            <span className="flex items-center gap-1" title="Deer">
+              <img src={icons.deer} alt="" className="size-5" />
+              <span className="font-semibold text-deer">{snap.deer}</span>
+              <span className="sr-only">deer</span>
+            </span>
+          )}
+          {game.scenario.species.includes('stoat') && (
+            <span className="flex items-center gap-1" title="Stoats">
+              <img src={icons.stoat} alt="" className="size-5" />
+              <span className="font-semibold text-stoat">{snap.stoat}</span>
+              <span className="sr-only">stoats</span>
+            </span>
+          )}
           <span className="flex items-center gap-1" title="Foxes">
             <img src={icons.fox} alt="" className="size-5" />
             <span className="font-semibold text-fox">{snap.pred}</span>

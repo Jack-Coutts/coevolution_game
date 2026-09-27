@@ -1,6 +1,7 @@
 import { useAnimalIcons } from '@/hooks/use-animal-icons'
 import { useGame } from '@/hooks/use-game'
 import { FoodWeb } from '@/components/food-web'
+import { FIVE_SPECIES } from '@/sim/species'
 
 const KEYS: [string, string][] = [
   ['Space', 'Play / pause'],
@@ -14,18 +15,21 @@ export function Guide() {
   const icons = useAnimalIcons()
   const [game] = useGame()
   const voles = game.scenario.species.includes('vole')
+  const wild = game.scenario.species.includes('stoat')
   return (
     <div className="gap-10 text-sm leading-relaxed lg:columns-2 [&>section]:mb-5 [&>section]:max-w-[70ch] [&>section]:break-inside-avoid">
       <section>
         <h3 className="mb-1 font-semibold">Goal</h3>
         <p className="text-muted-foreground">
-          {voles
+          {wild
+            ? <>In the Wild meadow, keep <b className="text-rabbit">rabbits</b>, <b className="text-vole">voles</b>, <b className="text-deer">deer</b>, <b className="text-stoat">stoats</b> and <b className="text-fox">foxes</b> alive together from 1 September to the following September. The run ends as soon as any of the five dies out.</>
+            : voles
             ? <>In the Vole meadow, keep <b className="text-rabbit">rabbits</b>, <b className="text-vole">voles</b> and <b className="text-fox">foxes</b> alive together from 1 September to the following September. The run ends as soon as any of the three dies out; Endless continues past the first year on the same rule.</>
             : <>Keep <b className="text-rabbit">rabbits</b> and <b className="text-fox">foxes</b> alive together from 1
           September to the following September. Endless mode continues past the first year, until either species dies out.</>}
         </p>
       </section>
-      <section className={voles ? 'grid grid-cols-3 gap-2' : 'grid grid-cols-2 gap-2'}>
+      <section className={voles ? 'grid grid-cols-2 gap-2 sm:grid-cols-3' : 'grid grid-cols-2 gap-2'}>
         <div className="flex items-center gap-2 rounded-lg border p-2">
           <img src={icons.rabbit} alt="" className="size-8" />
           <span className="text-xs text-muted-foreground">
@@ -38,9 +42,21 @@ export function Guide() {
             <span className="text-xs text-muted-foreground">Voles eat grass seed, and berries when seed runs short. A vole is a small meal for a fox.</span>
           </div>
         )}
+        {wild && (
+          <div className="flex items-center gap-2 rounded-lg border p-2">
+            <img src={icons.deer} alt="" className="size-8" />
+            <span className="text-xs text-muted-foreground">Red deer browse berries in big bites, and grass seed. Nothing here hunts them.</span>
+          </div>
+        )}
+        {wild && (
+          <div className="flex items-center gap-2 rounded-lg border p-2">
+            <img src={icons.stoat} alt="" className="size-8" />
+            <span className="text-xs text-muted-foreground">Stoats hunt voles, even in the tall grass, and young rabbits. Foxes eat stoats.</span>
+          </div>
+        )}
         <div className="flex items-center gap-2 rounded-lg border p-2">
           <img src={icons.fox} alt="" className="size-8" />
-          <span className="text-xs text-muted-foreground">{voles ? 'Foxes hunt rabbits and voles. A full fox stops hunting.' : 'Foxes hunt rabbits. A full fox stops hunting.'}</span>
+          <span className="text-xs text-muted-foreground">{wild ? 'Foxes hunt rabbits, voles and stoats. A full fox stops hunting.' : voles ? 'Foxes hunt rabbits and voles. A full fox stops hunting.' : 'Foxes hunt rabbits. A full fox stops hunting.'}</span>
         </div>
       </section>
       <section>
@@ -51,6 +67,16 @@ export function Guide() {
           turn to rabbits. Two extra interventions, Release voles and Vole illness, share the same four uses. The Open meadow has no voles.
         </p>
         <FoodWeb compact />
+      </section>
+      <section>
+        <h3 className="mb-1 font-semibold">The Wild meadow</h3>
+        <p className="mb-2 text-muted-foreground">
+          The sixth scenario adds stoats and red deer to the Vole meadow. Stoats are small, fast hunters that tall grass does not slow; they see voles
+          hiding in it at close range, and foxes eat stoats, so seed, voles, stoats and foxes form a chain four levels long. Deer are the largest animals
+          here: they eat the berries and seed every plant eater needs, breed slowly, live long, and nothing hunts them, so only Cull deer and Release deer
+          change their numbers. Release stoats, Cull deer and Release deer are offered only here.
+        </p>
+        <FoodWeb compact species={FIVE_SPECIES} />
       </section>
       <section>
         <h3 className="mb-1 font-semibold">How the animals work</h3>
@@ -75,7 +101,7 @@ export function Guide() {
         <h3 className="mb-1 font-semibold">Setup, then run</h3>
         <p className="text-muted-foreground">
           Tune the levers within the budget, then release the animals. During the run you can intervene with rain,
-          release animals, cull foxes, plant bushes, feed foxes or start species-specific illness, each followed by a cooldown. You have four uses shared across all eight options (ten in the Vole meadow); in Endless, one use comes back each season (see Keep a world). Illness spreads between nearby animals of the same species, adds an energy drain for ten days per case, and gives survivors temporary immunity. Purple rings mark illness. It can overshoot and cause extinction. The meadow pauses when a new red field note appears, so you have time to act; the switch beside the field notes turns this off.
+          release animals, cull foxes, plant bushes, feed foxes or start species-specific illness, mow or sow tall grass, put out hay, each followed by a cooldown. You have four uses shared across all eleven options (thirteen in the Vole meadow, sixteen in the Wild meadow); in Endless, one use comes back each season (see Keep a world). Illness spreads between nearby animals of the same species, adds an energy drain for ten days per case, and gives survivors temporary immunity. Purple rings mark illness. It can overshoot and cause extinction. The meadow pauses when a new red field note appears, so you have time to act; the switch beside the field notes turns this off.
         </p>
       </section>
       <section>

@@ -85,7 +85,7 @@ export const JOURNAL_LIMIT = 80
 const GENERATION_STEP = 5
 
 export const TRAIT_LABEL: Record<TraitKey, string> = { forage: 'food seeking', flee: 'threat avoidance', cruise: 'cruising pace', hide: 'cover seeking' }
-const NAME: Record<Species, [string, string]> = { prey: ['Rabbit', 'Rabbits'], pred: ['Fox', 'Foxes'], vole: ['Vole', 'Voles'] }
+const NAME: Record<Species, [string, string]> = { prey: ['Rabbit', 'Rabbits'], pred: ['Fox', 'Foxes'], vole: ['Vole', 'Voles'], stoat: ['Stoat', 'Stoats'], deer: ['Deer', 'Deer'] }
 const day = (tick: number) => Math.floor(tick / 24) + 1
 const f2 = (v: number) => v.toFixed(2)
 

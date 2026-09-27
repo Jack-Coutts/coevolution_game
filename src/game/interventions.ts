@@ -17,12 +17,30 @@ export const VOLE_ACTIONS: { id: Intervention; label: string; blurb: string }[] 
   { id: 'illnessVole', label: 'Vole illness', blurb: 'Start illness in up to six voles. Spreads among nearby voles, draining energy for ten days per case.' },
 ]
 
+/** Habitat actions, offered in every meadow. Tall grass hides rabbits and voles and holds the voles' seed. */
+export const HABITAT_ACTIONS: { id: Intervention; label: string; blurb: string }[] = [
+  { id: 'mow', label: 'Mow tall grass', blurb: 'Cut half the tall-grass patches for 30 days. Rabbits and voles lose their cover, so foxes and stoats catch more; voles lose that seed. For a rabbit or vole boom, not a crash.' },
+  { id: 'sow', label: 'Sow tall grass', blurb: 'Add two tall-grass patches for good. More places to hide from foxes and, in time, more seed for voles. Slow: the new grass starts with no seed.' },
+  { id: 'hay', label: 'Put out hay', blurb: 'Four hay piles, topped up for ten days. Every plant eater can eat them, deer and voles as well as rabbits, so it can feed the animals you meant to hold back.' },
+]
+/** Wild meadow actions, offered only where stoats and deer live. */
+export const WILD_ACTIONS: { id: Intervention; label: string; blurb: string }[] = [
+  { id: 'releaseStoat', label: 'Release stoats', blurb: 'Add four fed stoats in the tall grass, descended from living stoats. They need voles: released into a vole crash they starve, and in a vole boom they help thin it.' },
+  { id: 'cullDeer', label: 'Cull deer', blurb: 'Remove a third of the deer, leaving at least one. Leaves more berries and seed for rabbits and voles; deer breed slowly, so a cull lasts, and too many culls can end the herd.' },
+  { id: 'releaseDeer', label: 'Release deer', blurb: 'Add three fed deer at the edge, descended from living deer. For a herd that is ageing out; every extra deer eats berries rabbits and voles need.' },
+]
+
 /** The actions offered in a meadow: every one whose species lives there, sharing the same budget. */
 export function actionsFor(species: readonly Species[]): { id: Intervention; label: string; blurb: string }[] {
-  return species.includes('vole') ? [...ACTIONS, ...VOLE_ACTIONS] : ACTIONS
+  return [
+    ...ACTIONS,
+    ...(species.includes('vole') ? VOLE_ACTIONS : []),
+    ...HABITAT_ACTIONS,
+    ...(species.includes('stoat') ? WILD_ACTIONS : []),
+  ]
 }
 
-const WORDS = ['zero', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'ten', 'eleven', 'twelve']
+const WORDS = ['zero', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'ten', 'eleven', 'twelve', 'thirteen', 'fourteen', 'fifteen', 'sixteen']
 /** "eight", "ten": how many options, in words. */
 export function optionCount(species: readonly Species[]): string {
   const n = actionsFor(species).length

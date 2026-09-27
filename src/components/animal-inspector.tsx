@@ -145,7 +145,7 @@ function facts(animal: Float32Array, species: Species): [string, string | number
   // Brains start with no extra neurons; mutation can add them. Only worth a row once there are some.
   if (animal[16] > 0) rows.push(['Extra neurons', animal[16], 'Hidden neurons gained by mutation. More of them allow more complex responses.'])
   rows.push(
-    ['Food seeking', animal[17].toFixed(2), `Inherited: -1 to 1, higher means it steers to food more strongly.${species === 'vole' ? ' For a vole, food is grass seed first, then berries.' : ''}`],
+    ['Food seeking', animal[17].toFixed(2), `Inherited: -1 to 1, higher means it steers to food more strongly.${species === 'vole' ? ' For a vole, food is grass seed first, then berries.' : species === 'deer' ? ' For a deer, food is berries first, then grass seed.' : species === 'stoat' ? ' For a stoat, food is voles and young rabbits.' : ''}`],
     ['Threat avoidance', animal[18].toFixed(2), species !== 'pred'
       ? 'Inherited: -1 to 1, higher means it turns away from a nearby fox more strongly.'
       : 'Inherited, -1 to 1. Nothing hunts foxes here, so this tendency is never used and drifts freely.'],

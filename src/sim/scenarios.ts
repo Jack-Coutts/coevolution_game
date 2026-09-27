@@ -1,8 +1,8 @@
 import type { Disturbance } from './sim'
-import { THREE_SPECIES, TWO_SPECIES, type Species } from './species'
+import { FIVE_SPECIES, THREE_SPECIES, TWO_SPECIES, type Species } from './species'
 import { tickAt } from './time'
 
-export type ScenarioId = 'stable' | 'drought' | 'invasion' | 'winter' | 'voles'
+export type ScenarioId = 'stable' | 'drought' | 'invasion' | 'winter' | 'voles' | 'wild'
 
 export interface Scenario {
   id: ScenarioId
@@ -96,8 +96,24 @@ export const VOLE_MEADOW: Scenario = {
   markers: [],
 }
 
-/** Scenarios offered in the picker: the four two-species meadows, then the Vole meadow. */
-export const SCENARIOS: Scenario[] = [...TWO_SPECIES_SCENARIOS, VOLE_MEADOW]
+/**
+ * The Wild meadow (docs/game-design.md, "Extra animals"): the Vole meadow plus stoats, which
+ * hunt voles and are eaten by foxes, and red deer, large browsers with no predator here.
+ */
+export const WILD_MEADOW: Scenario = {
+  id: 'wild',
+  species: FIVE_SPECIES,
+  name: 'Wild meadow',
+  tagline: 'Keep rabbits, voles, stoats, foxes and deer alive for a year.',
+  description:
+    'Stoats hunt voles in the tall grass and foxes hunt stoats. Red deer browse the berries and seed that every plant eater needs, and nothing here hunts them.',
+  disturbance: { regrow: [], metabolism: [], arrivals: [] },
+  spans: [],
+  markers: [],
+}
+
+/** Scenarios offered in the picker: the four two-species meadows, then the Vole meadow and the Wild meadow. */
+export const SCENARIOS: Scenario[] = [...TWO_SPECIES_SCENARIOS, VOLE_MEADOW, WILD_MEADOW]
 export const ALL_SCENARIOS: Scenario[] = SCENARIOS
 
 export const SCENARIO_BY_ID: Record<ScenarioId, Scenario> = Object.fromEntries(

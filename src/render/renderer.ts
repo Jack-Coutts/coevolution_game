@@ -1,5 +1,5 @@
 import { ANIMAL_SIZE, ANIMAL_STRIDE, BUSH_STRIDE, EVENT_KIND, EVENT_STRIDE, type FrameData } from '@/worker/protocol'
-import { foxSheet, GAIT_FRAMES, rabbitSheet, voleSheet, type SpriteSheet } from './sprites'
+import { deerSheet, foxSheet, GAIT_FRAMES, rabbitSheet, stoatSheet, voleSheet, type SpriteSheet } from './sprites'
 import { paintBush, paintEarth, paintTerrain, type BushSprite, type TerrainLayers } from './terrain'
 
 export interface Weather {
@@ -33,6 +33,8 @@ const FX_MS: Record<Fx['kind'], number> = {
 const RABBIT = 0
 const FOX = 1
 const VOLE = 2
+const STOAT = 3
+const DEER = 4
 
 /** Fox births and deaths are rare and matter, so they get longer, always-on markers. */
 function fxDuration(f: Fx): number {
@@ -44,6 +46,11 @@ const RABBIT_LEN = 0.033
 const FOX_LEN = 0.052
 /** Two thirds of a rabbit (docs/third-species.md section 6). */
 const VOLE_LEN = 0.022
+/** Long and thin: about a rabbit's length, drawn slimmer. */
+const STOAT_LEN = 0.034
+/** Clearly the largest animal in the meadow. */
+const DEER_LEN = 0.07
+const HAY_R = 0.018
 const BUSH_R = 0.03
 const MARGIN = 0.025
 
@@ -64,6 +71,8 @@ export class WorldRenderer {
   private rabbits: SpriteSheet | null = null
   private foxes: SpriteSheet | null = null
   private voles: SpriteSheet | null = null
+  private stoats: SpriteSheet | null = null
+  private deer: SpriteSheet | null = null
   private bushSprites = new Map<number, BushSprite>()
   private earth: HTMLCanvasElement | null = null
   private fx: Fx[] = []
@@ -132,7 +141,51 @@ export class WorldRenderer {
     this.rabbits = rabbitSheet(RABBIT_LEN * inner, this.dpr)
     this.foxes = foxSheet(FOX_LEN * inner, this.dpr)
     this.voles = voleSheet(VOLE_LEN * inner, this.dpr)
+    this.stoats = stoatSheet(STOAT_LEN * inner, this.dpr)
+    this.deer = deerSheet(DEER_LEN * inner, this.dpr)
     this.bushSprites.clear()
+  }
+
+  /** Mowing and sowing change the tall grass during a run: repaint the terrain when a frame's patches differ. */
+  private followCover(cover: Float32Array | undefined): void {
+    if (!cover || !this.size) return
+    const same = cover.length === this.cover.length * 2 &&
+      this.cover.every(([x, y], i) => Math.abs(cover[2 * i] - x) < 1e-5 && Math.abs(cover[2 * i + 1] - y) < 1e-5)
+    if (same) return
+    const next: [number, number][] = []
+    for (let i = 0; i < cover.length; i += 2) next.push([cover[i], cover[i + 1]])
+    this.cover = next
+    this.worldKey = `${this.seed}:${next.map(([x, y]) => `${x},${y}`).join(';')}`
+    this.terrain = paintTerrain(this.size * this.dpr, this.seed, next.map(([x, y]) => this.toCanvas(x, y, 1)), this.coverR * (1 - 2 * MARGIN))
+  }
+
+  /** Hay piles: a golden bale that shrinks as it is eaten and fades as it spoils. */
+  private drawHay(hay: Float32Array | undefined): void {
+    if (!hay?.length) return
+    const ctx = this.ctx
+    const inner = this.size * (1 - 2 * MARGIN)
+    for (let i = 0; i < hay.length; i += 5) {
+      const [x, y] = this.toCanvas(hay[i + 1], hay[i + 2], this.size)
+      const r = HAY_R * inner * (0.45 + 0.55 * Math.min(1, hay[i + 3]))
+      ctx.globalAlpha = 0.55 + 0.45 * Math.min(1, hay[i + 4] * 3)
+      ctx.fillStyle = 'rgba(60, 45, 10, 0.3)'
+      ctx.beginPath()
+      ctx.ellipse(x + r * 0.15, y + r * 0.2, r * 1.1, r * 0.9, 0, 0, Math.PI * 2)
+      ctx.fill()
+      ctx.fillStyle = '#d9b44a'
+      ctx.beginPath()
+      ctx.roundRect(x - r, y - r * 0.8, 2 * r, 1.6 * r, r * 0.35)
+      ctx.fill()
+      ctx.strokeStyle = '#a07b22'
+      ctx.lineWidth = 1
+      for (const k of [-0.35, 0.35]) {
+        ctx.beginPath()
+        ctx.moveTo(x + k * r, y - r * 0.8)
+        ctx.lineTo(x + k * r, y + r * 0.8)
+        ctx.stroke()
+      }
+      ctx.globalAlpha = 1
+    }
   }
 
   /** Unit world coords to canvas coords as a fraction (scale=1) or CSS px (scale=size). */
@@ -173,7 +226,8 @@ export class WorldRenderer {
 
   draw(a: FrameData, b: FrameData, alpha: number, weather: Weather, now: number): void {
     const { ctx, dpr } = this
-    if (!this.terrain || !this.rabbits || !this.foxes || !this.voles) return
+    this.followCover(b.cover)
+    if (!this.terrain || !this.rabbits || !this.foxes || !this.voles || !this.stoats || !this.deer) return
     ctx.setTransform(1, 0, 0, 1, 0, 0)
     ctx.drawImage(this.terrain.base, 0, 0)
     if (weather.warm > 0.01) {
@@ -192,9 +246,12 @@ export class WorldRenderer {
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0)
 
     this.drawBushes(b.bushes)
+    this.drawHay(b.hay)
     this.drawFx(now, 'under')
     if (b.voles?.length) this.drawAnimals(a.voles ?? new Float32Array(), b.voles, alpha, this.voles, VOLE_LEN, now, 3.2)
     this.drawAnimals(a.prey, b.prey, alpha, this.rabbits, RABBIT_LEN, now, 2.4)
+    if (b.stoats?.length) this.drawAnimals(a.stoats ?? new Float32Array(), b.stoats, alpha, this.stoats, STOAT_LEN, now, 3)
+    if (b.deer?.length) this.drawAnimals(a.deer ?? new Float32Array(), b.deer, alpha, this.deer, DEER_LEN, now, 1.2)
     this.drawAnimals(a.preds, b.preds, alpha, this.foxes, FOX_LEN, now, 1.8)
     ctx.setTransform(1, 0, 0, 1, 0, 0)
     ctx.drawImage(this.terrain.grass, 0, 0)
@@ -401,7 +458,8 @@ export class WorldRenderer {
         case 'released':
         case 'culled': {
           if (layer !== 'over') break
-          const color = f.kind === 'culled' ? '150, 150, 150' : f.species === FOX ? '255, 140, 60' : f.species === VOLE ? '150, 180, 220' : '250, 245, 225'
+          const color = f.kind === 'culled' ? '150, 150, 150' : f.species === FOX ? '255, 140, 60' : f.species === VOLE ? '150, 180, 220'
+            : f.species === STOAT ? '230, 170, 110' : f.species === DEER ? '200, 120, 70' : '250, 245, 225'
           ctx.strokeStyle = `rgba(${color}, ${0.85 * (1 - t)})`
           ctx.lineWidth = 2
           ctx.beginPath()

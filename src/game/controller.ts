@@ -60,6 +60,9 @@ export interface Snapshot {
   pred: number
   /** 0 outside the Vole meadow. */
   vole: number
+  /** 0 outside the Wild meadow. */
+  stoat: number
+  deer: number
   stock: number
   bushes: number
   preyEnergy: number
@@ -208,6 +211,8 @@ export class GameController {
       prey: h.stat(t, 'prey'),
       pred: h.stat(t, 'pred'),
       vole: h.stat(t, 'vole'),
+      stoat: h.stat(t, 'stoat'),
+      deer: h.stat(t, 'deer'),
       stock: h.stat(t, 'stock'),
       bushes: h.stat(t, 'bushes'),
       preyEnergy: h.stat(t, 'preyEnergy'),

@@ -262,6 +262,136 @@ function drawVole(ctx: CanvasRenderingContext2D, L: number, phase: number): void
   }
 }
 
+/** Stoat, body length L (px). Long, thin, chestnut back and cream flanks, short legs, black-tipped tail. */
+function drawStoat(ctx: CanvasRenderingContext2D, L: number, phase: number): void {
+  const swing = Math.sin(phase * Math.PI * 2)
+  const bend = 0.05 * L * swing
+
+  ctx.fillStyle = 'rgba(20, 30, 10, 0.25)'
+  ellipse(ctx, 0, 0.06 * L, 0.6 * L, 0.16 * L)
+  ctx.fill()
+
+  // tail, chestnut with a black tip
+  ctx.lineCap = 'round'
+  ctx.strokeStyle = '#8a4b22'
+  ctx.lineWidth = Math.max(1, 0.07 * L)
+  ctx.beginPath()
+  ctx.moveTo(-0.4 * L, 0)
+  ctx.quadraticCurveTo(-0.52 * L, -bend, -0.62 * L, bend * 0.6)
+  ctx.stroke()
+  ctx.strokeStyle = '#141010'
+  ctx.lineWidth = Math.max(1.2, 0.09 * L)
+  ctx.beginPath()
+  ctx.moveTo(-0.62 * L, bend * 0.6)
+  ctx.lineTo(-0.72 * L, bend)
+  ctx.stroke()
+
+  // short legs, bounding
+  ctx.fillStyle = '#6e3a18'
+  for (const [x, s, w] of [[0.2, -1, swing], [0.2, 1, -swing], [-0.24, -1, -swing], [-0.24, 1, swing]] as const) {
+    ellipse(ctx, x * L + 0.05 * L * w, s * 0.13 * L, 0.05 * L, 0.03 * L)
+    ctx.fill()
+  }
+
+  // long body: cream underside showing at the edges, chestnut back on top
+  ctx.fillStyle = '#efe2c4'
+  ellipse(ctx, -0.02 * L, 0, 0.44 * L, 0.13 * L, 0.04 * swing)
+  ctx.fill()
+  ctx.fillStyle = '#9a5424'
+  ellipse(ctx, -0.04 * L, 0, 0.42 * L, 0.09 * L, 0.04 * swing)
+  ctx.fill()
+
+  // head, a little wider than the neck, with a cream chin
+  ctx.fillStyle = '#efe2c4'
+  ellipse(ctx, 0.43 * L, 0, 0.11 * L, 0.1 * L)
+  ctx.fill()
+  ctx.fillStyle = '#9a5424'
+  ellipse(ctx, 0.42 * L, 0, 0.1 * L, 0.075 * L)
+  ctx.fill()
+  // small round ears
+  ctx.fillStyle = '#7a4019'
+  for (const s of [-1, 1]) {
+    ellipse(ctx, 0.37 * L, s * 0.085 * L, 0.035 * L, 0.03 * L)
+    ctx.fill()
+  }
+  ctx.fillStyle = '#1a1210'
+  ellipse(ctx, 0.535 * L, 0, 0.02 * L, 0.022 * L)
+  ctx.fill()
+  for (const s of [-1, 1]) {
+    ellipse(ctx, 0.46 * L, s * 0.045 * L, 0.018 * L, 0.014 * L)
+    ctx.fill()
+  }
+}
+
+/** Red deer, body length L (px). Broad russet body, pale rump patch, long neck and head, branched antlers. */
+function drawDeer(ctx: CanvasRenderingContext2D, L: number, phase: number): void {
+  const swing = Math.sin(phase * Math.PI * 2)
+
+  ctx.fillStyle = 'rgba(20, 30, 10, 0.28)'
+  ellipse(ctx, 0.02 * L, 0.07 * L, 0.52 * L, 0.26 * L)
+  ctx.fill()
+
+  // legs, walking
+  ctx.fillStyle = '#4a2e1c'
+  for (const [x, s, w] of [[0.22, -1, swing], [0.22, 1, -swing], [-0.26, -1, -swing], [-0.26, 1, swing]] as const) {
+    ellipse(ctx, x * L + 0.06 * L * w, s * 0.2 * L, 0.05 * L, 0.035 * L)
+    ctx.fill()
+  }
+
+  // body
+  const body = ctx.createRadialGradient(0, -0.05 * L, 0.03 * L, 0, 0, 0.42 * L)
+  body.addColorStop(0, '#b0683a')
+  body.addColorStop(0.7, '#8e4f2a')
+  body.addColorStop(1, '#6d3a1e')
+  ctx.fillStyle = body
+  ellipse(ctx, -0.04 * L, 0, 0.38 * L, 0.2 * L)
+  ctx.fill()
+  // pale rump patch and short tail
+  ctx.fillStyle = '#e8d6b4'
+  ellipse(ctx, -0.36 * L, 0, 0.07 * L, 0.11 * L)
+  ctx.fill()
+  ctx.fillStyle = '#5a3420'
+  ellipse(ctx, -0.42 * L, 0, 0.03 * L, 0.03 * L)
+  ctx.fill()
+
+  // neck and long head
+  ctx.fillStyle = '#8a4c28'
+  ellipse(ctx, 0.3 * L, 0, 0.12 * L, 0.09 * L)
+  ctx.fill()
+  ctx.fillStyle = '#9c5a31'
+  ellipse(ctx, 0.44 * L, 0, 0.12 * L, 0.075 * L)
+  ctx.fill()
+  ctx.fillStyle = '#2a1a12'
+  ellipse(ctx, 0.56 * L, 0, 0.03 * L, 0.035 * L)
+  ctx.fill()
+
+  // antlers: two branched beams sweeping back
+  ctx.strokeStyle = '#d9c7a0'
+  ctx.lineCap = 'round'
+  ctx.lineWidth = Math.max(1, 0.03 * L)
+  for (const s of [-1, 1]) {
+    ctx.beginPath()
+    ctx.moveTo(0.38 * L, s * 0.05 * L)
+    ctx.quadraticCurveTo(0.34 * L, s * 0.2 * L, 0.24 * L, s * 0.26 * L)
+    ctx.moveTo(0.35 * L, s * 0.14 * L)
+    ctx.lineTo(0.43 * L, s * 0.2 * L)
+    ctx.moveTo(0.29 * L, s * 0.22 * L)
+    ctx.lineTo(0.33 * L, s * 0.3 * L)
+    ctx.stroke()
+  }
+  // ears
+  ctx.fillStyle = '#7a4222'
+  for (const s of [-1, 1]) {
+    ellipse(ctx, 0.37 * L, s * 0.085 * L, 0.05 * L, 0.025 * L, s * 0.6)
+    ctx.fill()
+  }
+  ctx.fillStyle = '#140d09'
+  for (const s of [-1, 1]) {
+    ellipse(ctx, 0.46 * L, s * 0.055 * L, 0.018 * L, 0.013 * L)
+    ctx.fill()
+  }
+}
+
 function sheet(draw: typeof drawRabbit, length: number, dpr: number): SpriteSheet {
   const size = length * 1.8
   const frames: HTMLCanvasElement[] = []
@@ -287,8 +417,16 @@ export function voleSheet(length: number, dpr: number): SpriteSheet {
   return sheet(drawVole, length, dpr)
 }
 
+export function stoatSheet(length: number, dpr: number): SpriteSheet {
+  return sheet(drawStoat, length, dpr)
+}
+
+export function deerSheet(length: number, dpr: number): SpriteSheet {
+  return sheet(drawDeer, length, dpr)
+}
+
 /** Standalone icons for the UI (HUD, legend). */
-export function animalIcon(kind: 'prey' | 'pred' | 'vole', px: number): string {
+export function animalIcon(kind: 'prey' | 'pred' | 'vole' | 'stoat' | 'deer', px: number): string {
   const [c, ctx] = makeCanvas(px * 2)
   ctx.scale(2, 2)
   ctx.translate(px / 2, px / 2)
@@ -299,6 +437,11 @@ export function animalIcon(kind: 'prey' | 'pred' | 'vole', px: number): string {
   } else if (kind === 'vole') {
     ctx.translate(px * 0.06, 0)
     drawVole(ctx, px * 0.72, 0.1)
+  } else if (kind === 'stoat') {
+    ctx.translate(px * 0.04, 0)
+    drawStoat(ctx, px * 0.66, 0.1)
+  } else if (kind === 'deer') {
+    drawDeer(ctx, px * 0.78, 0.1)
   } else {
     ctx.translate(px * 0.14, 0)
     drawFox(ctx, px * 0.78, 0.1)

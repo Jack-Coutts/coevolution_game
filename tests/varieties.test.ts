@@ -31,7 +31,7 @@ function frame(tick: number, groups: Group[], rng: Rng, gen: number, n = 120): F
 
 const flat = { mean: 0, low: 0, high: 0 }
 const pop = (count: number) => ({ count, generation: 1, lineages: 1, neurons: 0, traits: { forage: flat, flee: flat, cruise: flat, hide: flat } })
-const sample = (tick: number): EvolutionSample => ({ tick, prey: pop(120), pred: pop(0), vole: pop(0) })
+const sample = (tick: number): EvolutionSample => ({ tick, prey: pop(120), pred: pop(0), vole: pop(0), stoat: pop(0), deer: pop(0) })
 
 /** Feed one daily sample per entry of `days` (the populations of that day), with the mean generation rising `genPerDay`. */
 function run(days: Group[][], h = new RunHistory(8760, true), from = 0, genPerDay = 0.25, seed = 1): RunHistory {

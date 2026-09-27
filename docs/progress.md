@@ -46,6 +46,10 @@ Last updated: 25 September 2026, 17:35 UTC.
 - [x] #13 Test whether memory and growing brains help: no variant beat the linear controller with an interval excluding zero, and none made rabbits visibly flee; they stay assay-only. [#26](https://github.com/Jack-Coutts/coevolution_game/pull/26)
 - [x] #14 Growing brains in long-running worlds: deferred with the #13 evidence; it reopens only when a variant shows a visible gain whose interval excludes zero. [#26](https://github.com/Jack-Coutts/coevolution_game/pull/26)
 
+### Extra animals and interventions
+
+- [x] Wild meadow with stoats and red deer ([#30](https://github.com/Jack-Coutts/coevolution_game/pull/30)); habitat actions (mow, sow, hay) in every meadow and stoat and deer actions in the Wild meadow. Untouched all-five survival is 2/20 on fresh seeds, below the 20 to 50% guide (`docs/validation.md`).
+
 ## Known limits
 
 - The #3 playtests were played by agents that saw only the screen, not by human players. `docs/playtest.md` describes what this biases.
