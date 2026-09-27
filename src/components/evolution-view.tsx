@@ -34,7 +34,7 @@ export function EvolutionView({ selected, onSelect }: { selected: AnimalSelectio
   const series = useMemo(() => traitSeries(evolution.slice(0, last + 1)), [evolution, evolution.length, last, lastTick])
   const latest = series.plotted.at(-1)
   const SPECIES = speciesRows(game.scenario.species)
-  const now: Record<Species, number> = { prey: snap.prey, pred: snap.pred, vole: snap.vole }
+  const now: Record<Species, number> = { prey: snap.prey, pred: snap.pred, vole: snap.vole, stoat: snap.stoat, deer: snap.deer }
   const [family, setFamily] = useState<AnimalSelection | null>(null)
   const inspector = useRef<HTMLElement>(null)
   const inspect = (a: AnimalSelection) => {

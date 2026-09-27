@@ -71,7 +71,7 @@ describe('vole field notes', () => {
 })
 
 describe('vole explanations', () => {
-  const end = (e: Partial<EndInfo>): EndInfo => ({ tick: 500, survived: false, preyEnd: 50, predEnd: 10, voleEnd: 0, species: ['prey', 'pred', 'vole'], ...e })
+  const end = (e: Partial<EndInfo>): EndInfo => ({ tick: 500, survived: false, preyEnd: 50, predEnd: 10, voleEnd: 0, stoatEnd: 0, deerEnd: 0, species: ['prey', 'pred', 'vole'], ...e })
 
   it('voles that starved when the grass seed ran out', () => {
     const h = history(500, t => ({ prey: 50, pred: 10, vole: 0, seed: 0.05, voleStarved: t, voleEaten: t / 10 }))
@@ -132,8 +132,8 @@ describe('vole actions, levers and names', () => {
   it('journals a vole extinction by name', () => {
     const h = new RunHistory(8760, false, THREE_SPECIES)
     const pop = (count: number) => ({ count, generation: 2, lineages: 1, neurons: 0, traits: { forage: { mean: 0, low: 0, high: 0 }, flee: { mean: 0, low: 0, high: 0 }, cruise: { mean: 0, low: 0, high: 0 }, hide: { mean: 0, low: 0, high: 0 } } })
-    h.addEvolution({ tick: 24, prey: pop(10), pred: pop(3), vole: pop(5) })
-    h.addEvolution({ tick: 48, prey: pop(10), pred: pop(3), vole: pop(0) })
+    h.addEvolution({ tick: 24, prey: pop(10), pred: pop(3), vole: pop(5), stoat: pop(0), deer: pop(0) })
+    h.addEvolution({ tick: 48, prey: pop(10), pred: pop(3), vole: pop(0), stoat: pop(0), deer: pop(0) })
     expect(h.journal.map(e => e.text)).toContain('Voles died out. The last ones were generation 2.')
   })
 })
@@ -143,8 +143,8 @@ describe('journal and families in the Vole meadow', () => {
 
   it('notes a full year for all three species and a vole generation milestone', () => {
     const log = new Journal(false, THREE_SPECIES)
-    const a = { tick: 8736, prey: pop(50), pred: pop(8), vole: pop(70, 4) }
-    const b = { tick: 8760, prey: pop(50), pred: pop(8), vole: pop(70, 5) }
+    const a = { tick: 8736, prey: pop(50), pred: pop(8), vole: pop(70, 4), stoat: pop(0), deer: pop(0) }
+    const b = { tick: 8760, prey: pop(50), pred: pop(8), vole: pop(70, 5), stoat: pop(0), deer: pop(0) }
     log.observe([a], undefined)
     log.observe([a, b], undefined)
     const texts = log.entries.map(e => e.text)

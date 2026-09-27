@@ -1,5 +1,5 @@
 import { inheritedTraits } from '@/sim/evolution'
-import type { Sim } from '@/sim/sim'
+import { EFFECTS, type Sim } from '@/sim/sim'
 import type { Species } from '@/sim/species'
 import {
   ANIMAL_STRIDE,
@@ -55,8 +55,9 @@ function packAnimals(s: Sim, species: Species): Float32Array {
 const SPROUT_HOURS = 48
 
 function packBushes(s: Sim): Float32Array {
-  const out = new Float32Array(s.bushes.length * BUSH_STRIDE)
-  s.bushes.forEach((b, i) => {
+  const bushes = s.bushes.filter(b => b.hay === undefined)
+  const out = new Float32Array(bushes.length * BUSH_STRIDE)
+  bushes.forEach((b, i) => {
     const o = i * BUSH_STRIDE
     out[o] = b.id
     out[o + 1] = b.x
@@ -68,7 +69,19 @@ function packBushes(s: Sim): Float32Array {
   return out
 }
 
+/** Hay piles: id, x, y, fullness, share of their time left. */
+function packHay(s: Sim): Float32Array | undefined {
+  const hay = s.bushes.filter(b => b.hay !== undefined)
+  if (!hay.length) return undefined
+  const out = new Float32Array(hay.length * 5)
+  hay.forEach((b, i) => {
+    out.set([b.id, b.x, b.y, b.stock / s.p.patchStock, Math.max(0, (b.hay! - s.tick) / EFFECTS.hay.hours)], i * 5)
+  })
+  return out
+}
+
 export function frame(s: Sim): FrameData {
+  const hay = packHay(s)
   const events = new Float32Array(s.events.length * EVENT_STRIDE)
   s.events.forEach((e, i) => {
     const o = i * EVENT_STRIDE
@@ -82,7 +95,11 @@ export function frame(s: Sim): FrameData {
     prey: packAnimals(s, 'prey'),
     preds: packAnimals(s, 'pred'),
     voles: packAnimals(s, 'vole'),
+    ...(s.species.includes('stoat') && { stoats: packAnimals(s, 'stoat') }),
+    ...(s.species.includes('deer') && { deer: packAnimals(s, 'deer') }),
     bushes: packBushes(s),
+    ...(hay && { hay }),
+    cover: Float32Array.from(s.cover.flat()),
     events,
   }
 }
@@ -93,8 +110,11 @@ export function writeStats(s: Sim, out: Float64Array, row: number): void {
     arr.length ? arr.reduce((t, a) => t + a[key], 0) / arr.length / max : 0
   out[o + STAT.prey] = s.prey.length
   out[o + STAT.pred] = s.preds.length
-  out[o + STAT.stock] = s.bushes.reduce((t, b) => t + b.stock, 0) / (s.p.patchStock * Math.max(1, s.bushes.length))
-  out[o + STAT.bushes] = s.bushes.length
+  const bushes = s.bushes.filter(b => b.hay === undefined)
+  out[o + STAT.stock] = bushes.reduce((t, b) => t + b.stock, 0) / (s.p.patchStock * Math.max(1, bushes.length))
+  out[o + STAT.bushes] = bushes.length
+  out[o + STAT.hay] = s.bushes.length - bushes.length
+  out[o + STAT.cover] = s.cover.length
   out[o + STAT.preyEnergy] = mean(s.prey, 'energy', s.p.prey.maxEnergy)
   out[o + STAT.predEnergy] = mean(s.preds, 'energy', s.p.pred.maxEnergy)
   out[o + STAT.preyPace] = mean(s.prey, 'pace', 1)
@@ -131,11 +151,26 @@ export function writeStats(s: Sim, out: Float64Array, row: number): void {
   out[o + STAT.voleOld] = v.old
   out[o + STAT.voleIllness] = v.illness
   out[o + STAT.voleSick] = s.voles.filter(a => a.illUntil > s.tick).length
+  const st = s.tally.stoat
+  out[o + STAT.stoat] = s.pops.stoat.length
+  out[o + STAT.stoatEnergy] = mean(s.pops.stoat, 'energy', s.defs.stoat.body.maxEnergy)
+  out[o + STAT.stoatBorn] = st.born
+  out[o + STAT.stoatStarved] = st.starved
+  out[o + STAT.stoatEaten] = st.eaten
+  out[o + STAT.stoatOld] = st.old
+  const dt = s.tally.deer
+  out[o + STAT.deer] = s.pops.deer.length
+  out[o + STAT.deerEnergy] = mean(s.pops.deer, 'energy', s.defs.deer.body.maxEnergy)
+  out[o + STAT.deerBorn] = dt.born
+  out[o + STAT.deerStarved] = dt.starved
+  out[o + STAT.deerOld] = dt.old
+  out[o + STAT.deerCulled] = dt.culled
   out[o + STAT.seed] = s.p.vole && s.grassSeed.length
     ? s.grassSeed.reduce((t, n) => t + n, 0) / (s.p.vole.seedStock * s.grassSeed.length) : 0
 }
 
 export function endInfo(s: Sim): EndInfo | null {
   if (!s.ended) return null
-  return { tick: s.tick, survived: s.survived, preyEnd: s.prey.length, predEnd: s.preds.length, voleEnd: s.voles.length, species: s.species }
+  return { tick: s.tick, survived: s.survived, preyEnd: s.prey.length, predEnd: s.preds.length, voleEnd: s.voles.length,
+    stoatEnd: s.pops.stoat.length, deerEnd: s.pops.deer.length, species: s.species }
 }

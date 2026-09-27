@@ -154,6 +154,10 @@ export interface StoatParams {
   mealValue: number
   /** A stoat sees voles hidden in tall grass within this distance (a fox: `eco.coverSight`). */
   coverSight: number
+  /** Stoats also catch young rabbits (below the rabbits' first-birth age). */
+  kits: boolean
+  /** A fox must come this much closer to catch a stoat than to catch a rabbit (agility; 1 = no harder). */
+  dodge: number
 }
 
 export function defaultStoat(): StoatParams {
@@ -179,6 +183,8 @@ export function defaultStoat(): StoatParams {
     ceiling: 300,
     mealValue: 0.5,
     coverSight: 0.08,
+    kits: true,
+    dodge: 0.5,
   }
 }
 

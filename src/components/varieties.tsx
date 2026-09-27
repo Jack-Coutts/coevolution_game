@@ -7,7 +7,7 @@ import { cn } from '@/lib/utils'
 
 const day = (tick: number) => Math.floor(tick / 24) + 1
 const pct = (v: number) => `${Math.round(v * 100)}%`
-const NAME: Record<Species, [string, string]> = { prey: ['Rabbit', 'Rabbits'], pred: ['Fox', 'Foxes'], vole: ['Vole', 'Voles'] }
+const NAME: Record<Species, [string, string]> = { prey: ['Rabbit', 'Rabbits'], pred: ['Fox', 'Foxes'], vole: ['Vole', 'Voles'], stoat: ['Stoat', 'Stoats'], deer: ['Deer', 'Deer'] }
 
 /** Observed ecological varieties per species at the displayed day: shares, trait centroids and the evidence for them. */
 export function VarietiesCard() {

@@ -297,6 +297,8 @@ export default function App() {
                   <Legend color="bg-rabbit" label="Rabbits (left scale)" />
                   {sc.species.includes('vole') && <Legend color="bg-vole" label="Voles (left scale)" />}
                   <Legend color="bg-fox" label="Foxes (right scale)" />
+                  {sc.species.includes('deer') && <Legend color="bg-deer" label="Deer (right scale)" />}
+                  {sc.species.includes('stoat') && <Legend color="bg-stoat" label="Stoats (right scale)" />}
                   <Legend color="bg-berry/40" label="Berries on bushes" />
                   <span className="flex items-center gap-1.5">
                     <span className="inline-block w-4 border-t border-dashed border-rabbit" /> Forecast
@@ -314,7 +316,7 @@ export default function App() {
                   ) : (
                     <div className="flex flex-col gap-4">
                       <BestScore />
-                      {sc.species.includes('vole') && <FoodWeb />}
+                      {sc.species.includes('vole') && <FoodWeb species={sc.species} />}
                       {inspector}
                       <LeverPanel
                         endless={endless}

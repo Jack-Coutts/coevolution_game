@@ -65,6 +65,8 @@ export interface SpeciesDef {
   coverSight: number
   /** A plant eater bites a bush within this distance. */
   feedR: number
+  /** Hunters catch this animal within this share of their usual reach (1 for all but the agile stoat). */
+  dodge: number
   body: SpeciesParams
   ceiling: number
 }
@@ -95,6 +97,7 @@ export function speciesDefs(p: SimParams): Record<Species, SpeciesDef> {
     coverSlows: FOOD_WEB[key].coverSlows,
     coverSight,
     feedR,
+    dodge: 1,
     body,
     ceiling,
   })
@@ -105,7 +108,8 @@ export function speciesDefs(p: SimParams): Record<Species, SpeciesDef> {
       { food: 'seed', bite: vole.bite, value: 1 },
       { food: 'berries', bite: vole.bite, value: vole.berryValue },
     ], vole.mealValue),
-    stoat: def('stoat', stoat.body, stoat.ceiling, [], stoat.mealValue, stoat.coverSight),
+    stoat: { ...def('stoat', stoat.body, stoat.ceiling, [], stoat.mealValue, stoat.coverSight), dodge: stoat.dodge,
+      ...(!stoat.kits && { eats: FOOD_WEB.stoat.eats.filter((s) => present.includes(s) && s !== 'prey'), young: [] }) },
     deer: def('deer', deer.body, deer.ceiling, [
       { food: 'berries', bite: deer.bite, value: 1 },
       { food: 'seed', bite: deer.seedBite, value: deer.seedValue },

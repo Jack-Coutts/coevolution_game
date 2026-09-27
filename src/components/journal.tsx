@@ -13,7 +13,7 @@ import { displayOrder, framePop, SPECIES_UI } from '@/game/species-ui'
 const link = 'font-medium text-primary underline-offset-2 hover:underline'
 const day = (tick: number) => Math.floor(tick / 24) + 1
 const f2 = (v: number) => v.toFixed(2)
-const NAME: Record<Species, [string, string]> = { prey: ['Rabbit', 'rabbits'], pred: ['Fox', 'foxes'], vole: ['Vole', 'voles'] }
+const NAME: Record<Species, [string, string]> = { prey: ['Rabbit', 'rabbits'], pred: ['Fox', 'foxes'], vole: ['Vole', 'voles'], stoat: ['Stoat', 'stoats'], deer: ['Deer', 'deer'] }
 const TAG: Record<JournalCategory, [string, string]> = {
   family: ['Family', 'Who is descended from whom: counted, not explained.'],
   inherited: ['Measured change', 'A change in inherited tendencies, measured the same way every day. It is not evidence of an advantage.'],

@@ -4,7 +4,7 @@ import { migrateState, type Intervention, type MeadowState, type MeadowStateV2 }
 import type { EvolutionSample, PopulationEvolution } from '@/sim/evolution'
 import { CHARTED_TRAITS } from '@/sim/evolution'
 import { ALL_SPECIES } from '@/sim/species'
-import { ANIMAL_SIZE, ANIMAL_STRIDE, ANIMAL_STRIDE_V3, STAT_STRIDE, STAT_STRIDE_V2, type FrameData } from '@/worker/protocol'
+import { ANIMAL_SIZE, ANIMAL_STRIDE, ANIMAL_STRIDE_V3, STAT_STRIDE, STAT_STRIDE_V2, STAT_STRIDE_V3, type FrameData } from '@/worker/protocol'
 import type { JournalEntry } from './journal'
 
 export const SAVE_VERSION = 3
@@ -32,7 +32,7 @@ export interface MeadowSaveV2 extends Omit<MeadowSave, 'version' | 'state' | 'hi
   state: MeadowStateV2
   history: Omit<ReturnType<RunHistory['save']>, 'highestGeneration' | 'replayFrom' | 'journal' | 'families' | 'varieties' | 'animalStride'> & { highestGeneration?: { prey: number; pred: number }; replayFrom?: number }
     & Partial<Pick<ReturnType<RunHistory['save']>, 'journal' | 'families'>>
-  evolution?: Omit<EvolutionSample, 'vole'>[]
+  evolution?: Omit<EvolutionSample, 'vole' | 'stoat' | 'deer'>[]
 }
 
 const ROWS = HISTORY_HOURS + 1
@@ -50,22 +50,35 @@ function noAnimals(): PopulationEvolution {
 export function migrateSave(value: MeadowSave | MeadowSaveV2): MeadowSave {
   try {
     if (value.version === 3 && value.state.version === 3 && value.history.stats.length === ROWS * STAT_STRIDE) return withBodySize(value)
+    // Version 3 before the Wild meadow: 32 stats columns and no stoat or deer entries.
+    if (value.version === 3 && value.state.version === 3 && value.history.stats.length === ROWS * STAT_STRIDE_V3)
+      return withBodySize({
+        ...value,
+        state: migrateState(value.state),
+        history: { ...value.history, stats: widen(value.history.stats, STAT_STRIDE_V3) },
+        evolution: value.evolution?.map(e => ({ ...e, stoat: e.stoat ?? noAnimals(), deer: e.deer ?? noAnimals() })),
+      })
     if (value.version !== 2 || value.state.version !== 2 || value.history.stats.length !== ROWS * STAT_STRIDE_V2)
       throw new Error(INCOMPATIBLE_SAVE)
     const state = migrateState(value.state)
-    const stats = new Float64Array(ROWS * STAT_STRIDE)
-    for (let r = 0; r < ROWS; r++)
-      stats.set(value.history.stats.subarray(r * STAT_STRIDE_V2, (r + 1) * STAT_STRIDE_V2), r * STAT_STRIDE)
+    const stats = widen(value.history.stats, STAT_STRIDE_V2)
     return withBodySize({
       ...value,
       version: 3,
       state,
-      history: { ...value.history, journal: value.history.journal, families: value.history.families, varieties: undefined, replayFrom: value.history.replayFrom ?? value.history.start, stats, highestGeneration: { prey: 0, pred: 0, ...value.history.highestGeneration, vole: 0 }, animalStride: ANIMAL_STRIDE_V3 },
-      evolution: (value.evolution ?? []).map(e => ({ ...e, vole: noAnimals() })),
+      history: { ...value.history, journal: value.history.journal, families: value.history.families, varieties: undefined, replayFrom: value.history.replayFrom ?? value.history.start, stats, highestGeneration: { prey: 0, pred: 0, ...value.history.highestGeneration, vole: 0, stoat: 0, deer: 0 }, animalStride: ANIMAL_STRIDE_V3 },
+      evolution: (value.evolution ?? []).map(e => ({ ...e, vole: noAnimals(), stoat: noAnimals(), deer: noAnimals() })),
     })
   } catch {
     throw new Error(INCOMPATIBLE_SAVE)
   }
+}
+
+/** Stats rows of an older width, widened with zero columns for the species it did not have. */
+function widen(old: Float64Array, stride: number): Float64Array<ArrayBuffer> {
+  const stats = new Float64Array(ROWS * STAT_STRIDE)
+  for (let r = 0; r < ROWS; r++) stats.set(old.subarray(r * stride, (r + 1) * stride), r * STAT_STRIDE)
+  return stats
 }
 
 /** Widen 22-float animals to the current stride with body size 1. */

@@ -12,7 +12,7 @@ const PAD_R = 30
 const PAD_T = 14
 const PAD_B = 20
 
-const TOKENS = ['rabbit', 'fox', 'vole', 'berry', 'gold', 'primary', 'border', 'card', 'muted', 'muted-foreground', 'background', 'tone-info-foreground', 'tone-warn-foreground'] as const
+const TOKENS = ['rabbit', 'fox', 'vole', 'stoat', 'deer', 'berry', 'gold', 'primary', 'border', 'card', 'muted', 'muted-foreground', 'background', 'tone-info-foreground', 'tone-warn-foreground'] as const
 type Palette = Record<(typeof TOKENS)[number], string>
 
 function readPalette(): Palette {
@@ -64,11 +64,14 @@ export function Timeline() {
       const xOf = (t: number) => PAD_L + ((t - start) / (horizon - start)) * iw
       // Voles share the left scale with rabbits: both are plant eaters counted in the hundreds.
       const voles = h.species.includes('vole')
+      // Stoats and deer share the right scale with foxes: all three are counted in tens.
+      const stoats = h.species.includes('stoat')
+      const deer = h.species.includes('deer')
       let preyMax = 10
       let predMax = 4
       for (let t = start; t <= h.head; t += 12) {
         preyMax = Math.max(preyMax, h.stat(t, 'prey'), voles ? h.stat(t, 'vole') : 0)
-        predMax = Math.max(predMax, h.stat(t, 'pred'))
+        predMax = Math.max(predMax, h.stat(t, 'pred'), stoats ? h.stat(t, 'stoat') : 0, deer ? h.stat(t, 'deer') : 0)
       }
       preyMax = Math.ceil(preyMax * 1.15)
       predMax = Math.ceil(predMax * 1.15)
@@ -139,6 +142,8 @@ export function Timeline() {
           ctx.stroke()
         }
         if (voles) line('vole', yPrey, c.vole, 1.5)
+        if (deer) line('deer', yPred, c.deer, 1.5)
+        if (stoats) line('stoat', yPred, c.stoat, 1.5)
         line('prey', yPrey, c.rabbit, 1.8)
         line('pred', yPred, c.fox, 1.8)
 
@@ -162,6 +167,14 @@ export function Timeline() {
             ctx.beginPath()
             ctx.moveTo(xOf(head), yPrey(h.stat(head, 'vole')))
             ctx.lineTo(xOf(head + f.ahead), yPrey(Math.min(preyMax, f.vole)))
+            ctx.stroke()
+          }
+          for (const [on, key, color] of [[stoats, 'stoat', c.stoat], [deer, 'deer', c.deer]] as const) {
+            if (!on) continue
+            ctx.strokeStyle = color
+            ctx.beginPath()
+            ctx.moveTo(xOf(head), yPred(h.stat(head, key)))
+            ctx.lineTo(xOf(head + f.ahead), yPred(Math.min(predMax, f[key])))
             ctx.stroke()
           }
           ctx.setLineDash([])
@@ -235,7 +248,7 @@ export function Timeline() {
       ctx.textAlign = 'right'
       ctx.fillText(String(preyMax), PAD_L - 5, PAD_T + 8)
       ctx.fillText('0', PAD_L - 5, PAD_T + ih)
-      ctx.fillStyle = c.fox
+      ctx.fillStyle = stoats || deer ? c['muted-foreground'] : c.fox
       ctx.textAlign = 'left'
       ctx.fillText(String(predMax), W - PAD_R + 5, PAD_T + 8)
       ctx.fillText('0', W - PAD_R + 5, PAD_T + ih)
@@ -298,6 +311,8 @@ export function Timeline() {
           <span className="font-medium">{dateLabel(ht)}</span>
           <span className="ml-2 text-rabbit">{game.history.stat(ht, 'prey')} rabbits</span>
           {game.history.species.includes('vole') && <span className="ml-2 text-vole">{game.history.stat(ht, 'vole')} voles</span>}
+          {game.history.species.includes('deer') && <span className="ml-2 text-deer">{game.history.stat(ht, 'deer')} deer</span>}
+          {game.history.species.includes('stoat') && <span className="ml-2 text-stoat">{game.history.stat(ht, 'stoat')} stoats</span>}
           <span className="ml-2 text-fox">{game.history.stat(ht, 'pred')} foxes</span>
           <span className="ml-2 text-berry">{Math.round(game.history.stat(ht, 'stock') * 100)}% berries</span>
         </div>

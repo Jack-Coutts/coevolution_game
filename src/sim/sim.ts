@@ -871,6 +871,7 @@ export class Sim {
         // A small victim is a small meal: its worth is a share of the hunter's meal energy, times the victim's size.
         const worth = def.body.mealEnergy * this.defs[victim].mealValue
         const adult = def.young.includes(victim) ? this.defs[victim].body.adultAge : Infinity
+        const dodge = this.defs[victim].dodge
         const survivors: Creature[] = []
         for (const a of this.pops[victim]) {
           if (a.age >= adult) {
@@ -879,10 +880,10 @@ export class Sim {
           }
           let best = Infinity
           let hunter: Creature | null = null
-          this.grids[s].each(a.x, a.y, eatR * ((biggest + a.size) / 2), (q) => {
+          this.grids[s].each(a.x, a.y, eatR * ((biggest + a.size) / 2) * dodge, (q) => {
             if (q.energy > q.maxEnergy - halfMeal) return
             const d2 = (q.x - a.x) ** 2 + (q.y - a.y) ** 2
-            const reach = eatR * ((q.size + a.size) / 2)
+            const reach = eatR * ((q.size + a.size) / 2) * dodge
             if (d2 <= reach * reach && d2 <= best) {
               best = d2
               hunter = q
