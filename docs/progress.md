@@ -48,7 +48,7 @@ Last updated: 25 September 2026, 17:35 UTC.
 
 ### Extra animals and interventions
 
-- [ ] Wild meadow with stoats and red deer; habitat actions (mow, sow, hay) in every meadow and stoat and deer actions in the Wild meadow. Untouched all-five survival is 2/20 on fresh seeds, below the 20 to 50% guide (`docs/validation.md`).
+- [x] Wild meadow with stoats and red deer ([#30](https://github.com/Jack-Coutts/coevolution_game/pull/30)); habitat actions (mow, sow, hay) in every meadow and stoat and deer actions in the Wild meadow. Untouched all-five survival is 2/20 on fresh seeds, below the 20 to 50% guide (`docs/validation.md`).
 
 ## Known limits
 
